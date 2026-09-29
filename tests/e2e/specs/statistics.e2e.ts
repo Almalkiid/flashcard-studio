@@ -274,6 +274,8 @@ describe("statistics and insight", function () {
         // The card based charts still describe the deck
         expect(await stat("total-cards")).toEqual("5");
         expect(await canvasCount()).toBeGreaterThan(0);
+        await browser.pause(500);
+        await screenshot("statistics-empty");
     });
 
     it("shows today's numbers, a lit heatmap cell and the charts after answering cards", async function () {
@@ -294,14 +296,19 @@ describe("statistics and insight", function () {
         expect(await stat("streak")).toEqual("1");
         expect(await stat("days-studied")).toEqual("1");
 
-        const cell = browser.$(
-            `.sr-stats-view .sr-stats-heat-cell[data-day="${await todayKey()}"]`,
-        );
+        const today = await todayKey();
+        const cell = browser.$(`.sr-stats-view .sr-stats-heat-cell[data-day="${today}"]`);
         await cell.waitForExist({ timeoutMsg: "today has no cell in the heatmap" });
         expect(await cell.getAttribute("data-count")).toEqual("3");
         expect(Number(await cell.getAttribute("data-level"))).toBeGreaterThan(0);
 
-        // Tapping a day shows what happened on it
+        // Tapping a day shows what happened on it. Centre it first, clear of the status bar; WebdriverIO's own
+        // scrollIntoView leaves an element alone when it is inside the window, even under the status bar.
+        await browser.execute((day: string) => {
+            document
+                .querySelector(`.sr-stats-view .sr-stats-heat-cell[data-day="${day}"]`)
+                ?.scrollIntoView({ block: "center", inline: "center" });
+        }, today);
         await cell.click();
         const tooltip = browser.$(".sr-stats-view .sr-stats-tooltip.is-visible");
         await tooltip.waitForExist({ timeoutMsg: "tapping a day did not show its tooltip" });
@@ -516,7 +523,9 @@ describe("statistics and insight", function () {
         await createFiles([...notes, ...buildDemoLogFiles(folder, buildDemoLog(now))]);
         await waitForTags(notes.map((note) => note.path));
 
-        // Several decks have cards, so the review opens on the deck list; start with the top deck
+        // Several decks have cards, so the review opens on the deck list; start with the top deck. The Studio look
+        // shows its home screen instead of the deck tree, so pick the deck in the classic list.
+        await setSetting("reviewLook", "classic");
         await openReview();
         await browser.$(".sr-view .fs-home-deck.is-clickable").waitForClickable({
             timeoutMsg: "the deck list was not shown",
@@ -532,6 +541,7 @@ describe("statistics and insight", function () {
         // Answer one card, so today has a real review as well as the history
         await answerNextCard("sr-good-button");
         await closeModals();
+        await setSetting("reviewLook", "studio");
 
         const mobile = await isMobile();
         // Give the statistics the whole window on desktop, so the two column layout shows
@@ -551,11 +561,13 @@ describe("statistics and insight", function () {
         expect(levels).toBeGreaterThan(60);
         expect(Number(await stat("streak"))).toBeGreaterThan(20);
 
+        // Park the pointer on the title, so no chart shows a hover tooltip in the screenshots
+        await browser.$(".sr-stats-view .sr-stats-title").moveTo();
         await browser.pause(900);
         // The page is taller than the window, so it is shown in slices from the top
         await scrollStatistics(0);
         await screenshot("statistics");
-        const slices = mobile ? [640, 1500, 2400] : [700, 1400, 2100];
+        const slices = mobile ? [640, 1180, 2400] : [700, 1400, 2100];
         for (const [index, top] of slices.entries()) {
             await scrollStatistics(top);
             if (TAKE_SCREENSHOTS)
@@ -566,6 +578,32 @@ describe("statistics and insight", function () {
                     ),
                 );
         }
+
+        // The retention tile is the true retention of the last 30 days, and tapping it brings up that table
+        const last30 = browser.$(
+            ".sr-stats-view .sr-stats-retention tr[data-row='last30'] td:last-child .sr-stats-retention-rate",
+        );
+        expect(await stat("true-retention")).toEqual(await last30.getText());
+        await scrollStatistics(0);
+        await browser.$(".sr-stats-view .sr-stats-metric[data-metric='true-retention']").click();
+        await browser.waitUntil(
+            () =>
+                browser.execute(() => {
+                    const root = document.querySelector(".sr-stats-root");
+                    const card = document.querySelector("[data-section='retention']");
+                    if (!root || !card) return false;
+                    const offset =
+                        card.getBoundingClientRect().top - root.getBoundingClientRect().top;
+                    // The last card may not reach the top: then the view is scrolled to its end
+                    const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+                    return atEnd
+                        ? offset >= 0 && offset < root.clientHeight
+                        : Math.abs(offset - 16) < 4;
+                }),
+            { timeoutMsg: "the retention tile did not scroll to the true retention card" },
+        );
+        await scrollStatistics(0);
+        await browser.$(".sr-stats-view .sr-stats-title").moveTo();
 
         // A theme change redraws the charts in the new colours. Switching the body classes is what Obsidian does.
         const setLight = (light: boolean) =>

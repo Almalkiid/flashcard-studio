@@ -61,7 +61,7 @@ export class CardInfoModal extends Modal {
         this.card = card;
         this.notePath = notePath;
         this.onClosed = onClosed;
-        this.modalEl.addClass("sr-card-info-modal");
+        this.modalEl.addClass("sr-card-info-modal", "fs-studio");
         this.contentEl.addClass("sr-card-info");
         this.setTitle(t("CARD_INFO_TITLE"));
     }
@@ -92,7 +92,7 @@ export class CardInfoModal extends Modal {
         if (text === "") return;
         const preview =
             text.length > FRONT_PREVIEW_LENGTH ? text.slice(0, FRONT_PREVIEW_LENGTH) + "…" : text;
-        this.contentEl.createDiv({ cls: "sr-card-info-front", text: preview });
+        this.contentEl.createDiv({ cls: "sr-card-info-front fs-card", text: preview });
     }
 
     private renderBadges(stats: StatsCard): void {
@@ -163,15 +163,17 @@ export class CardInfoModal extends Modal {
             }
         }
 
-        const grid = this.contentEl.createDiv({ cls: "sr-card-info-grid" });
+        const grid = this.contentEl.createDiv({ cls: "sr-card-info-grid fs-card" });
         for (const item of items) {
             const cell = grid.createDiv({ cls: "sr-card-info-item" });
             cell.createDiv({ cls: "sr-card-info-label", text: item.label });
-            cell.createDiv({
+            const value = cell.createDiv({
                 cls: "sr-card-info-value",
                 text: item.value,
                 attr: { "data-field": item.key },
             });
+            // The state reads as a coloured pill, like the rest of the Studio screens
+            if (item.key === "state") value.addClass("fs-pill", `is-${stats.state}`);
         }
 
         if (stats.flag > 0) {
@@ -192,14 +194,19 @@ export class CardInfoModal extends Modal {
     }
 
     private renderNoteLink(): void {
-        const row = this.contentEl.createDiv({ cls: "sr-card-info-note" });
-        setIcon(row.createSpan({ cls: "sr-card-info-note-icon" }), "file-text");
-        const link = row.createEl("a", {
+        const row = this.contentEl.createDiv({ cls: "sr-card-info-note fs-card" });
+        setIcon(
+            row.createSpan({ cls: "sr-card-info-note-icon fs-icon-tile fs-tone-blue" }),
+            "file-text",
+        );
+        row.createEl("a", {
             cls: "sr-card-info-note-link",
             text: this.notePath,
             attr: { href: "#", "aria-label": t("CARD_INFO_OPEN_NOTE") },
         });
-        link.addEventListener("click", (event: MouseEvent) => {
+        setIcon(row.createSpan({ cls: "sr-card-info-note-chevron" }), "chevron-right");
+        // The whole row opens the note, the link inside it included
+        row.addEventListener("click", (event: MouseEvent) => {
             event.preventDefault();
             this.close();
             void this.app.workspace.openLinkText(this.notePath, "", false);
@@ -210,7 +217,7 @@ export class CardInfoModal extends Modal {
         const section = this.contentEl.createDiv({ cls: "sr-card-info-history" });
         const heading = section.createEl("h4", { cls: "sr-card-info-history-title" });
         heading.createSpan({ text: t("CARD_INFO_HISTORY") });
-        const count = heading.createSpan({ cls: "sr-card-info-history-count" });
+        const count = heading.createSpan({ cls: "sr-card-info-history-count fs-pill" });
 
         // A card that has never been written to the note has no id, so it cannot have any history
         if (stats.id === null) {
@@ -232,7 +239,7 @@ export class CardInfoModal extends Modal {
         }
         count.setText(String(entries.length));
 
-        const scroller = section.createDiv({ cls: "sr-card-info-history-scroll" });
+        const scroller = section.createDiv({ cls: "sr-card-info-history-scroll fs-card" });
         const table = scroller.createEl("table", { cls: "sr-card-info-table" });
         const headRow = table.createEl("thead").createEl("tr");
         for (const key of [
@@ -249,9 +256,9 @@ export class CardInfoModal extends Modal {
         for (const entry of [...entries].reverse()) {
             const row = body.createEl("tr", { attr: { "data-rating": entry.r } });
             row.createEl("td", { text: formatDateTimeShort(entry.t), cls: "sr-card-info-date" });
-            row.createEl("td", {
+            row.createEl("td", { cls: "sr-card-info-rating" }).createSpan({
+                cls: `sr-card-info-rating-pill sr-rating-${entry.r}`,
                 text: t(RATING_KEYS[entry.r]),
-                cls: `sr-card-info-rating sr-rating-${entry.r}`,
             });
             row.createEl("td", { text: t(KIND_KEYS[entry.k]) });
             // A cram answer does not reschedule the card, and a reset has no interval to speak of

@@ -24,84 +24,164 @@ export interface ViewToggles {
     hourlyMode: "reviews" | "success";
 }
 
-interface StatSpec {
+/** The cards a metric tile scrolls to. */
+export type MetricSection = "daily" | "heatmap" | "retention";
+
+interface MetricMeta {
     label: string;
-    value: string;
-    key: string;
-    hero?: boolean;
+    value?: string;
+    /** `data-stat` of the value, for the tests. */
+    key?: string;
 }
 
-function createStat(parent: HTMLElement, spec: StatSpec): void {
-    const stat = parent.createDiv({ cls: "sr-stats-stat" });
-    stat.createDiv({ cls: "sr-stats-stat-label", text: spec.label });
-    const value = stat.createDiv({
-        cls: "sr-stats-stat-value",
-        text: spec.value,
-        attr: { "data-stat": spec.key },
-    });
-    if (spec.hero) value.addClass("is-hero");
+interface MetricSpec {
+    /** `data-stat` of the big number. */
+    key: string;
+    icon: string;
+    tone: string;
+    value: string;
+    label: string;
+    meta: MetricMeta[];
+    section: MetricSection;
+    dim?: boolean;
 }
 
 /**
- * The two cards on top: what was done today, and the streak.
+ * Writes a value such as `1 h 05 min` or `92%` with its numbers large and its units small, like the reference
+ * designs. Text without a digit, such as the dash for "no rate", is written as it is.
  */
-export function renderHero(parent: HTMLElement, report: StatsReport): void {
-    const hero = parent.createDiv({ cls: "sr-stats-hero" });
+function fillValue(el: HTMLElement, text: string): void {
+    if (!/\d/.test(text)) {
+        el.setText(text);
+        return;
+    }
+    for (const part of text.split(/(\d[\d.,]*)/)) {
+        if (part === "") continue;
+        if (/^\d/.test(part)) el.appendText(part);
+        else el.createSpan({ cls: "sr-stats-unit", text: part });
+    }
+}
 
-    const today = hero.createDiv({ cls: "sr-stats-card sr-stats-hero-card sr-stats-today" });
-    const todayHead = today.createDiv({ cls: "sr-stats-hero-head" });
-    setIcon(todayHead.createDiv({ cls: "sr-stats-hero-icon" }), "calendar-check");
-    todayHead.createEl("h3", { cls: "sr-stats-card-title", text: t("STATS_TODAY") });
-    const todayGrid = today.createDiv({ cls: "sr-stats-stat-grid" });
-    createStat(todayGrid, {
-        label: t("STATS_REVIEWS"),
-        value: formatCount(report.today.reviews),
-        key: "reviews",
-        hero: true,
+function createMetric(
+    parent: HTMLElement,
+    spec: MetricSpec,
+    onOpen: (section: MetricSection) => void,
+): void {
+    const tile = parent.createDiv({
+        cls: "sr-stats-metric fs-card",
+        attr: { role: "button", tabindex: "0", "data-metric": spec.key },
     });
-    createStat(todayGrid, {
-        label: t("STATS_TIME"),
-        value: formatDuration(report.today.timeMs),
-        key: "time",
-    });
-    createStat(todayGrid, {
-        label: t("STATS_RETENTION"),
-        value: formatPercent(report.today.retention),
-        key: "retention",
-    });
-    createStat(todayGrid, {
-        label: t("STATS_NEW_CARDS"),
-        value: formatCount(report.today.newLearned),
-        key: "new",
-    });
+    const icon = tile.createDiv({ cls: `sr-stats-metric-icon fs-icon-tile fs-tone-${spec.tone}` });
+    if (spec.dim) icon.addClass("is-dim");
+    setIcon(icon, spec.icon);
 
-    const streak = hero.createDiv({ cls: "sr-stats-card sr-stats-hero-card sr-stats-streak" });
-    const streakHead = streak.createDiv({ cls: "sr-stats-hero-head" });
-    const flame = streakHead.createDiv({ cls: "sr-stats-hero-icon" });
-    if (report.streak.current > 0) flame.addClass("is-lit");
-    setIcon(flame, "flame");
-    streakHead.createEl("h3", { cls: "sr-stats-card-title", text: t("STATS_STREAK") });
-    const streakValue = streak.createDiv({ cls: "sr-stats-streak-value" });
-    streakValue.createSpan({
-        cls: "sr-stats-stat-value is-hero",
-        text: formatCount(report.streak.current),
-        attr: { "data-stat": "streak" },
+    const main = tile.createDiv({ cls: "sr-stats-metric-main" });
+    const text = main.createDiv({ cls: "sr-stats-metric-text" });
+    fillValue(
+        text.createDiv({ cls: "sr-stats-metric-value", attr: { "data-stat": spec.key } }),
+        spec.value,
+    );
+    text.createDiv({ cls: "sr-stats-metric-label", text: spec.label });
+    setIcon(main.createDiv({ cls: "sr-stats-metric-chevron" }), "chevron-right");
+
+    const meta = tile.createDiv({ cls: "sr-stats-metric-meta" });
+    for (const item of spec.meta) {
+        const entry = meta.createSpan({ cls: "sr-stats-metric-meta-item" });
+        if (item.label !== "") entry.createSpan({ text: item.label });
+        if (item.value !== undefined) {
+            const value = entry.createSpan({ cls: "sr-stats-metric-meta-value", text: item.value });
+            if (item.key) value.setAttribute("data-stat", item.key);
+        }
+    }
+
+    tile.addEventListener("click", () => onOpen(spec.section));
+    tile.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen(spec.section);
+        }
     });
-    streakValue.createSpan({
-        cls: "sr-stats-streak-unit",
-        text: report.streak.current === 1 ? t("STATS_UNIT_DAY") : t("STATS_UNIT_DAYS"),
-    });
-    const streakGrid = streak.createDiv({ cls: "sr-stats-stat-grid is-compact" });
-    createStat(streakGrid, {
-        label: t("STATS_STREAK_LONGEST"),
-        value: daysLabel(report.streak.longest),
-        key: "longest",
-    });
-    createStat(streakGrid, {
-        label: t("STATS_DAYS_STUDIED"),
-        value: formatCount(report.streak.activeDays),
-        key: "days-studied",
-    });
+}
+
+/**
+ * The four tiles on top: reviews today, true retention, the streak and the study time of the time range. Each opens
+ * the card that has the details.
+ *
+ * @param rangeLabel - The name of the selected time range, e.g. `1 month`.
+ */
+export function renderMetrics(
+    parent: HTMLElement,
+    report: StatsReport,
+    rangeLabel: string,
+    onOpen: (section: MetricSection) => void,
+): void {
+    const { today, streak, rangeSummary } = report;
+    const last30 = report.retention.find((row) => row.id === "last30")?.all.rate ?? null;
+
+    const retentionMeta: MetricMeta[] = [{ label: t("STATS_ROW_LAST30") }];
+    if (today.retention !== null) {
+        retentionMeta.push({
+            label: t("STATS_TODAY"),
+            value: formatPercent(today.retention),
+            key: "retention",
+        });
+    }
+
+    const grid = parent.createDiv({ cls: "sr-stats-metrics" });
+    const specs: MetricSpec[] = [
+        {
+            key: "reviews",
+            icon: "layers",
+            tone: "blue",
+            value: formatCount(today.reviews),
+            label: t("STATS_METRIC_REVIEWS_TODAY"),
+            meta: [
+                { label: t("STATS_NEW_CARDS"), value: formatCount(today.newLearned), key: "new" },
+                { label: t("STATS_TIME"), value: formatDuration(today.timeMs), key: "time" },
+            ],
+            section: "daily",
+        },
+        {
+            key: "true-retention",
+            icon: "target",
+            tone: "green",
+            value: formatPercent(last30),
+            label: t("STATS_RETENTION"),
+            meta: retentionMeta,
+            section: "retention",
+        },
+        {
+            key: "streak",
+            icon: "flame",
+            tone: "orange",
+            value: formatCount(streak.current),
+            label: t("STATS_METRIC_STREAK"),
+            meta: [
+                {
+                    label: t("STATS_METRIC_LONGEST"),
+                    value: daysLabel(streak.longest),
+                    key: "longest",
+                },
+                {
+                    label: t("STATS_DAYS_STUDIED"),
+                    value: formatCount(streak.activeDays),
+                    key: "days-studied",
+                },
+            ],
+            section: "heatmap",
+            dim: streak.current === 0,
+        },
+        {
+            key: "range-time",
+            icon: "clock",
+            tone: "purple",
+            value: formatDuration(rangeSummary.timeMs),
+            label: t("STATS_METRIC_STUDY_TIME"),
+            meta: [{ label: rangeLabel }, { label: "", value: reviewsLabel(rangeSummary.reviews) }],
+            section: "daily",
+        },
+    ];
+    for (const spec of specs) createMetric(grid, spec, onOpen);
 }
 
 function bucketTitle(row: DailyCount, granularity: StatsReport["dailyGranularity"]): string {
@@ -134,6 +214,7 @@ export function renderDaily(
     const average = report.rangeActiveDays === 0 ? 0 : range.reviews / report.rangeActiveDays;
     const parts = createCard(parent, t(titleKey[report.dailyGranularity]), {
         wide: true,
+        section: "daily",
         summary: t("STATS_DAILY_SUMMARY", {
             reviews: reviewsLabel(range.reviews),
             time: formatDuration(range.timeMs),
@@ -195,7 +276,11 @@ export function renderDaily(
         );
         createLegend(
             parts.body,
-            shown.map((kind) => ({ label: kind.label, cls: kind.cls })),
+            shown.map((kind) => ({
+                label: kind.label,
+                cls: kind.cls,
+                value: formatCount(rows.reduce((sum, row) => sum + row[kind.field], 0)),
+            })),
         );
         chart = createBarChart(host, parts.body, {
             labels,

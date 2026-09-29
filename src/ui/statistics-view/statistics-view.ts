@@ -11,9 +11,10 @@ import { ChartHost } from "src/ui/statistics-view/charts";
 import { createNote, createSegmented } from "src/ui/statistics-view/dom";
 import { renderHeatmap } from "src/ui/statistics-view/heatmap";
 import {
+    MetricSection,
     renderDaily,
-    renderHero,
     renderHourly,
+    renderMetrics,
     ViewToggles,
 } from "src/ui/statistics-view/sections-activity";
 import {
@@ -110,29 +111,20 @@ export class StatisticsView extends ItemView {
 
     private buildSkeleton(): void {
         this.contentEl.empty();
-        this.rootEl = this.contentEl.createDiv({ cls: "sr-stats-root" });
+        this.rootEl = this.contentEl.createDiv({ cls: "sr-stats-root fs-studio" });
         const inner = this.rootEl.createDiv({ cls: "sr-stats-inner" });
 
         const header = inner.createDiv({ cls: "sr-stats-header" });
         const titleRow = header.createDiv({ cls: "sr-stats-header-row" });
-        setIcon(titleRow.createDiv({ cls: "sr-stats-header-icon" }), "bar-chart-3");
         titleRow.createEl("h2", { cls: "sr-stats-title", text: t("STATS_VIEW_TITLE") });
         this.refreshEl = titleRow.createEl("button", {
-            cls: "clickable-icon sr-stats-refresh",
+            cls: "sr-stats-refresh",
             attr: { "aria-label": t("STATS_REFRESH"), type: "button" },
         });
         setIcon(this.refreshEl, "refresh-cw");
         this.refreshEl.addEventListener("click", () => void this.reload());
 
         const controls = header.createDiv({ cls: "sr-stats-controls" });
-        this.deckSelectEl = controls.createEl("select", {
-            cls: "dropdown sr-stats-select",
-            attr: { "aria-label": t("STATS_DECK_LABEL") },
-        });
-        this.deckSelectEl.addEventListener("change", () => {
-            this.deck = this.deckSelectEl?.value ?? "";
-            this.render();
-        });
         createSegmented(
             controls,
             TIME_RANGES.map((range) => ({ value: range, label: t(RANGE_LABEL_KEYS[range]) })),
@@ -143,6 +135,18 @@ export class StatisticsView extends ItemView {
                 this.render();
             },
         );
+        // A native select in a pill, so phones get their own picker
+        const deckPill = controls.createDiv({ cls: "sr-stats-deck" });
+        setIcon(deckPill.createSpan({ cls: "sr-stats-deck-icon" }), "layers");
+        this.deckSelectEl = deckPill.createEl("select", {
+            cls: "sr-stats-select",
+            attr: { "aria-label": t("STATS_DECK_LABEL") },
+        });
+        setIcon(deckPill.createSpan({ cls: "sr-stats-deck-chevron" }), "chevron-down");
+        this.deckSelectEl.addEventListener("change", () => {
+            this.deck = this.deckSelectEl?.value ?? "";
+            this.render();
+        });
 
         this.bodyEl = inner.createDiv({ cls: "sr-stats-body" });
         createNote(this.bodyEl, t("STATS_LOADING"));
@@ -214,7 +218,9 @@ export class StatisticsView extends ItemView {
         });
 
         if (report.hasHistory) {
-            renderHero(body, report);
+            renderMetrics(body, report, t(RANGE_LABEL_KEYS[this.range]), (section) =>
+                this.scrollToSection(section),
+            );
         } else {
             const stage = body.createDiv({ cls: "sr-stats-grid" });
             renderEmptyState(stage, () => {
@@ -224,11 +230,11 @@ export class StatisticsView extends ItemView {
 
         const grid = body.createDiv({ cls: "sr-stats-grid" });
         if (report.hasHistory) {
-            renderHeatmap(grid, report.heatmap, inputs.weekStart);
             renderDaily(grid, report, host, this.toggles);
+            renderHeatmap(grid, report.heatmap, inputs.weekStart);
         }
-        renderForecast(grid, report, host);
         renderCardCounts(grid, report, host);
+        renderForecast(grid, report, host);
         renderIntervals(grid, report, host);
         renderStability(grid, report, host);
         renderDifficulty(grid, report, host);
@@ -238,5 +244,20 @@ export class StatisticsView extends ItemView {
             renderHourly(grid, report, host, this.toggles);
             renderTrueRetention(grid, report.retention);
         }
+    }
+
+    /**
+     * Scrolls the view, and only the view, so the card of a metric tile sits at the top.
+     */
+    private scrollToSection(section: MetricSection): void {
+        const root = this.rootEl;
+        const target = root?.querySelector<HTMLElement>(`[data-section="${section}"]`);
+        if (!root || !target) return;
+        const offset = target.getBoundingClientRect().top - root.getBoundingClientRect().top;
+        const reducedMotion = activeWindow.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        root.scrollTo({
+            top: root.scrollTop + offset - 16,
+            behavior: reducedMotion ? "auto" : "smooth",
+        });
     }
 }

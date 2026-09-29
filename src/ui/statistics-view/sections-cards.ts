@@ -101,7 +101,7 @@ export function renderForecast(parent: HTMLElement, report: StatsReport, host: C
  */
 export function renderCardCounts(parent: HTMLElement, report: StatsReport, host: ChartHost): void {
     const counts = report.cardCounts;
-    const parts = createCard(parent, t("STATS_CARD_COUNTS_TITLE"));
+    const parts = createCard(parent, t("STATS_CARD_MATURITY_TITLE"));
 
     const definitions: { label: string; value: number }[] = [
         { label: t("STATS_COUNT_NEW"), value: counts.new },
@@ -127,7 +127,7 @@ export function renderCardCounts(parent: HTMLElement, report: StatsReport, host:
         host,
         chartBox,
         slices,
-        t("STATS_CARD_COUNTS_TITLE"),
+        t("STATS_CARD_MATURITY_TITLE"),
         (slice) =>
             `${slice.label}: ${t("STATS_CARDS_TOOLTIP", { count: formatCount(slice.value) })}`,
     );

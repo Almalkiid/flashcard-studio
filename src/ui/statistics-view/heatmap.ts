@@ -25,6 +25,7 @@ export function renderHeatmap(parent: HTMLElement, map: Heatmap, weekStart: numb
     const parts = createCard(parent, t("STATS_HEATMAP_TITLE"), {
         wide: true,
         cls: "sr-stats-heat-card",
+        section: "heatmap",
         summary: t("STATS_HEATMAP_SUMMARY", {
             reviews: reviewsLabel(map.total),
             days: daysLabel(map.activeDays),

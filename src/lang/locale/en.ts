@@ -859,6 +859,13 @@ const en: IBaseLocale = {
     ANKI_EXPORT_ERR_FAILED: "Export failed: ${detail}",
     ANKI_EXPORT_NOT_READY: "The plugin is still loading. Try again in a moment.",
     ANKI_SHOW_IN_FOLDER: "Show in folder",
+    // Design: statistics
+    STATS_METRIC_REVIEWS_TODAY: "Reviews today",
+    STATS_METRIC_STREAK: "Day streak",
+    STATS_METRIC_STUDY_TIME: "Study time",
+    STATS_METRIC_LONGEST: "Longest",
+    STATS_CARD_MATURITY_TITLE: "Card maturity",
+    // End design: statistics
 };
 
 export default en;

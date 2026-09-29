@@ -1,60 +1,76 @@
 /* MARK: Card info modal */
 
-.modal.sr-card-info-modal {
+/* A Flashcard Studio screen: the modal is the off-white page, its groups white cards */
+.modal.sr-card-info-modal.fs-studio {
     width: min(640px, 94vw);
+    border: 1px solid var(--fs-border);
+    border-radius: var(--fs-radius-xl);
+    background-color: var(--fs-bg);
+    box-shadow: var(--fs-shadow-lg);
+}
+
+.modal.sr-card-info-modal.fs-studio .modal-title {
+    font-size: var(--fs-title);
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    color: var(--fs-text);
 }
 
 .sr-card-info {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-4);
+    gap: 14px;
 }
 
-.sr-card-info-front {
-    padding: var(--size-4-3) var(--size-4-4);
-    border-left: 3px solid var(--interactive-accent);
-    border-radius: var(--radius-s);
-    background: var(--background-secondary);
-    color: var(--text-muted);
-    font-size: var(--font-ui-small);
-    line-height: 1.45;
+.fs-studio .sr-card-info-front {
+    padding: 16px 18px;
+    border-radius: var(--fs-radius-md);
+    color: var(--fs-text);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
 .sr-card-info-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-4-2);
+    gap: 8px;
 }
 
 .sr-card-info-badge {
-    padding: 2px var(--size-4-2);
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 11px;
     border-radius: 999px;
-    background: var(--background-modifier-hover);
-    color: var(--text-muted);
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-medium);
+    background-color: var(--fs-surface-2);
+    color: var(--fs-text-2);
+    font-size: var(--fs-caption);
+    font-weight: 600;
 }
 
 .sr-card-info-badge.is-suspended {
-    background: color-mix(in srgb, var(--color-orange) 16%, transparent);
-    color: var(--color-orange);
+    background-color: var(--fs-orange-soft);
+    color: var(--fs-orange);
 }
 
 .sr-card-info-badge.is-buried {
-    background: color-mix(in srgb, var(--color-yellow) 18%, transparent);
-    color: var(--color-yellow);
+    background-color: var(--fs-amber-soft);
+    color: var(--fs-amber);
 }
 
 .sr-card-info-badge.is-leech {
-    background: color-mix(in srgb, var(--color-red) 16%, transparent);
-    color: var(--color-red);
+    background-color: var(--fs-red-soft);
+    color: var(--fs-red);
 }
 
-.sr-card-info-grid {
+.fs-studio .sr-card-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--size-4-3) var(--size-4-4);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 18px 20px;
+    padding: 18px 20px;
+    border-radius: var(--fs-radius-md);
 }
 
 .sr-card-info-item {
@@ -62,19 +78,52 @@
 }
 
 .sr-card-info-label {
-    margin-bottom: 2px;
-    color: var(--text-muted);
-    font-size: var(--font-ui-smaller);
+    margin-bottom: 4px;
+    color: var(--fs-text-3);
+    font-size: 12.5px;
+    font-weight: 500;
 }
 
 .sr-card-info-value {
     display: flex;
     align-items: center;
-    gap: var(--size-4-2);
-    font-size: var(--font-ui-medium);
+    gap: 8px;
+    color: var(--fs-text);
+    font-size: var(--fs-headline);
     font-variant-numeric: tabular-nums;
-    font-weight: var(--font-medium);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
     overflow-wrap: anywhere;
+}
+
+/* The state pill, one tone per state */
+.fs-studio .sr-card-info-value.fs-pill {
+    display: inline-flex;
+    height: 28px;
+    padding: 0 12px;
+    font-size: var(--fs-caption);
+    letter-spacing: 0;
+}
+
+.fs-studio .sr-card-info-value.fs-pill.is-new {
+    background-color: var(--fs-blue-soft);
+    color: var(--fs-blue);
+}
+
+.fs-studio .sr-card-info-value.fs-pill.is-learning {
+    background-color: var(--fs-purple-soft);
+    color: var(--fs-purple);
+}
+
+.fs-studio .sr-card-info-value.fs-pill.is-review {
+    background-color: var(--fs-green-soft);
+    color: var(--fs-green);
+}
+
+.fs-studio .sr-card-info-value.fs-pill.is-relearning {
+    background-color: var(--fs-red-soft);
+    color: var(--fs-red);
 }
 
 .sr-card-info-flag {
@@ -82,102 +131,140 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--text-faint);
+    background-color: var(--fs-text-3);
 }
 
 .sr-card-info-flag-1 {
-    background: var(--color-red);
+    background-color: var(--fs-red);
 }
 
 .sr-card-info-flag-2 {
-    background: var(--color-orange);
+    background-color: var(--fs-orange);
 }
 
 .sr-card-info-flag-3 {
-    background: var(--color-green);
+    background-color: var(--fs-green);
 }
 
 .sr-card-info-flag-4 {
-    background: var(--color-blue);
+    background-color: var(--fs-blue);
 }
 
 .sr-card-info-flag-5 {
-    background: var(--color-pink);
+    background-color: color-mix(in srgb, var(--fs-red) 55%, var(--fs-purple));
 }
 
 .sr-card-info-flag-6 {
-    background: var(--color-cyan);
+    background-color: var(--fs-teal);
 }
 
 .sr-card-info-flag-7 {
-    background: var(--color-purple);
+    background-color: var(--fs-purple);
 }
 
 .sr-card-info-hint {
-    color: var(--text-faint);
-    font-size: var(--font-ui-small);
+    color: var(--fs-text-3);
+    font-size: var(--fs-caption);
+    line-height: 1.45;
 }
 
-.sr-card-info-note {
+/* The note, as a row of a settings list: icon tile, path, chevron */
+.fs-studio .sr-card-info-note {
     display: flex;
     align-items: center;
-    gap: var(--size-4-2);
+    gap: 12px;
     min-width: 0;
-    font-size: var(--font-ui-small);
+    padding: 10px 14px 10px 10px;
+    border-radius: var(--fs-radius-md);
+    cursor: pointer;
+    transition: box-shadow 150ms ease;
 }
 
-.sr-card-info-note-icon {
-    display: flex;
-    flex: none;
-    color: var(--text-faint);
+.fs-studio .sr-card-info-note:hover {
+    box-shadow: var(--fs-shadow-lg);
 }
 
-.sr-card-info-note-link {
+.fs-studio .sr-card-info-note-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.fs-studio .sr-card-info-note-icon svg {
+    width: 17px;
+    height: 17px;
+}
+
+.fs-studio .sr-card-info-note-link {
+    flex: 1;
     min-width: 0;
     overflow: hidden;
+    color: var(--fs-text);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.sr-card-info-note-chevron {
+    display: flex;
+    flex: none;
+    color: var(--fs-text-3);
+}
+
+.sr-card-info-note-chevron .svg-icon {
+    width: 18px;
+    height: 18px;
 }
 
 .sr-card-info-history {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-2);
+    gap: 10px;
+    margin-top: 6px;
 }
 
-.sr-card-info-history-title {
+.fs-studio .sr-card-info-history-title {
     display: flex;
-    align-items: baseline;
-    gap: var(--size-4-2);
+    align-items: center;
+    gap: 8px;
     margin: 0;
-    font-size: var(--font-ui-medium);
-    font-weight: var(--font-semibold);
+    color: var(--fs-text);
+    font-size: var(--fs-headline);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
-.sr-card-info-history-count {
-    color: var(--text-faint);
-    font-size: var(--font-ui-small);
-    font-weight: var(--font-normal);
+.fs-studio .sr-card-info-history-count {
+    height: 22px;
+    padding: 0 9px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
 }
 
-.sr-card-info-history-scroll {
+.sr-card-info-history-count:empty {
+    display: none;
+}
+
+.fs-studio .sr-card-info-history-scroll {
     max-height: 40vh;
     overflow: auto;
-    border: 1px solid var(--background-modifier-border);
-    border-radius: var(--radius-m);
+    border-radius: var(--fs-radius-md);
 }
 
 .sr-card-info-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--font-ui-small);
+    font-size: 13.5px;
     font-variant-numeric: tabular-nums;
 }
 
 .sr-card-info-table th,
 .sr-card-info-table td {
-    padding: var(--size-4-2) var(--size-4-3);
-    border-bottom: 1px solid var(--background-modifier-border);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--fs-border);
+    color: var(--fs-text);
     text-align: left;
     white-space: nowrap;
 }
@@ -185,30 +272,73 @@
 .sr-card-info-table thead th {
     position: sticky;
     top: 0;
-    background: var(--background-secondary);
-    color: var(--text-muted);
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-medium);
+    padding-top: 12px;
+    background-color: var(--fs-surface);
+    color: var(--fs-text-3);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .sr-card-info-table tbody tr:last-child td {
     border-bottom: 0;
 }
 
-.sr-card-info-rating {
-    font-weight: var(--font-semibold);
+.fs-studio .sr-card-info-table td.sr-card-info-date {
+    color: var(--fs-text-2);
 }
 
-.sr-card-info-date {
-    color: var(--text-muted);
+/* A rating is a small tinted pill in its button's colour */
+.sr-card-info-rating-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background-color: var(--fs-surface-2);
+    color: var(--fs-text-2);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.fs-studio .sr-card-info-rating-pill.sr-rating-1 {
+    background-color: var(--fs-red-soft);
+    color: var(--fs-red);
+}
+
+.fs-studio .sr-card-info-rating-pill.sr-rating-2 {
+    background-color: var(--fs-orange-soft);
+    color: var(--fs-orange);
+}
+
+.fs-studio .sr-card-info-rating-pill.sr-rating-3 {
+    background-color: var(--fs-green-soft);
+    color: var(--fs-green);
+}
+
+.fs-studio .sr-card-info-rating-pill.sr-rating-4 {
+    background-color: var(--fs-blue-soft);
+    color: var(--fs-blue);
 }
 
 .is-phone .sr-card-info-table th,
 .is-phone .sr-card-info-table td {
-    padding: var(--size-4-2) var(--size-4-2);
+    padding: 10px 10px;
 }
 
 .is-phone .sr-card-info-table th:nth-child(3),
 .is-phone .sr-card-info-table td:nth-child(3) {
     display: none;
+}
+
+.is-phone .fs-studio .sr-card-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-studio .sr-card-info-note {
+        transition: none;
+    }
 }

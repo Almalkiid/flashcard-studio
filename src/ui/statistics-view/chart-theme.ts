@@ -1,6 +1,7 @@
 /**
- * Colours for the charts. They are read from CSS custom properties of the statistics view at render time, so the
- * charts follow the active Obsidian theme, light or dark, including community themes. Nothing here is a colour value.
+ * Colours for the charts. They are read from CSS custom properties of the statistics view at render time; the view's
+ * stylesheet maps each one to a Flashcard Studio token (`--fs-*`), so the charts follow the light or dark Obsidian
+ * theme and redraw in its colours. Nothing here is a colour value.
  */
 export interface ChartTheme {
     fontFamily: string;

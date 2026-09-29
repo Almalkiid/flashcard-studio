@@ -11,15 +11,17 @@ export interface CardParts {
  * A titled card of the statistics grid.
  *
  * @param wide - Spans both columns of the grid.
+ * @param section - Names the card, so a metric tile can scroll to it.
  */
 export function createCard(
     parent: HTMLElement,
     title: string,
-    options: { wide?: boolean; summary?: string; cls?: string } = {},
+    options: { wide?: boolean; summary?: string; cls?: string; section?: string } = {},
 ): CardParts {
-    const card = parent.createDiv({ cls: "sr-stats-card" });
+    const card = parent.createDiv({ cls: "sr-stats-card fs-card" });
     if (options.wide) card.addClass("is-wide");
     if (options.cls) card.addClass(options.cls);
+    if (options.section) card.setAttribute("data-section", options.section);
 
     const head = card.createDiv({ cls: "sr-stats-card-head" });
     const titles = head.createDiv({ cls: "sr-stats-card-titles" });
@@ -84,14 +86,21 @@ export function createSegmented<T extends string>(
 }
 
 /**
- * A key of coloured dots and their names, shown above a chart with more than one series.
+ * A key of coloured dots and their names, shown above a chart with more than one series, each with an optional
+ * total.
  */
-export function createLegend(parent: HTMLElement, items: { label: string; cls: string }[]): void {
+export function createLegend(
+    parent: HTMLElement,
+    items: { label: string; cls: string; value?: string }[],
+): void {
     const legend = parent.createDiv({ cls: "sr-stats-legend" });
     for (const item of items) {
         const entry = legend.createDiv({ cls: "sr-stats-legend-item" });
         entry.createSpan({ cls: `sr-stats-swatch ${item.cls}` });
         entry.createSpan({ cls: "sr-stats-legend-label", text: item.label });
+        if (item.value !== undefined) {
+            entry.createSpan({ cls: "sr-stats-legend-value", text: item.value });
+        }
     }
 }
 

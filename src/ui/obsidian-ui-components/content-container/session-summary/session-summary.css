@@ -1,97 +1,122 @@
 /* MARK: Session summary */
 
+/* A Flashcard Studio screen: off-white page, white tiles with tinted icons */
 .sr-session-summary {
     display: flex;
     flex: 1;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: var(--size-4-3);
+    /* safe: a summary taller than the screen scrolls from its top instead of losing it */
+    justify-content: safe center;
+    gap: 8px;
     min-height: 0;
-    padding: var(--size-4-6) var(--size-4-5);
+    padding: 22px 20px;
     overflow-y: auto;
     text-align: center;
 }
 
-.sr-session-summary-badge {
+.fs-studio .sr-session-summary-badge,
+.sr-session-summary-badge.fs-icon-tile {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    margin-bottom: var(--size-4-1);
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-green) 18%, transparent);
-    color: var(--color-green);
+    width: 60px;
+    height: 60px;
+    margin-bottom: 6px;
+    border-radius: 19px;
     animation: sr-session-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 
 .sr-session-summary-badge::after {
     content: "";
     position: absolute;
-    inset: -6px;
-    border: 2px solid var(--color-green);
-    border-radius: 50%;
+    inset: -7px;
+    border: 2px solid var(--fs-green);
+    border-radius: 25px;
     opacity: 0;
     animation: sr-session-ring 900ms ease-out 250ms both;
 }
 
-.sr-session-summary-badge .svg-icon {
-    width: 32px;
-    height: 32px;
+.fs-studio .sr-session-summary-badge svg {
+    width: 30px;
+    height: 30px;
     stroke-width: 2.5px;
 }
 
-.sr-session-summary-title {
+.fs-studio .sr-session-summary-title {
     margin: 0;
-    font-size: var(--font-ui-large);
-    font-weight: var(--font-semibold);
+    color: var(--fs-text);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 .sr-session-summary-subtitle {
-    color: var(--text-muted);
-    font-size: var(--font-ui-small);
+    color: var(--fs-text-2);
+    font-size: var(--fs-body);
 }
 
 .sr-session-summary-tiles {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--size-4-2);
-    width: min(100%, 480px);
-    margin: var(--size-4-2) 0;
+    gap: 10px;
+    width: min(100%, 580px);
+    margin: 10px 0 4px;
 }
 
-.sr-session-summary-tile {
-    padding: var(--size-4-3) var(--size-4-2);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: var(--radius-m);
-    background: var(--background-secondary);
+/* Icon beside the number, so the summary fits the review modal without scrolling */
+.fs-studio .sr-session-summary-tile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px;
+    border-radius: var(--fs-radius-md);
+    text-align: left;
+}
+
+.sr-session-summary-tile-text {
+    min-width: 0;
+}
+
+.fs-studio .sr-session-summary-tile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.fs-studio .sr-session-summary-tile-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .sr-session-summary-value {
-    font-size: var(--font-ui-large);
+    color: var(--fs-text);
+    font-size: 21px;
     font-variant-numeric: tabular-nums;
-    font-weight: var(--font-semibold);
-    line-height: 1.2;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    white-space: nowrap;
 }
 
 .sr-session-summary-label {
-    margin-top: 2px;
-    color: var(--text-muted);
-    font-size: var(--font-ui-smaller);
+    margin-top: 3px;
+    color: var(--fs-text-3);
+    font-size: 12.5px;
+    font-weight: 500;
 }
 
-.sr-session-summary-streak {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--size-4-2);
-    padding: var(--size-4-1) var(--size-4-3);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-orange) 14%, transparent);
-    color: var(--color-orange);
-    font-size: var(--font-ui-small);
-    font-weight: var(--font-medium);
+.theme-dark .sr-session-summary-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.fs-studio .sr-session-summary-streak {
+    height: 30px;
+    padding: 0 14px;
+    background-color: var(--fs-orange-soft);
+    color: var(--fs-orange);
 }
 
 .sr-session-summary-streak-icon {
@@ -99,8 +124,8 @@
 }
 
 .sr-session-summary-streak-icon .svg-icon {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
 }
 
 .sr-session-summary-actions {
@@ -108,33 +133,61 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: var(--size-4-2);
-    margin-top: var(--size-4-2);
+    gap: 10px;
+    margin-top: 8px;
 }
 
-.sr-session-summary .sr-session-summary-undo {
+/* Obsidian styles every button; the summary's are scoped under it to win */
+.sr-session-summary.fs-studio .sr-session-summary-back {
+    min-width: 160px;
+}
+
+.sr-session-summary.fs-studio .sr-session-summary-stats {
+    height: 44px;
+    min-width: 160px;
+    padding: 0 20px;
+    border: 1px solid var(--fs-border-strong);
+    border-radius: 14px;
+    background-color: var(--fs-surface);
+    box-shadow: var(--fs-shadow);
+    color: var(--fs-text);
+    font-family: var(--fs-font);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sr-session-summary.fs-studio .sr-session-summary-stats:hover {
+    border-color: var(--fs-accent);
+    color: var(--fs-accent);
+}
+
+.sr-session-summary.fs-studio .sr-session-summary-undo {
     height: auto;
-    padding: var(--size-4-1) var(--size-4-2);
+    margin-top: 2px;
+    padding: 6px 10px;
+    border: 0;
     background: transparent;
     box-shadow: none;
-    color: var(--text-muted);
-    font-size: var(--font-ui-small);
+    color: var(--fs-text-3);
+    font-size: var(--fs-caption);
+    font-weight: 500;
 }
 
-.sr-session-summary .sr-session-summary-undo:hover {
+.sr-session-summary.fs-studio .sr-session-summary-undo:hover {
     background: transparent;
     box-shadow: none;
-    color: var(--text-normal);
+    color: var(--fs-text);
 }
 
 .is-phone .sr-session-summary-actions {
     flex-direction: column;
     align-items: stretch;
-    width: min(100%, 320px);
+    width: min(100%, 340px);
 }
 
-.is-phone .sr-session-summary-actions button {
-    min-height: 44px;
+.is-phone .sr-session-summary.fs-studio .sr-session-summary-actions button {
+    min-height: 48px;
 }
 
 .is-phone .sr-session-summary-tiles {

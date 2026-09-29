@@ -12,14 +12,26 @@ export interface SessionSummaryActions {
     onUndo: () => void;
 }
 
-function createTile(parent: HTMLElement, label: string, value: string, key: string): void {
-    const tile = parent.createDiv({ cls: "sr-session-summary-tile" });
-    tile.createDiv({
+function createTile(
+    parent: HTMLElement,
+    label: string,
+    value: string,
+    key: string,
+    icon: string,
+    tone: string,
+): void {
+    const tile = parent.createDiv({ cls: "sr-session-summary-tile fs-card" });
+    setIcon(
+        tile.createDiv({ cls: `sr-session-summary-tile-icon fs-icon-tile fs-tone-${tone}` }),
+        icon,
+    );
+    const text = tile.createDiv({ cls: "sr-session-summary-tile-text" });
+    text.createDiv({
         cls: "sr-session-summary-value",
         text: value,
         attr: { "data-stat": key },
     });
-    tile.createDiv({ cls: "sr-session-summary-label", text: label });
+    text.createDiv({ cls: "sr-session-summary-label", text: label });
 }
 
 /**
@@ -32,21 +44,28 @@ export function renderSessionSummary(
     summary: SessionSummary,
     actions: SessionSummaryActions,
 ): HTMLElement {
-    const panel = parent.createDiv({ cls: "sr-session-summary" });
+    const panel = parent.createDiv({ cls: "sr-session-summary fs-studio" });
 
-    const badge = panel.createDiv({ cls: "sr-session-summary-badge" });
+    const badge = panel.createDiv({ cls: "sr-session-summary-badge fs-icon-tile fs-tone-green" });
     setIcon(badge, "check");
     panel.createEl("h2", { cls: "sr-session-summary-title", text: t("SESSION_COMPLETE") });
     panel.createDiv({ cls: "sr-session-summary-subtitle", text: t("SESSION_SUBTITLE") });
 
     const tiles = panel.createDiv({ cls: "sr-session-summary-tiles" });
-    createTile(tiles, t("SESSION_CARDS"), formatCount(summary.reviews), "cards");
-    createTile(tiles, t("SESSION_TIME"), formatDuration(summary.timeMs), "time");
-    createTile(tiles, t("SESSION_AGAIN"), formatCount(summary.again), "again");
-    createTile(tiles, t("SESSION_RETENTION"), formatPercent(summary.retention), "retention");
+    createTile(tiles, t("SESSION_CARDS"), formatCount(summary.reviews), "cards", "layers", "blue");
+    createTile(tiles, t("SESSION_TIME"), formatDuration(summary.timeMs), "time", "clock", "purple");
+    createTile(tiles, t("SESSION_AGAIN"), formatCount(summary.again), "again", "rotate-ccw", "red");
+    createTile(
+        tiles,
+        t("SESSION_RETENTION"),
+        formatPercent(summary.retention),
+        "retention",
+        "target",
+        "green",
+    );
 
     if (summary.streak > 0) {
-        const streak = panel.createDiv({ cls: "sr-session-summary-streak" });
+        const streak = panel.createDiv({ cls: "sr-session-summary-streak fs-pill" });
         setIcon(streak.createSpan({ cls: "sr-session-summary-streak-icon" }), "flame");
         streak.createSpan({
             cls: "sr-session-summary-streak-text",
@@ -57,7 +76,7 @@ export function renderSessionSummary(
 
     const buttons = panel.createDiv({ cls: "sr-session-summary-actions" });
     const back = buttons.createEl("button", {
-        cls: "mod-cta sr-session-summary-back",
+        cls: "fs-primary-button sr-session-summary-back",
         text: t("SESSION_BACK_TO_DECKS"),
         attr: { type: "button" },
     });

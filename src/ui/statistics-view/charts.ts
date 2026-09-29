@@ -7,6 +7,7 @@ import {
     ChartConfiguration,
     DoughnutController,
     LinearScale,
+    ScriptableContext,
     Tooltip,
     TooltipItem,
 } from "chart.js";
@@ -83,9 +84,14 @@ export interface BarChartSpec {
     maxTicks?: number;
 }
 
+/** The corner radius of the top of a bar; chart.js caps it at half the bar width. */
+const BAR_RADIUS = 6;
+const ROUNDED_TOP = { topLeft: BAR_RADIUS, topRight: BAR_RADIUS, bottomLeft: 0, bottomRight: 0 };
+
 function applyGlobalStyle(theme: ChartTheme): void {
     Chart.defaults.font.family = theme.fontFamily;
     Chart.defaults.font.size = 11;
+    Chart.defaults.font.weight = 500;
     Chart.defaults.color = theme.text;
 }
 
@@ -97,15 +103,34 @@ function tooltipStyle(theme: ChartTheme) {
         footerColor: theme.tooltipText,
         borderColor: theme.tooltipBorder,
         borderWidth: 1,
-        padding: 8,
-        cornerRadius: 6,
-        boxPadding: 4,
+        padding: 10,
+        cornerRadius: 10,
+        caretSize: 5,
+        boxPadding: 5,
+        titleFont: { weight: 600 },
         usePointStyle: true,
     };
 }
 
 /**
- * Draws a bar chart, thin bars with rounded ends, in a fixed height box inside `parent`.
+ * Rounds the top of a bar; in a stack only the topmost bar that has a value, so a stack reads as one bar.
+ */
+function barRadius(stacked: boolean) {
+    return (context: ScriptableContext<"bar">) => {
+        if (!stacked) return ROUNDED_TOP;
+        const datasets = context.chart.data.datasets;
+        for (let index = datasets.length - 1; index >= 0; index--) {
+            const value = datasets[index].data[context.dataIndex];
+            if (typeof value === "number" && value > 0) {
+                return index === context.datasetIndex ? ROUNDED_TOP : 0;
+            }
+        }
+        return 0;
+    };
+}
+
+/**
+ * Draws a bar chart, thin bars with rounded tops over faint dashed lines, in a fixed height box inside `parent`.
  */
 export function createBarChart(host: ChartHost, parent: HTMLElement, spec: BarChartSpec): Chart {
     const { theme } = host;
@@ -130,11 +155,11 @@ export function createBarChart(host: ChartHost, parent: HTMLElement, spec: BarCh
                     hoverBackgroundColor: colors,
                     borderColor: theme.surface,
                     borderWidth: stacked ? 1 : 0,
-                    borderRadius: 3,
+                    borderRadius: barRadius(stacked),
                     borderSkipped: "bottom" as const,
-                    maxBarThickness: 22,
-                    categoryPercentage: 0.92,
-                    barPercentage: 0.82,
+                    maxBarThickness: 18,
+                    categoryPercentage: 0.84,
+                    barPercentage: 0.74,
                 };
             }),
         },
@@ -143,7 +168,7 @@ export function createBarChart(host: ChartHost, parent: HTMLElement, spec: BarCh
             maintainAspectRatio: false,
             animation: host.animation,
             interaction: { mode: "index", intersect: false },
-            layout: { padding: { top: 6 } },
+            layout: { padding: { top: 8 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -175,6 +200,7 @@ export function createBarChart(host: ChartHost, parent: HTMLElement, spec: BarCh
                     border: { display: false },
                     ticks: {
                         color: theme.text,
+                        padding: 6,
                         maxRotation: 0,
                         autoSkip: true,
                         maxTicksLimit: spec.maxTicks ?? 8,
@@ -184,10 +210,11 @@ export function createBarChart(host: ChartHost, parent: HTMLElement, spec: BarCh
                     stacked,
                     beginAtZero: true,
                     max: spec.yMax,
-                    grid: { color: theme.grid },
-                    border: { display: false },
+                    grid: { color: theme.grid, drawTicks: false },
+                    border: { display: false, dash: [3, 4] },
                     ticks: {
                         color: theme.text,
+                        padding: 8,
                         maxTicksLimit: 5,
                         precision: 0,
                         callback: (value: string | number) => spec.valueFormat(Number(value)),
@@ -234,15 +261,15 @@ export function createDoughnut(
                     backgroundColor: slices.map((slice) => slice.color),
                     hoverBackgroundColor: slices.map((slice) => slice.color),
                     borderColor: theme.surface,
-                    borderWidth: 2,
-                    hoverOffset: 3,
+                    borderWidth: 3,
+                    hoverOffset: 4,
                 },
             ],
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: "72%",
+            cutout: "66%",
             animation: host.animation,
             plugins: {
                 legend: { display: false },

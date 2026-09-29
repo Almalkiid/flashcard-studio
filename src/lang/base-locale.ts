@@ -744,4 +744,11 @@ export interface IBaseLocale {
     ANKI_EXPORT_ERR_FAILED: string;
     ANKI_EXPORT_NOT_READY: string;
     ANKI_SHOW_IN_FOLDER: string;
+    // Design: statistics
+    STATS_METRIC_REVIEWS_TODAY: string;
+    STATS_METRIC_STREAK: string;
+    STATS_METRIC_STUDY_TIME: string;
+    STATS_METRIC_LONGEST: string;
+    STATS_CARD_MATURITY_TITLE: string;
+    // End design: statistics
 }

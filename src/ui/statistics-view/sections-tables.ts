@@ -101,6 +101,7 @@ function retentionCell(row: HTMLElement, cell: RetentionCell): void {
 export function renderTrueRetention(parent: HTMLElement, rows: RetentionRow[]): void {
     const parts = createCard(parent, t("STATS_TRUE_RETENTION_TITLE"), {
         wide: true,
+        section: "retention",
         summary: t("STATS_TRUE_RETENTION_NOTE"),
     });
     const scroller = parts.body.createDiv({ cls: "sr-stats-table-scroll" });
@@ -124,12 +125,15 @@ export function renderTrueRetention(parent: HTMLElement, rows: RetentionRow[]): 
  * Shown when the deck has no recorded answers yet, above the charts that only need the cards.
  */
 export function renderEmptyState(parent: HTMLElement, onReview: () => void): void {
-    const empty = parent.createDiv({ cls: "sr-stats-card sr-stats-empty is-wide" });
-    setIcon(empty.createDiv({ cls: "sr-stats-empty-icon" }), "bar-chart-3");
+    const empty = parent.createDiv({ cls: "sr-stats-card fs-card sr-stats-empty is-wide" });
+    setIcon(
+        empty.createDiv({ cls: "sr-stats-empty-icon fs-icon-tile fs-tone-blue" }),
+        "bar-chart-3",
+    );
     empty.createEl("h3", { cls: "sr-stats-empty-title", text: t("STATS_EMPTY_TITLE") });
     empty.createDiv({ cls: "sr-stats-empty-text", text: t("STATS_EMPTY_TEXT") });
     const button = empty.createEl("button", {
-        cls: "mod-cta sr-stats-empty-button",
+        cls: "fs-primary-button sr-stats-empty-button",
         text: t("STATS_REVIEW_NOW"),
         attr: { type: "button" },
     });
