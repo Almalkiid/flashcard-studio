@@ -2,6 +2,7 @@ import { Question } from "src/data/data-structures/card/questions/question";
 import { PluginData } from "src/data/plugin-data";
 import { PluginDataManager } from "src/data/plugin-data-manager";
 import { SRSettings } from "src/data/settings";
+import { moment } from "src/utils/dates";
 
 /**
  * Represents a list of postponed questions (i.e. questions buried siblings).
@@ -63,7 +64,8 @@ export class QuestionPostponementList implements IQuestionPostponementList {
      * @returns {Promise<void>} - A promise that resolves when the list is cleared if it's a new day.
      */
     async clearIfNewDay(data: PluginData): Promise<void> {
-        const now = window.moment(Date.now());
+        // Locale independent, because the date is stored and compared as text
+        const now = moment(Date.now());
         const todayDate: string = now.format("YYYY-MM-DD");
 
         // clear bury list if we've changed dates
