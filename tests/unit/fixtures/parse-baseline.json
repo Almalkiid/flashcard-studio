@@ -1,0 +1,4831 @@
+{
+  "corpus/callout-note-plain": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "after::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "after",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "after::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "after",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "after::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "after",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "after::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "after",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-question-plain-text-before-card": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-sr-layout-1105": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "> [!tip] Kentucky\n> - ==Louisville==\n> - Lexington\n<!--SR:!2026-01-01,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>[...]</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->",
+            "back": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>Louisville</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "- ==Frankfort==",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "- <span style='color:#2196f3'>[...]</span>",
+            "back": "- <span style='color:#2196f3'>Frankfort</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "> [!tip] Kentucky\n> - ==Louisville==\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- ==Frankfort==",
+        "firstLine": 0,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>[...]</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- Frankfort",
+            "back": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>Louisville</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- Frankfort"
+          },
+          {
+            "front": "> [!tip] Kentucky\n> - Louisville\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- <span style='color:#2196f3'>[...]</span>",
+            "back": "> [!tip] Kentucky\n> - Louisville\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- <span style='color:#2196f3'>Frankfort</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "> [!tip] Kentucky\n> - ==Louisville==\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- ==Frankfort==",
+        "firstLine": 0,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>[...]</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- Frankfort",
+            "back": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>Louisville</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- Frankfort"
+          },
+          {
+            "front": "> [!tip] Kentucky\n> - Louisville\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- <span style='color:#2196f3'>[...]</span>",
+            "back": "> [!tip] Kentucky\n> - Louisville\n> - Lexington\n<!--SR:!2026-01-01,4,270-->\n\n- <span style='color:#2196f3'>Frankfort</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "> [!tip] Kentucky\n> - ==Louisville==\n> - Lexington\n<!--SR:!2026-01-01,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>[...]</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->",
+            "back": "> [!tip] Kentucky\n> - <span style='color:#2196f3'>Louisville</span>\n> - Lexington\n<!--SR:!2026-01-01,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "- ==Frankfort==",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "- <span style='color:#2196f3'>[...]</span>",
+            "back": "- <span style='color:#2196f3'>Frankfort</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-tip-after-multiline-answer": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "**Q**\n?\n- A1\n- A2\n> [!tip] The board\n> Extra tip.",
+        "firstLine": 0,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "**Q**",
+            "back": "- A1\n- A2\n> [!tip] The board\n> Extra tip."
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "**Q2**\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "**Q2**",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "**Q**\n?\n- A1\n- A2\n> [!tip] The board\n> Extra tip.\n\n**Q2**\n?\nA",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "**Q**",
+            "back": "- A1\n- A2\n> [!tip] The board\n> Extra tip.\n\n**Q2**\n?\nA"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "**Q**\n?\n- A1\n- A2\n> [!tip] The board\n> Extra tip.\n\n**Q2**\n?\nA",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "**Q**",
+            "back": "- A1\n- A2\n> [!tip] The board\n> Extra tip.\n\n**Q2**\n?\nA"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "**Q**\n?\n- A1\n- A2\n> [!tip] The board\n> Extra tip.",
+        "firstLine": 0,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "**Q**",
+            "back": "- A1\n- A2\n> [!tip] The board\n> Extra tip."
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "**Q2**\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "**Q2**",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-with-cloze": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "> [!question] The capital of ==France==\n> is a city\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "> [!question] The capital of <span style='color:#2196f3'>[...]</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->",
+            "back": "> [!question] The capital of <span style='color:#2196f3'>France</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "next ==c==",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "next <span style='color:#2196f3'>[...]</span>",
+            "back": "next <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "> [!question] The capital of ==France==\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext ==c==",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "> [!question] The capital of <span style='color:#2196f3'>[...]</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext c",
+            "back": "> [!question] The capital of <span style='color:#2196f3'>France</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext c"
+          },
+          {
+            "front": "> [!question] The capital of France\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext <span style='color:#2196f3'>[...]</span>",
+            "back": "> [!question] The capital of France\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "> [!question] The capital of ==France==\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext ==c==",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "> [!question] The capital of <span style='color:#2196f3'>[...]</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext c",
+            "back": "> [!question] The capital of <span style='color:#2196f3'>France</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext c"
+          },
+          {
+            "front": "> [!question] The capital of France\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext <span style='color:#2196f3'>[...]</span>",
+            "back": "> [!question] The capital of France\n> is a city\n<!--SR:!2021-08-11,4,270-->\n\nnext <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "> [!question] The capital of ==France==\n> is a city\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "> [!question] The capital of <span style='color:#2196f3'>[...]</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->",
+            "back": "> [!question] The capital of <span style='color:#2196f3'>France</span>\n> is a city\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "next ==c==",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "next <span style='color:#2196f3'>[...]</span>",
+            "back": "next <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-with-inline-separator": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "> [!question] What is std::vector",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "> [!question] What is std",
+            "back": "vector"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "next::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "next",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "> [!question] What is std::vector",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "> [!question] What is std",
+            "back": "vector"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "next::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "next",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "> [!question] What is std::vector",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "> [!question] What is std",
+            "back": "vector"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "next::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "next",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "> [!question] What is std::vector",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "> [!question] What is std",
+            "back": "vector"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "next::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "next",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/callout-with-multiline-separator-lines": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 4,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 4,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 4,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 4,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-in-heading-and-quote": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "# Heading ==h1==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "# Heading <span style='color:#2196f3'>[...]</span>",
+            "back": "# Heading <span style='color:#2196f3'>h1</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "> quoted ==q==\n> more quote",
+        "firstLine": 2,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> quoted <span style='color:#2196f3'>[...]</span>\n> more quote",
+            "back": "> quoted <span style='color:#2196f3'>q</span>\n> more quote"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "# Heading ==h1==\n\n> quoted ==q==\n> more quote",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "# Heading <span style='color:#2196f3'>[...]</span>\n\n> quoted q\n> more quote",
+            "back": "# Heading <span style='color:#2196f3'>h1</span>\n\n> quoted q\n> more quote"
+          },
+          {
+            "front": "# Heading h1\n\n> quoted <span style='color:#2196f3'>[...]</span>\n> more quote",
+            "back": "# Heading h1\n\n> quoted <span style='color:#2196f3'>q</span>\n> more quote"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "# Heading ==h1==\n\n> quoted ==q==\n> more quote",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "# Heading <span style='color:#2196f3'>[...]</span>\n\n> quoted q\n> more quote",
+            "back": "# Heading <span style='color:#2196f3'>h1</span>\n\n> quoted q\n> more quote"
+          },
+          {
+            "front": "# Heading h1\n\n> quoted <span style='color:#2196f3'>[...]</span>\n> more quote",
+            "back": "# Heading h1\n\n> quoted <span style='color:#2196f3'>q</span>\n> more quote"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "# Heading ==h1==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "# Heading <span style='color:#2196f3'>[...]</span>",
+            "back": "# Heading <span style='color:#2196f3'>h1</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "> quoted ==q==\n> more quote",
+        "firstLine": 2,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> quoted <span style='color:#2196f3'>[...]</span>\n> more quote",
+            "back": "> quoted <span style='color:#2196f3'>q</span>\n> more quote"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-in-list": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "- item ==one==\n- item ==two==",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "- item <span style='color:#2196f3'>[...]</span>\n- item two",
+            "back": "- item <span style='color:#2196f3'>one</span>\n- item two"
+          },
+          {
+            "front": "- item one\n- item <span style='color:#2196f3'>[...]</span>",
+            "back": "- item one\n- item <span style='color:#2196f3'>two</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "1. numbered ==three==\n2. plain",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "1. numbered <span style='color:#2196f3'>[...]</span>\n2. plain",
+            "back": "1. numbered <span style='color:#2196f3'>three</span>\n2. plain"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "- item ==one==\n- item ==two==\n\n1. numbered ==three==\n2. plain",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "- item <span style='color:#2196f3'>[...]</span>\n- item two\n\n1. numbered three\n2. plain",
+            "back": "- item <span style='color:#2196f3'>one</span>\n- item two\n\n1. numbered three\n2. plain"
+          },
+          {
+            "front": "- item one\n- item <span style='color:#2196f3'>[...]</span>\n\n1. numbered three\n2. plain",
+            "back": "- item one\n- item <span style='color:#2196f3'>two</span>\n\n1. numbered three\n2. plain"
+          },
+          {
+            "front": "- item one\n- item two\n\n1. numbered <span style='color:#2196f3'>[...]</span>\n2. plain",
+            "back": "- item one\n- item two\n\n1. numbered <span style='color:#2196f3'>three</span>\n2. plain"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "- item ==one==\n- item ==two==\n\n1. numbered ==three==\n2. plain",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "- item <span style='color:#2196f3'>[...]</span>\n- item two\n\n1. numbered three\n2. plain",
+            "back": "- item <span style='color:#2196f3'>one</span>\n- item two\n\n1. numbered three\n2. plain"
+          },
+          {
+            "front": "- item one\n- item <span style='color:#2196f3'>[...]</span>\n\n1. numbered three\n2. plain",
+            "back": "- item one\n- item <span style='color:#2196f3'>two</span>\n\n1. numbered three\n2. plain"
+          },
+          {
+            "front": "- item one\n- item two\n\n1. numbered <span style='color:#2196f3'>[...]</span>\n2. plain",
+            "back": "- item one\n- item two\n\n1. numbered <span style='color:#2196f3'>three</span>\n2. plain"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "- item ==one==\n- item ==two==",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "- item <span style='color:#2196f3'>[...]</span>\n- item two",
+            "back": "- item <span style='color:#2196f3'>one</span>\n- item two"
+          },
+          {
+            "front": "- item one\n- item <span style='color:#2196f3'>[...]</span>",
+            "back": "- item one\n- item <span style='color:#2196f3'>two</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "1. numbered ==three==\n2. plain",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "1. numbered <span style='color:#2196f3'>[...]</span>\n2. plain",
+            "back": "1. numbered <span style='color:#2196f3'>three</span>\n2. plain"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-in-table": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "| a | b |\n|---|---|\n| ==x== | y |",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>[...]</span> | y |",
+            "back": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>x</span> | y |"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "| a | b |\n|---|---|\n| ==x== | y |\n\nafter",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>[...]</span> | y |\n\nafter",
+            "back": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>x</span> | y |\n\nafter"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "| a | b |\n|---|---|\n| ==x== | y |\n\nafter",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>[...]</span> | y |\n\nafter",
+            "back": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>x</span> | y |\n\nafter"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "| a | b |\n|---|---|\n| ==x== | y |",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>[...]</span> | y |",
+            "back": "| a | b |\n|---|---|\n| <span style='color:#2196f3'>x</span> | y |"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-multiline-paragraph-comment-at-end": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "L1 <span style='color:#2196f3'>[...]</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "L1 <span style='color:#2196f3'>a</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "L1 a\nL2 <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "L1 a\nL2 <span style='color:#2196f3'>b</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "next ==c==",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "next <span style='color:#2196f3'>[...]</span>",
+            "back": "next <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext ==c==",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "L1 <span style='color:#2196f3'>[...]</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c",
+            "back": "L1 <span style='color:#2196f3'>a</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c"
+          },
+          {
+            "front": "L1 a\nL2 <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c",
+            "back": "L1 a\nL2 <span style='color:#2196f3'>b</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c"
+          },
+          {
+            "front": "L1 a\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext <span style='color:#2196f3'>[...]</span>",
+            "back": "L1 a\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext ==c==",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "L1 <span style='color:#2196f3'>[...]</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c",
+            "back": "L1 <span style='color:#2196f3'>a</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c"
+          },
+          {
+            "front": "L1 a\nL2 <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c",
+            "back": "L1 a\nL2 <span style='color:#2196f3'>b</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext c"
+          },
+          {
+            "front": "L1 a\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext <span style='color:#2196f3'>[...]</span>",
+            "back": "L1 a\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nnext <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "L1 <span style='color:#2196f3'>[...]</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "L1 <span style='color:#2196f3'>a</span>\nL2 b\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "L1 a\nL2 <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "L1 a\nL2 <span style='color:#2196f3'>b</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "next ==c==",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "next <span style='color:#2196f3'>[...]</span>",
+            "back": "next <span style='color:#2196f3'>c</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-numbered-and-hints": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "==[1;;]alpha;;first== and ==[1;;]beta== and ==[2;;]gamma;;third== plain",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "<span style='color:#2196f3'>[]alpha;;first]</span> and [1 and [2 plain",
+            "back": "<span style='color:#2196f3'>[1</span> and [1 and [2 plain"
+          },
+          {
+            "front": "[1 and <span style='color:#2196f3'>[]beta]</span> and [2 plain",
+            "back": "[1 and <span style='color:#2196f3'>[1</span> and [2 plain"
+          },
+          {
+            "front": "[1 and [1 and <span style='color:#2196f3'>[]gamma;;third]</span> plain",
+            "back": "[1 and [1 and <span style='color:#2196f3'>[2</span> plain"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "==[1;;]alpha;;first== and ==[1;;]beta== and ==[2;;]gamma;;third== plain",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "<span style='color:#2196f3'>[]alpha;;first]</span> and [1 and [2 plain",
+            "back": "<span style='color:#2196f3'>[1</span> and [1 and [2 plain"
+          },
+          {
+            "front": "[1 and <span style='color:#2196f3'>[]beta]</span> and [2 plain",
+            "back": "[1 and <span style='color:#2196f3'>[1</span> and [2 plain"
+          },
+          {
+            "front": "[1 and [1 and <span style='color:#2196f3'>[]gamma;;third]</span> plain",
+            "back": "[1 and [1 and <span style='color:#2196f3'>[2</span> plain"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "==[1;;]alpha;;first== and ==[1;;]beta== and ==[2;;]gamma;;third== plain",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "<span style='color:#2196f3'>[]alpha;;first]</span> and [1 and [2 plain",
+            "back": "<span style='color:#2196f3'>[1</span> and [1 and [2 plain"
+          },
+          {
+            "front": "[1 and <span style='color:#2196f3'>[]beta]</span> and [2 plain",
+            "back": "[1 and <span style='color:#2196f3'>[1</span> and [2 plain"
+          },
+          {
+            "front": "[1 and [1 and <span style='color:#2196f3'>[]gamma;;third]</span> plain",
+            "back": "[1 and [1 and <span style='color:#2196f3'>[2</span> plain"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "==[1;;]alpha;;first== and ==[1;;]beta== and ==[2;;]gamma;;third== plain",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "<span style='color:#2196f3'>[]alpha;;first]</span> and [1 and [2 plain",
+            "back": "<span style='color:#2196f3'>[1</span> and [1 and [2 plain"
+          },
+          {
+            "front": "[1 and <span style='color:#2196f3'>[]beta]</span> and [2 plain",
+            "back": "[1 and <span style='color:#2196f3'>[1</span> and [2 plain"
+          },
+          {
+            "front": "[1 and [1 and <span style='color:#2196f3'>[]gamma;;third]</span> plain",
+            "back": "[1 and [1 and <span style='color:#2196f3'>[2</span> plain"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-paragraph": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "intro line\nthe ==cloze== here\nmore text",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "intro line\nthe <span style='color:#2196f3'>[...]</span> here\nmore text",
+            "back": "intro line\nthe <span style='color:#2196f3'>cloze</span> here\nmore text"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "another ==one==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "another <span style='color:#2196f3'>[...]</span>",
+            "back": "another <span style='color:#2196f3'>one</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "intro line\nthe ==cloze== here\nmore text\n\nnext paragraph without a cloze\n\nanother ==one==",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "intro line\nthe <span style='color:#2196f3'>[...]</span> here\nmore text\n\nnext paragraph without a cloze\n\nanother one",
+            "back": "intro line\nthe <span style='color:#2196f3'>cloze</span> here\nmore text\n\nnext paragraph without a cloze\n\nanother one"
+          },
+          {
+            "front": "intro line\nthe cloze here\nmore text\n\nnext paragraph without a cloze\n\nanother <span style='color:#2196f3'>[...]</span>",
+            "back": "intro line\nthe cloze here\nmore text\n\nnext paragraph without a cloze\n\nanother <span style='color:#2196f3'>one</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "intro line\nthe ==cloze== here\nmore text\n\nnext paragraph without a cloze\n\nanother ==one==",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "intro line\nthe <span style='color:#2196f3'>[...]</span> here\nmore text\n\nnext paragraph without a cloze\n\nanother one",
+            "back": "intro line\nthe <span style='color:#2196f3'>cloze</span> here\nmore text\n\nnext paragraph without a cloze\n\nanother one"
+          },
+          {
+            "front": "intro line\nthe cloze here\nmore text\n\nnext paragraph without a cloze\n\nanother <span style='color:#2196f3'>[...]</span>",
+            "back": "intro line\nthe cloze here\nmore text\n\nnext paragraph without a cloze\n\nanother <span style='color:#2196f3'>one</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "intro line\nthe ==cloze== here\nmore text",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "intro line\nthe <span style='color:#2196f3'>[...]</span> here\nmore text",
+            "back": "intro line\nthe <span style='color:#2196f3'>cloze</span> here\nmore text"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "another ==one==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "another <span style='color:#2196f3'>[...]</span>",
+            "back": "another <span style='color:#2196f3'>one</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-simple": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "The capital of ==France== is ==Paris==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "The capital of <span style='color:#2196f3'>[...]</span> is Paris",
+            "back": "The capital of <span style='color:#2196f3'>France</span> is Paris"
+          },
+          {
+            "front": "The capital of France is <span style='color:#2196f3'>[...]</span>",
+            "back": "The capital of France is <span style='color:#2196f3'>Paris</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "The capital of ==France== is ==Paris==\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "The capital of <span style='color:#2196f3'>[...]</span> is Paris\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+            "back": "The capital of <span style='color:#2196f3'>France</span> is Paris\n\nBold **cloze** here\n\nCurly {{cloze}} here"
+          },
+          {
+            "front": "The capital of France is <span style='color:#2196f3'>[...]</span>\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+            "back": "The capital of France is <span style='color:#2196f3'>Paris</span>\n\nBold **cloze** here\n\nCurly {{cloze}} here"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "The capital of ==France== is ==Paris==\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "The capital of <span style='color:#2196f3'>[...]</span> is Paris\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+            "back": "The capital of <span style='color:#2196f3'>France</span> is Paris\n\nBold **cloze** here\n\nCurly {{cloze}} here"
+          },
+          {
+            "front": "The capital of France is <span style='color:#2196f3'>[...]</span>\n\nBold **cloze** here\n\nCurly {{cloze}} here",
+            "back": "The capital of France is <span style='color:#2196f3'>Paris</span>\n\nBold **cloze** here\n\nCurly {{cloze}} here"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "The capital of ==France== is ==Paris==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "The capital of <span style='color:#2196f3'>[...]</span> is Paris",
+            "back": "The capital of <span style='color:#2196f3'>France</span> is Paris"
+          },
+          {
+            "front": "The capital of France is <span style='color:#2196f3'>[...]</span>",
+            "back": "The capital of France is <span style='color:#2196f3'>Paris</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Bold **cloze** here",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Bold <span style='color:#2196f3'>[...]</span> here",
+            "back": "Bold <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Curly {{cloze}} here",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Curly <span style='color:#2196f3'>[...]</span> here",
+            "back": "Curly <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/cloze-with-schedule": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "A ==b== and ==c==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "A <span style='color:#2196f3'>[...]</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "A <span style='color:#2196f3'>b</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A b and <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "A b and <span style='color:#2196f3'>c</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "D ==e== <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "D <span style='color:#2196f3'>[...]</span> <!--SR:!2021-08-11,4,270-->",
+            "back": "D <span style='color:#2196f3'>e</span> <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "A ==b== and ==c==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD ==e== <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "A <span style='color:#2196f3'>[...]</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->",
+            "back": "A <span style='color:#2196f3'>b</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->"
+          },
+          {
+            "front": "A b and <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->",
+            "back": "A b and <span style='color:#2196f3'>c</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->"
+          },
+          {
+            "front": "A b and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD <span style='color:#2196f3'>[...]</span> <!--SR:!2021-08-11,4,270-->",
+            "back": "A b and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD <span style='color:#2196f3'>e</span> <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "A ==b== and ==c==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD ==e== <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "A <span style='color:#2196f3'>[...]</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->",
+            "back": "A <span style='color:#2196f3'>b</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->"
+          },
+          {
+            "front": "A b and <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->",
+            "back": "A b and <span style='color:#2196f3'>c</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD e <!--SR:!2021-08-11,4,270-->"
+          },
+          {
+            "front": "A b and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD <span style='color:#2196f3'>[...]</span> <!--SR:!2021-08-11,4,270-->",
+            "back": "A b and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->\n\nD <span style='color:#2196f3'>e</span> <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "A ==b== and ==c==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "A <span style='color:#2196f3'>[...]</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "A <span style='color:#2196f3'>b</span> and c\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A b and <span style='color:#2196f3'>[...]</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "A b and <span style='color:#2196f3'>c</span>\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "D ==e== <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "D <span style='color:#2196f3'>[...]</span> <!--SR:!2021-08-11,4,270-->",
+            "back": "D <span style='color:#2196f3'>e</span> <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/code-fence-then-card": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/crlf": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==x==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>x</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n\ncloze ==x==",
+        "firstLine": 2,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n\ncloze ==x=="
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n\ncloze ==x==",
+        "firstLine": 2,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n\ncloze ==x=="
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==x==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>x</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/dashes-hr-in-prose": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 8,
+        "lastLine": 10,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 8,
+        "lastLine": 11,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n\n---",
+        "firstLine": 8,
+        "lastLine": 12,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n\n---"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 8,
+        "lastLine": 10,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/definition-list-ish": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Term::Definition one",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Term",
+            "back": "Definition one"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Term2::Definition two",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Term2",
+            "back": "Definition two"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Term3:::Two-way",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Term3",
+            "back": "Two-way"
+          },
+          {
+            "front": "Two-way",
+            "back": "Term3"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Term::Definition one",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Term",
+            "back": "Definition one"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Term2::Definition two",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Term2",
+            "back": "Definition two"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Term3:::Two-way",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Term3",
+            "back": "Two-way"
+          },
+          {
+            "front": "Two-way",
+            "back": "Term3"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Term::Definition one",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Term",
+            "back": "Definition one"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Term2::Definition two",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Term2",
+            "back": "Definition two"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Term3:::Two-way",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Term3",
+            "back": "Two-way"
+          },
+          {
+            "front": "Two-way",
+            "back": "Term3"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Term::Definition one",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Term",
+            "back": "Definition one"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Term2::Definition two",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Term2",
+            "back": "Definition two"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Term3:::Two-way",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Term3",
+            "back": "Two-way"
+          },
+          {
+            "front": "Two-way",
+            "back": "Term3"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/emoji-and-unicode": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Café::☕ latte",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Café",
+            "back": "☕ latte"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "naïve ==élève== 😀",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "naïve <span style='color:#2196f3'>[...]</span> 😀",
+            "back": "naïve <span style='color:#2196f3'>élève</span> 😀"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Café::☕ latte",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Café",
+            "back": "☕ latte"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "naïve ==élève== 😀",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "naïve <span style='color:#2196f3'>[...]</span> 😀",
+            "back": "naïve <span style='color:#2196f3'>élève</span> 😀"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Café::☕ latte",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Café",
+            "back": "☕ latte"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "naïve ==élève== 😀",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "naïve <span style='color:#2196f3'>[...]</span> 😀",
+            "back": "naïve <span style='color:#2196f3'>élève</span> 😀"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Café::☕ latte",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Café",
+            "back": "☕ latte"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "naïve ==élève== 😀",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "naïve <span style='color:#2196f3'>[...]</span> 😀",
+            "back": "naïve <span style='color:#2196f3'>élève</span> 😀"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/empty": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "corpus/end-marker-cloze-then-text": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "cloze ==a==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>a</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "third ==b==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "third <span style='color:#2196f3'>[...]</span>",
+            "back": "third <span style='color:#2196f3'>b</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "cloze ==a==\n\nsecond paragraph",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>\n\nsecond paragraph",
+            "back": "cloze <span style='color:#2196f3'>a</span>\n\nsecond paragraph"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "third ==b==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "third <span style='color:#2196f3'>[...]</span>",
+            "back": "third <span style='color:#2196f3'>b</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "cloze ==a==\n\nsecond paragraph\n\n---\n\nthird ==b==",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>\n\nsecond paragraph\n\n---\n\nthird b",
+            "back": "cloze <span style='color:#2196f3'>a</span>\n\nsecond paragraph\n\n---\n\nthird b"
+          },
+          {
+            "front": "cloze a\n\nsecond paragraph\n\n---\n\nthird <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze a\n\nsecond paragraph\n\n---\n\nthird <span style='color:#2196f3'>b</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "cloze ==a==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>a</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "third ==b==",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "third <span style='color:#2196f3'>[...]</span>",
+            "back": "third <span style='color:#2196f3'>b</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/end-marker-friendly": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n+++\nQ2\n?\nA2 line1",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n+++\nQ2\n?\nA2 line1"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Cloze ==x== here\n+++",
+        "firstLine": 11,
+        "lastLine": 12,
+        "cards": [
+          {
+            "front": "Cloze <span style='color:#2196f3'>[...]</span> here\n+++",
+            "back": "Cloze <span style='color:#2196f3'>x</span> here\n+++"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 14,
+        "lastLine": 14,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "+++\nQ4\n---\nQ5\n?\nA5\n---",
+        "firstLine": 14,
+        "lastLine": 21,
+        "cards": [
+          {
+            "front": "+++\nQ4\n---\nQ5",
+            "back": "A5\n---"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n+++\nQ2\n?\nA2 line1\n\nA2 line2\n+++\n\nCloze ==x== here\n+++\n\nQ3::A3\n+++\nQ4",
+        "firstLine": 0,
+        "lastLine": 16,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n+++\nQ2\n?\nA2 line1\n\nA2 line2\n+++\n\nCloze ==x== here\n+++\n\nQ3::A3\n+++\nQ4"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q5\n?\nA5",
+        "firstLine": 18,
+        "lastLine": 20,
+        "cards": [
+          {
+            "front": "Q5",
+            "back": "A5"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q2\n?\nA2 line1\n\nA2 line2",
+        "firstLine": 4,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 line1\n\nA2 line2"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Cloze ==x== here",
+        "firstLine": 11,
+        "lastLine": 11,
+        "cards": [
+          {
+            "front": "Cloze <span style='color:#2196f3'>[...]</span> here",
+            "back": "Cloze <span style='color:#2196f3'>x</span> here"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 14,
+        "lastLine": 14,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q4\n---\nQ5\n?\nA5\n---",
+        "firstLine": 16,
+        "lastLine": 21,
+        "cards": [
+          {
+            "front": "Q4\n---\nQ5",
+            "back": "A5\n---"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n+++\nQ2\n?\nA2 line1",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n+++\nQ2\n?\nA2 line1"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Cloze ==x== here\n+++",
+        "firstLine": 11,
+        "lastLine": 12,
+        "cards": [
+          {
+            "front": "Cloze <span style='color:#2196f3'>[...]</span> here\n+++",
+            "back": "Cloze <span style='color:#2196f3'>x</span> here\n+++"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 14,
+        "lastLine": 14,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "+++\nQ4\n---\nQ5\n?\nA5\n---",
+        "firstLine": 14,
+        "lastLine": 21,
+        "cards": [
+          {
+            "front": "+++\nQ4\n---\nQ5",
+            "back": "A5\n---"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/end-marker-unterminated-last-card": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n---\nQ2\n?\nA2 with no end marker at all",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n---\nQ2\n?\nA2 with no end marker at all"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q2\n?\nA2 with no end marker at all",
+        "firstLine": 4,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 with no end marker at all"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n---\nQ2\n?\nA2 with no end marker at all",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n---\nQ2\n?\nA2 with no end marker at all"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n---\nQ2\n?\nA2 with no end marker at all",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n---\nQ2\n?\nA2 with no end marker at all"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/end-marker-with-schedule": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q2\n?\nA2\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 5,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q1\n?\nA1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->\n+++\nQ2\n?\nA2\n<!--SR:!2021-08-11,4,270-->\n+++"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/frontmatter": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Who::Socrates",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Who",
+            "back": "Socrates"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Who::Socrates",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Who",
+            "back": "Socrates"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Who::Socrates",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Who",
+            "back": "Socrates"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Who::Socrates",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Who",
+            "back": "Socrates"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 7,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/html-comments": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q3::A3",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/inline-code-with-separators": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "Use `a::b` and ==this==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Use `a::b` and <span style='color:#2196f3'>[...]</span>",
+            "back": "Use `a::b` and <span style='color:#2196f3'>this</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "real::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "real",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "Use `a::b` and ==this==\n\nreal::card",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Use `a::b` and <span style='color:#2196f3'>[...]</span>\n\nreal::card",
+            "back": "Use `a::b` and <span style='color:#2196f3'>this</span>\n\nreal::card"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "Use `a::b` and ==this==\n\nreal::card",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Use `a::b` and <span style='color:#2196f3'>[...]</span>\n\nreal::card",
+            "back": "Use `a::b` and <span style='color:#2196f3'>this</span>\n\nreal::card"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "Use `a::b` and ==this==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Use `a::b` and <span style='color:#2196f3'>[...]</span>",
+            "back": "Use `a::b` and <span style='color:#2196f3'>this</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "real::card",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "real",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/long-list-question": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "List the layers\n?\n1. Physical\n2. Data link",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "List the layers",
+            "back": "1. Physical\n2. Data link"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Unrelated ==text==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Unrelated <span style='color:#2196f3'>[...]</span>",
+            "back": "Unrelated <span style='color:#2196f3'>text</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "List the layers\n?\n1. Physical\n2. Data link\n\n3. Network\n4. Transport\n\nUnrelated ==text==",
+        "firstLine": 0,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "List the layers",
+            "back": "1. Physical\n2. Data link\n\n3. Network\n4. Transport\n\nUnrelated ==text=="
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "List the layers\n?\n1. Physical\n2. Data link\n\n3. Network\n4. Transport\n\nUnrelated ==text==",
+        "firstLine": 0,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "List the layers",
+            "back": "1. Physical\n2. Data link\n\n3. Network\n4. Transport\n\nUnrelated ==text=="
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "List the layers\n?\n1. Physical\n2. Data link",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "List the layers",
+            "back": "1. Physical\n2. Data link"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Unrelated ==text==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Unrelated <span style='color:#2196f3'>[...]</span>",
+            "back": "Unrelated <span style='color:#2196f3'>text</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/math-plain": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "Inline $x^2$ and ==cloze== here",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Inline $x^2$ and <span style='color:#2196f3'>[...]</span> here",
+            "back": "Inline $x^2$ and <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "Inline $x^2$ and ==cloze== here",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Inline $x^2$ and <span style='color:#2196f3'>[...]</span> here",
+            "back": "Inline $x^2$ and <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "Inline $x^2$ and ==cloze== here",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Inline $x^2$ and <span style='color:#2196f3'>[...]</span> here",
+            "back": "Inline $x^2$ and <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "Inline $x^2$ and ==cloze== here",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Inline $x^2$ and <span style='color:#2196f3'>[...]</span> here",
+            "back": "Inline $x^2$ and <span style='color:#2196f3'>cloze</span> here"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/math-with-highlight-in-formula": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "The formula $E = mc^2$ means ==energy==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "The formula $E = mc^2$ means <span style='color:#2196f3'>[...]</span>",
+            "back": "The formula $E = mc^2$ means <span style='color:#2196f3'>energy</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "$a$::$b$",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "$a$",
+            "back": "$b$"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "The formula $E = mc^2$ means ==energy==\n\n$$ x + y $$\n$a$::$b$",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "The formula $E = mc^2$ means <span style='color:#2196f3'>[...]</span>\n\n$$ x + y $$\n$a$::$b$",
+            "back": "The formula $E = mc^2$ means <span style='color:#2196f3'>energy</span>\n\n$$ x + y $$\n$a$::$b$"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "The formula $E = mc^2$ means ==energy==\n\n$$ x + y $$\n$a$::$b$",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "The formula $E = mc^2$ means <span style='color:#2196f3'>[...]</span>\n\n$$ x + y $$\n$a$::$b$",
+            "back": "The formula $E = mc^2$ means <span style='color:#2196f3'>energy</span>\n\n$$ x + y $$\n$a$::$b$"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "The formula $E = mc^2$ means ==energy==",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "The formula $E = mc^2$ means <span style='color:#2196f3'>[...]</span>",
+            "back": "The formula $E = mc^2$ means <span style='color:#2196f3'>energy</span>"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "$a$::$b$",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "$a$",
+            "back": "$b$"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      },
+      {
+        "cardType": 3,
+        "text": "Question 2 line 1\nline 2\n??\nAnswer 2\nmore answer",
+        "firstLine": 4,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Question 2 line 1\nline 2",
+            "back": "Answer 2\nmore answer"
+          },
+          {
+            "front": "Answer 2\nmore answer",
+            "back": "Question 2 line 1\nline 2"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 3,
+        "text": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2\n??\nAnswer 2\nmore answer\n\nlast",
+        "firstLine": 0,
+        "lastLine": 10,
+        "cards": [
+          {
+            "front": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2",
+            "back": "Answer 2\nmore answer\n\nlast"
+          },
+          {
+            "front": "Answer 2\nmore answer\n\nlast",
+            "back": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 3,
+        "text": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2\n??\nAnswer 2\nmore answer\n\nlast",
+        "firstLine": 0,
+        "lastLine": 10,
+        "cards": [
+          {
+            "front": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2",
+            "back": "Answer 2\nmore answer\n\nlast"
+          },
+          {
+            "front": "Answer 2\nmore answer\n\nlast",
+            "back": "Question\n?\nAnswer\n\nQuestion 2 line 1\nline 2"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer"
+          }
+        ]
+      },
+      {
+        "cardType": 3,
+        "text": "Question 2 line 1\nline 2\n??\nAnswer 2\nmore answer",
+        "firstLine": 4,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Question 2 line 1\nline 2",
+            "back": "Answer 2\nmore answer"
+          },
+          {
+            "front": "Answer 2\nmore answer",
+            "back": "Question 2 line 1\nline 2"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-blank-lines-in-answer": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer para 1",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer para 1"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer para 1\n\nAnswer para 2\n\nfollowing text",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer para 1\n\nAnswer para 2\n\nfollowing text"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer para 1\n\nAnswer para 2\n\nfollowing text",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer para 1\n\nAnswer para 2\n\nfollowing text"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer para 1",
+        "firstLine": 0,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer para 1"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-blank-lines-in-question": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Paragraph two of the question\n?\nThe answer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Paragraph two of the question",
+            "back": "The answer"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Paragraph two of the question\n?\nThe answer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Paragraph two of the question",
+            "back": "The answer"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Paragraph two of the question\n?\nThe answer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Paragraph two of the question",
+            "back": "The answer"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Paragraph two of the question\n?\nThe answer",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Paragraph two of the question",
+            "back": "The answer"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-code-block": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "How do I print?\n?\n```python\nprint('x')\n\nprint('y')\n```\nDone",
+        "firstLine": 0,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "How do I print?",
+            "back": "```python\nprint('x')\n\nprint('y')\n```\nDone"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Next::card",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Next",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "How do I print?\n?\n```python\nprint('x')\n\nprint('y')\n```\nDone\n\nNext::card",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "How do I print?",
+            "back": "```python\nprint('x')\n\nprint('y')\n```\nDone\n\nNext::card"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "How do I print?\n?\n```python\nprint('x')\n\nprint('y')\n```\nDone\n\nNext::card",
+        "firstLine": 0,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "How do I print?",
+            "back": "```python\nprint('x')\n\nprint('y')\n```\nDone\n\nNext::card"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "How do I print?\n?\n```python\nprint('x')\n\nprint('y')\n```\nDone",
+        "firstLine": 0,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "How do I print?",
+            "back": "```python\nprint('x')\n\nprint('y')\n```\nDone"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Next::card",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "Next",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-empty-answer": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Other::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Other",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\n\nOther::card\n\nQ\n?",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "\nOther::card\n\nQ\n?"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\n\nOther::card\n\nQ\n?",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "\nOther::card\n\nQ\n?"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Other::card",
+        "firstLine": 3,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Other",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-tilde-block": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\n~~~\ncode :: here\n~~~",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "~~~\ncode :: here\n~~~"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "A::B",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "A",
+            "back": "B"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\n~~~\ncode :: here\n~~~\n\nA::B",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "~~~\ncode :: here\n~~~\n\nA::B"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\n~~~\ncode :: here\n~~~\n\nA::B",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "~~~\ncode :: here\n~~~\n\nA::B"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\n~~~\ncode :: here\n~~~",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "~~~\ncode :: here\n~~~"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "A::B",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "A",
+            "back": "B"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/multiline-with-schedule": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q2\n?\nA2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 5,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n<!--SR:!2021-08-11,4,270-->\n\nQ2\n?\nA2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n<!--SR:!2021-08-11,4,270-->\n\nQ2\n?\nA2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n<!--SR:!2021-08-11,4,270-->\n\nQ2\n?\nA2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n<!--SR:!2021-08-11,4,270-->\n\nQ2\n?\nA2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Question\n?\nAnswer\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "Question",
+            "back": "Answer\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "Q2\n?\nA2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 5,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/nested-quote-cloze": {
+    "default": [
+      {
+        "cardType": 4,
+        "text": "> > deep ==quote==\n> back",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "> > deep <span style='color:#2196f3'>[...]</span>\n> back",
+            "back": "> > deep <span style='color:#2196f3'>quote</span>\n> back"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 4,
+        "text": "> > deep ==quote==\n> back\n\nx",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> > deep <span style='color:#2196f3'>[...]</span>\n> back\n\nx",
+            "back": "> > deep <span style='color:#2196f3'>quote</span>\n> back\n\nx"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 4,
+        "text": "> > deep ==quote==\n> back\n\nx",
+        "firstLine": 0,
+        "lastLine": 3,
+        "cards": [
+          {
+            "front": "> > deep <span style='color:#2196f3'>[...]</span>\n> back\n\nx",
+            "back": "> > deep <span style='color:#2196f3'>quote</span>\n> back\n\nx"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "> > deep ==quote==\n> back",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "> > deep <span style='color:#2196f3'>[...]</span>\n> back",
+            "back": "> > deep <span style='color:#2196f3'>quote</span>\n> back"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/no-cards": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "corpus/only-blank-lines": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "corpus/plus-lines-in-prose": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==z==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>z</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==z==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>z</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==z==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>z</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q::A",
+        "firstLine": 4,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "cloze ==z==",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "cloze <span style='color:#2196f3'>[...]</span>",
+            "back": "cloze <span style='color:#2196f3'>z</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/rtl": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "سؤال::جواب",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "سؤال",
+            "back": "جواب"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "من ==هو==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "من <span style='color:#2196f3'>[...]</span>",
+            "back": "من <span style='color:#2196f3'>هو</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "سؤال::جواب",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "سؤال",
+            "back": "جواب"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "من ==هو==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "من <span style='color:#2196f3'>[...]</span>",
+            "back": "من <span style='color:#2196f3'>هو</span>"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "سؤال::جواب",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "سؤال",
+            "back": "جواب"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "من ==هو==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "من <span style='color:#2196f3'>[...]</span>",
+            "back": "من <span style='color:#2196f3'>هو</span>"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "سؤال::جواب",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "سؤال",
+            "back": "جواب"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "من ==هو==",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "من <span style='color:#2196f3'>[...]</span>",
+            "back": "من <span style='color:#2196f3'>هو</span>"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/schedule-old-format": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "c ==a==\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "c <span style='color:#2196f3'>[...]</span>\n<!--SR:2021-08-11,4,270-->",
+            "back": "c <span style='color:#2196f3'>a</span>\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "c ==a==\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "c <span style='color:#2196f3'>[...]</span>\n<!--SR:2021-08-11,4,270-->",
+            "back": "c <span style='color:#2196f3'>a</span>\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "c ==a==\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "c <span style='color:#2196f3'>[...]</span>\n<!--SR:2021-08-11,4,270-->",
+            "back": "c <span style='color:#2196f3'>a</span>\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "c ==a==\n<!--SR:2021-08-11,4,270-->",
+        "firstLine": 3,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "c <span style='color:#2196f3'>[...]</span>\n<!--SR:2021-08-11,4,270-->",
+            "back": "c <span style='color:#2196f3'>a</span>\n<!--SR:2021-08-11,4,270-->"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/separator-lookalikes": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA\n\nQ\n???\nA",
+        "firstLine": 2,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A\n\nQ\n???\nA"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA\n\nQ\n???\nA",
+        "firstLine": 2,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A\n\nQ\n???\nA"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Q\n?\nA",
+        "firstLine": 2,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Q",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/single-line": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2:: A2",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": " A2"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3 reversed",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3 reversed"
+          },
+          {
+            "front": "A3 reversed",
+            "back": "Q3"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q4 ::A4",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q4 ",
+            "back": "A4"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2:: A2",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": " A2"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3 reversed",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3 reversed"
+          },
+          {
+            "front": "A3 reversed",
+            "back": "Q3"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q4 ::A4",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q4 ",
+            "back": "A4"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2:: A2",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": " A2"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3 reversed",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3 reversed"
+          },
+          {
+            "front": "A3 reversed",
+            "back": "Q3"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q4 ::A4",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q4 ",
+            "back": "A4"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2:: A2",
+        "firstLine": 1,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": " A2"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3 reversed",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3 reversed"
+          },
+          {
+            "front": "A3 reversed",
+            "back": "Q3"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q4 ::A4",
+        "firstLine": 5,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q4 ",
+            "back": "A4"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/single-line-with-schedule": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 3,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "Q3"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 3,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "Q3"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 3,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "Q3"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "Q1::A1\n<!--SR:!2021-08-11,4,270-->",
+        "firstLine": 0,
+        "lastLine": 1,
+        "cards": [
+          {
+            "front": "Q1",
+            "back": "A1\n<!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Q2::A2 <!--SR:!2021-08-11,4,270-->",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "Q2",
+            "back": "A2 <!--SR:!2021-08-11,4,270-->"
+          }
+        ]
+      },
+      {
+        "cardType": 1,
+        "text": "Q3:::A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+        "firstLine": 3,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "Q3",
+            "back": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->"
+          },
+          {
+            "front": "A3\n> [!sr|card-metadata] \n> <!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+            "back": "Q3"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/table-answer": {
+    "default": [
+      {
+        "cardType": 2,
+        "text": "Compare\n?\n| a | b |\n|---|---|\n| 1 | 2 |",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Compare",
+            "back": "| a | b |\n|---|---|\n| 1 | 2 |"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Another::card",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Another",
+            "back": "card"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 2,
+        "text": "Compare\n?\n| a | b |\n|---|---|\n| 1 | 2 |\n\nAnother::card",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Compare",
+            "back": "| a | b |\n|---|---|\n| 1 | 2 |\n\nAnother::card"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 2,
+        "text": "Compare\n?\n| a | b |\n|---|---|\n| 1 | 2 |\n\nAnother::card",
+        "firstLine": 0,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Compare",
+            "back": "| a | b |\n|---|---|\n| 1 | 2 |\n\nAnother::card"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 2,
+        "text": "Compare\n?\n| a | b |\n|---|---|\n| 1 | 2 |",
+        "firstLine": 0,
+        "lastLine": 4,
+        "cards": [
+          {
+            "front": "Compare",
+            "back": "| a | b |\n|---|---|\n| 1 | 2 |"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "Another::card",
+        "firstLine": 6,
+        "lastLine": 6,
+        "cards": [
+          {
+            "front": "Another",
+            "back": "card"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/tags-and-block-ids": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "#flashcards/science Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "#flashcards/science Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "#flashcards/x\nQuestion\n?\nAnswer ^abc123",
+        "firstLine": 2,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "#flashcards/x\nQuestion",
+            "back": "Answer ^abc123"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Cloze ==x== ^blk",
+        "firstLine": 7,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Cloze <span style='color:#2196f3'>[...]</span> ^blk",
+            "back": "Cloze <span style='color:#2196f3'>x</span> ^blk"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "#flashcards/science Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "#flashcards/science Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "#flashcards/x\nQuestion\n?\nAnswer ^abc123\n\nCloze ==x== ^blk",
+        "firstLine": 2,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "#flashcards/x\nQuestion",
+            "back": "Answer ^abc123\n\nCloze ==x== ^blk"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "#flashcards/science Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "#flashcards/science Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "#flashcards/x\nQuestion\n?\nAnswer ^abc123\n\nCloze ==x== ^blk",
+        "firstLine": 2,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "#flashcards/x\nQuestion",
+            "back": "Answer ^abc123\n\nCloze ==x== ^blk"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "#flashcards/science Q1::A1",
+        "firstLine": 0,
+        "lastLine": 0,
+        "cards": [
+          {
+            "front": "#flashcards/science Q1",
+            "back": "A1"
+          }
+        ]
+      },
+      {
+        "cardType": 2,
+        "text": "#flashcards/x\nQuestion\n?\nAnswer ^abc123",
+        "firstLine": 2,
+        "lastLine": 5,
+        "cards": [
+          {
+            "front": "#flashcards/x\nQuestion",
+            "back": "Answer ^abc123"
+          }
+        ]
+      },
+      {
+        "cardType": 4,
+        "text": "Cloze ==x== ^blk",
+        "firstLine": 7,
+        "lastLine": 7,
+        "cards": [
+          {
+            "front": "Cloze <span style='color:#2196f3'>[...]</span> ^blk",
+            "back": "Cloze <span style='color:#2196f3'>x</span> ^blk"
+          }
+        ]
+      }
+    ]
+  },
+  "corpus/unterminated-highlight": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/filesButNoQuestions/Newton thought that light was composed of particles.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/filesButNoQuestions/The nature of light.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes1/Computation Graph.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes2/Triboelectric Effect.md": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other::Triboelectric effect",
+        "firstLine": 28,
+        "lastLine": 28,
+        "cards": [
+          {
+            "front": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other",
+            "back": "Triboelectric effect"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other::Triboelectric effect",
+        "firstLine": 28,
+        "lastLine": 28,
+        "cards": [
+          {
+            "front": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other",
+            "back": "Triboelectric effect"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other::Triboelectric effect",
+        "firstLine": 28,
+        "lastLine": 28,
+        "cards": [
+          {
+            "front": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other",
+            "back": "Triboelectric effect"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other::Triboelectric effect",
+        "firstLine": 28,
+        "lastLine": 28,
+        "cards": [
+          {
+            "front": "What is the phenomenon called when electric charge is transferred between two objects when they contact or slide against each other",
+            "back": "Triboelectric effect"
+          }
+        ]
+      }
+    ]
+  },
+  "vault/notes3/A.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes3/B.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes3/C.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes3/D.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes4/A.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes4/B.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes4/C.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes4/D.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes4/notes4_readme.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes5/A.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes5/B.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes5/C.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes5/D.md": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "This is question 1::This is answer 1",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "This is question 1",
+            "back": "This is answer 1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "This is question 2::This is answer 2",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "This is question 2",
+            "back": "This is answer 2"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "This is question 1::This is answer 1",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "This is question 1",
+            "back": "This is answer 1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "This is question 2::This is answer 2",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "This is question 2",
+            "back": "This is answer 2"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "This is question 1::This is answer 1",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "This is question 1",
+            "back": "This is answer 1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "This is question 2::This is answer 2",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "This is question 2",
+            "back": "This is answer 2"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "This is question 1::This is answer 1",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "This is question 1",
+            "back": "This is answer 1"
+          }
+        ]
+      },
+      {
+        "cardType": 0,
+        "text": "This is question 2::This is answer 2",
+        "firstLine": 9,
+        "lastLine": 9,
+        "cards": [
+          {
+            "front": "This is question 2",
+            "back": "This is answer 2"
+          }
+        ]
+      }
+    ]
+  },
+  "vault/notes5/notes5_readme.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  },
+  "vault/notes6/A.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": [
+      {
+        "cardType": 4,
+        "text": "A {{question}} with multiple parts {{Navevo part}} <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->",
+        "firstLine": 8,
+        "lastLine": 8,
+        "cards": [
+          {
+            "front": "A <span style='color:#2196f3'>[...]</span> with multiple parts Navevo part <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->",
+            "back": "A <span style='color:#2196f3'>question</span> with multiple parts Navevo part <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->"
+          },
+          {
+            "front": "A question with multiple parts <span style='color:#2196f3'>[...]</span> <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->",
+            "back": "A question with multiple parts <span style='color:#2196f3'>Navevo part</span> <!--SR:!2024-05-22,1,230!2024-05-25,4,270!2033-03-03,3,333-->"
+          }
+        ]
+      }
+    ]
+  },
+  "vault/notes7/A.md": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "vault/notes7/B.md": {
+    "default": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerDashes": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "endMarkerPlus": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ],
+    "allClozePatterns": [
+      {
+        "cardType": 0,
+        "text": "question::A",
+        "firstLine": 2,
+        "lastLine": 2,
+        "cards": [
+          {
+            "front": "question",
+            "back": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "vault/readme.md": {
+    "default": [],
+    "endMarkerDashes": [],
+    "endMarkerPlus": [],
+    "allClozePatterns": []
+  }
+}

@@ -2,6 +2,7 @@ import { ClozeCrafter } from "clozecraft";
 
 import { SR_METADATA_CALLOUT } from "src/data/constants";
 import { CardType } from "src/data/data-structures/card/questions/question";
+import { SRSettings } from "src/data/settings";
 
 export let debugParser = false;
 
@@ -12,6 +13,20 @@ export interface ParserOptions {
     multilineReversedCardSeparator: string;
     multilineCardEndMarker: string;
     clozePatterns: string[];
+}
+
+/**
+ * Builds the parser options from the user settings, so that every caller parses a note the same way.
+ */
+export function parserOptionsFromSettings(settings: SRSettings): ParserOptions {
+    return {
+        singleLineCardSeparator: settings.singleLineCardSeparator,
+        singleLineReversedCardSeparator: settings.singleLineReversedCardSeparator,
+        multilineCardSeparator: settings.multilineCardSeparator,
+        multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
+        multilineCardEndMarker: settings.multilineCardEndMarker,
+        clozePatterns: settings.clozePatterns,
+    };
 }
 
 export function setDebugParser(value: boolean) {

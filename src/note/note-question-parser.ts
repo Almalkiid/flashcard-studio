@@ -13,7 +13,7 @@ import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-pa
 import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
 import { SettingsUtil, SRSettings } from "src/data/settings";
-import { parse, ParsedQuestionInfo, ParserOptions } from "src/parser";
+import { parse, ParsedQuestionInfo, parserOptionsFromSettings } from "src/parser";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
     splitNoteIntoFrontmatterAndContent,
@@ -160,18 +160,8 @@ export class NoteQuestionParser {
     }
 
     private parseQuestions(): ParsedQuestionInfo[] {
-        const settings = this.settings;
-        const parserOptions: ParserOptions = {
-            singleLineCardSeparator: settings.singleLineCardSeparator,
-            singleLineReversedCardSeparator: settings.singleLineReversedCardSeparator,
-            multilineCardSeparator: settings.multilineCardSeparator,
-            multilineReversedCardSeparator: settings.multilineReversedCardSeparator,
-            multilineCardEndMarker: settings.multilineCardEndMarker,
-            clozePatterns: settings.clozePatterns,
-        };
-
         // We pass contentText which has the frontmatter blanked out; see extractFrontmatter for reasoning
-        return parse(this.contentText, parserOptions);
+        return parse(this.contentText, parserOptionsFromSettings(this.settings));
     }
 
     private createQuestionObject(
