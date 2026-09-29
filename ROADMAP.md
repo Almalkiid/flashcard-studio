@@ -1,6 +1,6 @@
 # Roadmap
 
-Cardwright aims to be the best way to study with spaced repetition in Obsidian: Anki's scheduling and control, with your cards in plain Markdown, on every device.
+Flashcard Studio aims to be the best way to study with spaced repetition in Obsidian: Anki's scheduling and control, with your cards in plain Markdown, on every device.
 
 ## 1.0
 
@@ -24,4 +24,4 @@ Cardwright aims to be the best way to study with spaced repetition in Obsidian: 
 - Multiple-choice cards
 - Per-deck presets
 
-Ideas and requests are welcome in [Discussions](https://github.com/Almalkiid/cardwright/discussions).
+Ideas and requests are welcome in [Discussions](https://github.com/Almalkiid/flashcard-studio/discussions).

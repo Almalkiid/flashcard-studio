@@ -3,7 +3,7 @@ import { setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UpstreamCommentParser } from "./upstream/upstream-comment-parser";
 
-// Cardwright appends metadata tokens (id, suspended, buried, flag, leech) after the fixed fields of each
+// Flashcard Studio appends metadata tokens (id, suspended, buried, flag, leech) after the fixed fields of each
 // schedule segment. The original Spaced Repetition plugin must keep reading the same schedules from these
 // comments, so a user can switch back without losing progress.
 
@@ -17,7 +17,7 @@ function summarize(schedules: (RepItemScheduleInfo | null)[]): (string | null)[]
     );
 }
 
-const COMMENTS_WRITTEN_BY_CARDWRIGHT = [
+const COMMENTS_WRITTEN_BY_FLASHCARD_STUDIO = [
     "!fsrs,2026-10-06T08:00:00.000Z,7,7.21,5.1,2,3,0,0,2026-09-29T08:00:00.000Z,id=k3f9a2,flag=1",
     "!fsrs,-,0,0,0,0,0,0,0,-,id=aaaaaa,susp!fsrs,2026-10-06T08:00:00.000Z,7,7.2,5.1,2,3,0,0,-,id=bbbbbb",
     "!2026-10-06,7,250,id=abc123,bury=2026-10-01",
@@ -29,7 +29,7 @@ describe("upstream compatibility", () => {
         setupStaticDateProvider20230906();
     });
 
-    test.each(COMMENTS_WRITTEN_BY_CARDWRIGHT)(
+    test.each(COMMENTS_WRITTEN_BY_FLASHCARD_STUDIO)(
         "upstream parses %s exactly as if the tokens were absent",
         (comment: string) => {
             const withTokens = UpstreamCommentParser.parseMultiScheduleComment(comment);

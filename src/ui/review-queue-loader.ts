@@ -143,7 +143,10 @@ export class ReviewQueueLoader {
                 monthsCovering(dayStartMs, nowMs),
             );
         } catch (error) {
-            console.error("Cardwright: could not read the review log for daily limits", error);
+            console.error(
+                "Flashcard Studio: could not read the review log for daily limits",
+                error,
+            );
         }
         const todayYmd: string = globalDateProvider.today.format("YYYY-MM-DD");
         return new DailyLimits(
@@ -177,7 +180,10 @@ export class ReviewQueueLoader {
             );
             context.forgottenIds = forgottenCardIds(entries, sinceMs);
         } catch (error) {
-            console.error("Cardwright: could not read the review log for custom study", error);
+            console.error(
+                "Flashcard Studio: could not read the review log for custom study",
+                error,
+            );
         }
         return context;
     }

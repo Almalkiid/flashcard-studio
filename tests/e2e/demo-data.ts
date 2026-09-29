@@ -283,8 +283,8 @@ export function buildDemoLogFiles(
     return Array.from(months.entries()).map(([month, list]) => ({
         path: `${folder}/${month} ${device}.md`,
         content:
-            `---\ncardwright: review-log\ndevice: ${device}\n---\n` +
-            "Review history written by Cardwright. One JSON object per line. Do not edit.\n\n" +
+            `---\nflashcard-studio: review-log\ndevice: ${device}\n---\n` +
+            "Review history written by Flashcard Studio. One JSON object per line. Do not edit.\n\n" +
             "```srlog\n" +
             list.map((entry) => JSON.stringify(entry)).join("\n") +
             "\n",

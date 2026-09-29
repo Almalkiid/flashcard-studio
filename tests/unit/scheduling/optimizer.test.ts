@@ -278,6 +278,6 @@ describe("review log CSV", () => {
     });
 
     test("names the file after the day", () => {
-        expect(revlogCsvFileName("2026-09-29")).toBe("cardwright-revlog-2026-09-29.csv");
+        expect(revlogCsvFileName("2026-09-29")).toBe("flashcard-studio-revlog-2026-09-29.csv");
     });
 });

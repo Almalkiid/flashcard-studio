@@ -2,7 +2,7 @@ import { App, Platform } from "obsidian";
 
 import { generateCardId } from "src/data/card-meta";
 
-const DEVICE_ID_KEY = "cardwright-device-id";
+const DEVICE_ID_KEY = "flashcard-studio-device-id";
 const DEVICE_ID_PATTERN = /^[a-z]+-[0-9a-z]{4}$/;
 
 function platformName(): string {

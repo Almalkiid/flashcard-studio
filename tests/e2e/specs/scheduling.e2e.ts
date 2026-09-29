@@ -485,12 +485,12 @@ describe("scheduling settings, custom study, answer keys and postpone", function
             () =>
                 fs
                     .readdirSync(obsidianPage.getVaultPath())
-                    .some((f) => /^cardwright-revlog-.*\.csv$/.test(f)),
+                    .some((f) => /^flashcard-studio-revlog-.*\.csv$/.test(f)),
             { timeoutMsg: "the CSV was never written to the vault root" },
         );
         const file = fs
             .readdirSync(obsidianPage.getVaultPath())
-            .find((f) => /^cardwright-revlog-.*\.csv$/.test(f));
+            .find((f) => /^flashcard-studio-revlog-.*\.csv$/.test(f));
         const lines = fs
             .readFileSync(vaultPath(file ?? ""), "utf8")
             .trim()
@@ -518,11 +518,11 @@ describe("scheduling settings, custom study, answer keys and postpone", function
     });
 
     it("optimizes from a review history, shows the fit and applies the new parameters", async function () {
-        const logFile = "Cardwright/Review log/2025-01 test-0000.md";
+        const logFile = "Flashcard Studio/Review log/2025-01 test-0000.md";
         await browser.executeObsidian(
             async ({ app }, filePath, content) => {
-                await app.vault.createFolder("Cardwright").catch(() => undefined);
-                await app.vault.createFolder("Cardwright/Review log").catch(() => undefined);
+                await app.vault.createFolder("Flashcard Studio").catch(() => undefined);
+                await app.vault.createFolder("Flashcard Studio/Review log").catch(() => undefined);
                 await app.vault.create(filePath, content);
             },
             logFile,
@@ -589,10 +589,10 @@ function syntheticReviewLog(): string {
     }
     return [
         "---",
-        "cardwright: review-log",
+        "flashcard-studio: review-log",
         "device: test-0000",
         "---",
-        "Review history written by Cardwright. One JSON object per line. Do not edit.",
+        "Review history written by Flashcard Studio. One JSON object per line. Do not edit.",
         "",
         "```srlog",
         ...lines,

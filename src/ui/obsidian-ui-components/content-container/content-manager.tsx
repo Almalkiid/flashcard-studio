@@ -323,7 +323,7 @@ export default class ContentManager {
             });
             return true;
         } catch (error) {
-            console.error("Cardwright: could not build the session summary", error);
+            console.error("Flashcard Studio: could not build the session summary", error);
             return false;
         }
     }

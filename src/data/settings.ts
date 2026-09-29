@@ -207,7 +207,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
     scheduleDataVaultLocation: "Spaced Repetition",
-    reviewLogFolder: "Cardwright/Review log",
+    reviewLogFolder: "Flashcard Studio/Review log",
 
     // logging
     showSchedulingDebugMessages: false,

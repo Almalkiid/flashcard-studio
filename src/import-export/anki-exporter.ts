@@ -140,7 +140,7 @@ export async function buildApkg(
     const noteTypes = {
         basic: new Notetype({
             id: NOTETYPE_IDS.basic,
-            name: `Cardwright ${STOCK_NOTETYPE_NAMES.basic}`,
+            name: `Flashcard Studio ${STOCK_NOTETYPE_NAMES.basic}`,
             css: CARD_CSS,
             fields: [{ name: "Front" }, { name: "Back" }],
             templates: [
@@ -153,7 +153,7 @@ export async function buildApkg(
         }),
         reversed: new Notetype({
             id: NOTETYPE_IDS.reversed,
-            name: `Cardwright ${STOCK_NOTETYPE_NAMES.reversed}`,
+            name: `Flashcard Studio ${STOCK_NOTETYPE_NAMES.reversed}`,
             css: CARD_CSS,
             fields: [{ name: "Front" }, { name: "Back" }],
             templates: [
@@ -171,7 +171,7 @@ export async function buildApkg(
         }),
         cloze: new Notetype({
             id: NOTETYPE_IDS.cloze,
-            name: `Cardwright ${STOCK_NOTETYPE_NAMES.cloze}`,
+            name: `Flashcard Studio ${STOCK_NOTETYPE_NAMES.cloze}`,
             type: "cloze",
             css: CARD_CSS + CLOZE_CSS,
             fields: [{ name: "Text" }, { name: "Back Extra" }],

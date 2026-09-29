@@ -37,12 +37,14 @@ const OCT_02 = new Date(2026, 9, 2, 10).getTime();
 describe("ReviewLogStore", () => {
     test("append creates the header once and one line per entry", async () => {
         const adapter = new MemoryAdapter();
-        const store = new ReviewLogStore(adapter, "Cardwright/Review log", "mac-3f9a");
+        const store = new ReviewLogStore(adapter, "Flashcard Studio/Review log", "mac-3f9a");
         await store.append(entry(SEP_15));
         await store.append(entry(SEP_15 + 1));
 
-        const text = adapter.files.get("Cardwright/Review log/2026-09 mac-3f9a.md");
-        expect(text.startsWith("---\ncardwright: review-log\ndevice: mac-3f9a\n---\n")).toBe(true);
+        const text = adapter.files.get("Flashcard Studio/Review log/2026-09 mac-3f9a.md");
+        expect(text.startsWith("---\nflashcard-studio: review-log\ndevice: mac-3f9a\n---\n")).toBe(
+            true,
+        );
         expect(text.match(/```srlog/g)).toHaveLength(1);
         expect(ReviewLogStore.parseFile(text)).toHaveLength(2);
         expect(store.deviceId).toBe("mac-3f9a");

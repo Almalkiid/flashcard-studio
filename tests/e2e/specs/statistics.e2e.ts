@@ -257,7 +257,7 @@ describe("statistics and insight", function () {
         await closeModals();
         // Close the statistics tab so the next test opens a fresh one
         await browser.executeObsidian(({ app }) => {
-            app.workspace.detachLeavesOfType("cardwright-statistics");
+            app.workspace.detachLeavesOfType("flashcard-studio-statistics");
             app.workspace.detachLeavesOfType("spaced-repetition-tab-view");
         });
     });

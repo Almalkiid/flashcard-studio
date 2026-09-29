@@ -361,7 +361,8 @@ describe("scheduled cards must not lose a schedule (issue #1402)", () => {
     });
 
     test("atomic clozes: a paragraph with one shared schedule is not split, so nothing is deleted", async () => {
-        const text = "#flashcards\n\nL1 ==a==\nL2 ==b==\n<!--SR:!2023-09-05,4,270!2023-09-07,6,250-->\n";
+        const text =
+            "#flashcards\n\nL1 ==a==\nL2 ==b==\n<!--SR:!2023-09-05,4,270!2023-09-07,6,250-->\n";
         const file = new UnitTestSRFile(text);
         const loaded = await load(file, settingsWith({ atomicClozes: true }));
 

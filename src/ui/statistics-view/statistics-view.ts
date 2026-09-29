@@ -31,7 +31,7 @@ import {
 } from "src/ui/statistics-view/sections-tables";
 import { loadStatsInputs, StatsInputs } from "src/ui/statistics-view/stats-data";
 
-export const STATISTICS_VIEW_TYPE = "cardwright-statistics";
+export const STATISTICS_VIEW_TYPE = "flashcard-studio-statistics";
 
 /** Coming back to the tab reloads the data unless it was loaded just now. */
 const RELOAD_AFTER_MS = 2000;
@@ -161,7 +161,7 @@ export class StatisticsView extends ItemView {
             this.fillDeckOptions(this.inputs.decks);
             this.render();
         } catch (error) {
-            console.error("Cardwright: could not load the statistics", error);
+            console.error("Flashcard Studio: could not load the statistics", error);
             this.bodyEl?.empty();
             if (this.bodyEl) createNote(this.bodyEl, t("STATS_ERROR"));
         } finally {

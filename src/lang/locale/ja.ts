@@ -57,7 +57,7 @@ const ja: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Cardwright",
+    SETTINGS_HEADER: "Flashcard Studio",
     GROUP_TAGS_FOLDERS: "Tags & Folders",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",

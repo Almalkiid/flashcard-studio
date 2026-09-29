@@ -62,7 +62,7 @@ function cardId(index: number): string {
 }
 
 /**
- * Simulates a learner and writes what Cardwright would have logged.
+ * Simulates a learner and writes what Flashcard Studio would have logged.
  *
  * Every card is answered on the days a scheduler with the true weights would show it, sometimes a few days late, and
  * the answer is recalled or forgotten by the true forgetting curve. On top of that come the entries the optimizer's

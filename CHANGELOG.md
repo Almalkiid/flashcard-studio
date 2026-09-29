@@ -1,15 +1,15 @@
 # Changelog
 
-All notable changes to Cardwright are listed here. Versions follow [semantic versioning](https://semver.org).
+All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 Changes made before the fork are in the [Spaced Repetition changelog](docs/docs/changelog.md).
 
 ## [0.9.0] - Unreleased
 
-First preview of Cardwright, forked from Spaced Repetition 1.15.4.
+First preview of Flashcard Studio, forked from Spaced Repetition 1.15.4.
 
 ### Added
 
-- Review history: every answer is recorded in `Cardwright/Review log/`, one file per device per month, so syncing never conflicts. Log files render as a table.
+- Review history: every answer is recorded in `Flashcard Studio/Review log/`, one file per device per month, so syncing never conflicts. Log files render as a table.
 - Stable card ids, stored in the existing schedule comment and ignored by the original plugin.
 - Undo last answer (toast, menu, Ctrl/Cmd+Z or U), including after a deck is finished.
 - Suspend, bury until tomorrow and seven flag colours, with Anki's shortcuts.

@@ -20,7 +20,7 @@ const en: IBaseLocale = {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reset card's progress",
-    WELCOME_TITLE: "Welcome to Cardwright",
+    WELCOME_TITLE: "Welcome to Flashcard Studio",
     WELCOME_LEAD: "Spaced repetition flashcards that live in your notes.",
     WELCOME_WRITE_TITLE: "Write cards in any note",
     WELCOME_WRITE_DESC:
@@ -152,7 +152,7 @@ const en: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}y",
 
     // settings.ts
-    SETTINGS_HEADER: "Cardwright",
+    SETTINGS_HEADER: "Flashcard Studio",
     GROUP_TAGS_FOLDERS: "Tags & Folders",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",
@@ -534,7 +534,7 @@ const en: IBaseLocale = {
     OPTIMIZER_RUNNING:
         "Optimizing... This takes a few seconds, and the screen may pause while it runs.",
     OPTIMIZER_TOO_FEW:
-        "Not enough reviews yet. Cardwright needs at least ${min} reviews of cards you had already seen on an earlier day, and found ${count}. With fewer, the parameters would fit chance instead of your memory and could make your schedule worse (Anki's manual asks for at least a few hundred reviews). Keep reviewing and try again later.",
+        "Not enough reviews yet. Flashcard Studio needs at least ${min} reviews of cards you had already seen on an earlier day, and found ${count}. With fewer, the parameters would fit chance instead of your memory and could make your schedule worse (Anki's manual asks for at least a few hundred reviews). Keep reviewing and try again later.",
     OPTIMIZER_SUMMARY: "Used ${reviews} reviews of ${cards} cards. It took ${seconds} s.",
     OPTIMIZER_CURRENT: "Current",
     OPTIMIZER_OPTIMIZED: "Optimized",

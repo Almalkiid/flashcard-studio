@@ -61,7 +61,7 @@ const uk: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}р",
 
     // settings.ts
-    SETTINGS_HEADER: "Cardwright",
+    SETTINGS_HEADER: "Flashcard Studio",
     GROUP_TAGS_FOLDERS: "Теги та теки",
     GROUP_FLASHCARD_REVIEW: "Повторення карток",
     GROUP_FLASHCARD_SEPARATORS: "Роздільники карток",

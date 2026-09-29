@@ -33,7 +33,7 @@ describe("mergeImportedSettings", () => {
         expect(current.baseEase).toBe(250);
     });
 
-    test("keeps Cardwright-only settings", () => {
+    test("keeps Flashcard Studio-only settings", () => {
         const { settings } = mergeImportedSettings(
             { ...current, newCardsPerDay: 7 },
             { settings: { newCardsPerDay: 99 } },
@@ -41,7 +41,7 @@ describe("mergeImportedSettings", () => {
         expect(settings.newCardsPerDay).toBe(7);
     });
 
-    test("keeps the FSRS and answer key settings that only Cardwright has", () => {
+    test("keeps the FSRS and answer key settings that only Flashcard Studio has", () => {
         const { settings } = mergeImportedSettings(
             { ...current, fsrsLearningSteps: "5m", answerKeys: "anki" },
             { settings: { fsrsLearningSteps: "1d", answerKeys: "original" } },

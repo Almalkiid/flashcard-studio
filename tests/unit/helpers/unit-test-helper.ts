@@ -158,7 +158,7 @@ export function unitTestCheckNoteFrontmatter(
 }
 
 /**
- * Removes the stable card ids (`,id=xxxxxx`) that Cardwright appends to schedule segments, so that tests
+ * Removes the stable card ids (`,id=xxxxxx`) that Flashcard Studio appends to schedule segments, so that tests
  * written against upstream's exact comment text keep checking everything else. Ids have dedicated tests.
  */
 export function stripCardIds(text: string): string {

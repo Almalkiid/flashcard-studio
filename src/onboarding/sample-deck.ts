@@ -1,5 +1,5 @@
 /** Where the sample deck is created. */
-export const SAMPLE_DECK_PATH = "Cardwright/Getting started.md";
+export const SAMPLE_DECK_PATH = "Flashcard Studio/Getting started.md";
 
 /**
  * A short deck that shows every card style, written the way a real study note would be.
@@ -7,7 +7,7 @@ export const SAMPLE_DECK_PATH = "Cardwright/Getting started.md";
 export function sampleDeckMarkdown(): string {
     return `#flashcards/getting-started
 
-# Getting started with Cardwright
+# Getting started with Flashcard Studio
 
 Each card below is written in plain Markdown. Edit this note freely: your changes show up the next time you review.
 
@@ -37,7 +37,7 @@ Capital of Japan:::Tokyo
 
 Highlight text to hide it: the ==forgetting curve== shows how memory fades without review.
 
-Each highlight becomes its own card: Cardwright keeps a ==review history== so you can ==undo== an answer.
+Each highlight becomes its own card: Flashcard Studio keeps a ==review history== so you can ==undo== an answer.
 
 ## Formulas and code
 

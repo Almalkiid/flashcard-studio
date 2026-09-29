@@ -16,7 +16,10 @@ describe("welcome guide", function () {
         await create.waitForClickable({ timeoutMsg: "the welcome guide did not open" });
         await create.click();
 
-        const samplePath = path.join(obsidianPage.getVaultPath(), "Cardwright/Getting started.md");
+        const samplePath = path.join(
+            obsidianPage.getVaultPath(),
+            "Flashcard Studio/Getting started.md",
+        );
         // The file can appear on disk before its content is written, so wait for the content
         await browser.waitUntil(
             () =>
@@ -29,7 +32,7 @@ describe("welcome guide", function () {
         await browser.waitUntil(
             () =>
                 browser.executeObsidian(({ app }) => {
-                    const file = app.vault.getFileByPath("Cardwright/Getting started.md");
+                    const file = app.vault.getFileByPath("Flashcard Studio/Getting started.md");
                     return (app.metadataCache.getFileCache(file)?.tags ?? []).length > 0;
                 }),
             { timeoutMsg: "the sample deck was never indexed" },

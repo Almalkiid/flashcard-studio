@@ -19,7 +19,7 @@ export interface LogFileAdapter {
 }
 
 const FENCE_OPEN = "```srlog";
-const FRONTMATTER_MARKER = "cardwright: review-log";
+const FRONTMATTER_MARKER = "flashcard-studio: review-log";
 
 /**
  * Append-only review history, one file per device per month: `<folder>/<YYYY-MM> <device>.md`.
@@ -46,7 +46,7 @@ export class ReviewLogStore {
     static header(deviceId: string): string {
         return (
             `---\n${FRONTMATTER_MARKER}\ndevice: ${deviceId}\n---\n` +
-            "Review history written by Cardwright. One JSON object per line. Do not edit.\n\n" +
+            "Review history written by Flashcard Studio. One JSON object per line. Do not edit.\n\n" +
             `${FENCE_OPEN}\n`
         );
     }

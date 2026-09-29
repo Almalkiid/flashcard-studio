@@ -1,9 +1,9 @@
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 
 /**
- * Settings that only exist in Cardwright. The original plugin never has them, and they must not be overwritten.
+ * Settings that only exist in Flashcard Studio. The original plugin never has them, and they must not be overwritten.
  */
-const CARDWRIGHT_ONLY_KEYS: ReadonlySet<string> = new Set([
+const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "leechThreshold",
     "leechAction",
     "dailyLimitsEnabled",
@@ -28,10 +28,10 @@ function sameKind(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Merges the settings stored by the original Spaced Repetition plugin (its `data.json`) into Cardwright's.
- * Only settings that Cardwright also has, with a value of the same kind, are copied.
+ * Merges the settings stored by the original Spaced Repetition plugin (its `data.json`) into Flashcard Studio's.
+ * Only settings that Flashcard Studio also has, with a value of the same kind, are copied.
  *
- * @param current - Cardwright's current settings (not modified).
+ * @param current - Flashcard Studio's current settings (not modified).
  * @param imported - The parsed content of the original plugin's `data.json`.
  */
 export function mergeImportedSettings(
@@ -46,7 +46,7 @@ export function mergeImportedSettings(
 
     const target = settings as unknown as Record<string, unknown>;
     for (const [key, value] of Object.entries(imported.settings)) {
-        if (!(key in DEFAULT_SETTINGS) || CARDWRIGHT_ONLY_KEYS.has(key)) continue;
+        if (!(key in DEFAULT_SETTINGS) || FLASHCARD_STUDIO_ONLY_KEYS.has(key)) continue;
         const defaultValue = (DEFAULT_SETTINGS as unknown as Record<string, unknown>)[key];
         if (value === undefined || value === null || !sameKind(value, defaultValue)) continue;
         target[key] = Array.isArray(value) ? [...(value as unknown[])] : value;

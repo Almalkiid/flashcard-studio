@@ -444,7 +444,7 @@ describe("anki bridge", function () {
         expect(byGuid.get("e2e-hola")?.fields).toEqual(["hola", "<b>hello</b><br>(a greeting)"]);
         expect(byGuid.get("e2e-hola")?.tags).toEqual(["greetings", "week1"]);
         expect(byGuid.get("e2e-gracias")?.notetypeName).toEqual(
-            "Cardwright Basic (and reversed card)",
+            "Flashcard Studio Basic (and reversed card)",
         );
         expect(byGuid.get("e2e-cloze")?.fields).toEqual([
             "Yo {{c1::hablo::hablar}} y tu {{c2::hablas}}",

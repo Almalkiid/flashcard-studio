@@ -67,6 +67,6 @@ export async function setClozeMathMacro(enabled: boolean): Promise<void> {
             ownsMacro = false;
         }
     } catch (error) {
-        console.warn("Cardwright: could not update the \\cloze MathJax macro", error);
+        console.warn("Flashcard Studio: could not update the \\cloze MathJax macro", error);
     }
 }

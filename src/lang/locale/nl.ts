@@ -58,7 +58,7 @@ const nl: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}j",
 
     // settings.ts
-    SETTINGS_HEADER: "Cardwright",
+    SETTINGS_HEADER: "Flashcard Studio",
     GROUP_TAGS_FOLDERS: "Tags & Mappen",
     GROUP_FLASHCARD_REVIEW: "Flitskaart Beoordeling",
     GROUP_FLASHCARD_SEPARATORS: "Flitskaart Scheidingstekens",

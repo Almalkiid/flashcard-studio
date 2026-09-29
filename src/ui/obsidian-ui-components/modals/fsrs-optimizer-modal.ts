@@ -118,7 +118,7 @@ export class FsrsOptimizerModal extends Modal {
             );
             this.renderResult(result);
         } catch (error) {
-            console.error("Cardwright: optimizing the FSRS parameters failed", error);
+            console.error("Flashcard Studio: optimizing the FSRS parameters failed", error);
             this.showMessage(
                 t("OPTIMIZER_ERROR", {
                     reason: error instanceof Error ? error.message : String(error),

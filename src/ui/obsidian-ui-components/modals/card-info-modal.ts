@@ -224,7 +224,7 @@ export class CardInfoModal extends Modal {
                 (entry) => entry.c === stats.id,
             );
         } catch (error) {
-            console.error("Cardwright: could not read the review history", error);
+            console.error("Flashcard Studio: could not read the review history", error);
         }
         if (entries.length === 0) {
             section.createDiv({ cls: "sr-card-info-hint", text: t("CARD_INFO_NO_HISTORY") });

@@ -79,7 +79,7 @@ describe("buildApkg", () => {
             guid: "g1",
             deck: "Spanish",
             kind: "basic",
-            noteTypeName: "Cardwright Basic",
+            noteTypeName: "Flashcard Studio Basic",
             fieldNames: ["Front", "Back"],
             fields: ["hola", "<b>hello</b>"],
             tags: ["exam", "grammar::verbs"],
@@ -103,7 +103,7 @@ describe("buildApkg", () => {
         expect(first.data.notetypes.map((type) => type.id)).toEqual(
             second.data.notetypes.map((type) => type.id),
         );
-        expect(first.data.notetypes.map((type) => type.name)).toEqual(["Cardwright Basic"]);
+        expect(first.data.notetypes.map((type) => type.name)).toEqual(["Flashcard Studio Basic"]);
         // The deck points at the collection's own default preset
         expect(first.data.decks.find((deck) => deck.name === "Spanish")).toBeDefined();
     });

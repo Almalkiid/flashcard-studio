@@ -43,8 +43,8 @@ export function formatRevlogCsv(entries: readonly ReviewLogEntry[]): string {
 }
 
 /**
- * The file name for an export made on a given day: `cardwright-revlog-2026-09-29.csv`.
+ * The file name for an export made on a given day: `flashcard-studio-revlog-2026-09-29.csv`.
  */
 export function revlogCsvFileName(dateYmd: string): string {
-    return `cardwright-revlog-${dateYmd}.csv`;
+    return `flashcard-studio-revlog-${dateYmd}.csv`;
 }

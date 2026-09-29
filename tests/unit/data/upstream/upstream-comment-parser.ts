@@ -1,5 +1,5 @@
 // Verbatim copy of upstream st3v3nmw/obsidian-spaced-repetition src/utils/comment-parser.ts at 3d5079f.
-// Used only to prove that comments written by Cardwright still parse in the original plugin. Do not edit.
+// Used only to prove that comments written by Flashcard Studio still parse in the original plugin. Do not edit.
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {

@@ -1,24 +1,24 @@
-# Cardwright
+# Flashcard Studio
 
 **Flashcards that live in your notes, with the scheduling and control you know from Anki.**
 
-Cardwright turns the Markdown you already write into spaced repetition flashcards, and schedules them with [FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm), the modern algorithm Anki uses. It keeps a full review history, so you can undo an answer and see how your memory is doing. Every card and every review stays in plain files in your vault, and it works the same on desktop and on your phone.
+Flashcard Studio turns the Markdown you already write into spaced repetition flashcards, and schedules them with [FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm), the modern algorithm Anki uses. It keeps a full review history, so you can undo an answer and see how your memory is doing. Every card and every review stays in plain files in your vault, and it works the same on desktop and on your phone.
 
-> Cardwright is a fork of [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) by Stephen Mwangi, maintained by Kyle Klus. It keeps that plugin's card syntax and schedule format, so your existing cards work unchanged, and you can switch back at any time. See [Credits](#credits).
+> Flashcard Studio is a fork of [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) by Stephen Mwangi, maintained by Kyle Klus. It keeps that plugin's card syntax and schedule format, so your existing cards work unchanged, and you can switch back at any time. See [Credits](#credits).
 
-## Why Cardwright
+## Why Flashcard Studio
 
-|                                       | Spaced Repetition | Cardwright |
-| ------------------------------------- | ----------------- | ---------- |
-| Cards written in plain Markdown       | ✓                 | ✓          |
-| FSRS scheduling                       | ✓                 | ✓          |
-| Review history of every answer        |                   | ✓          |
-| Undo last answer                      |                   | ✓          |
-| Daily new card and review limits      |                   | ✓          |
-| Suspend, bury and flag cards          |                   | ✓          |
-| Leech detection                       |                   | ✓          |
-| Sync without conflicts across devices |                   | ✓          |
-| Works on iPhone, iPad and Android     | ✓                 | ✓          |
+|                                       | Spaced Repetition | Flashcard Studio |
+| ------------------------------------- | ----------------- | ---------------- |
+| Cards written in plain Markdown       | ✓                 | ✓                |
+| FSRS scheduling                       | ✓                 | ✓                |
+| Review history of every answer        |                   | ✓                |
+| Undo last answer                      |                   | ✓                |
+| Daily new card and review limits      |                   | ✓                |
+| Suspend, bury and flag cards          |                   | ✓                |
+| Leech detection                       |                   | ✓                |
+| Sync without conflicts across devices |                   | ✓                |
+| Works on iPhone, iPad and Android     | ✓                 | ✓                |
 
 ## Writing cards
 
@@ -55,7 +55,7 @@ Images, audio, LaTeX, code and footnotes work inside cards, because Obsidian ren
 
 ## Reviewing
 
-Run **Cardwright: Review flashcards from all notes** from the command palette, or click the ribbon icon. Rate each card **Again**, **Hard**, **Good** or **Easy**. After an answer, a toast shows when you will see the card again, with an **Undo** button.
+Run **Flashcard Studio: Review flashcards from all notes** from the command palette, or click the ribbon icon. Rate each card **Again**, **Hard**, **Good** or **Easy**. After an answer, a toast shows when you will see the card again, with an **Undo** button.
 
 | Key                | Action                                                   |
 | ------------------ | -------------------------------------------------------- |
@@ -74,28 +74,28 @@ On a phone, the same actions are in the card menu.
 ## Where your data lives
 
 - **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the original plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the original plugin ignores.
-- **Your review history** is in `Cardwright/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
+- **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
 - **Settings** are in the plugin's `data.json`.
 
 These plain files make it easy for scripts or AI assistants to read your progress and add cards.
 
 ## Installing
 
-Until Cardwright is in the community plugin directory, install it with [BRAT](https://github.com/TfTHacker/obsidian42-brat):
+Until Flashcard Studio is in the community plugin directory, install it with [BRAT](https://github.com/TfTHacker/obsidian42-brat):
 
 1. Install and enable **BRAT** from the community plugins.
-2. Run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/cardwright`.
-3. Enable **Cardwright** in the community plugins.
+2. Run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/flashcard-studio`.
+3. Enable **Flashcard Studio** in the community plugins.
 
-**Coming from Spaced Repetition?** Disable it and enable Cardwright. Your cards and schedules work as they are. To keep your settings, use **Settings, Data, Import settings from Spaced Repetition**.
+**Coming from Spaced Repetition?** Disable it and enable Flashcard Studio. Your cards and schedules work as they are. To keep your settings, use **Settings, Data, Import settings from Spaced Repetition**.
 
 ## Network use
 
-Cardwright works offline. It makes no network requests unless you turn on **Show update available status bar item** in the settings, which checks this repository's latest release on GitHub.
+Flashcard Studio works offline. It makes no network requests unless you turn on **Show update available status bar item** in the settings, which checks this repository's latest release on GitHub.
 
 ## Credits
 
-Cardwright is built on [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) by **Stephen Mwangi** (original author) and **Kyle Klus** (maintainer), and on the work of its many contributors and translators. Their plugin's history is kept in this repository.
+Flashcard Studio is built on [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) by **Stephen Mwangi** (original author) and **Kyle Klus** (maintainer), and on the work of its many contributors and translators. Their plugin's history is kept in this repository.
 
 It includes fixes that community members contributed to the original plugin but that were not merged yet:
 

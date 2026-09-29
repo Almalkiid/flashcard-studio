@@ -18,7 +18,7 @@ export async function hasSpacedRepetitionSettings(plugin: SRPlugin): Promise<boo
 }
 
 /**
- * Copies the settings of the original Spaced Repetition plugin into Cardwright's and applies them.
+ * Copies the settings of the original Spaced Repetition plugin into Flashcard Studio's and applies them.
  *
  * @returns The number of settings imported, or null when there were none to import.
  */

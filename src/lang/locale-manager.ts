@@ -123,7 +123,9 @@ export class LocaleManager implements ILocaleManager {
         // Obsidian can run in a language this plugin has no translation for (#1644); use English then
         if (!currentLocaleMap) {
             if (this.warnedMissingLocale !== currentLocale) {
-                console.warn(`Cardwright: no translation for "${currentLocale}", using English.`);
+                console.warn(
+                    `Flashcard Studio: no translation for "${currentLocale}", using English.`,
+                );
                 this.warnedMissingLocale = currentLocale;
             }
             return this.localeMap["en"];

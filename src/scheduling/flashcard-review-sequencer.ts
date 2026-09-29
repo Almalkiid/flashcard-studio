@@ -653,7 +653,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 await this.reviewLog.remove(record.entry);
             } catch (error) {
                 console.error(
-                    "Cardwright: could not remove the undone answer from the review log",
+                    "Flashcard Studio: could not remove the undone answer from the review log",
                     error,
                 );
             }
@@ -760,7 +760,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         try {
             await this.reviewLog.append(entry);
         } catch (error) {
-            console.error("Cardwright: could not write the review log", error);
+            console.error("Flashcard Studio: could not write the review log", error);
         }
     }
 

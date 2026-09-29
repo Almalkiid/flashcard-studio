@@ -57,7 +57,7 @@ const fr: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}a",
 
     // settings.ts
-    SETTINGS_HEADER: "Cardwright",
+    SETTINGS_HEADER: "Flashcard Studio",
     GROUP_TAGS_FOLDERS: "Tags & Dossiers",
     GROUP_FLASHCARD_REVIEW: "Apprentissage des flashcards",
     GROUP_FLASHCARD_SEPARATORS: "Séparateurs de flashcards",
