@@ -117,8 +117,10 @@ export class MainPage extends SettingsPage {
                 setting
                     .setName(getPageName("statistics-page"))
                     .addButton((button: ButtonComponent) => {
-                        button.setIcon("chevron-right").onClick(() => {
-                            this.openPage("statistics-page");
+                        button.setIcon("chevron-right").onClick((evt: MouseEvent) => {
+                            // The row opens the view as well, so the click must not reach it twice
+                            evt.stopPropagation();
+                            this.openStatistics();
                         });
 
                         button.buttonEl.addClass("clickable-icon");
@@ -131,7 +133,7 @@ export class MainPage extends SettingsPage {
                 setting.nameEl.addClass("sr-settings-page-title");
                 setting.settingEl.addClass("sr-settings-page-title-setting");
                 setting.settingEl.addEventListener("click", () => {
-                    this.openPage("statistics-page");
+                    this.openStatistics();
                 });
             })
             .addSetting((setting: Setting) => {
@@ -268,5 +270,13 @@ export class MainPage extends SettingsPage {
                             });
                     });
             });
+    }
+
+    /**
+     * Opens the statistics view. The settings dialog is closed first, or the view would open behind it.
+     */
+    private openStatistics(): void {
+        (this.plugin.app as unknown as { setting?: { close: () => void } }).setting?.close();
+        void this.plugin.uiManager.openStatisticsView();
     }
 }

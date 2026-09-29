@@ -18,14 +18,16 @@ import {
     UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
 import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
+import { buildSessionSummary } from "src/stats/session";
 import { CardActions } from "src/ui/card-actions";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
-import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
+import { CardInfoModal } from "src/ui/obsidian-ui-components/modals/card-info-modal";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { CustomStudyModal } from "src/ui/obsidian-ui-components/modals/custom-study-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
+import { currentDayKeyFn } from "src/ui/statistics-view/stats-data";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import { moment } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -93,6 +95,9 @@ export default class ContentManager {
 
     private lastPressedOnProcessReview: number = 0;
     private pendingResumeTimeout: number | null = null;
+    // When the current review session started, to summarise it when it ends; 0 outside a session
+    private sessionStartMs: number = 0;
+    private readonly closeModal: (() => void) | undefined;
 
     // Shared by every queue this screen loads, so the last answer of a deck can still be undone
     private undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
@@ -113,6 +118,7 @@ export default class ContentManager {
         this.reviewQueueLoader = reviewQueueLoader;
         this.settings = settings;
         this.reviewMode = reviewQueueLoader.getReviewMode();
+        this.closeModal = closeModal;
 
         this.uiManager = this.plugin.uiManager;
         this.dataManager = this.plugin.dataManager;
@@ -137,7 +143,7 @@ export default class ContentManager {
             () => void this._skipCurrentCard(),
             () => void this._showAnswer(),
             this._jumpToCurrentCard.bind(this),
-            this._displayCurrentCardInfoNotice.bind(this),
+            this._showCardInfo.bind(this),
             this.cardActions,
             closeModal,
         );
@@ -196,6 +202,7 @@ export default class ContentManager {
 
     private async _showDecksList(reloadReviewQueue: boolean = false): Promise<void> {
         this._clearPendingResumeTimeout();
+        this.sessionStartMs = 0;
         if (reloadReviewQueue) {
             this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
         }
@@ -211,6 +218,7 @@ export default class ContentManager {
     }
 
     private async _reviewDeck(deck: Deck): Promise<void> {
+        this.sessionStartMs = Date.now();
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
@@ -234,7 +242,7 @@ export default class ContentManager {
         if (!this.reviewSequencer.hasCurrentCard) {
             if (this.reviewSequencer.hasPendingCards) {
                 await this._showPendingState();
-            } else {
+            } else if (!(await this._showSessionSummary())) {
                 await this._showDecksList(true);
             }
             return;
@@ -280,6 +288,43 @@ export default class ContentManager {
             this.cardShownAt = activeWindow.performance.now();
         } else {
             await this._showDecksList(true);
+        }
+    }
+
+    /**
+     * Shows how the session went, when the queue is done and something was answered in it.
+     *
+     * @returns Whether the summary is showing; false when there was nothing to summarise.
+     */
+    private async _showSessionSummary(): Promise<boolean> {
+        if (this.reviewMode !== FlashcardReviewMode.Review || this.sessionStartMs === 0) {
+            return false;
+        }
+        try {
+            // Read back from the log rather than counting in memory, so undone answers and answers logged by
+            // other devices are accounted for the same way as in the statistics
+            const dayKeyOf = currentDayKeyFn();
+            const entries = await this.dataManager.reviewLog.readAll();
+            const summary = buildSessionSummary(
+                entries,
+                this.sessionStartMs,
+                dayKeyOf(Date.now()),
+                dayKeyOf,
+            );
+            if (summary.reviews === 0) return false;
+
+            this.cardContainer.showSessionSummary(summary, {
+                onBackToDecks: () => void this._showDecksList(true),
+                onUndo: () => void this._undoLastAnswer(),
+                onOpenStatistics: () => {
+                    this.closeModal?.();
+                    void this.uiManager.openStatisticsView();
+                },
+            });
+            return true;
+        } catch (error) {
+            console.error("Cardwright: could not build the session summary", error);
+            return false;
         }
     }
 
@@ -492,12 +537,22 @@ export default class ContentManager {
         await this._showNextCard();
     }
 
-    private _displayCurrentCardInfoNotice() {
-        if (this.sessionData === null) return;
-        new CardInfoNotice(
-            this.sessionData.cardData.currentCard.scheduleInfo,
+    /**
+     * Opens the info of the card being reviewed: its state and its whole review history.
+     */
+    public _showCardInfo(): void {
+        if (this.sessionData === null || this.sessionData.cardData.currentCard === null) return;
+
+        // Keep the review shortcuts from reacting to keys typed in the info window
+        const wasInFocus = this.uiManager.isSRInFocus;
+        this.uiManager.setSRViewInFocus(false);
+        new CardInfoModal(
+            this.app,
+            this.plugin,
+            this.sessionData.cardData.currentCard,
             this.sessionData.currentNote.file.path,
-        );
+            () => this.uiManager.setSRViewInFocus(wasInFocus),
+        ).open();
     }
 
     public async _processReview(response: ReviewResponse): Promise<void> {
@@ -515,7 +570,12 @@ export default class ContentManager {
         await this.reviewSequencer.processReview(response, durationMs);
         const entry = this.reviewSequencer.lastLoggedEntry;
         await this._showNextCard();
-        if (entry !== null && this.reviewMode === FlashcardReviewMode.Review) {
+        // The session summary has its own undo button; the toast would sit on top of its buttons
+        if (
+            entry !== null &&
+            this.reviewMode === FlashcardReviewMode.Review &&
+            !this.cardContainer.isShowingSessionSummary
+        ) {
             this.cardContainer.showAnswerToast(entry);
         }
     }

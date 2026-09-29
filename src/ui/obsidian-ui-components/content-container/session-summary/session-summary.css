@@ -1,0 +1,182 @@
+/* MARK: Session summary */
+
+.sr-session-summary {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-3);
+    min-height: 0;
+    padding: var(--size-4-6) var(--size-4-5);
+    overflow-y: auto;
+    text-align: center;
+}
+
+.sr-session-summary-badge {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--size-4-1);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-green) 18%, transparent);
+    color: var(--color-green);
+    animation: sr-session-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.sr-session-summary-badge::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 2px solid var(--color-green);
+    border-radius: 50%;
+    opacity: 0;
+    animation: sr-session-ring 900ms ease-out 250ms both;
+}
+
+.sr-session-summary-badge .svg-icon {
+    width: 32px;
+    height: 32px;
+    stroke-width: 2.5px;
+}
+
+.sr-session-summary-title {
+    margin: 0;
+    font-size: var(--font-ui-large);
+    font-weight: var(--font-semibold);
+}
+
+.sr-session-summary-subtitle {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+.sr-session-summary-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--size-4-2);
+    width: min(100%, 480px);
+    margin: var(--size-4-2) 0;
+}
+
+.sr-session-summary-tile {
+    padding: var(--size-4-3) var(--size-4-2);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    background: var(--background-secondary);
+}
+
+.sr-session-summary-value {
+    font-size: var(--font-ui-large);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-semibold);
+    line-height: 1.2;
+}
+
+.sr-session-summary-label {
+    margin-top: 2px;
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+}
+
+.sr-session-summary-streak {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-4-2);
+    padding: var(--size-4-1) var(--size-4-3);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-orange) 14%, transparent);
+    color: var(--color-orange);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+}
+
+.sr-session-summary-streak-icon {
+    display: flex;
+}
+
+.sr-session-summary-streak-icon .svg-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.sr-session-summary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-2);
+}
+
+.sr-session-summary .sr-session-summary-undo {
+    height: auto;
+    padding: var(--size-4-1) var(--size-4-2);
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+.sr-session-summary .sr-session-summary-undo:hover {
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-normal);
+}
+
+.is-phone .sr-session-summary-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 320px);
+}
+
+.is-phone .sr-session-summary-actions button {
+    min-height: 44px;
+}
+
+.is-phone .sr-session-summary-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* While the summary shows there is no card, so the card actions of the toolbar have nothing to act on */
+.sr-summary-open .sr-card-toolbar .sr-edit-button,
+.sr-summary-open .sr-card-toolbar .sr-reset-button,
+.sr-summary-open .sr-card-toolbar .sr-skip-button,
+.sr-summary-open .sr-card-toolbar .sr-menu-dots-button,
+.sr-summary-open .sr-card-toolbar > .sr-divider {
+    display: none !important;
+}
+
+@keyframes sr-session-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes sr-session-ring {
+    from {
+        opacity: 0.6;
+        transform: scale(0.85);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.25);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sr-session-summary-badge,
+    .sr-session-summary-badge::after {
+        animation: none;
+    }
+}

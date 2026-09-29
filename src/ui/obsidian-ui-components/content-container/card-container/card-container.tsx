@@ -10,6 +10,7 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { digitFromKeyCode, responseForDigit } from "src/scheduling/answer-keys";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import { SessionSummary } from "src/stats/session";
 import { CardActions, FLAG_COUNT } from "src/ui/card-actions";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
@@ -18,6 +19,10 @@ import {
     CardState,
     SessionData,
 } from "src/ui/obsidian-ui-components/content-container/content-manager";
+import {
+    renderSessionSummary,
+    SessionSummaryActions,
+} from "src/ui/obsidian-ui-components/content-container/session-summary/session-summary";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { moment } from "src/utils/dates";
 import { escapeHtml } from "src/utils/escape-html";
@@ -55,6 +60,7 @@ export class CardContainer {
     private actions: CardActions;
     private answerToast: HTMLDivElement | null = null;
     private answerToastTimeout: number | null = null;
+    private summaryEl: HTMLElement | null = null;
 
     constructor(
         app: App,
@@ -158,8 +164,39 @@ export class CardContainer {
         }
         this.cardState = CardState.Closed;
         this.hideAnswerToast();
+        this.hideSessionSummary();
         activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
+    }
+
+    public get isShowingSessionSummary(): boolean {
+        return this.summaryEl !== null;
+    }
+
+    /**
+     * Replaces the card with the summary of the session that just ended.
+     */
+    public showSessionSummary(summary: SessionSummary, actions: SessionSummaryActions): void {
+        this.hideSessionSummary();
+        // The toast of the previous answer would sit on top of the summary's buttons
+        this.hideAnswerToast();
+        // No card is being shown, so the review shortcuts must do nothing
+        this.cardState = CardState.Closed;
+        this.view.addClass("sr-summary-open");
+        this.scrollWrapper.addClass("sr-is-hidden");
+        this.response.responseEl.addClass("sr-is-hidden");
+        this.summaryEl = renderSessionSummary(this.view, summary, actions);
+    }
+
+    /**
+     * Removes the session summary, if it is showing. The next card brings the rest of the screen back.
+     */
+    public hideSessionSummary(): void {
+        if (this.summaryEl === null) return;
+        this.summaryEl.remove();
+        this.summaryEl = null;
+        this.view.removeClass("sr-summary-open");
+        this.scrollWrapper.removeClass("sr-is-hidden");
     }
 
     /**
@@ -219,6 +256,7 @@ export class CardContainer {
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.hideSessionSummary();
         this.toolbar.setResetButtonDisabled(true);
         // Update current deck info
         this.cardState = sessionData.cardData.currentCardState;
@@ -281,6 +319,7 @@ export class CardContainer {
     }
 
     public drawPendingState(nextPendingDueUnix: number): void {
+        this.hideSessionSummary();
         this.toolbar.setResetButtonDisabled(true);
         this.cardState = CardState.Front;
         this.content.empty();
