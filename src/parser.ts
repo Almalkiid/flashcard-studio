@@ -186,7 +186,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
 
     // M3b: card syntax
     const startMarker = options.multilineCardStartMarker ?? "";
-    const endMarker = options.multilineCardEndMarker;
+    const endMarker = options.multilineCardEndMarker ?? "";
     const calloutTypes: string[] = normalizeCalloutTypes(options.calloutCardTypes);
     // True between a start marker and its end marker. The blank lines in there belong to the card
     let inRegion = false;
@@ -232,15 +232,25 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
         return [text, last];
     };
 
-    // The last line of the paragraph that lines[from] is in. A paragraph ends at a blank line or a marker
+    // Whether a line ends a paragraph: a blank line or a marker
+    const endsParagraph = (line: string): boolean => {
+        const trimmed = line.trim();
+        return (
+            trimmed.length === 0 ||
+            (endMarker.length > 0 && trimmed === endMarker) ||
+            (startMarker.length > 0 && trimmed === startMarker)
+        );
+    };
+
+    // The first and the last line of the paragraph that lines[from] is in
+    const paragraphFirstLine = (from: number): number => {
+        let start = from;
+        while (start > 0 && !endsParagraph(lines[start - 1])) start--;
+        return start;
+    };
     const paragraphLastLine = (from: number): number => {
         let end = from;
-        while (end + 1 < lines.length) {
-            const next = lines[end + 1].trim();
-            if (next.length === 0 || (endMarker && next === endMarker)) break;
-            if (startMarker && next === startMarker) break;
-            end++;
-        }
+        while (end + 1 < lines.length && !endsParagraph(lines[end + 1])) end++;
         return end;
     };
 
@@ -253,9 +263,8 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     // `$$ ... $$` block. A block of display math is one piece, and is not cut in two. Returns null when such
     // a block is not closed in the paragraph.
     const atomicClozeRange = (from: number): [number, number] | null => {
+        const paragraphStart = paragraphFirstLine(from);
         const paragraphEnd = paragraphLastLine(from);
-        let paragraphStart = from;
-        while (paragraphStart > 0 && lines[paragraphStart - 1].trim().length > 0) paragraphStart--;
 
         // The line that opened the display math that is still open where lines[from] starts, if any
         let opener = -1;
@@ -280,7 +289,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     // The lines of the atomic card that ends on lines[last]: the block of display math that ends there, or that line
     const atomicCardEndingAt = (last: number): string[] => {
         if (countDisplayMathDelimiters(lines[last]) % 2 === 1) {
-            for (let k = last - 1; k >= 0 && lines[k].trim().length > 0; k--) {
+            for (let k = last - 1; k >= 0 && !endsParagraph(lines[k]); k--) {
                 if (countDisplayMathDelimiters(lines[k]) % 2 === 1) return lines.slice(k, last + 1);
             }
         }

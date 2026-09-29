@@ -709,6 +709,19 @@ describe("atomic clozes and display math ($$ ... $$ is not cut in two)", () => {
         ]);
     });
 
+    test("a marker ends the paragraph: a $$ before an end marker does not reach past it", () => {
+        // (A block that is never closed above the marker, and a $$ below it, are not one block)
+        expect(
+            parseT("$$\n> body ==c==\n---\nQuestion\n- list ==item==\n$$", {
+                ...atomic,
+                multilineCardEndMarker: "---",
+            }),
+        ).toEqual([
+            [CardType.Cloze, "$$\n> body ==c==", 0, 1],
+            [CardType.Cloze, "- list ==item==", 4, 4],
+        ]);
+    });
+
     test("an escaped dollar sign is not a delimiter", () => {
         expect(parseT("cost \\$$ and ==a==\nnext ==b==", atomic).map((c) => c[1])).toEqual([
             "cost \\$$ and ==a==",
