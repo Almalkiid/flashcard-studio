@@ -1,4 +1,4 @@
-name: Lint and Test Code
+name: Lint and test
 
 on:
     pull_request:
@@ -7,17 +7,15 @@ on:
         branches-ignore: [gh-pages]
 
 jobs:
-    lint_and_test_code:
+    lint_and_test:
         runs-on: ubuntu-latest
-
         steps:
             - uses: actions/checkout@v7
             - uses: pnpm/action-setup@v6
               with:
                   run_install: false
 
-            - name: Setup Node
-              uses: actions/setup-node@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
                   cache: "pnpm"
@@ -25,13 +23,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Lint
+            - name: Lint (Prettier and the Obsidian directory rules)
               run: pnpm lint || (echo && echo "Run 'pnpm format' to fix." && exit 1)
 
-            - name: Test
+            - name: Unit tests
               run: pnpm test
 
-            - name: Upload results to Codecov
-              uses: codecov/codecov-action@v7
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+            - name: Build
+              run: pnpm build

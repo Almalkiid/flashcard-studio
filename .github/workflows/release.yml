@@ -1,129 +1,79 @@
 name: Release
 
+# Push a tag equal to manifest.json's version (e.g. 1.0.0) to publish a release with the three files Obsidian
+# installs: main.js, manifest.json and styles.css. Each file gets a build provenance attestation.
+
 on:
     push:
         tags:
             - "*"
 
-env:
-    PLUGIN_NAME: obsidian-spaced-repetition
+permissions:
+    contents: write
+    id-token: write
+    attestations: write
 
 jobs:
     release:
         runs-on: ubuntu-latest
-        permissions:
-            id-token: write
-            contents: write
-            attestations: write
-            artifact-metadata: write
-
         steps:
             - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
+              with:
+                  run_install: false
 
-            - name: Use Node.js
-              uses: actions/setup-node@v7
+            - uses: actions/setup-node@v7
               with:
                   node-version: "24"
+                  cache: "pnpm"
 
-            - name: Build files
-              id: build
+            - name: Check the tag matches the manifest version
               run: |
-                  npm install -g pnpm
-                  pnpm build
+                  version=$(node -p "require('./manifest.json').version")
+                  if [ "$version" != "${GITHUB_REF_NAME}" ]; then
+                      echo "Tag ${GITHUB_REF_NAME} does not match manifest version ${version}" >&2
+                      exit 1
+                  fi
 
-            - name: Verify Files Exist
-              id: verify-files
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Test
+              run: pnpm test
+
+            - name: Build
+              run: pnpm build
+
+            - name: Collect release files
               run: |
-                  ls -la build/main.js styles.css manifest.json
+                  mkdir release
+                  cp build/main.js manifest.json styles.css release/
+                  ls -la release
 
-            - name: Generate artifact attestation
+            - name: Attest build provenance
               uses: actions/attest@v4
               with:
                   subject-path: |
-                      build/main.js
-                      styles.css
+                      release/main.js
+                      release/manifest.json
+                      release/styles.css
 
-            - name: Package files
-              id: package
+            - name: Extract release notes from CHANGELOG.md
               run: |
-                  mkdir ${{ env.PLUGIN_NAME }}
-                  cp build/main.js manifest.json styles.css ${{ env.PLUGIN_NAME }}
-                  zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
-                  ls
-                  echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
+                  awk -v version="${GITHUB_REF_NAME}" '
+                      $0 ~ "^## \\[?" version "\\]?" { found = 1; next }
+                      found && /^## / { exit }
+                      found { print }
+                  ' CHANGELOG.md > release-notes.md
+                  if [ ! -s release-notes.md ]; then
+                      echo "See CHANGELOG.md" > release-notes.md
+                  fi
 
-            - name: Extract release notes
-              id: extract-release-notes
-              uses: ffurrer2/extract-release-notes@v3
-              with:
-                  changelog_file: docs/docs/changelog.md
-
-            - name: Create Release
-              id: create-release
-              uses: actions/create-release@v1
+            - name: Publish the release
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  VERSION: ${{ github.ref }}
-              with:
-                  tag_name: ${{ github.ref }}
-                  release_name: ${{ github.ref }}
-                  draft: false
-                  prerelease: false
-                  body: ${{ steps.extract-release-notes.outputs.release_notes }}
-
-            - name: Upload zip file
-              id: upload-zip
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./${{ env.PLUGIN_NAME }}.zip
-                  asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
-                  asset_content_type: application/zip
-
-            - name: Upload main.js
-              id: upload-main
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./build/main.js
-                  asset_name: main.js
-                  asset_content_type: text/javascript
-
-            - name: Upload manifest.json
-              id: upload-manifest
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./manifest.json
-                  asset_name: manifest.json
-                  asset_content_type: application/json
-
-            - name: Upload styles.css
-              id: upload-css
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create-release.outputs.upload_url }}
-                  asset_path: ./styles.css
-                  asset_name: styles.css
-                  asset_content_type: text/css
-
-            - name: Use Python
-              uses: actions/setup-python@v7
-              with:
-                  python-version: "3.14"
-
-            - name: Install dependencies
-              run: pip install -r requirements.txt
-
-            - name: Deploy the documentation
-              run: mkdocs gh-deploy --force --clean --verbose
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  prerelease=""
+                  case "${GITHUB_REF_NAME}" in 0.*) prerelease="--prerelease" ;; esac
+                  gh release create "${GITHUB_REF_NAME}" release/main.js release/manifest.json release/styles.css \
+                      --title "${GITHUB_REF_NAME}" --notes-file release-notes.md ${prerelease}
