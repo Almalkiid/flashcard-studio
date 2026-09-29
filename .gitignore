@@ -52,3 +52,6 @@ env.sh
 .claude/
 .sourcerer/
 .e2e-artifacts/
+
+# Planning notes stay local
+docs/superpowers/
