@@ -4,6 +4,7 @@ import { unburyAllInText, unsuspendAllInText } from "src/data/card-meta";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import { UndoResult } from "src/scheduling/undo-history";
 import {
     setupStaticDateProvider20230906,
     setupStaticDateProviderOriginDatePlusDays,
@@ -109,7 +110,7 @@ describe("undo", () => {
     test("nothing to undo at the start of a session", async () => {
         const c = await ReviewSessionContext.create("#flashcards Q1::A1\n");
         expect(c.sequencer.canUndo).toBe(false);
-        expect(await c.sequencer.undoLastAnswer()).toBe(false);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Nothing);
     });
 
     test("undo restores the note, removes the log entry and shows the card again", async () => {
@@ -121,7 +122,7 @@ describe("undo", () => {
         expect(c.currentFront).toBe("Q2");
         expect(c.sequencer.canUndo).toBe(true);
 
-        expect(await c.sequencer.undoLastAnswer()).toBe(true);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.currentFront).toBe("Q1");
         expect(c.log.entries).toHaveLength(0);
         expect(c.text).toBe(text);
@@ -135,9 +136,9 @@ describe("undo", () => {
         await c.sequencer.processReview(ReviewResponse.Easy, 0);
         expect(c.currentFront).toBe("Q3");
 
-        expect(await c.sequencer.undoLastAnswer()).toBe(true);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.currentFront).toBe("Q2");
-        expect(await c.sequencer.undoLastAnswer()).toBe(true);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.currentFront).toBe("Q1");
         expect(c.log.entries).toHaveLength(0);
         expect(c.text).toBe(text);
@@ -149,7 +150,7 @@ describe("undo", () => {
         const edited = "#flashcards Q1 rewritten elsewhere::A1\n#flashcards Q2::A2\n";
         c.file.content = edited;
 
-        expect(await c.sequencer.undoLastAnswer()).toBe(false);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Failed);
         expect(c.text).toBe(edited);
         expect(c.log.entries).toHaveLength(1);
         expect(c.currentFront).toBe("Q2");
@@ -160,10 +161,28 @@ describe("undo", () => {
         await c.sequencer.processReview(ReviewResponse.Again, 0);
         expect(c.sequencer.hasPendingCards).toBe(true);
 
-        expect(await c.sequencer.undoLastAnswer()).toBe(true);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.sequencer.hasPendingCards).toBe(false);
         expect(c.currentFront).toBe("Q1");
         expect(c.text).toBe("#flashcards Q1::A1\n");
+    });
+});
+
+describe("undo across sessions", () => {
+    test("an answer from a closed session is undone in the note and asks for a reload", async () => {
+        const text = "#flashcards Q1::A1\n";
+        const c = await ReviewSessionContext.create(text);
+        await c.sequencer.processReview(ReviewResponse.Easy, 0);
+        expect(c.sequencer.hasCurrentCard).toBe(false);
+
+        await c.reopen();
+        expect(c.sequencer.canUndo).toBe(true);
+        expect(await c.sequencer.undoLastAnswer()).toBe(UndoResult.NeedsReload);
+        expect(c.text).toBe(text);
+        expect(c.log.entries).toHaveLength(0);
+
+        await c.reopen();
+        expect(c.currentFront).toBe("Q1");
     });
 });
 

@@ -1,6 +1,7 @@
 import { Menu } from "obsidian";
 
 import { t } from "src/lang/helpers";
+import { CardActions, FLAG_COUNT } from "src/ui/card-actions";
 import MenuButtonComponent from "src/ui/obsidian-ui-components/content-container/menu-button";
 
 export default class CardMenuButtonComponent extends MenuButtonComponent {
@@ -17,6 +18,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
         onOpenResetModalClick: () => void,
+        actions: CardActions | null,
         closeModal?: () => void,
         classNames?: string[],
     ) {
@@ -38,6 +40,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     deleteCurrentCard,
                     closeModal,
                 );
+                if (actions) this.addCardActions(cardMenu, actions, evt);
 
                 cardMenu.showAtMouseEvent(evt);
             },
@@ -132,5 +135,52 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     });
             });
         }
+    }
+
+    private addCardActions(cardMenu: Menu, actions: CardActions, evt: MouseEvent) {
+        cardMenu.addSeparator();
+        cardMenu.addItem((item) => {
+            item.setTitle(t("UNDO_LAST_ANSWER"))
+                .setIcon("undo-2")
+                .setDisabled(!actions.canUndo())
+                .onClick(() => void actions.undo());
+        });
+        cardMenu.addItem((item) => {
+            item.setTitle(t("BURY_CARD"))
+                .setIcon("eye-off")
+                .onClick(() => void actions.bury());
+        });
+        cardMenu.addItem((item) => {
+            item.setTitle(t("SUSPEND_CARD"))
+                .setIcon("pause-circle")
+                .onClick(() => void actions.suspend());
+        });
+        cardMenu.addItem((item) => {
+            item.setTitle(t("FLAG_CARD"))
+                .setIcon("flag")
+                .onClick(() => {
+                    // Obsidian menus have no public submenu API, so the colours open as a second menu in place
+                    const flagMenu = new Menu();
+                    const current = actions.currentFlag();
+                    for (let flag = 1; flag <= FLAG_COUNT; flag++) {
+                        flagMenu.addItem((flagItem) => {
+                            flagItem
+                                .setTitle(t(`FLAG_${flag}` as "FLAG_1"))
+                                .setIcon("flag")
+                                .setChecked(current === flag)
+                                .onClick(() => void actions.setFlag(flag));
+                        });
+                    }
+                    flagMenu.addSeparator();
+                    flagMenu.addItem((flagItem) => {
+                        flagItem
+                            .setTitle(t("REMOVE_FLAG"))
+                            .setIcon("flag-off")
+                            .setDisabled(current === 0)
+                            .onClick(() => void actions.setFlag(0));
+                    });
+                    flagMenu.showAtPosition({ x: evt.clientX, y: evt.clientY });
+                });
+        });
     }
 }

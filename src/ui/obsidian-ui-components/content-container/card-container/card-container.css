@@ -72,3 +72,96 @@
         }
     }
 }
+
+/* Card flags (Anki colours) shown as a left border on the card */
+.sr-scroll-wrapper.sr-flag-1,
+.sr-scroll-wrapper.sr-flag-2,
+.sr-scroll-wrapper.sr-flag-3,
+.sr-scroll-wrapper.sr-flag-4,
+.sr-scroll-wrapper.sr-flag-5,
+.sr-scroll-wrapper.sr-flag-6,
+.sr-scroll-wrapper.sr-flag-7 {
+    border-left: 4px solid transparent;
+}
+
+.sr-scroll-wrapper.sr-flag-1 {
+    border-left-color: var(--color-red);
+}
+
+.sr-scroll-wrapper.sr-flag-2 {
+    border-left-color: var(--color-orange);
+}
+
+.sr-scroll-wrapper.sr-flag-3 {
+    border-left-color: var(--color-green);
+}
+
+.sr-scroll-wrapper.sr-flag-4 {
+    border-left-color: var(--color-blue);
+}
+
+.sr-scroll-wrapper.sr-flag-5 {
+    border-left-color: var(--color-pink);
+}
+
+.sr-scroll-wrapper.sr-flag-6 {
+    border-left-color: var(--color-cyan);
+}
+
+.sr-scroll-wrapper.sr-flag-7 {
+    border-left-color: var(--color-purple);
+}
+
+/* Short-lived confirmation of the last answer, with undo */
+.sr-card-container {
+    position: relative;
+}
+
+.sr-answer-toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--size-4-16) + var(--size-4-4));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-3);
+    padding: var(--size-4-2) var(--size-4-3);
+    border-radius: var(--radius-l);
+    background-color: var(--background-secondary-alt);
+    box-shadow: var(--shadow-s);
+    font-size: var(--font-ui-small);
+    white-space: nowrap;
+    z-index: var(--layer-popover);
+    animation: sr-toast-in 160ms ease-out;
+}
+
+.sr-answer-toast-rating {
+    font-weight: var(--font-semibold);
+}
+
+.sr-answer-toast-interval {
+    color: var(--text-muted);
+}
+
+.sr-answer-toast-undo {
+    font-size: var(--font-ui-small);
+    padding: var(--size-2-1) var(--size-4-2);
+}
+
+@keyframes sr-toast-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sr-answer-toast {
+        animation: none;
+    }
+}

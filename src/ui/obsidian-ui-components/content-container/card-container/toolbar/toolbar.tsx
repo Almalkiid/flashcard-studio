@@ -3,6 +3,7 @@ import { Platform } from "obsidian";
 
 import { Deck } from "src/data/data-structures/deck/deck";
 import { DeckStats } from "src/scheduling/flashcard-review-sequencer";
+import { CardActions } from "src/ui/card-actions";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
 import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
@@ -29,6 +30,7 @@ export default class CardToolbarComponent {
         displayCurrentCardInfoNotice: () => void,
         skipCurrentCard: () => void,
         onOpenResetModalClick: () => void,
+        actions: CardActions | null,
         closeModal?: () => void,
     ) {
         // Build ui
@@ -83,6 +85,7 @@ export default class CardToolbarComponent {
             displayCurrentCardInfoNotice,
             skipCurrentCard,
             onOpenResetModalClick,
+            actions,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-short-menu-button"]
@@ -101,6 +104,7 @@ export default class CardToolbarComponent {
             displayCurrentCardInfoNotice,
             skipCurrentCard,
             onOpenResetModalClick,
+            actions,
             closeModal,
             EmulatedPlatform().isPhone || Platform.isPhone
                 ? ["mod-raised", "sr-extended-menu-button"]

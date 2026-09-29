@@ -11,6 +11,9 @@ import { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { ISRNoteTFile, SRNoteTFile } from "src/data/data-structures/file/note-file";
 import { PluginData } from "src/data/plugin-data";
 import { PluginDataManager } from "src/data/plugin-data-manager";
+import { getDeviceId } from "src/data/review-log/device-id";
+import { ObsidianLogAdapter } from "src/data/review-log/obsidian-log-adapter";
+import { ReviewLogStore } from "src/data/review-log/review-log-store";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
@@ -36,6 +39,7 @@ export class DataManager {
     public settingsManager: SettingsManager; // TODO: Refactor so that the plugin data manager and the settings manager are separate from the data manager
     private _osrCore: OsrCore | null = null;
     private _syncLock = false;
+    private _deviceId: string | null = null;
 
     constructor(
         plugin: SRPlugin,
@@ -68,6 +72,26 @@ export class DataManager {
 
     set data(data: PluginData) {
         this.pluginDataManager.pluginData = data;
+    }
+
+    /**
+     * The review log for the configured folder. Built on each call so a changed folder setting applies immediately.
+     */
+    get reviewLog(): ReviewLogStore {
+        this._deviceId = this._deviceId ?? getDeviceId(this.plugin.app);
+        return new ReviewLogStore(
+            new ObsidianLogAdapter(this.plugin.app.vault),
+            this.settingsManager.settings.reviewLogFolder,
+            this._deviceId,
+        );
+    }
+
+    /**
+     * Whether a path is inside the review log folder, which holds history rather than cards.
+     */
+    isInReviewLogFolder(path: string): boolean {
+        const folder = this.settingsManager.settings.reviewLogFolder.replace(/\/+$/, "");
+        return folder.length > 0 && path.startsWith(folder + "/");
     }
 
     get osrCore(): OsrCore {
@@ -129,6 +153,9 @@ export class DataManager {
 
             const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
+                // The review log is history, not cards; skipping it keeps start-up fast on phones
+                if (this.isInReviewLogFolder(noteFile.path)) continue;
+
                 // Skip files in the note ignore folder
                 if (
                     SettingsUtil.isPathInFoldersToIgnore(

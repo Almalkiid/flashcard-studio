@@ -34,6 +34,49 @@ export class SchedulingPage extends SettingsPage {
         this.dataManager.refreshAlgorithmParameters(this.settingsManager.settings);
     }
 
+    /**
+     * A text field that accepts whole numbers in a range, saved when it loses focus or on Enter.
+     */
+    private addWholeNumberSetting(
+        setting: Setting,
+        name: string,
+        description: string,
+        getValue: () => number,
+        setValue: (value: number) => void,
+        min: number,
+        max: number,
+        disabled: boolean,
+    ): void {
+        setting
+            .setName(name)
+            .setDesc(description)
+            .addText((text) => {
+                text.setValue(getValue().toString());
+                text.inputEl.type = "number";
+                text.inputEl.min = String(min);
+                text.inputEl.max = String(max);
+                text.inputEl.step = "1";
+                text.setDisabled(disabled);
+
+                const commit = () => {
+                    this.applySettingsUpdate(async () => {
+                        const parsed = Number(text.getValue());
+                        if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
+                            new Notice(t("INVALID_WHOLE_NUMBER", { min, max }));
+                            text.setValue(getValue().toString());
+                            return;
+                        }
+                        setValue(parsed);
+                        await this.settingsManager.save();
+                    });
+                };
+                text.inputEl.addEventListener("blur", commit);
+                text.inputEl.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter") commit();
+                });
+            });
+    }
+
     constructor(
         pageContainerEl: HTMLElement,
         plugin: SRPlugin,
@@ -56,6 +99,78 @@ export class SchedulingPage extends SettingsPage {
             openPage,
             scrollListener,
         );
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("DAILY_LIMITS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DAILY_LIMITS"))
+                    .setDesc(t("DAILY_LIMITS_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.dailyLimitsEnabled)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.dailyLimitsEnabled = value;
+                                await this.settingsManager.save();
+                                this.display();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                this.addWholeNumberSetting(
+                    setting,
+                    t("NEW_CARDS_PER_DAY"),
+                    t("NEW_CARDS_PER_DAY_DESC"),
+                    () => this.settingsManager.settings.newCardsPerDay,
+                    (value) => (this.settingsManager.settings.newCardsPerDay = value),
+                    0,
+                    9999,
+                    !this.settingsManager.settings.dailyLimitsEnabled,
+                );
+            })
+            .addSetting((setting: Setting) => {
+                this.addWholeNumberSetting(
+                    setting,
+                    t("REVIEW_LIMIT_PER_DAY"),
+                    t("REVIEW_LIMIT_PER_DAY_DESC"),
+                    () => this.settingsManager.settings.reviewsPerDay,
+                    (value) => (this.settingsManager.settings.reviewsPerDay = value),
+                    0,
+                    99999,
+                    !this.settingsManager.settings.dailyLimitsEnabled,
+                );
+            });
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("LEECHES"))
+            .addSetting((setting: Setting) => {
+                this.addWholeNumberSetting(
+                    setting,
+                    t("LEECH_THRESHOLD"),
+                    t("LEECH_THRESHOLD_DESC"),
+                    () => this.settingsManager.settings.leechThreshold,
+                    (value) => (this.settingsManager.settings.leechThreshold = value),
+                    0,
+                    99,
+                    false,
+                );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("LEECH_ACTION"))
+                    .setDesc(t("LEECH_ACTION_DESC"))
+                    .addDropdown((dropdown) =>
+                        dropdown
+                            .addOption("suspend", t("LEECH_ACTION_SUSPEND"))
+                            .addOption("tag", t("LEECH_ACTION_TAG"))
+                            .setValue(this.settingsManager.settings.leechAction)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.leechAction =
+                                    value === "tag" ? "tag" : "suspend";
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
 
         // These controls live under Scheduling because they govern when review is surfaced to the
         // user, not how flashcards are parsed or reviewed once a session is already open.

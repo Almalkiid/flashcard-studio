@@ -14,7 +14,10 @@ import {
     DeckStats,
     FlashcardReviewMode,
     IFlashcardReviewSequencer,
+    UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
+import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
+import { CardActions } from "src/ui/card-actions";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
@@ -89,6 +92,11 @@ export default class ContentManager {
     private lastPressedOnProcessReview: number = 0;
     private pendingResumeTimeout: number | null = null;
 
+    // Shared by every queue this screen loads, so the last answer of a deck can still be undone
+    private undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
+    // When the current card was shown, to record how long the answer took
+    private cardShownAt: number = 0;
+
     constructor(
         app: App,
         plugin: SRPlugin,
@@ -126,6 +134,7 @@ export default class ContentManager {
             () => void this._showAnswer(),
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
+            this._createCardActions(),
             closeModal,
         );
     }
@@ -140,7 +149,7 @@ export default class ContentManager {
 
     public async open() {
         // Prepare a review queue to display
-        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
 
         // Determine if the card view should be opened immediately
         const subdecksWithCardsInQueue: Deck[] = this.reviewSequencer.getSubDecksWithCardsInQueue(
@@ -184,7 +193,7 @@ export default class ContentManager {
     private async _showDecksList(reloadReviewQueue: boolean = false): Promise<void> {
         this._clearPendingResumeTimeout();
         if (reloadReviewQueue) {
-            this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+            this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
         }
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
@@ -198,6 +207,7 @@ export default class ContentManager {
         if (this.sessionData === null) return;
         this.uiManager.setUIState(UIState.CardFront);
         await this.cardContainer.openSession(this.sessionData, this.settings);
+        this.cardShownAt = activeWindow.performance.now();
     }
 
     private async _showNextCard(): Promise<void> {
@@ -258,6 +268,7 @@ export default class ContentManager {
             this.sessionData.cardData.currentCard !== undefined
         ) {
             await this.cardContainer.drawCardFront(this.sessionData, this.settings);
+            this.cardShownAt = activeWindow.performance.now();
         } else {
             await this._showDecksList(true);
         }
@@ -491,8 +502,71 @@ export default class ContentManager {
         }
         this.lastPressedOnProcessReview = timeNow;
 
-        await this.reviewSequencer.processReview(response);
+        const durationMs: number = activeWindow.performance.now() - this.cardShownAt;
+        await this.reviewSequencer.processReview(response, durationMs);
+        const entry = this.reviewSequencer.lastLoggedEntry;
         await this._showNextCard();
+        if (entry !== null && this.reviewMode === FlashcardReviewMode.Review) {
+            this.cardContainer.showAnswerToast(entry);
+        }
+    }
+
+    // MARK: Card actions (undo, bury, suspend, flag)
+
+    private _createCardActions(): CardActions {
+        return {
+            undo: () => this._undoLastAnswer(),
+            canUndo: () => this.reviewSequencer?.canUndo ?? false,
+            suspend: () => this._changeCurrentCard((sequencer) => sequencer.suspendCurrentCard()),
+            bury: () => this._changeCurrentCard((sequencer) => sequencer.buryCurrentCard()),
+            setFlag: async (flag: number) => {
+                if (this.reviewSequencer === null || !this.reviewSequencer.hasCurrentCard) return;
+                await this.reviewSequencer.setFlagCurrentCard(flag);
+                this.cardContainer.showFlag(flag);
+            },
+            currentFlag: () => this.reviewSequencer?.currentCard?.meta.flag ?? 0,
+        };
+    }
+
+    private async _changeCurrentCard(
+        change: (sequencer: IFlashcardReviewSequencer) => Promise<void>,
+    ): Promise<void> {
+        if (this.reviewSequencer === null || !this.reviewSequencer.hasCurrentCard) return;
+        await change(this.reviewSequencer);
+        await this._showNextCard();
+    }
+
+    public async _undoLastAnswer(): Promise<void> {
+        if (this.reviewSequencer === null) return;
+        this.cardContainer.hideAnswerToast();
+        const result: UndoResult = await this.reviewSequencer.undoLastAnswer();
+
+        switch (result) {
+            case UndoResult.Nothing:
+                new Notice(t("NOTHING_TO_UNDO"));
+                return;
+            case UndoResult.Failed:
+                return;
+            case UndoResult.NeedsReload:
+                // The answer came from a session that has since ended; start a fresh one on the same deck
+                this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(
+                    this.undoHistory,
+                );
+                if (this.sessionData !== null) {
+                    await this._startReviewOfDeck(this.sessionData.deckData.chosenDeck);
+                } else {
+                    await this._showDecksList();
+                }
+                return;
+            case UndoResult.Requeued:
+                this._clearPendingResumeTimeout();
+                await this._showNextCard();
+                if (this.sessionData !== null) {
+                    this.deckContainer.closeList();
+                    await this.cardContainer.openSession(this.sessionData, this.settings);
+                }
+                return;
+        }
     }
 
     // MARK: Deck button handlers
@@ -510,7 +584,7 @@ export default class ContentManager {
     private async _changeReviewMode(reviewMode: FlashcardReviewMode) {
         this.reviewQueueLoader.setReviewMode(reviewMode);
         this.reviewMode = reviewMode;
-        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue();
+        this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
         this.deckContainer.closeList();
         await this._showDecksList();
     }

@@ -25,6 +25,7 @@ import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item
 import { DailyLimits } from "src/scheduling/daily-limits";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
 import { buildReviewLogEntry } from "src/scheduling/review-log-builder";
+import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
 import { globalDateProvider } from "src/utils/dates";
 import { MultiLineTextFinder } from "src/utils/strings";
 
@@ -36,9 +37,11 @@ export interface IReviewLogSink {
     remove(entry: ReviewLogEntry): Promise<boolean>;
 }
 
-const MAX_UNDO_STEPS = 20;
-
-interface UndoRecord {
+/**
+ * Everything needed to revert one answer.
+ */
+export interface UndoRecord {
+    owner: FlashcardReviewSequencer;
     card: Card;
     question: Question;
     prevSchedule: RepItemScheduleInfo | null;
@@ -75,7 +78,7 @@ export interface IFlashcardReviewSequencer {
 
     get canUndo(): boolean;
     get lastLoggedEntry(): ReviewLogEntry | null;
-    undoLastAnswer(): Promise<boolean>;
+    undoLastAnswer(): Promise<UndoResult>;
     suspendCurrentCard(): Promise<void>;
     buryCurrentCard(): Promise<void>;
     setFlagCurrentCard(flag: number): Promise<void>;
@@ -178,7 +181,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private currentTopicPath: TopicPath = TopicPath.emptyPath;
     private reviewLog: IReviewLogSink | null;
     private dailyLimits: DailyLimits | null;
-    private undoStack: UndoRecord[] = [];
+    private undoHistory: UndoHistory<UndoRecord>;
     private _lastLoggedEntry: ReviewLogEntry | null = null;
 
     constructor(
@@ -190,6 +193,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         dueDateFlashcardHistogram: DueDateHistogram,
         reviewLog: IReviewLogSink | null = null,
         dailyLimits: DailyLimits | null = null,
+        undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>(),
     ) {
         this.reviewMode = reviewMode;
         this.cardSequencer = cardSequencer;
@@ -199,10 +203,11 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.dueDateFlashcardHistogram = dueDateFlashcardHistogram;
         this.reviewLog = reviewLog;
         this.dailyLimits = dailyLimits;
+        this.undoHistory = undoHistory;
     }
 
     get canUndo(): boolean {
-        return this.undoStack.length > 0;
+        return this.undoHistory.size > 0;
     }
 
     get lastLoggedEntry(): ReviewLogEntry | null {
@@ -421,7 +426,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             await this.appendToReviewLog(entry);
             this.dailyLimits?.record(entry);
 
-            this.undoStack.push({
+            this.undoHistory.push({
+                owner: this,
                 card,
                 question,
                 prevSchedule: oldSchedule,
@@ -433,7 +439,6 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 histogramDecrementKey,
                 wasPostponed,
             });
-            if (this.undoStack.length > MAX_UNDO_STEPS) this.undoStack.shift();
 
             if (leech) {
                 const lapses = (card.scheduleInfo as RepItemScheduleInfoFsrs).lapses;
@@ -611,13 +616,12 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     }
 
     /**
-     * Reverts the most recent answer of this session: the note, the review log, today's limits and the queue.
-     *
-     * @returns False when there is nothing to undo, or when the note changed since the answer (then nothing is touched).
+     * Reverts the most recent answer: the note, the review log, today's limits and, when the answer was given in this
+     * session, the queue. When the note changed since the answer nothing is touched.
      */
-    async undoLastAnswer(): Promise<boolean> {
-        const record = this.undoStack.pop();
-        if (!record) return false;
+    async undoLastAnswer(): Promise<UndoResult> {
+        const record = this.undoHistory.pop();
+        if (!record) return UndoResult.Nothing;
 
         const { card, question } = record;
         const fileText: string = await question.note.file.read();
@@ -633,7 +637,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 : null;
         if (restoredText === null) {
             new Notice(t("UNDO_FAILED_NOTE_CHANGED"));
-            return false;
+            return UndoResult.Failed;
         }
         await question.note.file.write(restoredText);
         question.questionText = QuestionText.create(
@@ -666,13 +670,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             await this.questionPostponementList.write();
         }
 
+        // An answer from an earlier session refers to cards that are no longer in this queue
+        if (record.owner !== this) return UndoResult.NeedsReload;
+
         this.pendingCards = this.pendingCards.filter((pending) => pending.card !== card);
         this.remainingDeckTree.deleteCardFromAllDecks(card, false);
         this.remainingDeckTree.prependRepItem(question.topicPathList, card);
         if (!this.cardSequencer.setCurrentRepItem(card, this.currentTopicPath)) {
             this.refreshCurrentDeck();
         }
-        return true;
+        return UndoResult.Requeued;
     }
 
     async suspendCurrentCard(): Promise<void> {

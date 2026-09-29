@@ -9,15 +9,20 @@ import {
     IIteratorOrder,
     RepItemOrder,
 } from "src/data/data-structures/deck/deck-tree-iterator";
+import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import { countToday, DailyLimits, monthsCovering } from "src/scheduling/daily-limits";
 import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IFlashcardReviewSequencer,
+    UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
+import { UndoHistory } from "src/scheduling/undo-history";
+import { globalDateProvider } from "src/utils/dates";
 
 export class ReviewQueueLoader {
     private plugin: SRPlugin;
@@ -49,7 +54,12 @@ export class ReviewQueueLoader {
         this.reviewMode = reviewMode;
     }
 
-    public async loadReviewQueue(): Promise<IFlashcardReviewSequencer> {
+    /**
+     * @param undoHistory - Answers that can still be undone, shared across the queues of one review screen.
+     */
+    public async loadReviewQueue(
+        undoHistory?: UndoHistory<UndoRecord>,
+    ): Promise<IFlashcardReviewSequencer> {
         if (this.plugin === null || this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
@@ -76,19 +86,44 @@ export class ReviewQueueLoader {
                     : this.osrCore.remainingDeckTree;
         }
 
+        const dailyLimits: DailyLimits | null =
+            this.reviewMode === FlashcardReviewMode.Review ? await this.loadDailyLimits() : null;
+
         const reviewSequencerData = this.getPreparedReviewSequencer(
             deckTree,
             remainingDeckTree,
             this.reviewMode,
+            dailyLimits,
+            undoHistory,
         );
 
         return reviewSequencerData.reviewSequencer;
+    }
+
+    /**
+     * Today's new and review allowance, from the review logs of every device.
+     */
+    private async loadDailyLimits(): Promise<DailyLimits> {
+        const settings: SRSettings = this.plugin.dataManager.data.settings;
+        const dayStartMs: number = globalDateProvider.today.valueOf();
+        const nowMs: number = globalDateProvider.now.valueOf();
+        let entries: ReviewLogEntry[] = [];
+        try {
+            entries = await this.plugin.dataManager.reviewLog.readMonths(
+                monthsCovering(dayStartMs, nowMs),
+            );
+        } catch (error) {
+            console.error("Cardwright: could not read the review log for daily limits", error);
+        }
+        return new DailyLimits(settings, countToday(entries, dayStartMs));
     }
 
     public getPreparedReviewSequencer(
         fullDeckTree: Deck,
         remainingDeckTree: Deck,
         reviewMode: FlashcardReviewMode,
+        dailyLimits: DailyLimits | null = null,
+        undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>(),
     ): { reviewSequencer: IFlashcardReviewSequencer; mode: FlashcardReviewMode } {
         const deckIterator: IDeckTreeIterator = this.createDeckTreeIterator(
             this.plugin.dataManager.data.settings,
@@ -101,6 +136,9 @@ export class ReviewQueueLoader {
             SRAlgorithm.getInstance(),
             this.plugin.dataManager.osrCore.questionPostponementList,
             this.plugin.dataManager.osrCore.dueDateFlashcardHistogram,
+            this.plugin.dataManager.reviewLog,
+            dailyLimits,
+            undoHistory,
         );
 
         reviewSequencer.setDeckTree(fullDeckTree, remainingDeckTree);

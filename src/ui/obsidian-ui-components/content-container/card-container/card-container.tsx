@@ -2,12 +2,14 @@ import "src/ui/obsidian-ui-components/content-container/card-container/card-cont
 import { App, Platform } from "obsidian";
 
 import { CardType } from "src/data/data-structures/card/questions/question";
+import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import { CardActions, FLAG_COUNT } from "src/ui/card-actions";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
@@ -18,8 +20,11 @@ import {
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { moment } from "src/utils/dates";
 import { escapeHtml } from "src/utils/escape-html";
+import { formatIntervalCompact } from "src/utils/format-interval";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
+
+const ANSWER_LABELS = ["Reset", "Again", "Hard", "Good", "Easy"];
 
 // TODO: Refactor cloze rendering into the renderers file
 export class CardContainer {
@@ -46,6 +51,9 @@ export class CardContainer {
     private skipCardHandler: () => void;
     private showAnswerHandler: () => void;
     private jumpToCardHandler: () => Promise<void>;
+    private actions: CardActions;
+    private answerToast: HTMLDivElement | null = null;
+    private answerToastTimeout: number | null = null;
 
     constructor(
         app: App,
@@ -60,6 +68,7 @@ export class CardContainer {
         showAnswerHandler: () => void,
         jumpToCurrentCardHandler: () => Promise<void>,
         displayCurrentCardInfoNoticeHandler: () => void,
+        actions: CardActions,
         closeModal?: () => void,
     ) {
         // Init properties
@@ -70,6 +79,7 @@ export class CardContainer {
         this.skipCardHandler = skipCardHandler;
         this.showAnswerHandler = showAnswerHandler;
         this.jumpToCardHandler = jumpToCurrentCardHandler;
+        this.actions = actions;
 
         // Build ui
         this.view = parentEl.createDiv();
@@ -97,6 +107,7 @@ export class CardContainer {
                     },
                 ).open();
             },
+            actions,
             closeModal,
         );
 
@@ -145,8 +156,52 @@ export class CardContainer {
             this.pendingResumeTimeout = null;
         }
         this.cardState = CardState.Closed;
+        this.hideAnswerToast();
         activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
+    }
+
+    /**
+     * Shows the card's flag colour as a border on the card, or removes it for 0.
+     */
+    public showFlag(flag: number): void {
+        for (let i = 1; i <= FLAG_COUNT; i++) this.scrollWrapper.removeClass(`sr-flag-${i}`);
+        if (flag > 0) this.scrollWrapper.addClass(`sr-flag-${flag}`);
+    }
+
+    /**
+     * Briefly shows what the last answer did, with a button to undo it.
+     */
+    public showAnswerToast(entry: ReviewLogEntry): void {
+        this.hideAnswerToast();
+        const toast = this.view.createDiv({ cls: "sr-answer-toast" });
+        toast.createSpan({
+            cls: `sr-answer-toast-rating sr-rating-${entry.r}`,
+            text: ANSWER_LABELS[entry.r],
+        });
+        toast.createSpan({
+            cls: "sr-answer-toast-interval",
+            text: t("NEXT_REVIEW_IN", { interval: formatIntervalCompact(entry.ivl) }),
+        });
+        const undoButton = toast.createEl("button", {
+            cls: "sr-answer-toast-undo",
+            text: t("UNDO"),
+        });
+        undoButton.addEventListener("click", () => {
+            this.hideAnswerToast();
+            void this.actions.undo();
+        });
+        this.answerToast = toast;
+        this.answerToastTimeout = window.setTimeout(() => this.hideAnswerToast(), 4000);
+    }
+
+    public hideAnswerToast(): void {
+        if (this.answerToastTimeout !== null) {
+            window.clearTimeout(this.answerToastTimeout);
+            this.answerToastTimeout = null;
+        }
+        this.answerToast?.remove();
+        this.answerToast = null;
     }
 
     /**
@@ -168,6 +223,7 @@ export class CardContainer {
         this.cardState = sessionData.cardData.currentCardState;
 
         this._updateInfoBar(sessionData, settings.flashcardCardOrder);
+        this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
 
         // Update card content
         await this.drawCardFrontContent(sessionData, settings);
@@ -342,6 +398,7 @@ export class CardContainer {
         this.cardState = sessionData.cardData.currentCardState;
 
         this.toolbar.setResetButtonDisabled(false);
+        this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
 
         // Show answer text
         if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
@@ -406,7 +463,35 @@ export class CardContainer {
             e.stopPropagation();
         };
 
+        // Anki's review shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+1..7 flag, - bury, @ suspend
+        if (e.ctrlKey || e.metaKey) {
+            if (e.code === "KeyZ" && !e.shiftKey) {
+                void this.actions.undo();
+                consumeKeyEvent();
+            } else if (/^Digit[1-7]$/.test(e.code)) {
+                const flag = Number(e.code.slice(5));
+                void this.actions.setFlag(this.actions.currentFlag() === flag ? 0 : flag);
+                consumeKeyEvent();
+            }
+            return;
+        }
+        if (e.altKey) return;
+        if (e.key === "@") {
+            void this.actions.suspend();
+            consumeKeyEvent();
+            return;
+        }
+        if (e.key === "-") {
+            void this.actions.bury();
+            consumeKeyEvent();
+            return;
+        }
+
         switch (e.code) {
+            case "KeyU":
+                void this.actions.undo();
+                consumeKeyEvent();
+                break;
             case "KeyS":
                 this.skipCardHandler();
                 consumeKeyEvent();

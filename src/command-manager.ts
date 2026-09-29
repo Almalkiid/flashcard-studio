@@ -1,5 +1,6 @@
-import { Platform, TFile } from "obsidian";
+import { Notice, Platform, TFile } from "obsidian";
 
+import { unburyAllInText, unsuspendAllInText } from "src/data/card-meta";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -47,6 +48,7 @@ export class CommandManager {
         this.plugin.removeCommand("srs-card-review-easy");
         this.plugin.removeCommand("srs-card-review-show-answer");
         this.plugin.removeCommand("srs-card-review-reset");
+        this.plugin.removeCommand("srs-card-review-open-in-background");
         this.plugin.removeCommand("srs-card-review-skip");
     }
 
@@ -266,7 +268,7 @@ export class CommandManager {
         });
 
         this.plugin.addCommand({
-            id: "srs-card-review-reset",
+            id: "srs-card-review-open-in-background",
             name: t("OPEN_IN_BACKGROUND"),
             repeatable: false,
             checkCallback: (checking: boolean) => {
@@ -433,6 +435,34 @@ export class CommandManager {
         });
 
         this.plugin.addCommand({
+            id: "srs-undo-last-answer",
+            name: t("UNDO_LAST_ANSWER"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                const contentManager = this.uiManager.contentManager;
+                if (!this.plugin.isInitialized || contentManager === null) return false;
+                if (!checking) void contentManager._undoLastAnswer();
+                return true;
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-unsuspend-cards-in-note",
+            name: t("UNSUSPEND_NOTE_CARDS"),
+            repeatable: false,
+            checkCallback: (checking: boolean) =>
+                this.rewriteActiveNote(checking, unsuspendAllInText, t("CARDS_UNSUSPENDED")),
+        });
+
+        this.plugin.addCommand({
+            id: "srs-unbury-cards-in-note",
+            name: t("UNBURY_NOTE_CARDS"),
+            repeatable: false,
+            checkCallback: (checking: boolean) =>
+                this.rewriteActiveNote(checking, unburyAllInText, t("CARDS_UNBURIED")),
+        });
+
+        this.plugin.addCommand({
             id: "srs-open-review-queue-view",
             name: t("OPEN_REVIEW_QUEUE_VIEW"),
             callback: async () => {
@@ -440,5 +470,26 @@ export class CommandManager {
                 await this.uiManager.sidebarManager.openReviewQueueView();
             },
         });
+    }
+
+    /**
+     * Applies a text rewrite to the active markdown note atomically, for the command palette.
+     */
+    private rewriteActiveNote(
+        checking: boolean,
+        rewrite: (text: string) => string,
+        doneMessage: string,
+    ): boolean {
+        const openFile: TFile | null = this.plugin.app.workspace.getActiveFile();
+        if (openFile === null || openFile.extension !== "md" || !this.plugin.isInitialized)
+            return false;
+
+        if (!checking) {
+            void this.plugin.app.vault.process(openFile, rewrite).then(async () => {
+                new Notice(doneMessage);
+                await this.plugin.dataManager.sync();
+            });
+        }
+        return true;
     }
 }

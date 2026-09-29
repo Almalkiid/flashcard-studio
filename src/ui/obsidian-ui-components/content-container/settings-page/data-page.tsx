@@ -1,8 +1,9 @@
-import { Setting, SettingGroup } from "obsidian";
+import { normalizePath, Notice, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { DEFAULT_SETTINGS } from "src/data/settings";
+import { mergeImportedSettings } from "src/data/settings-import";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -41,6 +42,38 @@ export class DataPage extends SettingsPage {
         );
 
         // TODO: Implement this when the other data stores are implemented
+
+        new SettingGroup(this.containerEl)
+            .setHeading(t("REVIEW_HISTORY"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_LOG_FOLDER"))
+                    .setDesc(t("REVIEW_LOG_FOLDER_DESC"))
+                    .addText((text) => {
+                        text.setPlaceholder(DEFAULT_SETTINGS.reviewLogFolder)
+                            .setValue(this.settingsManager.settings.reviewLogFolder)
+                            .onChange((value) => {
+                                this.applySettingsUpdate(async () => {
+                                    const folder = normalizePath(value.trim());
+                                    this.settingsManager.settings.reviewLogFolder =
+                                        folder.length > 0 && folder !== "/"
+                                            ? folder
+                                            : DEFAULT_SETTINGS.reviewLogFolder;
+                                    await this.settingsManager.save();
+                                });
+                            });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("IMPORT_SR_SETTINGS"))
+                    .setDesc(t("IMPORT_SR_SETTINGS_DESC"))
+                    .addButton((button) =>
+                        button.setButtonText(t("IMPORT")).onClick(async () => {
+                            await this.importSpacedRepetitionSettings();
+                        }),
+                    );
+            });
 
         const dataStorageGroup = new SettingGroup(this.containerEl).setHeading(
             t("GROUP_DATA_STORAGE"),
@@ -320,5 +353,37 @@ export class DataPage extends SettingsPage {
                             });
                     });
             });
+    }
+
+    /**
+     * Copies the settings of the original Spaced Repetition plugin, when it is installed in this vault.
+     */
+    private async importSpacedRepetitionSettings(): Promise<void> {
+        const path = normalizePath(
+            `${this.plugin.app.vault.configDir}/plugins/obsidian-spaced-repetition/data.json`,
+        );
+        const adapter = this.plugin.app.vault.adapter;
+        if (!(await adapter.exists(path))) {
+            new Notice(t("SR_SETTINGS_NOT_FOUND"));
+            return;
+        }
+
+        let imported: unknown;
+        try {
+            imported = JSON.parse(await adapter.read(path));
+        } catch {
+            new Notice(t("SR_SETTINGS_NOT_FOUND"));
+            return;
+        }
+
+        const { settings, importedKeys } = mergeImportedSettings(
+            this.settingsManager.settings,
+            imported,
+        );
+        Object.assign(this.settingsManager.settings, settings);
+        await this.settingsManager.save();
+        this.dataManager.setupDataStoreAndAlgorithmInstances(this.settingsManager.settings);
+        new Notice(t("SR_SETTINGS_IMPORTED", { count: importedKeys.length }));
+        this.display();
     }
 }

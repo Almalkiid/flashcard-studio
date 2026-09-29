@@ -23,7 +23,9 @@ import {
     FlashcardReviewMode,
     FlashcardReviewSequencer,
     IReviewLogSink,
+    UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
+import { UndoHistory } from "src/scheduling/undo-history";
 
 import { SampleItemDecks } from "../sample-items";
 import { UnitTestSRFile } from "./unit-test-file";
@@ -73,6 +75,8 @@ export class ReviewSessionContext {
     sequencer: FlashcardReviewSequencer;
     postponementList: QuestionPostponementList;
     histogram: CardDueDateHistogram = new CardDueDateHistogram();
+    /** Shared across reopen(), as the review screen shares it across queue reloads. */
+    undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
     private mode: FlashcardReviewMode;
 
     static async create(text: string, options: SessionOptions = {}): Promise<ReviewSessionContext> {
@@ -120,6 +124,7 @@ export class ReviewSessionContext {
             this.histogram,
             this.log,
             this.limits,
+            this.undoHistory,
         );
         const deckTree: Deck = await SampleItemDecks.createDeckFromFile(
             this.file,

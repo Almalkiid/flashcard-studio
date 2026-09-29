@@ -11,6 +11,7 @@ import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { ReminderManager } from "src/scheduling/reminder-manager";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
+import { renderReviewLog } from "src/ui/review-log-renderer";
 import { UIManager } from "src/ui/ui-manager";
 import { TextDirection } from "src/utils/strings";
 
@@ -40,6 +41,11 @@ export default class SRPlugin extends Plugin {
             const uiManager = new UIManager(this, settingsManager);
             this.uiManager = uiManager;
             this.commandManager = new CommandManager(this, settingsManager, uiManager);
+
+            // Review log files render as a readable table instead of raw JSON lines
+            this.registerMarkdownCodeBlockProcessor("srlog", (source, el) =>
+                renderReviewLog(source, el),
+            );
 
             this.app.workspace.onLayoutReady(async () => {
                 this.dataManager.loadData();
