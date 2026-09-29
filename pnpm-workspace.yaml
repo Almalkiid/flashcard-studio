@@ -3,7 +3,10 @@ packages:
 
 allowBuilds:
     "@parcel/watcher": true
+    classic-level: false
+    edgedriver: false
     esbuild: true
+    geckodriver: false
     pre-commit: true
     spawn-sync: true
     unrs-resolver: true

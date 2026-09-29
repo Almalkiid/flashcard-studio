@@ -19,6 +19,6 @@
         "noEmit": true
     },
     "include": ["src/**/*", "tests/**/*"],
-    "exclude": ["build", "coverage", "node_modules"],
+    "exclude": ["build", "coverage", "node_modules", "tests/e2e"],
     "files": ["node_modules/jest-expect-message/types/index.d.ts", "eslint.config.mjs"]
 }
