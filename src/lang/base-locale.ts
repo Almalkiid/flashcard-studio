@@ -36,6 +36,17 @@ export interface IBaseLocale {
     REVIEW_LOOK_DESC: string;
     REVIEW_LOOK_STUDIO: string;
     REVIEW_LOOK_CLASSIC: string;
+    HOME_TODAY: string;
+    HOME_ONE_CARD: string;
+    HOME_CARDS: string;
+    HOME_MINUTES: string;
+    STUDY_NOW: string;
+    HOME_ALL_DONE_TITLE: string;
+    HOME_ALL_DONE_DESC: string;
+    HOME_DECKS: string;
+    HOME_DECK_DONE: string;
+    HOME_DUE_CHIP: string;
+    HOME_NEW_CHIP: string;
     UNDO_LAST_ANSWER: string;
     DAILY_LIMITS: string;
     DAILY_LIMITS_DESC: string;

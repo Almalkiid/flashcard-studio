@@ -182,6 +182,7 @@ export class CardContainer {
         this.hideSessionSummary();
         // The toast of the previous answer would sit on top of the summary's buttons
         this.hideAnswerToast();
+        this.toolbar.markSessionComplete();
         // No card is being shown, so the review shortcuts must do nothing
         this.cardState = CardState.Closed;
         this.view.addClass("sr-summary-open");
@@ -270,6 +271,7 @@ export class CardContainer {
 
         // Update card content
         await this.drawCardFrontContent(sessionData, settings);
+        this.animateCardIn();
 
         // Update response buttons
         this.response.resetResponseButtons();
@@ -320,6 +322,21 @@ export class CardContainer {
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
+    }
+
+    /**
+     * Slides a new card into place in the Studio look (not when the system asks for reduced motion).
+     */
+    private animateCardIn(): void {
+        if (!this.view.hasClass("sr-look-studio")) return;
+        if (activeWindow.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        this.content.animate(
+            [
+                { opacity: 0, transform: "translateY(14px) scale(0.985)" },
+                { opacity: 1, transform: "none" },
+            ],
+            { duration: 280, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+        );
     }
 
     /**

@@ -1,0 +1,375 @@
+/* Studio look: the home screen that replaces the deck table (hero card for today, a tile for every deck). */
+
+.sr-home {
+    --sr-home-card: var(--background-primary);
+    --sr-home-radius: 16px;
+    --sr-home-hero-from: var(--interactive-accent);
+    --sr-home-hero-to: color-mix(in srgb, var(--interactive-accent) 55%, var(--color-blue));
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-2);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: var(--size-4-2) 0 var(--size-4-6);
+}
+
+.theme-dark .sr-home {
+    --sr-home-card: var(--background-secondary);
+}
+
+/* MARK: Hero */
+
+.sr-home-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px 24px;
+    border-radius: 22px;
+    color: var(--text-on-accent);
+    background:
+        radial-gradient(120% 90% at 100% 0%, rgb(255 255 255 / 22%), transparent 55%),
+        radial-gradient(80% 60% at 0% 100%, rgb(0 0 0 / 18%), transparent 60%),
+        linear-gradient(135deg, var(--sr-home-hero-from), var(--sr-home-hero-to));
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 25%),
+        0 1px 2px rgb(0 0 0 / 10%),
+        0 18px 40px -18px color-mix(in srgb, var(--interactive-accent) 65%, transparent);
+}
+
+.sr-home-hero.is-done {
+    --sr-home-hero-from: var(--color-green);
+    --sr-home-hero-to: color-mix(in srgb, var(--color-green) 60%, var(--color-cyan));
+}
+
+.sr-home-hero-decoration {
+    position: absolute;
+    right: -18px;
+    bottom: -22px;
+    opacity: 0.16;
+    pointer-events: none;
+
+    & svg {
+        width: 150px;
+        height: 150px;
+        stroke-width: 1.4;
+    }
+}
+
+.sr-home-hero-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    opacity: 0.85;
+}
+
+.sr-home-hero-label-icon {
+    display: flex;
+
+    & svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.sr-home-hero-number {
+    margin-top: 10px;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.sr-home-hero-detail {
+    margin-top: 6px;
+    font-size: var(--font-ui-small);
+    opacity: 0.88;
+    max-width: 30em;
+}
+
+/* Two classes, to outrank Obsidian's own button colours */
+.sr-home .sr-home-study-now {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    height: 44px;
+    padding: 0 20px 0 22px;
+    border-radius: 999px;
+    border: none;
+    font-size: var(--font-ui-medium);
+    font-weight: var(--font-semibold);
+    color: color-mix(in srgb, var(--sr-home-hero-from) 88%, black) !important;
+    background-color: rgb(255 255 255 / 96%) !important;
+    box-shadow:
+        0 1px 2px rgb(0 0 0 / 12%),
+        0 8px 20px -8px rgb(0 0 0 / 35%);
+    cursor: pointer;
+    transition:
+        transform 120ms ease,
+        box-shadow 120ms ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow:
+            0 2px 4px rgb(0 0 0 / 12%),
+            0 12px 26px -10px rgb(0 0 0 / 40%);
+    }
+
+    &:active {
+        transform: translateY(0) scale(0.98);
+    }
+}
+
+.sr-home-study-now-icon {
+    display: flex;
+
+    & svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* MARK: Decks */
+
+.sr-home-section-title {
+    margin: 18px 6px 6px;
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+}
+
+.sr-home-deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sr-home-deck {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px 12px 12px;
+    border-radius: var(--sr-home-radius);
+    background-color: var(--sr-home-card);
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    transition:
+        transform 140ms ease,
+        box-shadow 140ms ease,
+        border-color 140ms ease;
+
+    &[data-depth="1"] {
+        margin-left: 22px;
+    }
+
+    &[data-depth="2"] {
+        margin-left: 44px;
+    }
+
+    &[data-depth="3"],
+    &[data-depth="4"] {
+        margin-left: 66px;
+    }
+
+    &.is-clickable {
+        cursor: pointer;
+    }
+
+    &.is-clickable:hover,
+    &.is-clickable:focus-visible {
+        transform: translateY(-1px);
+        border-color: color-mix(
+            in srgb,
+            var(--interactive-accent) 35%,
+            var(--background-modifier-border)
+        );
+        box-shadow: 0 10px 24px -12px rgb(0 0 0 / 28%);
+        outline: none;
+    }
+
+    &.is-clickable:active {
+        transform: scale(0.99);
+    }
+
+    &.is-done {
+        opacity: 0.72;
+    }
+}
+
+.sr-home-deck-monogram {
+    --sr-monogram: var(--interactive-accent);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--sr-monogram);
+    background-color: color-mix(in srgb, var(--sr-monogram) 15%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sr-monogram) 22%, transparent);
+}
+
+.sr-monogram-2 {
+    --sr-monogram: var(--color-blue);
+}
+
+.sr-monogram-3 {
+    --sr-monogram: var(--color-green);
+}
+
+.sr-monogram-4 {
+    --sr-monogram: var(--color-orange);
+}
+
+.sr-monogram-5 {
+    --sr-monogram: var(--color-pink);
+}
+
+.sr-monogram-6 {
+    --sr-monogram: var(--color-cyan);
+}
+
+.sr-monogram-7 {
+    --sr-monogram: var(--color-purple);
+}
+
+.sr-home-deck-body {
+    min-width: 0;
+}
+
+.sr-home-deck-name {
+    font-size: var(--font-ui-medium);
+    font-weight: var(--font-semibold);
+    color: var(--text-normal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sr-home-deck-meta {
+    margin-top: 1px;
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.sr-home-deck-progress {
+    margin-top: 8px;
+    height: 3px;
+    border-radius: 3px;
+    background-color: var(--background-modifier-border);
+    overflow: hidden;
+}
+
+.sr-home-deck-progress-fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    transform: scaleX(var(--sr-deck-seen, 0));
+    border-radius: inherit;
+    background-color: color-mix(in srgb, var(--interactive-accent) 75%, transparent);
+}
+
+.sr-home-deck-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sr-home-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    &.is-due {
+        color: var(--color-green);
+        background-color: color-mix(in srgb, var(--color-green) 14%, transparent);
+    }
+
+    &.is-new {
+        color: var(--color-blue);
+        background-color: color-mix(in srgb, var(--color-blue) 14%, transparent);
+    }
+
+    &.is-done {
+        color: var(--text-muted);
+        background-color: var(--background-modifier-hover);
+    }
+}
+
+.sr-home-chip-icon {
+    display: flex;
+
+    & svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.sr-home-deck-chevron {
+    display: flex;
+    color: var(--text-faint);
+
+    & svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* MARK: Phones */
+
+.is-phone .sr-home {
+    padding-top: var(--size-4-1);
+}
+
+.is-phone .sr-home-hero {
+    padding: 18px 20px 20px;
+}
+
+.is-phone .sr-home-hero-number {
+    font-size: 30px;
+}
+
+.is-phone .sr-home-study-now {
+    width: 100%;
+    justify-content: center;
+    height: 48px;
+}
+
+.is-phone .sr-home-deck {
+    &[data-depth="1"] {
+        margin-left: 14px;
+    }
+
+    &[data-depth="2"],
+    &[data-depth="3"],
+    &[data-depth="4"] {
+        margin-left: 28px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sr-home-study-now,
+    .sr-home-deck {
+        transition: none;
+    }
+}

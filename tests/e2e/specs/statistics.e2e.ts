@@ -14,6 +14,8 @@ const manifest = JSON.parse(fs.readFileSync(path.resolve("manifest.json"), "utf8
 const pluginId = manifest.id;
 const DECK_NOTE = "CIA/Part1/Deck.md";
 const SCREENSHOT_DIR = path.resolve("docs/media/screenshots");
+// README screenshots are only (re)written when asked for, so a normal test run leaves the repository unchanged
+const TAKE_SCREENSHOTS = process.env.SCREENSHOTS === "1";
 const REVIEW_CARD = ".sr-view .sr-card-container";
 
 interface PluginWithData {
@@ -88,7 +90,7 @@ async function isMobile(): Promise<boolean> {
 
 async function screenshot(name: string): Promise<void> {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-    await browser.saveScreenshot(
+    if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
         path.join(SCREENSHOT_DIR, `${name}-${(await isMobile()) ? "mobile" : "desktop"}.png`),
     );
 }
@@ -555,7 +557,7 @@ describe("statistics and insight", function () {
         const slices = mobile ? [640, 1500, 2400] : [700, 1400, 2100];
         for (const [index, top] of slices.entries()) {
             await scrollStatistics(top);
-            await browser.saveScreenshot(
+            if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
                 path.join(
                     SCREENSHOT_DIR,
                     `statistics-${mobile ? "mobile" : "desktop"}-${index + 2}.png`,
@@ -574,11 +576,11 @@ describe("statistics and insight", function () {
         await browser.pause(1200);
         await scrollStatistics(0);
         expect(await canvasCount()).toBeGreaterThanOrEqual(7);
-        await browser.saveScreenshot(
+        if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
             path.join(SCREENSHOT_DIR, `statistics-${mobile ? "mobile" : "desktop"}-light.png`),
         );
         await scrollStatistics(mobile ? 640 : 700);
-        await browser.saveScreenshot(
+        if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
             path.join(SCREENSHOT_DIR, `statistics-${mobile ? "mobile" : "desktop"}-light-2.png`),
         );
         await setLight(false);

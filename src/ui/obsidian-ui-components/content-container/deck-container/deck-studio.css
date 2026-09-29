@@ -1,0 +1,98 @@
+/* Studio look for the deck list: calm rows, counts as coloured numbers instead of pills. */
+
+.sr-deck-container.sr-look-studio {
+    background-color: var(--background-secondary);
+
+    & .sr-content {
+        padding: var(--size-4-2) var(--size-4-4) var(--size-4-4);
+    }
+
+    /* Column titles */
+    & .sr-header-row .sr-tree-item-row {
+        border-bottom: 1px solid var(--background-modifier-border);
+        padding-bottom: var(--size-4-2);
+        margin-bottom: var(--size-4-2);
+    }
+
+    & .sr-header-row .sr-tree-row-text,
+    & .sr-header-row .sr-tree-numbers-text {
+        color: var(--text-faint) !important;
+        font-size: var(--font-ui-smaller);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    /* Deck rows */
+    & .sr-tree-container .sr-tree-item-row {
+        min-height: 40px;
+        align-items: center;
+        border-radius: var(--radius-m);
+        padding-top: var(--size-4-1);
+        padding-bottom: var(--size-4-1);
+        transition: background-color 120ms ease;
+    }
+
+    & .sr-tree-container .sr-tree-item-row.is-clickable:hover {
+        background-color: var(--background-modifier-hover);
+    }
+
+    & .sr-tree-container .sr-tree-item-row.is-disabled {
+        opacity: 0.55;
+    }
+
+    & .sr-tree-container .tag-pane-tag-self {
+        font-size: var(--font-ui-medium);
+        color: var(--text-normal);
+    }
+
+    /* The first row ("All decks") leads the list */
+    & .sr-tree-container > .tree-item:first-child > .tree-item-self .tag-pane-tag-self {
+        font-weight: var(--font-semibold);
+    }
+
+    /* Counts: due and new in colour, the rest quiet, zero faded. The extra class outranks the original rule that
+       forces white text on the coloured pills. */
+    & .sr-tree-stats-count.tree-item-flair {
+        background: none !important;
+        min-width: 2.6em;
+        padding: 0;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        font-weight: var(--font-semibold);
+        color: var(--text-muted) !important;
+    }
+
+    & .sr-tree-stats-count.sr-bg-green {
+        color: var(--color-green) !important;
+    }
+
+    & .sr-tree-stats-count.sr-bg-blue {
+        color: var(--color-blue) !important;
+    }
+
+    & .sr-tree-stats-count.sr-bg-yellow,
+    & .sr-tree-stats-count.sr-bg-red {
+        font-weight: var(--font-normal);
+    }
+
+    & .sr-tree-stats-count.sr-is-zero {
+        color: var(--text-faint) !important;
+        font-weight: var(--font-normal);
+        opacity: 0.6;
+    }
+}
+
+.theme-dark .sr-deck-container.sr-look-studio {
+    background-color: var(--background-primary);
+}
+
+.is-phone .sr-deck-container.sr-look-studio {
+    & .sr-content {
+        padding: var(--size-4-2) var(--size-4-3) var(--size-4-3);
+    }
+
+    & .sr-tree-container .sr-tree-item-row {
+        min-height: 46px;
+    }
+}

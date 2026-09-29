@@ -5,11 +5,14 @@ import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
+import { renderStudioHome } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;
     private content: HTMLDivElement;
     private treeContainer: HTMLDivElement;
+    // The Studio look's home screen, shown instead of the table
+    private homeEl: HTMLDivElement;
 
     private treeHeaderRow: HTMLDivElement;
     private treeHeaderRowSelf: HTMLDivElement;
@@ -101,6 +104,7 @@ export default class DeckListComponent {
 
         // Prep tree container
         this.treeContainer = this.content.createDiv("sr-tree-container");
+        this.homeEl = this.content.createDiv("sr-home");
     }
 
     /**
@@ -115,6 +119,15 @@ export default class DeckListComponent {
         const originDeckStats = reviewSequencer.getDeckStats(
             reviewSequencer.originalDeckTree.getTopicPath(),
         );
+
+        const studio = settings.reviewLook !== "classic" && originDeckStats.totalCount > 0;
+        this.treeHeaderRow.toggleClass("sr-is-hidden", studio);
+        this.treeContainer.toggleClass("sr-is-hidden", studio);
+        this.homeEl.toggleClass("sr-is-hidden", !studio);
+        if (studio) {
+            renderStudioHome(this.homeEl, reviewSequencer, this.startReviewOfDeck);
+            return;
+        }
 
         if (originDeckStats.totalCount === 0) {
             const noDecksToReviewEl = this.treeContainer.createDiv();
@@ -282,5 +295,7 @@ export default class DeckListComponent {
         ]);
 
         statsContainer.setText(statsNumber.toString());
+        // Lets the Studio look fade counts that are zero
+        statsContainer.toggleClass("sr-is-zero", statsNumber === 0);
     }
 }

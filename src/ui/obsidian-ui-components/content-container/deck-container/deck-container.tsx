@@ -1,3 +1,4 @@
+import "src/ui/obsidian-ui-components/content-container/deck-container/deck-studio.css";
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-container.css";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- h is the JSX factory, only referenced by compiled JSX
 import h from "vhtml";
@@ -46,6 +47,8 @@ export class DeckContainer {
         reviewMode: FlashcardReviewMode,
         customStudyActive: boolean = false,
     ) {
+        this.containerEl.toggleClass("sr-look-studio", settings.reviewLook !== "classic");
+
         // Redraw in case the stats have changed
         this.deckListHeader.updateReviewMode(reviewMode);
         this.deckListHeader.setCustomStudyActive(customStudyActive);

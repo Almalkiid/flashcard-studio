@@ -70,6 +70,18 @@ export default class DeckInfoComponent {
         );
     }
 
+    private totalCardsInChosenDeck: number = 0;
+
+    /**
+     * Shows every card of the chosen deck as done, when the session has ended.
+     */
+    public markChosenDeckComplete(): void {
+        this.chosenDeckCardCounter.setProgress(
+            this.totalCardsInChosenDeck,
+            this.totalCardsInChosenDeck,
+        );
+    }
+
     public updateInfo(
         chosenDeckName: string,
         totalCardsInChosenDeck: number,
@@ -81,6 +93,8 @@ export default class DeckInfoComponent {
         cardProgressInCurrentDeck: number,
         isTotallyRandom: boolean,
     ) {
+        this.totalCardsInChosenDeck = totalCardsInChosenDeck;
+
         // Set values
         this.chosenDeckName.setText(chosenDeckName);
         this.chosenDeckCardCounter.setProgress(cardProgressInChosenDeck, totalCardsInChosenDeck);

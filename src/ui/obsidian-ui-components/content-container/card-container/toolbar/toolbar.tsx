@@ -166,6 +166,14 @@ export default class CardToolbarComponent {
     }
 
     /**
+     * Shows the session as finished: a full progress bar and every card counted as done.
+     */
+    public markSessionComplete(): void {
+        this.progressFill.setCssProps({ "--sr-progress": "1" });
+        this.infoSection.markChosenDeckComplete();
+    }
+
+    /**
      * Sets the reset button disabled state
      * @param disabled - The disabled state
      */
