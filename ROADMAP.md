@@ -7,18 +7,30 @@ Flashcard Studio aims to be the best way to study with spaced repetition in Obsi
 - [x] Review history on every device, without sync conflicts
 - [x] Undo, suspend, bury, flags and leeches
 - [x] Anki-style daily limits
-- [ ] Statistics: streak, calendar heatmap, retention, forecast and more
-- [ ] Card info with the full review history of a card
-- [ ] FSRS learning steps, parameters and an optimizer trained on your own reviews
-- [ ] Custom study sessions (forgotten today, review ahead, preview new, by deck, tag or flag)
-- [ ] Callout cards, multi-paragraph cards, LaTeX-friendly clozes
-- [ ] Import from and export to Anki (.apkg and text)
-- [ ] A welcome guide and sample deck
+- [x] Statistics: streak, calendar heatmap, retention, forecast and more
+- [x] Card info with the full review history of a card
+- [x] FSRS learning steps, parameters and an optimizer trained on your own reviews
+- [x] Custom study sessions (forgotten today, review ahead, preview new, by deck, tag or flag)
+- [x] Callout cards, multi-paragraph cards, LaTeX-friendly clozes
+- [x] Import from and export to Anki (.apkg and text)
+- [x] A welcome guide and sample deck
+- [x] The Studio look: home, study screen, statistics, card info and session summary in one design, light and dark
+
+## Next
+
+- [ ] **Review mistakes**: at the end of a session, study again the cards you just got wrong
+- [ ] **Today's plan** on the home screen: due, new and weak-topic cards, with the time they take
+- [ ] **Weak areas**: decks and tags ranked by retention, cards you keep missing, what to focus on
+- [ ] **Card browser**: search, filter by deck, state and tag, and edit in bulk
+- [ ] **Add and edit cards** in a form: deck, tags and the source the card came from
+- [ ] **Agent inbox**: cards and edits proposed by an AI agent wait for you to approve, edit or reject them
+- [ ] **Deck mastery** on each deck, and a deck page with its sources
+- [ ] **Achievements** from your review history
 
 ## Later
 
+- An optional card assistant (explain, simplify, a mnemonic) using your own AI provider key
 - Image occlusion
-- A card browser with search and bulk editing
 - Easy days and load balancing
 - Text to speech
 - Multiple-choice cards
