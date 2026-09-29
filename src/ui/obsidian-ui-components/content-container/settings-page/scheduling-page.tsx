@@ -706,6 +706,18 @@ export class SchedulingPage extends SettingsPage {
                 "fsrsRelearningSteps",
             ),
         );
+        group.addSetting((setting: Setting) =>
+            this.addWholeNumberSetting(
+                setting,
+                t("LEARN_AHEAD_LIMIT"),
+                t("LEARN_AHEAD_LIMIT_DESC"),
+                () => settings.learnAheadMinutes,
+                (value) => (settings.learnAheadMinutes = value),
+                0,
+                1440,
+                false,
+            ),
+        );
 
         group.addSetting((setting: Setting) => {
             setting

@@ -256,6 +256,11 @@ export default class ContentManager {
             this.reviewSequencer.refreshCurrentDeck();
         }
 
+        // Like Anki's learn ahead limit: with nothing else left, a card due soon is shown now instead of waited for
+        if (!this.reviewSequencer.hasCurrentCard && this.reviewSequencer.hasPendingCards) {
+            this.reviewSequencer.learnAhead(this.settings.learnAheadMinutes * 60 * 1000);
+        }
+
         if (!this.reviewSequencer.hasCurrentCard) {
             if (this.reviewSequencer.hasPendingCards) {
                 await this._showPendingState();

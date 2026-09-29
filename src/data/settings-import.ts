@@ -15,7 +15,11 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "fsrsRelearningSteps",
     "fsrsEnableFuzz",
     "fsrsWeights",
+    "learnAheadMinutes",
     "answerKeys",
+    // The Studio look
+    "reviewLook",
+    "learnerName",
 ]);
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

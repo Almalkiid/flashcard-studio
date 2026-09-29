@@ -257,9 +257,10 @@ describe("statistics and insight", function () {
         await setSetting("openViewInNewTabMobile", false);
         // A fixed order makes "the first card" the same card in every session
         await setSetting("flashcardCardOrder", "DueFirstSequential");
-        // The default learning steps, which a test may change
+        // The default learning steps and learn ahead limit, which a test may change
         await setSetting("fsrsLearningSteps", "1m 10m");
         await setSetting("fsrsRelearningSteps", "10m");
+        await setSetting("learnAheadMinutes", 20);
     });
 
     afterEach(async function () {
@@ -475,6 +476,32 @@ describe("statistics and insight", function () {
             .$(".sr-stats-view .sr-stats-root")
             .waitForExist({ timeoutMsg: "Open statistics did not open the view" });
         await browser.waitUntil(async () => (await stat("reviews")) === String(answered));
+    });
+
+    it("shows a missed card again at once when nothing else is left, as Anki's learn ahead limit does", async function () {
+        await openReview();
+        await answerNextCard("sr-again-button");
+        // The missed card is due again in a minute; it comes back instead of a waiting screen
+        const answered = await finishSession();
+        expect(await browser.$(".sr-session-summary [data-stat='cards']").getText()).toEqual(
+            String(answered + 1),
+        );
+    });
+
+    it("waits for a missed card when the learn ahead limit is 0", async function () {
+        await setSetting("learnAheadMinutes", 0);
+        await openReview();
+        await answerNextCard("sr-again-button");
+        await browser.waitUntil(
+            async () => {
+                const waiting = browser.$(`${REVIEW_CARD} .sr-centered`);
+                if (await waiting.isDisplayed()) return true;
+                await answerNextCard("sr-easy-button");
+                return false;
+            },
+            { timeoutMsg: "the waiting screen never showed" },
+        );
+        expect(await browser.$(`${REVIEW_CARD} .sr-centered`).getText()).toContain("Waiting");
     });
 
     it("offers to review the cards answered Again, then studies only those", async function () {

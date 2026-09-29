@@ -466,6 +466,8 @@ export interface IBaseLocale {
     FSRS_LEARNING_STEPS_DESC: string;
     FSRS_RELEARNING_STEPS: string;
     FSRS_RELEARNING_STEPS_DESC: string;
+    LEARN_AHEAD_LIMIT: string;
+    LEARN_AHEAD_LIMIT_DESC: string;
     FSRS_STEPS_INVALID: string;
     FSRS_STEPS_LONG_WARNING: string;
     FSRS_FUZZ: string;

@@ -104,6 +104,8 @@ export interface SRSettings {
     // M3a: scheduling
     fsrsLearningSteps: string;
     fsrsRelearningSteps: string;
+    /** When nothing else is left, cards whose next step is due within this many minutes are shown now (Anki). */
+    learnAheadMinutes: number;
     fsrsEnableFuzz: boolean;
     fsrsWeights: string;
     answerKeys: AnswerKeys;
@@ -222,6 +224,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // PluginDataManager.loadData)
     fsrsLearningSteps: "1m 10m",
     fsrsRelearningSteps: "10m",
+    // Anki's default
+    learnAheadMinutes: 20,
     fsrsEnableFuzz: false,
     // Empty means FSRS's default weights
     fsrsWeights: "",

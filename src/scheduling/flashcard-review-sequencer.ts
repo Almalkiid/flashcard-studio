@@ -68,6 +68,7 @@ export interface IFlashcardReviewSequencer {
     setDeckTree(originalDeckTree: Deck, remainingDeckTree: Deck): void;
     setCurrentDeck(topicPath: TopicPath): void;
     refreshCurrentDeck(): void;
+    learnAhead(limitMs: number): boolean;
     getDeckStats(topicPath: TopicPath): DeckStats;
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
@@ -279,6 +280,22 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     refreshCurrentDeck(): void {
         this.setCurrentDeck(this.currentTopicPath);
+    }
+
+    /**
+     * Like Anki's learn ahead limit: when no card is left, pending cards due within `limitMs` from now are shown
+     * straight away instead of being waited for. Cards still in the queue always come first.
+     *
+     * @returns Whether there is a card to show.
+     */
+    learnAhead(limitMs: number): boolean {
+        if (this.hasCurrentCard) return true;
+        const untilUnix = globalDateProvider.now.valueOf() + limitMs;
+        if (!this.pendingCards.some((pendingCard) => pendingCard.dueUnix <= untilUnix))
+            return false;
+        this.wakeDuePendingCards(untilUnix);
+        this.refreshCurrentDeck();
+        return this.hasCurrentCard;
     }
 
     get originalDeckTree(): Deck {
@@ -526,16 +543,15 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         return scheduleInfo.isDue() ? "immediate" : "pending";
     }
 
-    private wakeDuePendingCards(): void {
+    private wakeDuePendingCards(untilUnix: number = globalDateProvider.now.valueOf()): void {
         if (this.pendingCards.length === 0) {
             return;
         }
 
-        const nowUnix = globalDateProvider.now.valueOf();
         const duePendingCards: PendingCard[] = [];
         const remainingPendingCards: PendingCard[] = [];
         for (const pendingCard of this.pendingCards) {
-            if (pendingCard.dueUnix <= nowUnix) {
+            if (pendingCard.dueUnix <= untilUnix) {
                 duePendingCards.push(pendingCard);
             } else {
                 remainingPendingCards.push(pendingCard);

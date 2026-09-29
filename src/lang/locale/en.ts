@@ -547,6 +547,9 @@ const en: IBaseLocale = {
     FSRS_RELEARNING_STEPS: "Relearning steps",
     FSRS_RELEARNING_STEPS_DESC:
         'The delays after you press Again on a review card, for example "10m". Leave empty to let FSRS decide.',
+    LEARN_AHEAD_LIMIT: "Learn ahead limit (minutes)",
+    LEARN_AHEAD_LIMIT_DESC:
+        "When nothing else is left to study, show a card whose next step is due within this many minutes instead of waiting for it, as Anki does. 0 always waits.",
     FSRS_STEPS_INVALID:
         "Steps are whole numbers followed by m, h or d, separated by spaces, for example 1m 10m.",
     FSRS_STEPS_LONG_WARNING:

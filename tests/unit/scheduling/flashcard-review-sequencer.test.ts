@@ -23,6 +23,7 @@ import {
     IFlashcardReviewSequencer,
 } from "src/scheduling/flashcard-review-sequencer";
 import {
+    globalDateProvider,
     setupStaticDateProvider20230906,
     setupStaticDateProviderOriginDatePlusDays,
 } from "src/utils/dates";
@@ -885,6 +886,58 @@ Q1::A1
 
             expect(reviewSequencer.currentCard.front).toEqual("A");
             expect(reviewSequencer.hasPendingCards).toEqual(false);
+        });
+
+        test("Learn ahead: with nothing else left, a pending card due within the limit is shown now", async () => {
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                "#flashcards A::a <!--SR:!2023-09-02,4,270-->",
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const inTenMinutes = globalDateProvider.now.clone().add(10, "minutes").toISOString();
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(
+                createPendingSchedule(inTenMinutes),
+            );
+
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Again);
+            expect(reviewSequencer.hasCurrentCard).toEqual(false);
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+
+            // Five minutes ahead does not reach it, so it keeps waiting
+            expect(reviewSequencer.learnAhead(5 * 60 * 1000)).toEqual(false);
+            expect(reviewSequencer.hasCurrentCard).toEqual(false);
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
+
+            // Anki's default of twenty minutes does
+            expect(reviewSequencer.learnAhead(20 * 60 * 1000)).toEqual(true);
+            expect(reviewSequencer.currentCard.front).toEqual("A");
+            expect(reviewSequencer.hasPendingCards).toEqual(false);
+        });
+
+        test("Learn ahead never puts a pending card before cards still in the queue", async () => {
+            const c: TestContext = TestContext.Create(
+                orderDueFirstSequential,
+                FlashcardReviewMode.Review,
+                DEFAULT_SETTINGS,
+                `#flashcards A::a <!--SR:!2023-09-02,4,270-->
+#flashcards B::b <!--SR:!2023-09-02,4,270-->`,
+            );
+            await c.setSequencerDeckTreeFromOriginalText();
+            const reviewSequencer = c.reviewSequencer as FlashcardReviewSequencer;
+            const inTenMinutes = globalDateProvider.now.clone().add(10, "minutes").toISOString();
+            jest.spyOn(reviewSequencer, "determineCardSchedule").mockReturnValue(
+                createPendingSchedule(inTenMinutes),
+            );
+
+            await reviewSequencer.processReviewReviewMode(ReviewResponse.Again);
+            expect(reviewSequencer.currentCard.front).toEqual("B");
+
+            expect(reviewSequencer.learnAhead(20 * 60 * 1000)).toEqual(true);
+            expect(reviewSequencer.currentCard.front).toEqual("B");
+            expect(reviewSequencer.hasPendingCards).toEqual(true);
         });
 
         test("Due pending cards are requeued in ascending due order", async () => {
