@@ -1,0 +1,213 @@
+/*
+ * Flashcard Studio design tokens, shared by every Studio screen (home, decks, study, statistics).
+ *
+ * Light follows the owner's reference designs: a cool off-white page, white cards, one clear blue, soft tinted
+ * fills for each rating. Dark mirrors it: near-black page, raised charcoal cards, fine light borders.
+ * Screens opt in with the `fs-studio` class on their root element and use only these variables.
+ */
+
+.fs-studio {
+    /* Surfaces */
+    --fs-bg: #f4f6f9;
+    --fs-surface: #ffffff;
+    --fs-surface-2: #f6f7fa;
+    --fs-border: rgb(15 23 42 / 7%);
+    --fs-border-strong: rgb(15 23 42 / 12%);
+
+    /* Text */
+    --fs-text: #0f172a;
+    --fs-text-2: #475569;
+    --fs-text-3: #94a3b8;
+    --fs-on-accent: #ffffff;
+
+    /* Accent and ratings, each with a soft fill */
+    --fs-accent: #2563eb;
+    --fs-accent-soft: #e8efff;
+    --fs-red: #e5484d;
+    --fs-red-soft: #fdecec;
+    --fs-orange: #f76b15;
+    --fs-orange-soft: #fff0e5;
+    --fs-green: #1a9d55;
+    --fs-green-soft: #e6f6ec;
+    --fs-blue: #2563eb;
+    --fs-blue-soft: #e8efff;
+    --fs-purple: #7c3aed;
+    --fs-purple-soft: #f0e9fe;
+    --fs-teal: #0d9488;
+    --fs-teal-soft: #e2f5f2;
+    --fs-amber: #d97706;
+    --fs-amber-soft: #fdf3dc;
+
+    /* Shape and depth */
+    --fs-radius-xl: 24px;
+    --fs-radius-lg: 20px;
+    --fs-radius-md: 14px;
+    --fs-radius-sm: 10px;
+    --fs-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 8px 24px -6px rgb(15 23 42 / 8%);
+    --fs-shadow-lg: 0 2px 4px rgb(15 23 42 / 4%), 0 24px 48px -16px rgb(15 23 42 / 18%);
+
+    /* Type */
+    --fs-font: var(--font-interface, -apple-system, "SF Pro Text", system-ui, sans-serif);
+    --fs-display: 30px;
+    --fs-title: 22px;
+    --fs-headline: 17px;
+    --fs-body: 15px;
+    --fs-caption: 13px;
+    --fs-micro: 11px;
+
+    font-family: var(--fs-font);
+    color: var(--fs-text);
+    background-color: var(--fs-bg);
+}
+
+.theme-dark .fs-studio {
+    --fs-bg: #0b0d12;
+    --fs-surface: #13161d;
+    --fs-surface-2: #191d26;
+    --fs-border: rgb(255 255 255 / 7%);
+    --fs-border-strong: rgb(255 255 255 / 12%);
+
+    --fs-text: #f1f5f9;
+    --fs-text-2: #a7b0be;
+    --fs-text-3: #6b7486;
+
+    --fs-accent: #4f8cff;
+    --fs-accent-soft: rgb(79 140 255 / 16%);
+    --fs-red: #ff6b6b;
+    --fs-red-soft: rgb(255 107 107 / 14%);
+    --fs-orange: #ff8a3d;
+    --fs-orange-soft: rgb(255 138 61 / 14%);
+    --fs-green: #3ecf8e;
+    --fs-green-soft: rgb(62 207 142 / 14%);
+    --fs-blue: #4f8cff;
+    --fs-blue-soft: rgb(79 140 255 / 16%);
+    --fs-purple: #a78bfa;
+    --fs-purple-soft: rgb(167 139 250 / 16%);
+    --fs-teal: #2dd4bf;
+    --fs-teal-soft: rgb(45 212 191 / 14%);
+    --fs-amber: #fbbf24;
+    --fs-amber-soft: rgb(251 191 36 / 14%);
+
+    --fs-shadow: 0 1px 0 rgb(255 255 255 / 3%) inset, 0 8px 24px -8px rgb(0 0 0 / 50%);
+    --fs-shadow-lg: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 24px 48px -16px rgb(0 0 0 / 60%);
+}
+
+/* Shared building blocks */
+
+.fs-studio .fs-label {
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fs-text-3);
+}
+
+.fs-studio .fs-card {
+    background-color: var(--fs-surface);
+    border: 1px solid var(--fs-border);
+    border-radius: var(--fs-radius-lg);
+    box-shadow: var(--fs-shadow);
+}
+
+.fs-studio .fs-icon-tile {
+    --fs-tile: var(--fs-accent);
+    --fs-tile-soft: var(--fs-accent-soft);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    color: var(--fs-tile);
+    background: linear-gradient(160deg, var(--fs-tile-soft), color-mix(in srgb, var(--fs-tile-soft) 70%, var(--fs-tile) 8%));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fs-tile) 14%, transparent);
+
+    & svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 1.9;
+    }
+}
+
+.fs-studio .fs-tone-red {
+    --fs-tile: var(--fs-red);
+    --fs-tile-soft: var(--fs-red-soft);
+}
+
+.fs-studio .fs-tone-orange {
+    --fs-tile: var(--fs-orange);
+    --fs-tile-soft: var(--fs-orange-soft);
+}
+
+.fs-studio .fs-tone-green {
+    --fs-tile: var(--fs-green);
+    --fs-tile-soft: var(--fs-green-soft);
+}
+
+.fs-studio .fs-tone-blue {
+    --fs-tile: var(--fs-blue);
+    --fs-tile-soft: var(--fs-blue-soft);
+}
+
+.fs-studio .fs-tone-purple {
+    --fs-tile: var(--fs-purple);
+    --fs-tile-soft: var(--fs-purple-soft);
+}
+
+.fs-studio .fs-tone-teal {
+    --fs-tile: var(--fs-teal);
+    --fs-tile-soft: var(--fs-teal-soft);
+}
+
+.fs-studio .fs-tone-amber {
+    --fs-tile: var(--fs-amber);
+    --fs-tile-soft: var(--fs-amber-soft);
+}
+
+.fs-studio .fs-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 11px;
+    border-radius: 999px;
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--fs-accent);
+    background-color: var(--fs-accent-soft);
+}
+
+.fs-studio .fs-primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 14px;
+    font-family: var(--fs-font);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--fs-on-accent) !important;
+    background-color: var(--fs-accent) !important;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 10%), 0 8px 18px -8px color-mix(in srgb, var(--fs-accent) 70%, transparent);
+    cursor: pointer;
+    transition: transform 100ms ease, filter 120ms ease;
+
+    &:hover {
+        filter: brightness(1.06);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-studio .fs-primary-button {
+        transition: none;
+    }
+}

@@ -1,3 +1,5 @@
+import "src/ui/design/studio-tokens.css";
+
 import { Plugin } from "obsidian";
 
 import { CommandManager } from "src/command-manager";
