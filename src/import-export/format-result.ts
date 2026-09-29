@@ -60,7 +60,8 @@ export function summariseImport(
     }
     if (result.hasClozes) details.push(t("ANKI_IMPORT_RESULT_CLOZE"));
     if (clozePatternAdded) details.push(t("ANKI_IMPORT_CLOZE_PATTERN_ADDED"));
-    if (result.cards > 0) details.push(t("ANKI_IMPORT_RESULT_FOLDER", { folder: targetFolder }));
+    if (result.cards > 0)
+        details.push(t("ANKI_IMPORT_RESULT_FOLDER", { folder: targetFolder || "/" }));
     return { headline, details };
 }
 

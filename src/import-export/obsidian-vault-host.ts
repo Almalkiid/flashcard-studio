@@ -64,7 +64,8 @@ export class ObsidianVaultHost implements ImportHost, ExportMediaHost {
     }
 
     listNotes(folder: string): Promise<string[]> {
-        const prefix = normalizePath(folder) + "/";
+        // The vault's root folder is the empty path: every note is in it
+        const prefix = folder === "" ? "" : normalizePath(folder) + "/";
         return Promise.resolve(
             this.vault
                 .getMarkdownFiles()

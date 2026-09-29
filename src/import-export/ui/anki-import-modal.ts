@@ -19,6 +19,7 @@ import {
 import { openAnkiPackage } from "src/import-export/anki-package-reader";
 import { AnkiImportError, AnkiNote } from "src/import-export/anki-types";
 import { BasicStyle } from "src/import-export/card-builder";
+import { joinPath } from "src/import-export/deck-note";
 import { summariseImport } from "src/import-export/format-result";
 import { IMPORTABLE_EXTENSIONS, ObsidianVaultHost } from "src/import-export/obsidian-vault-host";
 import { loadSql } from "src/import-export/sql-loader";
@@ -246,7 +247,8 @@ export class AnkiImportModal extends Modal {
             const settingsManager = this.plugin.dataManager.settingsManager;
             const settings = settingsManager.settings;
             const options: ImportOptions = {
-                targetFolder: this.targetFolder || DEFAULT_TARGET_FOLDER,
+                // Slashes at the ends are not part of the folder's name; `/` alone is the vault's root folder
+                targetFolder: joinPath(this.targetFolder || DEFAULT_TARGET_FOLDER),
                 basicStyle: this.basicStyle,
                 keepTags: this.keepTags,
                 plainText,

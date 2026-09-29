@@ -62,6 +62,10 @@ describe("summariseImport", () => {
         ]);
     });
 
+    test("names the vault's root folder as /", () => {
+        expect(summariseImport(result, "", false).details).toContain("The notes are in /.");
+    });
+
     test("does not point at a folder when nothing was imported", () => {
         const summary = summariseImport(
             { ...result, cards: 0, decks: 0, mediaFiles: 0, duplicates: 5 },
