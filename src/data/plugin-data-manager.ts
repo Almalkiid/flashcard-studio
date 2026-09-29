@@ -1,8 +1,8 @@
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { setDebugParser } from "src/parser";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 
 /**
  * Custom error class for plugin data errors.
