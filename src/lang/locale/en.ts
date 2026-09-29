@@ -485,7 +485,7 @@ const en: IBaseLocale = {
     MULTILINE_CARDS_START_MARKER:
         "Characters denoting the start of clozes and multiline flashcards",
     MULTILINE_CARDS_START_MARKER_DESC:
-        'Lets a card contain blank lines, tables and several paragraphs, also in its question. Put this on a line of its own before the card, and the end marker (set above) after it, for example "+++" for both. While this is set, multiline and cloze cards are only found between the two markers. Inline ("::") and callout cards need no markers. After changing it, wrap your existing multiline and cloze cards, or they will not be found.',
+        'The end marker above lets the answer of a multiline card contain blank lines. Set a start marker as well and a card can contain blank lines, tables and several paragraphs everywhere, also in its question: put the start marker on a line of its own before the card and the end marker after it, for example "+++" for both. While this is set, multiline and cloze cards are only found between the two markers. Inline ("::") and callout cards need no markers. After changing it, wrap your existing multiline and cloze cards, or they will not be found.',
     ATOMIC_CLOZES: "Cloze card is only the line with the cloze",
     ATOMIC_CLOZES_DESC:
         "Off: a cloze card is the whole paragraph around the cloze. On: it is only the line that holds the cloze. A paragraph that was reviewed before and shares one schedule stays whole. Has no effect while a start marker is set.",
