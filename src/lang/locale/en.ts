@@ -612,7 +612,7 @@ const en: IBaseLocale = {
     SESSION_TIME: "Time",
     SESSION_AGAIN: "Again",
     SESSION_RETENTION: "Retention",
-    SESSION_STREAK: "Day streak",
+    SESSION_STREAK: "day streak",
     SESSION_BACK_TO_DECKS: "Back to decks",
 };
 
