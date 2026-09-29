@@ -9,7 +9,8 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { customStudyMode, CustomStudySpec } from "src/scheduling/custom-study";
 import {
     DeckStats,
     FlashcardReviewMode,
@@ -22,6 +23,7 @@ import { CardContainer } from "src/ui/obsidian-ui-components/content-container/c
 import CardInfoNotice from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-info-notice";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { CustomStudyModal } from "src/ui/obsidian-ui-components/modals/custom-study-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { UIManager, UIState } from "src/ui/ui-manager";
@@ -120,6 +122,7 @@ export default class ContentManager {
             (reviewMode) => void this._changeReviewMode(reviewMode),
             (deck) => void this._startReviewOfDeck(deck),
             closeModal,
+            () => this._openCustomStudy(),
         );
 
         this.cardContainer = new CardContainer(
@@ -199,7 +202,12 @@ export default class ContentManager {
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
         this.uiManager.setUIState(UIState.DeckList);
-        this.deckContainer.showList(this.reviewSequencer, this.settings, this.reviewMode);
+        this.deckContainer.showList(
+            this.reviewSequencer,
+            this.settings,
+            this.reviewMode,
+            this.reviewQueueLoader.getCustomStudy() !== null,
+        );
     }
 
     private async _reviewDeck(deck: Deck): Promise<void> {
@@ -583,9 +591,46 @@ export default class ContentManager {
     }
 
     private async _changeReviewMode(reviewMode: FlashcardReviewMode) {
+        // Picking a mode goes back to the normal decks
+        this.reviewQueueLoader.setCustomStudy(null);
         this.reviewQueueLoader.setReviewMode(reviewMode);
         this.reviewMode = reviewMode;
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
+        this.deckContainer.closeList();
+        await this._showDecksList();
+    }
+
+    // MARK: Custom study
+
+    private _openCustomStudy(): void {
+        new CustomStudyModal(this.app, this.plugin, {
+            onLimitsChanged: () => void this._showDecksList(true),
+            onStartSession: (spec) => void this._startCustomStudy(spec),
+        }).open();
+    }
+
+    /**
+     * Serves a custom study session in this review screen, in place of the normal decks. When no card matches, the
+     * normal decks stay.
+     */
+    private async _startCustomStudy(spec: CustomStudySpec): Promise<void> {
+        const previousSpec = this.reviewQueueLoader.getCustomStudy();
+        const previousMode = this.reviewMode;
+
+        this.reviewQueueLoader.setCustomStudy(spec);
+        this.reviewMode = customStudyMode(spec);
+        this.reviewQueueLoader.setReviewMode(this.reviewMode);
+        const sequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
+
+        if (sequencer.originalDeckTree.getDistinctRepItemCount(RepItemState.AnyItem, true) === 0) {
+            new Notice(t("CUSTOM_STUDY_NO_CARDS"));
+            this.reviewQueueLoader.setCustomStudy(previousSpec);
+            this.reviewMode = previousMode;
+            this.reviewQueueLoader.setReviewMode(previousMode);
+            return;
+        }
+
+        this.reviewSequencer = sequencer;
         this.deckContainer.closeList();
         await this._showDecksList();
     }

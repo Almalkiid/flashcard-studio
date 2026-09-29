@@ -10,6 +10,12 @@ const CARDWRIGHT_ONLY_KEYS: ReadonlySet<string> = new Set([
     "newCardsPerDay",
     "reviewsPerDay",
     "reviewLogFolder",
+    // M3a: scheduling
+    "fsrsLearningSteps",
+    "fsrsRelearningSteps",
+    "fsrsEnableFuzz",
+    "fsrsWeights",
+    "answerKeys",
 ]);
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

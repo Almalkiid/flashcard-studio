@@ -21,6 +21,7 @@ export class DeckContainer {
         changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
         startReviewOfDeck: (deck: Deck) => void,
         closeModal?: () => void,
+        openCustomStudy?: () => void,
     ) {
         // Build ui
         this.containerEl = parentEl.createDiv();
@@ -30,6 +31,7 @@ export class DeckContainer {
             this.containerEl,
             changeReviewMode,
             closeModal,
+            openCustomStudy,
         );
 
         this.deckList = new DeckListComponent(this.containerEl, startReviewOfDeck);
@@ -42,9 +44,11 @@ export class DeckContainer {
         reviewSequencer: IFlashcardReviewSequencer,
         settings: SRSettings,
         reviewMode: FlashcardReviewMode,
+        customStudyActive: boolean = false,
     ) {
         // Redraw in case the stats have changed
         this.deckListHeader.updateReviewMode(reviewMode);
+        this.deckListHeader.setCustomStudyActive(customStudyActive);
 
         this.deckList.redraw(reviewSequencer, settings);
 

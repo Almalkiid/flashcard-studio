@@ -10,6 +10,7 @@
         "lint": "pnpm prettier --check . && pnpm eslint src/ tests/",
         "test": "pnpm jest",
         "test:e2e": "node esbuild.config.mjs production && node tests/e2e/stage-plugin.mjs && wdio run ./wdio.conf.mts",
+        "validate:optimizer": "tsx tests/optimizer/compare-with-binding.ts",
         "validate": "concurrently --kill-others-on-fail -g -p \"[{name}]\" -n \"format,lint,test\" \"pnpm:format\" \"pnpm:lint\" \"pnpm:test\"",
         "precommit-msg": "echo 'Pre-commit checks...'",
         "changelog": "pnpm auto-changelog --template=compact --package --output docs/docs/changelog.md && pnpm prettier --write docs/docs/changelog.md"
@@ -26,6 +27,7 @@
     "license": "MIT",
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@open-spaced-repetition/binding": "0.5.0",
         "@types/jest": "^30.0.0",
         "@types/mocha": "^10.0.10",
         "@types/node": "^25.9.5",
@@ -69,7 +71,8 @@
         "minimatch": "^10.2.6",
         "pagerank.js": "^1.0.2",
         "short-uuid": "^6.0.3",
-        "ts-fsrs": "5.4.1"
+        "ts-fsrs": "5.4.1",
+        "ts-fsrs-optimizer": "0.1.2"
     },
     "pre-commit": [
         "precommit-msg",

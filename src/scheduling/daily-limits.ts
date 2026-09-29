@@ -11,6 +11,14 @@ export interface DailyLimitSettings {
     reviewsPerDay: number;
 }
 
+/**
+ * Extra allowance granted for today by custom study's "increase today's limit".
+ */
+export interface ExtraAllowance {
+    extraNew: number;
+    extraReviews: number;
+}
+
 function countsAsNew(entry: ReviewLogEntry): boolean {
     return entry.n === 1 && entry.r !== 0 && entry.k !== 3;
 }
@@ -54,20 +62,32 @@ export function monthsCovering(dayStartMs: number, nowMs: number): string[] {
 export class DailyLimits {
     private readonly settings: DailyLimitSettings;
     private counts: TodayCounts;
+    private readonly extra: ExtraAllowance;
 
-    constructor(settings: DailyLimitSettings, counts: TodayCounts) {
+    constructor(
+        settings: DailyLimitSettings,
+        counts: TodayCounts,
+        extra: ExtraAllowance = { extraNew: 0, extraReviews: 0 },
+    ) {
         this.settings = settings;
         this.counts = { ...counts };
+        this.extra = { ...extra };
     }
 
     remainingNew(): number {
         if (!this.settings.dailyLimitsEnabled) return Infinity;
-        return Math.max(0, this.settings.newCardsPerDay - this.counts.newDone);
+        return Math.max(
+            0,
+            this.settings.newCardsPerDay + this.extra.extraNew - this.counts.newDone,
+        );
     }
 
     remainingReviews(): number {
         if (!this.settings.dailyLimitsEnabled) return Infinity;
-        return Math.max(0, this.settings.reviewsPerDay - this.counts.reviewsDone);
+        return Math.max(
+            0,
+            this.settings.reviewsPerDay + this.extra.extraReviews - this.counts.reviewsDone,
+        );
     }
 
     record(entry: ReviewLogEntry): void {

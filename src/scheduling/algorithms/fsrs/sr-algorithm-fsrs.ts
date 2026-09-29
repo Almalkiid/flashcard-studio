@@ -1,4 +1,4 @@
-import { CardInput, createEmptyCard, FSRS, fsrs, State } from "ts-fsrs";
+import { CardInput, createEmptyCard, FSRS, fsrs, State, StrategyMode } from "ts-fsrs";
 
 import { SRSettings } from "src/data/settings";
 import { Note } from "src/note/note";
@@ -10,6 +10,7 @@ import {
     buildFsrsParameters,
     reviewResponseToFsrsGrade,
     sm2ScheduleToFsrsCard,
+    stableFuzzSeed,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
@@ -33,7 +34,14 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
 
     constructor(settings: SRSettings) {
         this.noteDelegate = new SRAlgorithmOsr(settings);
-        this.scheduler = fsrs(buildFsrsParameters(settings));
+        this.scheduler = SrsAlgorithmFsrs.createScheduler(settings);
+    }
+
+    /**
+     * Fuzz is seeded from the card, so the interval shown on a button is the one applied when it is pressed.
+     */
+    private static createScheduler(settings: SRSettings): FSRS {
+        return fsrs(buildFsrsParameters(settings)).useStrategy(StrategyMode.SEED, stableFuzzSeed);
     }
 
     /**
@@ -44,7 +52,7 @@ export class SrsAlgorithmFsrs implements ISRAlgorithm {
      * @param {SRSettings} settings - The settings object.
      */
     updateParameters(settings: SRSettings): void {
-        this.scheduler = fsrs(buildFsrsParameters(settings));
+        this.scheduler = SrsAlgorithmFsrs.createScheduler(settings);
     }
 
     noteOnLoadedNote(path: string, note: Note, noteEase: number): void {

@@ -1,6 +1,7 @@
 import { StorageType } from "src/data/data-store/base/data-store";
 import { t } from "src/lang/helpers";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { AnswerKeys } from "src/scheduling/answer-keys";
 import { pathMatchesPattern } from "src/utils/fs";
 
 export interface SRSettings {
@@ -99,6 +100,13 @@ export interface SRSettings {
 
     preferredDateFormatForNoteReviewQueue: string;
     preferredLocale: string;
+
+    // M3a: scheduling
+    fsrsLearningSteps: string;
+    fsrsRelearningSteps: string;
+    fsrsEnableFuzz: boolean;
+    fsrsWeights: string;
+    answerKeys: AnswerKeys;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -195,6 +203,16 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showParserDebugMessages: false,
     preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
     preferredLocale: "-",
+
+    // M3a: scheduling
+    // Existing installs keep no fuzz and the original keys; a new install starts with both switched on (see
+    // PluginDataManager.loadData)
+    fsrsLearningSteps: "1m 10m",
+    fsrsRelearningSteps: "10m",
+    fsrsEnableFuzz: false,
+    // Empty means FSRS's default weights
+    fsrsWeights: "",
+    answerKeys: "original",
 };
 
 /**

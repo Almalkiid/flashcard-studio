@@ -67,6 +67,9 @@ export class PluginDataManager {
         // whatever algorithm they chose.
         if (!loadedData?.settings) {
             this._pluginData.settings.algorithm = SRAlgorithmType.FSRS;
+            // M3a: scheduling. New installs start with Anki's keys and fuzz; existing settings keep what they had
+            this._pluginData.settings.answerKeys = "anki";
+            this._pluginData.settings.fsrsEnableFuzz = true;
         }
         this._isFirstRun = !loadedData?.settings;
 

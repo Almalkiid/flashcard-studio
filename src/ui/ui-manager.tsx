@@ -7,6 +7,7 @@ import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { CustomStudySpec } from "src/scheduling/custom-study";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
@@ -398,7 +399,11 @@ export class UIManager {
         electronApp?.dock?.bounce?.("informational");
     }
 
-    public async openDeckContainer(mode: FlashcardReviewMode, singleNote?: TFile): Promise<void> {
+    public async openDeckContainer(
+        mode: FlashcardReviewMode,
+        singleNote?: TFile,
+        customStudy?: CustomStudySpec,
+    ): Promise<void> {
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
@@ -419,6 +424,7 @@ export class UIManager {
             this.plugin.dataManager.osrCore,
             singleNote ?? null,
             mode,
+            customStudy ?? null,
         );
 
         if (openInNewTab) {

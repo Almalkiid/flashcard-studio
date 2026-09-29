@@ -14,6 +14,14 @@ import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { SRAlgorithm } from "src/scheduling/algorithms/base/sr-algorithm";
+import {
+    allowanceFor,
+    buildCustomStudyTree,
+    CustomStudyContext,
+    CustomStudySpec,
+    forgottenCardIds,
+    monthsBetween,
+} from "src/scheduling/custom-study";
 import { countToday, DailyLimits, monthsCovering } from "src/scheduling/daily-limits";
 import {
     FlashcardReviewMode,
@@ -29,17 +37,29 @@ export class ReviewQueueLoader {
     private osrCore: OsrCore;
     private singleNote: TFile | null = null;
     private reviewMode: FlashcardReviewMode;
+    // M3a: scheduling. A custom study session serves its own cards in place of the normal queue
+    private customStudy: CustomStudySpec | null = null;
 
     constructor(
         plugin: SRPlugin,
         osrCore: OsrCore,
         singleNote: TFile | null,
         reviewMode: FlashcardReviewMode,
+        customStudy: CustomStudySpec | null = null,
     ) {
         this.osrCore = osrCore;
         this.singleNote = singleNote;
         this.reviewMode = reviewMode;
         this.plugin = plugin;
+        this.customStudy = customStudy;
+    }
+
+    public getCustomStudy(): CustomStudySpec | null {
+        return this.customStudy;
+    }
+
+    setCustomStudy(customStudy: CustomStudySpec | null) {
+        this.customStudy = customStudy;
     }
 
     public getSingleNote(): TFile | null {
@@ -69,7 +89,15 @@ export class ReviewQueueLoader {
         let deckTree: Deck;
         let remainingDeckTree: Deck;
 
-        if (this.singleNote) {
+        if (this.customStudy !== null) {
+            deckTree = buildCustomStudyTree(
+                this.osrCore.reviewableDeckTree,
+                this.customStudy,
+                await this.loadCustomStudyContext(this.customStudy),
+            );
+            // The sequencer removes cards from the remaining tree as they are answered; the full tree keeps the counts
+            remainingDeckTree = deckTree.clone();
+        } else if (this.singleNote) {
             const singleNoteDeckData = await this.getPreparedDecksForSingleNoteReview(
                 this.singleNote,
                 this.reviewMode,
@@ -85,8 +113,11 @@ export class ReviewQueueLoader {
                     : this.osrCore.remainingDeckTree;
         }
 
+        // Custom study is not held to the daily limits, as in Anki's filtered decks
         const dailyLimits: DailyLimits | null =
-            this.reviewMode === FlashcardReviewMode.Review ? await this.loadDailyLimits() : null;
+            this.reviewMode === FlashcardReviewMode.Review && this.customStudy === null
+                ? await this.loadDailyLimits()
+                : null;
 
         const reviewSequencerData = this.getPreparedReviewSequencer(
             deckTree,
@@ -114,7 +145,41 @@ export class ReviewQueueLoader {
         } catch (error) {
             console.error("Cardwright: could not read the review log for daily limits", error);
         }
-        return new DailyLimits(settings, countToday(entries, dayStartMs));
+        const todayYmd: string = globalDateProvider.today.format("YYYY-MM-DD");
+        return new DailyLimits(
+            settings,
+            countToday(entries, dayStartMs),
+            allowanceFor(this.plugin.dataManager.data.limitOverride, todayYmd),
+        );
+    }
+
+    /**
+     * What a custom study session needs to know about now, and, for forgotten cards, the ids of the cards answered
+     * Again in the period from the review log of every device.
+     */
+    private async loadCustomStudyContext(spec: CustomStudySpec): Promise<CustomStudyContext> {
+        const nowMs: number = globalDateProvider.now.valueOf();
+        const context: CustomStudyContext = {
+            nowMs,
+            todayYmd: globalDateProvider.today.format("YYYY-MM-DD"),
+            forgottenIds: new Set<string>(),
+        };
+        if (spec.type !== "forgotten") return context;
+
+        // "The last N days" counts today as the first day
+        const sinceMs: number = globalDateProvider.today
+            .clone()
+            .subtract(Math.max(1, spec.days) - 1, "d")
+            .valueOf();
+        try {
+            const entries = await this.plugin.dataManager.reviewLog.readMonths(
+                monthsBetween(sinceMs, nowMs),
+            );
+            context.forgottenIds = forgottenCardIds(entries, sinceMs);
+        } catch (error) {
+            console.error("Cardwright: could not read the review log for custom study", error);
+        }
+        return context;
     }
 
     public getPreparedReviewSequencer(

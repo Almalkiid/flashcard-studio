@@ -30,6 +30,18 @@ export interface PluginData {
     scheduleData: ISerializedScheduleData;
     // Whether the first-run welcome guide has been shown
     welcomeShown?: boolean;
+    // M3a: scheduling
+    limitOverride: LimitOverride;
+}
+
+/**
+ * Custom study's "increase today's limit": extra new cards and reviews allowed on one day. It only counts while
+ * `date` (`YYYY-MM-DD`, after the day boundary) is today, so it resets by itself the next day.
+ */
+export interface LimitOverride {
+    date: string;
+    extraNew: number;
+    extraReviews: number;
 }
 
 export const DEFAULT_DATA: PluginData = {
@@ -42,4 +54,6 @@ export const DEFAULT_DATA: PluginData = {
         noteSchedules: {},
         cardSchedules: {},
     },
+    // M3a: scheduling
+    limitOverride: { date: "", extraNew: 0, extraReviews: 0 },
 };
