@@ -1,4 +1,4 @@
-import { CURLY_CLOZE_PATTERN } from "src/import-export/anki-cloze";
+import { convertAnkiClozes, CURLY_CLOZE_PATTERN } from "src/import-export/anki-cloze";
 import { convertClozesToAnki } from "src/import-export/export-cloze";
 
 const HIGHLIGHT = "==[123;;]answer[;;hint]==";
@@ -38,11 +38,18 @@ describe("convertClozesToAnki", () => {
     test("writes an overlapping cloze on every card it is asked on", () => {
         expect(
             convertClozesToAnki("{{as;;A}} {{sa;;B}} {{aa;;C;;hint}}", [CURLY_CLOZE_PATTERN]),
-        ).toBe("{{c1::A}} {{c2::B}} {{c1,2::C::hint}}");
+        ).toBe("{{c1::A}} {{c2::B}} {{c1::{{c2::C::hint}}}}");
         // A cloze that is never asked is plain text
         expect(convertClozesToAnki("{{aa;;A}} {{ss;;B}}", [CURLY_CLOZE_PATTERN])).toBe(
-            "{{c1,2::A}} B",
+            "{{c1::{{c2::A}}}} B",
         );
+    });
+
+    test("an overlapping cloze is the same cloze after export and import", () => {
+        const exported = convertClozesToAnki("{{as;;A}} {{sa;;B}} {{aa;;C;;hint}}", [
+            CURLY_CLOZE_PATTERN,
+        ]);
+        expect(convertAnkiClozes(exported)).toBe("{{a;;A}} {{sa;;B}} {{aa;;C;;hint}}");
     });
 
     test("does not read $ in the text as a replacement pattern", () => {

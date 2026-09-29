@@ -217,6 +217,18 @@ describe("buildTextExport", () => {
         ]);
     });
 
+    test("quotes a guid that starts with #, which Anki would take for a comment, and any field with #", () => {
+        const { text } = buildTextExport(
+            [note({ guid: "#abc", front: "std:&#58;vector", back: "plain" })],
+            mediaHost({}),
+        );
+        expect(text.split("\n")[6]).toBe('"#abc"\tBasic\tSpanish\t"std:&#58;vector"\tplain\t');
+        const notes = textFileToNotes(parseTextFile(text), "unused");
+        expect(notes.map((item) => [item.guid, item.fields])).toEqual([
+            ["#abc", ["std:&#58;vector", "plain"]],
+        ]);
+    });
+
     test("names the stock note types", () => {
         expect(STOCK_NOTETYPE_NAMES).toEqual({
             basic: "Basic",

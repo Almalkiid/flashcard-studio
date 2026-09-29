@@ -500,7 +500,7 @@ describe("anki bridge", function () {
             "e2e-cloze\tCloze\tSpanish::Verbs\tYo {{c1::hablo::hablar}} y tu {{c2::hablas}}\tPresent tense\t",
         );
         expect(lines[7]).toEqual(
-            "e2e-colons\tBasic\tSpanish::Verbs\tstd:&#58;vector is a\tcontainer\t",
+            'e2e-colons\tBasic\tSpanish::Verbs\t"std:&#58;vector is a"\tcontainer\t',
         );
     });
 });

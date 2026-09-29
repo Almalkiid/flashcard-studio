@@ -221,9 +221,13 @@ export async function buildApkg(
     };
 }
 
-/** A field of Anki's text file format: quoted when it has a tab, a new line or a quote. */
+/**
+ * A field of Anki's text file format: quoted when it has a tab, a new line or a quote. A field with a `#` is quoted
+ * too, as Anki does: a line that starts with an unquoted `#` is a comment, and guids (the first column) can start
+ * with one.
+ */
 function textField(value: string): string {
-    return /[\t\n"]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+    return /[\t\n"#]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }
 
 /**
