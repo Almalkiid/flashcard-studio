@@ -16,6 +16,7 @@ export default class DeckListHeaderComponent {
         parentEl: HTMLElement,
         changeReviewMode: (reviewMode: FlashcardReviewMode) => void,
         closeModal?: () => void,
+        openCustomStudy?: () => void,
     ) {
         this.header = parentEl.createDiv();
         this.header.addClass("sr-deck-list-header");
@@ -44,6 +45,16 @@ export default class DeckListHeaderComponent {
             if (value === "Cram") changeReviewMode(FlashcardReviewMode.Cram);
         });
 
+        // M3a: scheduling
+        if (openCustomStudy !== undefined) {
+            const customStudyButton = this.header.createDiv({
+                cls: "sr-custom-study-button clickable-icon",
+                attr: { "aria-label": t("CUSTOM_STUDY") },
+            });
+            setIcon(customStudyButton, "list-filter");
+            customStudyButton.addEventListener("click", () => openCustomStudy());
+        }
+
         // TODO: Add a menu button here, if there are any more actions we want to add
 
         // If we don't have a close modal, we don't need the close button
@@ -64,6 +75,13 @@ export default class DeckListHeaderComponent {
             () => closeModal && closeModal(),
             closeButtonClasses,
         );
+    }
+
+    /**
+     * A custom study session is titled as such, instead of "Decks".
+     */
+    public setCustomStudyActive(active: boolean) {
+        this.title.setText(active ? t("CUSTOM_STUDY") : t("DECKS"));
     }
 
     public updateReviewMode(reviewMode: FlashcardReviewMode) {

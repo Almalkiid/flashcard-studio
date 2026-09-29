@@ -476,6 +476,103 @@ const en: IBaseLocale = {
     COPY: "Copy",
     NO_DECKS_TO_REVIEW:
         "There are no decks with cards to review. Make sure you have created some flashcards by adding the tag 'flashcards' to a note and then add cards to it (see plugin page for details on that). In case you did all that and still don't see any decks here, then it will probably caused by a bug in the plugin. There is a known bug that happens when one reviews the cards very fast, then the system bugs out and the decks are not shown. Please try again to open the deck list after a few seconds.",
+
+    // M3a: scheduling
+    FSRS_GROUP: "FSRS",
+    FSRS_LEARNING_STEPS: "Learning steps",
+    FSRS_LEARNING_STEPS_DESC:
+        'The delays a new card goes through before it graduates, for example "1m 10m". Use m for minutes, h for hours and d for days. FSRS works best when every step fits inside one day. Leave empty to let FSRS decide.',
+    FSRS_RELEARNING_STEPS: "Relearning steps",
+    FSRS_RELEARNING_STEPS_DESC:
+        'The delays after you press Again on a review card, for example "10m". Leave empty to let FSRS decide.',
+    FSRS_STEPS_INVALID:
+        "Steps are whole numbers followed by m, h or d, separated by spaces, for example 1m 10m.",
+    FSRS_STEPS_LONG_WARNING:
+        "A step of a day or longer is not recommended with FSRS. Saved anyway.",
+    FSRS_FUZZ: "Fuzz",
+    FSRS_FUZZ_DESC:
+        "Vary long intervals slightly, so cards you learned together do not all come back on the same day.",
+    FSRS_WEIGHTS: "Custom parameters",
+    FSRS_WEIGHTS_DESC:
+        "The 21 FSRS weights, separated by commas. Paste them from the optimizer or from Anki; lists of 17, 19 or 21 numbers are accepted. Leave empty to use the defaults.",
+    FSRS_WEIGHTS_INVALID: "These are not valid FSRS parameters: ${reason}",
+    FSRS_WEIGHTS_CONVERTED: "Converted ${count} parameters to the 21 that FSRS 6 uses.",
+    FSRS_OPTIMIZE: "Optimize parameters",
+    FSRS_OPTIMIZE_DESC:
+        "Fit the FSRS parameters to your own review history. It runs on this device and needs at least ${min} reviews.",
+    OPTIMIZER_TITLE: "Optimize FSRS parameters",
+    OPTIMIZER_DECK_FILTER: "Deck (optional)",
+    OPTIMIZER_DECK_FILTER_DESC:
+        "Only use the review history of this deck and its subdecks, for example CIA/Part1. Leave empty to use every deck.",
+    OPTIMIZER_LOADING: "Reading the review history...",
+    OPTIMIZER_RUNNING:
+        "Optimizing... This takes a few seconds, and the screen may pause while it runs.",
+    OPTIMIZER_TOO_FEW:
+        "Not enough reviews yet. Cardwright needs at least ${min} reviews of cards you had already seen on an earlier day, and found ${count}. With fewer, the parameters would fit chance instead of your memory and could make your schedule worse (Anki's manual asks for at least a few hundred reviews). Keep reviewing and try again later.",
+    OPTIMIZER_SUMMARY: "Used ${reviews} reviews of ${cards} cards. It took ${seconds} s.",
+    OPTIMIZER_CURRENT: "Current",
+    OPTIMIZER_OPTIMIZED: "Optimized",
+    OPTIMIZER_LOG_LOSS: "Log loss",
+    OPTIMIZER_RMSE: "RMSE (bins)",
+    OPTIMIZER_LOWER_IS_BETTER:
+        "Both measure how far the predictions are from what happened; lower is better.",
+    OPTIMIZER_BETTER: "The optimized parameters fit your history better.",
+    OPTIMIZER_NOT_BETTER:
+        "Your current parameters already fit your history as well or better, so there is nothing to apply.",
+    OPTIMIZER_APPLY: "Apply",
+    OPTIMIZER_APPLIED: "FSRS parameters updated.",
+    OPTIMIZER_ERROR: "Optimizing failed: ${reason}",
+    EXPORT_REVLOG_CSV: "Export review log for the FSRS optimizer (CSV)",
+    EXPORT_REVLOG_DONE: "Exported ${count} reviews to ${path}.",
+    EXPORT_REVLOG_EMPTY: "There is no review history to export yet.",
+    CUSTOM_STUDY: "Custom study",
+    CUSTOM_STUDY_LIMITS_OFF:
+        "Daily limits are turned off in the scheduling settings, so there is nothing to increase.",
+    CUSTOM_STUDY_INCREASE_NEW: "Increase today's new card limit",
+    CUSTOM_STUDY_INCREASE_NEW_DESC: "Allow more new cards today. This resets tomorrow.",
+    CUSTOM_STUDY_INCREASE_REVIEWS: "Increase today's review limit",
+    CUSTOM_STUDY_INCREASE_REVIEWS_DESC:
+        "Allow more reviews today, if the daily limit hid some that are due. This resets tomorrow.",
+    CUSTOM_STUDY_LIMIT_RAISED: "Today's limit raised by ${count}.",
+    CUSTOM_STUDY_FORGOTTEN: "Review forgotten cards",
+    CUSTOM_STUDY_FORGOTTEN_DESC:
+        "Cards you answered Again in the last number of days. Nothing is rescheduled.",
+    CUSTOM_STUDY_AHEAD: "Review ahead",
+    CUSTOM_STUDY_AHEAD_DESC:
+        "Cards that fall due in the next number of days. They are rescheduled as usual.",
+    CUSTOM_STUDY_PREVIEW: "Preview new cards",
+    CUSTOM_STUDY_PREVIEW_DESC:
+        "Look through some new cards without starting to learn them. Nothing is rescheduled.",
+    CUSTOM_STUDY_FILTER: "Study by deck, flag or state",
+    CUSTOM_STUDY_FILTER_DESC:
+        "Pick cards by deck, flag colour, leech mark or state. Nothing is rescheduled, and suspended or buried cards are left out.",
+    CUSTOM_STUDY_DECK: "Deck",
+    CUSTOM_STUDY_ALL_DECKS: "All decks",
+    CUSTOM_STUDY_STATE: "Cards",
+    CUSTOM_STUDY_STATE_ALL: "All cards",
+    CUSTOM_STUDY_STATE_NEW: "New cards only",
+    CUSTOM_STUDY_STATE_DUE: "Due cards only",
+    CUSTOM_STUDY_FLAG: "Flag",
+    CUSTOM_STUDY_ANY_FLAG: "Any card",
+    CUSTOM_STUDY_LEECHES_ONLY: "Leeches only",
+    CUSTOM_STUDY_MAX_CARDS: "Maximum cards",
+    CUSTOM_STUDY_DAYS: "Days",
+    CUSTOM_STUDY_COUNT: "Cards",
+    CUSTOM_STUDY_APPLY: "Apply",
+    CUSTOM_STUDY_START: "Start",
+    CUSTOM_STUDY_NO_CARDS: "No cards match, so there is nothing to study.",
+    POSTPONE_REVIEWS: "Postpone due reviews",
+    POSTPONE_COUNT: "${count} review cards are due today or overdue.",
+    POSTPONE_NONE: "No review cards are due today or overdue, so there is nothing to postpone.",
+    POSTPONE_DAYS: "Postpone by (days)",
+    POSTPONE_DAYS_DESC:
+        "Each of them becomes due this many days after today. Cards you are still learning and cards due on a later day are not changed. Nothing is added to the review history.",
+    POSTPONE_CONFIRM: "Postpone",
+    POSTPONE_DONE: "Postponed ${count} cards by ${days} days.",
+    ANSWER_KEYS: "Answer keys",
+    ANSWER_KEYS_DESC: "Which number keys answer a card during review.",
+    ANSWER_KEYS_ANKI: "Anki (1 Again, 2 Hard, 3 Good, 4 Easy)",
+    ANSWER_KEYS_ORIGINAL: "Original (1 Hard, 2 Good, 3 Easy, 0 Reset)",
 };
 
 export default en;

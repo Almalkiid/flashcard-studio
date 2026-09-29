@@ -484,5 +484,25 @@ export class UIPreferencesPage extends SettingsPage {
                             }),
                     );
             });
+
+        // M3a: scheduling
+        new SettingGroup(this.containerEl)
+            .setHeading(t("ANSWER_KEYS"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ANSWER_KEYS"))
+                    .setDesc(t("ANSWER_KEYS_DESC"))
+                    .addDropdown((dropdown) =>
+                        dropdown
+                            .addOption("anki", t("ANSWER_KEYS_ANKI"))
+                            .addOption("original", t("ANSWER_KEYS_ORIGINAL"))
+                            .setValue(this.settingsManager.settings.answerKeys)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.answerKeys =
+                                    value === "anki" ? "anki" : "original";
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
     }
 }

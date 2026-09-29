@@ -41,6 +41,15 @@ describe("mergeImportedSettings", () => {
         expect(settings.newCardsPerDay).toBe(7);
     });
 
+    test("keeps the FSRS and answer key settings that only Cardwright has", () => {
+        const { settings } = mergeImportedSettings(
+            { ...current, fsrsLearningSteps: "5m", answerKeys: "anki" },
+            { settings: { fsrsLearningSteps: "1d", answerKeys: "original" } },
+        );
+        expect(settings.fsrsLearningSteps).toBe("5m");
+        expect(settings.answerKeys).toBe("anki");
+    });
+
     test.each([[null], ["text"], [42], [{}], [{ settings: "x" }], [{ settings: [1] }]])(
         "ignores %p",
         (imported: unknown) => {

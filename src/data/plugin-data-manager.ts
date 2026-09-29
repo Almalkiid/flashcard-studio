@@ -1,8 +1,8 @@
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { setDebugParser } from "src/parser";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 
 /**
  * Custom error class for plugin data errors.
@@ -61,6 +61,9 @@ export class PluginDataManager {
         // whatever algorithm they chose.
         if (!loadedData?.settings) {
             this._pluginData.settings.algorithm = SRAlgorithmType.FSRS;
+            // M3a: scheduling. New installs start with Anki's keys and fuzz; existing settings keep what they had
+            this._pluginData.settings.answerKeys = "anki";
+            this._pluginData.settings.fsrsEnableFuzz = true;
         }
 
         setDebugParser(this._pluginData.settings.showParserDebugMessages);

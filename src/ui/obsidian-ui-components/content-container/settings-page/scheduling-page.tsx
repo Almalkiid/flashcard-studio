@@ -7,9 +7,18 @@ import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import {
+    formatFsrsSteps,
+    formatFsrsWeights,
+    hasStepOfADayOrMore,
+    parseFsrsSteps,
+    parseFsrsWeights,
+} from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { MIN_REVIEWS_TO_OPTIMIZE } from "src/scheduling/optimizer/optimize";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { FsrsOptimizerModal } from "src/ui/obsidian-ui-components/modals/fsrs-optimizer-modal";
 import { DateUtil, globalDateProvider, IDayBoundary } from "src/utils/dates";
 
 /**
@@ -661,6 +670,177 @@ export class SchedulingPage extends SettingsPage {
                                 });
                             }),
                     );
+            });
+
+        // M3a: scheduling
+        if (this.settingsManager.settings.algorithm === SRAlgorithmType.FSRS) {
+            this.addFsrsGroup();
+        }
+    }
+
+    // M3a: scheduling
+
+    /**
+     * The FSRS group: learning and relearning steps, fuzz, custom weights and the optimizer. Every change is applied to
+     * the live scheduler at once.
+     */
+    private addFsrsGroup(): void {
+        const settings = this.settingsManager.settings;
+        const group = new SettingGroup(this.containerEl).setHeading(t("FSRS_GROUP"));
+
+        group.addSetting((setting: Setting) =>
+            this.addStepsSetting(
+                setting,
+                t("FSRS_LEARNING_STEPS"),
+                t("FSRS_LEARNING_STEPS_DESC"),
+                "sr-fsrs-learning-steps",
+                "fsrsLearningSteps",
+            ),
+        );
+        group.addSetting((setting: Setting) =>
+            this.addStepsSetting(
+                setting,
+                t("FSRS_RELEARNING_STEPS"),
+                t("FSRS_RELEARNING_STEPS_DESC"),
+                "sr-fsrs-relearning-steps",
+                "fsrsRelearningSteps",
+            ),
+        );
+
+        group.addSetting((setting: Setting) => {
+            setting
+                .setName(t("FSRS_FUZZ"))
+                .setDesc(t("FSRS_FUZZ_DESC"))
+                .addToggle((toggle) =>
+                    toggle.setValue(settings.fsrsEnableFuzz).onChange(async (value) => {
+                        settings.fsrsEnableFuzz = value;
+                        await this.saveAndRefreshAlgorithm();
+                    }),
+                );
+        });
+
+        group.addSetting((setting: Setting) => {
+            setting
+                .setClass("sr-fsrs-weights")
+                .setName(t("FSRS_WEIGHTS"))
+                .setDesc(t("FSRS_WEIGHTS_DESC"))
+                .addExtraButton((button) => {
+                    button
+                        .setIcon("reset")
+                        .setTooltip(t("RESET_DEFAULT"))
+                        .onClick(async () => {
+                            settings.fsrsWeights = DEFAULT_SETTINGS.fsrsWeights;
+                            await this.saveAndRefreshAlgorithm();
+                            this.display();
+                        });
+                })
+                .addTextArea((text) => {
+                    text.setValue(settings.fsrsWeights);
+                    text.inputEl.rows = 3;
+
+                    const commit = () => {
+                        this.applySettingsUpdate(async () => {
+                            const relearningCount = (
+                                parseFsrsSteps(settings.fsrsRelearningSteps) ?? []
+                            ).length;
+                            const parsed = parseFsrsWeights(text.getValue(), relearningCount);
+                            if (parsed.error !== null) {
+                                new Notice(t("FSRS_WEIGHTS_INVALID", { reason: parsed.error }));
+                                text.setValue(settings.fsrsWeights);
+                                return;
+                            }
+
+                            // Weights are stored as the 21 that FSRS 6 uses, so an older export is converted once
+                            const stored =
+                                parsed.weights === null ? "" : formatFsrsWeights(parsed.weights);
+                            if (parsed.typedCount === 17 || parsed.typedCount === 19) {
+                                new Notice(
+                                    t("FSRS_WEIGHTS_CONVERTED", { count: parsed.typedCount }),
+                                );
+                            }
+                            text.setValue(stored);
+                            if (stored === settings.fsrsWeights) return;
+                            settings.fsrsWeights = stored;
+                            await this.saveAndRefreshAlgorithm();
+                        });
+                    };
+                    text.inputEl.addEventListener("blur", commit);
+                });
+        });
+
+        group.addSetting((setting: Setting) => {
+            setting
+                .setName(t("FSRS_OPTIMIZE"))
+                .setDesc(t("FSRS_OPTIMIZE_DESC", { min: MIN_REVIEWS_TO_OPTIMIZE }))
+                .addButton((button) =>
+                    button
+                        .setButtonText(t("FSRS_OPTIMIZE"))
+                        .setClass("sr-fsrs-optimize")
+                        .onClick(() => {
+                            new FsrsOptimizerModal(
+                                this.plugin.app,
+                                this.plugin,
+                                async (weights) => {
+                                    settings.fsrsWeights = formatFsrsWeights(weights);
+                                    await this.saveAndRefreshAlgorithm();
+                                    new Notice(t("OPTIMIZER_APPLIED"));
+                                    this.display();
+                                },
+                            ).open();
+                        }),
+                );
+        });
+    }
+
+    /**
+     * A field for learning or relearning steps such as `1m 10m`, saved when it loses focus or on Enter.
+     */
+    private addStepsSetting(
+        setting: Setting,
+        name: string,
+        description: string,
+        className: string,
+        key: "fsrsLearningSteps" | "fsrsRelearningSteps",
+    ): void {
+        const settings = this.settingsManager.settings;
+        setting
+            .setClass(className)
+            .setName(name)
+            .setDesc(description)
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        settings[key] = DEFAULT_SETTINGS[key];
+                        await this.saveAndRefreshAlgorithm();
+                        this.display();
+                    });
+            })
+            .addText((text) => {
+                text.setValue(settings[key]);
+
+                const commit = () => {
+                    this.applySettingsUpdate(async () => {
+                        const steps = parseFsrsSteps(text.getValue());
+                        if (steps === null) {
+                            new Notice(t("FSRS_STEPS_INVALID"));
+                            text.setValue(settings[key]);
+                            return;
+                        }
+                        if (hasStepOfADayOrMore(steps)) new Notice(t("FSRS_STEPS_LONG_WARNING"));
+
+                        const formatted = formatFsrsSteps(steps);
+                        text.setValue(formatted);
+                        if (formatted === settings[key]) return;
+                        settings[key] = formatted;
+                        await this.saveAndRefreshAlgorithm();
+                    });
+                };
+                text.inputEl.addEventListener("blur", commit);
+                text.inputEl.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter") commit();
+                });
             });
     }
 }

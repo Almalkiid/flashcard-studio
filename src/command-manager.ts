@@ -6,6 +6,7 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import { exportRevlogCsv, openCustomStudy, openPostpone } from "src/ui/scheduling-commands";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -482,6 +483,34 @@ export class CommandManager {
             callback: async () => {
                 if (!this.plugin.isInitialized) return;
                 await this.uiManager.sidebarManager.openReviewQueueView();
+            },
+        });
+
+        // M3a: scheduling
+        this.plugin.addCommand({
+            id: "srs-custom-study",
+            name: t("CUSTOM_STUDY"),
+            callback: () => {
+                if (!this.plugin.isInitialized) return;
+                openCustomStudy(this.plugin);
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-postpone-due-reviews",
+            name: t("POSTPONE_REVIEWS"),
+            callback: async () => {
+                if (!this.plugin.isInitialized) return;
+                await openPostpone(this.plugin);
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-export-revlog-csv",
+            name: t("EXPORT_REVLOG_CSV"),
+            callback: async () => {
+                if (!this.plugin.isInitialized) return;
+                await exportRevlogCsv(this.plugin);
             },
         });
     }

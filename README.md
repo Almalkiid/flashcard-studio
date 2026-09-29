@@ -52,13 +52,14 @@ Run **Cardwright: Review flashcards from all notes** from the command palette, o
 | Key                | Action                                                   |
 | ------------------ | -------------------------------------------------------- |
 | Space or Enter     | Show answer, then Good                                   |
-| 1, 2, 3            | Hard, Good, Easy                                         |
-| 0                  | Reset the card                                           |
+| 1, 2, 3, 4         | Again, Hard, Good, Easy (Anki keys)                      |
 | Ctrl/Cmd + Z, or U | Undo last answer                                         |
 | -                  | Bury until tomorrow                                      |
 | @                  | Suspend                                                  |
 | Ctrl/Cmd + 1 to 7  | Flag (red, orange, green, blue, pink, turquoise, purple) |
 | S                  | Skip                                                     |
+
+The number keys follow **Answer keys** in the settings. **Anki** (1 Again, 2 Hard, 3 Good, 4 Easy) is the default for new installs. **Original** (1 Hard, 2 Good, 3 Easy, 0 Reset the card) is the layout of the original Spaced Repetition plugin, and existing installs keep it until you change the setting.
 
 On a phone, the same actions are in the card menu.
 
