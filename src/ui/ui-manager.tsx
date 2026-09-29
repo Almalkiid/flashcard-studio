@@ -402,9 +402,6 @@ export class UIManager {
         if (this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
-        if (this.plugin.dataManager.syncLock) {
-            return;
-        }
         // We foreground Obsidian before and after opening review so reminder-driven auto-open is
         // less likely to leave the tab or modal hidden behind another desktop app.
         this.focusObsidianWindow();

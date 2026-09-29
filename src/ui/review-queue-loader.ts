@@ -63,9 +63,8 @@ export class ReviewQueueLoader {
         if (this.plugin === null || this.plugin.dataManager.osrCore === null)
             throw new Error("SR plugin or OSR app core not initialized!!!");
 
-        if (!this.plugin.dataManager.syncLock) {
-            await this.plugin.dataManager.sync();
-        }
+        // Waits for a sync already in progress, so the queue is never built from a half-loaded vault
+        await this.plugin.dataManager.sync();
 
         let deckTree: Deck;
         let remainingDeckTree: Deck;

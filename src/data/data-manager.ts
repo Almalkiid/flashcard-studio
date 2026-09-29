@@ -40,6 +40,7 @@ export class DataManager {
     private _osrCore: OsrCore | null = null;
     private _syncLock = false;
     private _deviceId: string | null = null;
+    private syncInFlight: Promise<void> | null = null;
 
     constructor(
         plugin: SRPlugin,
@@ -149,9 +150,10 @@ export class DataManager {
         this._syncLock = true;
 
         try {
+            const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
+            await this.waitForMetadataCache(notes);
             this.osrCore.loadInitialStateOfCore();
 
-            const notes: TFile[] = this.plugin.app.vault.getMarkdownFiles();
             for (const noteFile of notes) {
                 // The review log is history, not cards; skipping it keeps start-up fast on phones
                 if (this.isInReviewLogFolder(noteFile.path)) continue;
@@ -226,16 +228,46 @@ export class DataManager {
     }
 
     /**
+     * Waits until Obsidian's metadata cache has an entry for every note, or for at most `timeoutMs`.
+     *
+     * Right after a note changes (for example when a review writes its schedule), Obsidian briefly has no cached
+     * metadata for it. Cards are found through the cached tags, so scanning in that moment dropped the whole note
+     * and the review showed "no decks". Waiting once per scan for the cache to resolve avoids that.
+     */
+    private async waitForMetadataCache(notes: TFile[], timeoutMs: number = 3000): Promise<void> {
+        const metadataCache = this.plugin.app.metadataCache;
+        if (notes.every((note) => metadataCache.getFileCache(note) !== null)) return;
+
+        await new Promise<void>((resolve) => {
+            const finish = () => {
+                metadataCache.offref(eventRef);
+                window.clearTimeout(timer);
+                resolve();
+            };
+            const eventRef = metadataCache.on("resolved", finish);
+            const timer = window.setTimeout(finish, timeoutMs);
+        });
+    }
+
+    /**
      * Synchronizes the data with the Obsidian vault.
      *
      * @returns {Promise<void>} - A promise that resolves when the synchronization is complete.
      */
     async sync(): Promise<void> {
         if (this.osrCore === null) throw new Error("OSR app core not initialized!!!");
-        if (this.syncLock) {
-            return;
-        }
 
+        // A sync that is already running rebuilds the deck tree from scratch. Callers wait for it instead of
+        // returning at once and reading a half-built tree (which showed "no decks" or opened nothing).
+        if (this.syncInFlight === null) {
+            this.syncInFlight = this.runSync().finally(() => {
+                this.syncInFlight = null;
+            });
+        }
+        return this.syncInFlight;
+    }
+
+    private async runSync(): Promise<void> {
         const now = window.moment(Date.now());
         this.osrCore.defaultTextDirection = this.plugin.getObsidianRtlSetting();
 
