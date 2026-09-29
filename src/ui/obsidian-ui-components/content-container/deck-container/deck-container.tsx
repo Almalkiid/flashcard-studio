@@ -1,5 +1,5 @@
 import "src/ui/obsidian-ui-components/content-container/deck-container/deck-container.css";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- h is the JSX factory, only referenced by compiled JSX
 import h from "vhtml";
 
 import { Deck } from "src/data/data-structures/deck/deck";

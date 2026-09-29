@@ -1,5 +1,3 @@
-import moment from "moment";
-
 import { ISerializedScheduleEntry } from "src/data/plugin-data";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
@@ -11,7 +9,7 @@ import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item
 import { ISerializedFSRSScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { ISerializedSM2ScheduleData } from "src/scheduling/algorithms/osr/serialized-schedule-data";
-import { globalDateProvider } from "src/utils/dates";
+import { globalDateProvider, moment } from "src/utils/dates";
 
 export class RepItemScheduleFactory {
     static create(

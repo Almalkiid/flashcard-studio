@@ -60,7 +60,7 @@ export class MainPage extends SettingsPage {
 
                     button.buttonEl.addClass("clickable-icon");
                 });
-                const iconEl = activeDocument.createElement("div");
+                const iconEl = createDiv();
                 iconEl.addClass("sr-settings-page-title-icon");
                 setIcon(iconEl, getPageIcon(pageType));
 
@@ -115,7 +115,7 @@ export class MainPage extends SettingsPage {
 
                         button.buttonEl.addClass("clickable-icon");
                     });
-                const iconEl = activeDocument.createElement("div");
+                const iconEl = createDiv();
                 iconEl.addClass("sr-settings-page-title-icon");
                 setIcon(iconEl, getPageIcon("statistics-page"));
 

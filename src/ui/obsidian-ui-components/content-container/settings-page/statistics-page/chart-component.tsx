@@ -150,9 +150,11 @@ export default class ChartComponent extends SettingsItemOverrideComponent {
 
         if (canvasSummary) {
             canvasSummary.setText(summary);
-            canvasSummary.setCssProps({
-                "text-align": canvasId === "cardTypesChart" ? "right" : "center",
-            });
+            canvasSummary.addClass(
+                canvasId === "cardTypesChart"
+                    ? "sr-chart-summary-right"
+                    : "sr-chart-summary-center",
+            );
         }
         this.chart = statsChart;
     }

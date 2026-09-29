@@ -1,4 +1,3 @@
-import { now } from "moment";
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
@@ -23,6 +22,7 @@ import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirma
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { UIManager, UIState } from "src/ui/ui-manager";
+import { moment } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export enum ContentState {
@@ -108,8 +108,8 @@ export default class ContentManager {
 
         this.deckContainer = new DeckContainer(
             parentEl,
-            this._changeReviewMode.bind(this),
-            this._startReviewOfDeck.bind(this),
+            (reviewMode) => void this._changeReviewMode(reviewMode),
+            (deck) => void this._startReviewOfDeck(deck),
             closeModal,
         );
 
@@ -120,10 +120,10 @@ export default class ContentManager {
             parentEl,
             this._deleteCurrentCard.bind(this),
             this._showDecksList.bind(this),
-            this._doEditQuestionText.bind(this),
+            () => void this._doEditQuestionText(),
             this._processReview.bind(this),
-            this._skipCurrentCard.bind(this),
-            this._showAnswer.bind(this),
+            () => void this._skipCurrentCard(),
+            () => void this._showAnswer(),
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
             closeModal,
@@ -325,7 +325,7 @@ export default class ContentManager {
         )
             return;
 
-        const timeNow = now();
+        const timeNow = moment.now();
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
@@ -351,7 +351,7 @@ export default class ContentManager {
     public async _showAnswer() {
         if (this.sessionData === null) return;
 
-        const timeNow = now();
+        const timeNow = moment.now();
         if (
             this.lastPressedOnProcessReview &&
             timeNow - this.lastPressedOnProcessReview <
@@ -409,7 +409,7 @@ export default class ContentManager {
                     }
                 }
             })
-            .catch((reason) => console.log(reason));
+            .catch((reason) => console.error(reason));
     }
 
     public async _jumpToCurrentCard(): Promise<void> {
@@ -478,7 +478,7 @@ export default class ContentManager {
 
     public async _processReview(response: ReviewResponse): Promise<void> {
         if (this.reviewSequencer === null) return;
-        const timeNow = now();
+        const timeNow = moment.now();
         if (
             timeNow - this.lastPressedOnProcessReview <
             this.dataManager.data.settings.reviewButtonDelay

@@ -82,7 +82,7 @@ function hasInlineMarker(text: string, marker: string): boolean {
  */
 export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[] {
     if (debugParser) {
-        console.log("Text to parse:\n<<<" + text + ">>>");
+        console.debug("Text to parse:\n<<<" + text + ">>>");
     }
 
     // Sort inline separators by length, longest first
@@ -209,7 +209,7 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     }
 
     if (debugParser) {
-        console.log("Parsed cards:\n", cards);
+        console.debug("Parsed cards:\n", cards);
     }
 
     return cards;

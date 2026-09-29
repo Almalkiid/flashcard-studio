@@ -163,11 +163,9 @@ export class FlashcardsPage extends SettingsPage {
                         .addOptions(
                             deckOrderEnabled
                                 ? {
-                                      // eslint-disable-next-line camelcase
                                       PrevDeckComplete_Sequential: t(
                                           "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_SEQUENTIAL",
                                       ),
-                                      // eslint-disable-next-line camelcase
                                       PrevDeckComplete_Random: t(
                                           "REVIEW_DECK_ORDER_PREV_DECK_COMPLETE_RANDOM",
                                       ),
@@ -509,7 +507,7 @@ export class FlashcardsPage extends SettingsPage {
                 } else {
                     setting.addButton((button) => {
                         button
-                            .setButtonText("Unlock Setting")
+                            .setButtonText("Unlock setting")
                             .setClass("mod-warning")
                             .onClick(() => {
                                 new ConfirmationModal(

@@ -1,5 +1,4 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
-import moment from "moment";
 import { App, Platform } from "obsidian";
 
 import { CardType } from "src/data/data-structures/card/questions/question";
@@ -17,6 +16,7 @@ import {
     SessionData,
 } from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { moment } from "src/utils/dates";
 import { escapeHtml } from "src/utils/escape-html";
 import EmulatedPlatform from "src/utils/platform-detector";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
@@ -318,19 +318,14 @@ export class CardContainer {
                     cls: "cloze-answer",
                 });
 
-                answerElement.setCssProps({
-                    color: inputText === answerText ? "green" : "red",
-                    "text-Decoration": inputText === answerText ? "none" : "line-through",
-                });
+                answerElement.addClass(
+                    inputText === answerText ? "cloze-answer-correct" : "cloze-answer-incorrect",
+                );
 
                 if (inputText !== answerText) {
-                    const span = clozeAnswer.createSpan({
+                    clozeAnswer.createSpan({
                         text: escapeHtml(answerText),
                         cls: "cloze-answer-wrong",
-                    });
-                    span.setCssProps({
-                        color: "green",
-                        "text-decoration": "none",
                     });
                 }
             }
@@ -351,7 +346,7 @@ export class CardContainer {
         // Show answer text
         if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
             await this.drawCardFrontContent(sessionData, settings);
-            const hr: HTMLElement = activeDocument.createElement("hr");
+            const hr: HTMLElement = createEl("hr");
             this.content.appendChild(hr);
         } else {
             this.content.empty();

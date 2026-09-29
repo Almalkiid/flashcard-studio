@@ -79,14 +79,16 @@ export class NoteDataFileModifier implements IFileModifier {
         deleteTags: boolean,
         tagsToDelete: string[] = [],
     ) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-            delete frontmatter["sr-due"];
+        await this.plugin.app.fileManager.processFrontMatter(
+            file,
+            (frontmatter: Record<string, unknown>) => {
+                delete frontmatter["sr-due"];
 
-            delete frontmatter["sr-interval"];
+                delete frontmatter["sr-interval"];
 
-            delete frontmatter["sr-ease"];
-        });
+                delete frontmatter["sr-ease"];
+            },
+        );
 
         if (deleteTags) {
             await this.removeTagsFromFile(vault, file, tagsToDelete);
@@ -99,7 +101,7 @@ export class NoteDataFileModifier implements IFileModifier {
             let newData = data;
             for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
                 const regex = new RegExp(
-                    // eslint-disable-next-line no-useless-escape
+                    // eslint-disable-next-line no-useless-escape -- the escapes only affect the template literal; kept so the regex source stays unchanged
                     `(${tagToDelete}[\/[a-zA-z\-[0-9]*]*\/]*[a-zA-z\-[0-9]*]*)`,
                     "gm",
                 );
@@ -111,19 +113,21 @@ export class NoteDataFileModifier implements IFileModifier {
     }
 
     async removeTagsFromFrontmatter(vault: Vault, file: TFile, tagsToDelete: string[]) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter: any) => {
-            frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
-                let deleteTag = false;
-                for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
-                    if (tag.startsWith(tagToDelete.replace("#", ""))) {
-                        deleteTag = true;
-                        break;
+        await this.plugin.app.fileManager.processFrontMatter(
+            file,
+            (frontmatter: Record<string, unknown>) => {
+                frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
+                    let deleteTag = false;
+                    for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
+                        if (tag.startsWith(tagToDelete.replace("#", ""))) {
+                            deleteTag = true;
+                            break;
+                        }
                     }
-                }
-                return !deleteTag;
-            });
-        });
+                    return !deleteTag;
+                });
+            },
+        );
     }
 
     /**

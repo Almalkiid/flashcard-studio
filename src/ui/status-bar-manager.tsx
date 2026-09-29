@@ -188,7 +188,7 @@ export default class StatusBarManager {
         );
 
         if (updateItem !== undefined) {
-            updateItem.setText("Spaced Repetition: new Update!");
+            updateItem.setText("Spaced Repetition: new update!");
         }
     }
 
@@ -197,8 +197,7 @@ export default class StatusBarManager {
             const response: string = await request({
                 url: "https://api.github.com/repos/st3v3nmw/obsidian-spaced-repetition/releases/latest",
             });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            return (await JSON.parse(response)).tag_name as string;
+            return (JSON.parse(response) as { tag_name: string }).tag_name;
         } catch (e) {
             console.warn(e);
             return this.plugin.manifest.version;

@@ -11,6 +11,21 @@
     ) !important;
 }
 
+.sr-tab-view-content {
+    width: var(--sr-view-width);
+    max-width: var(--sr-view-width);
+    height: var(--sr-view-height);
+    max-height: var(--sr-view-height);
+}
+
 .sr-tab-view-content.sr-center-view {
     margin: auto;
+}
+
+body.sr-reduced-bottom-fade-mask {
+    --view-bottom-fade-mask: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.5) 0%,
+        #000000 calc(16px - 0px)
+    );
 }

@@ -9,6 +9,7 @@
         "target": "ES2018",
         "allowJs": true,
         "noImplicitAny": true,
+        "strictBindCallApply": true,
         "moduleResolution": "bundler",
         "esModuleInterop": true,
         "importHelpers": true,

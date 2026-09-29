@@ -35,6 +35,17 @@
     & .sr-content .cloze-input {
         height: 1.4rem;
     }
+
+    & .sr-content .cloze-answer-correct,
+    & .sr-content .cloze-answer-wrong {
+        color: green;
+        text-decoration: none;
+    }
+
+    & .sr-content .cloze-answer-incorrect {
+        color: red;
+        text-decoration: line-through;
+    }
 }
 
 @media only screen and (orientation: landscape) {

@@ -368,7 +368,6 @@ export class SchedulingPage extends SettingsPage {
                             slider
                                 .setLimits(0, 100, 1)
                                 .setValue(this.settingsManager.settings.maxLinkFactor * 100)
-                                .setDynamicTooltip()
                                 .onChange(async (value: number) => {
                                     this.settingsManager.settings.maxLinkFactor = value / 100;
                                     await this.settingsManager.save();
@@ -395,7 +394,6 @@ export class SchedulingPage extends SettingsPage {
                             slider
                                 .setLimits(1, 99, 1)
                                 .setValue(this.settingsManager.settings.lapsesIntervalChange * 100)
-                                .setDynamicTooltip()
                                 .onChange(async (value: number) => {
                                     this.settingsManager.settings.lapsesIntervalChange =
                                         value / 100;

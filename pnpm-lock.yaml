@@ -64,8 +64,8 @@ importers:
         specifier: ^10.8.0
         version: 10.8.0
       eslint-plugin-obsidianmd:
-        specifier: ^0.3.0
-        version: 0.3.0(@eslint/js@10.0.1(eslint@10.8.0))(@eslint/json@0.14.0)(@typescript-eslint/parser@8.65.0(eslint@10.8.0)(typescript@5.9.3))(eslint@10.8.0)(obsidian@1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6))(typescript-eslint@8.65.0(eslint@10.8.0)(typescript@5.9.3))
+        specifier: ^0.4.2
+        version: 0.4.2(@eslint/js@10.0.1(eslint@10.8.0))(@eslint/json@0.14.0)(@typescript-eslint/parser@8.65.0(eslint@10.8.0)(typescript@5.9.3))(eslint@10.8.0)(obsidian@1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6))(typescript-eslint@8.65.0(eslint@10.8.0)(typescript@5.9.3))
       eslint-plugin-simple-import-sort:
         specifier: ^12.1.1
         version: 12.1.1(eslint@10.8.0)
@@ -477,6 +477,12 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@eslint-community/eslint-plugin-eslint-comments@4.8.1':
+    resolution: {integrity: sha512-vafrdi15JHBFh1qWOAucyJwlEEuhdoMof28jOdKdgnwZ7bXwd6v4wzHYSmAVLwnx0yc7bqAtfJ0EZQV1WAzV/Q==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      eslint: ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
 
   '@eslint-community/eslint-utils@4.10.1':
     resolution: {integrity: sha512-cuadcxVFE8sDK6iWJbs8Sn0av2Nrh2QSGQhVlBW9AaAHqHwjWsZHT8LJ4hFGPh7ASBV2deFdM7H/DPjulmh8rg==}
@@ -1477,14 +1483,14 @@ packages:
     peerDependencies:
       eslint: ^9 || ^10
 
-  eslint-plugin-obsidianmd@0.3.0:
-    resolution: {integrity: sha512-QvGDI6B2nxJBrsZKGTg31da2A/fEJNlnwN+fRZkaoPIu1QL3fYXUdpP7ThyMdr/0iTYQxifb9lt2X9cpydQx1w==}
+  eslint-plugin-obsidianmd@0.4.2:
+    resolution: {integrity: sha512-NFp6wsRSvN0TU6EPi03uF2UQ3GuYyVtzjKDl25KyP8Bnz8gM0unX7R/e+VQ2JtMW2/3DC/VwIXjHnzAhB9JQwg==}
     engines: {node: '>= 18'}
     hasBin: true
     peerDependencies:
       '@eslint/js': ^9.30.1
       '@eslint/json': 0.14.0
-      eslint: '>=9.0.0'
+      eslint: '>=9.19.0'
       obsidian: 1.8.7
       typescript-eslint: ^8.35.1
 
@@ -3376,6 +3382,12 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
+  '@eslint-community/eslint-plugin-eslint-comments@4.8.1(eslint@10.8.0)':
+    dependencies:
+      escape-string-regexp: 4.0.0
+      eslint: 10.8.0
+      ignore: 7.0.6
+
   '@eslint-community/eslint-utils@4.10.1(eslint@10.8.0)':
     dependencies:
       eslint: 10.8.0
@@ -4666,8 +4678,9 @@ snapshots:
     dependencies:
       eslint: 10.8.0
 
-  eslint-plugin-obsidianmd@0.3.0(@eslint/js@10.0.1(eslint@10.8.0))(@eslint/json@0.14.0)(@typescript-eslint/parser@8.65.0(eslint@10.8.0)(typescript@5.9.3))(eslint@10.8.0)(obsidian@1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6))(typescript-eslint@8.65.0(eslint@10.8.0)(typescript@5.9.3)):
+  eslint-plugin-obsidianmd@0.4.2(@eslint/js@10.0.1(eslint@10.8.0))(@eslint/json@0.14.0)(@typescript-eslint/parser@8.65.0(eslint@10.8.0)(typescript@5.9.3))(eslint@10.8.0)(obsidian@1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6))(typescript-eslint@8.65.0(eslint@10.8.0)(typescript@5.9.3)):
     dependencies:
+      '@eslint-community/eslint-plugin-eslint-comments': 4.8.1(eslint@10.8.0)
       '@eslint/config-helpers': 0.4.2
       '@eslint/js': 10.0.1(eslint@10.8.0)
       '@eslint/json': 0.14.0

@@ -55,11 +55,10 @@ export function cyrb53(str: string, seed = 0): string {
     return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertToStringOrEmpty(v: any): string {
+export function convertToStringOrEmpty(v: string | number | boolean | null | undefined): string {
     let result: string = "";
     if (v !== null && v !== undefined) {
-        result = v + "";
+        result = String(v);
     }
     return result;
 }

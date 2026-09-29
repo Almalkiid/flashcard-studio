@@ -92,7 +92,8 @@ export class SRModalView extends Modal {
     }
 
     private setRoundedModalCorners(rounded: boolean) {
-        this.modalEl.setCssProps({ "border-Radius": rounded ? "var(--modal-radius)" : "0" });
+        this.modalEl.toggleClass("sr-modal-rounded", rounded);
+        this.modalEl.toggleClass("sr-modal-square", !rounded);
     }
 
     private setModalSize(heightPercent: number, widthPercent: number) {

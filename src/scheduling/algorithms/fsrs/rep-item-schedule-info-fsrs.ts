@@ -1,4 +1,4 @@
-import moment, { Moment } from "moment";
+import type { Moment } from "moment";
 import { Card, CardInput, State } from "ts-fsrs";
 
 import { ISerializedScheduleEntry } from "src/data/plugin-data";
@@ -10,7 +10,7 @@ import {
     FSRS_COMMENT_PREFIX,
 } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 import { ISerializedFSRSScheduleData } from "src/scheduling/algorithms/fsrs/serialized-schedule-data";
-import { globalDateProvider } from "src/utils/dates";
+import { globalDateProvider, moment } from "src/utils/dates";
 
 /**
  * Represents scheduling information for a repetition item using the FSRS algorithm.

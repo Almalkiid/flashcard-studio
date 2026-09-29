@@ -1,4 +1,4 @@
-import moment from "moment";
+import { moment } from "src/utils/dates";
 
 // These functions were used to diagnose performance issue
 // https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/914

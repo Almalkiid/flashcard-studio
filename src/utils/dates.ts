@@ -1,8 +1,11 @@
-import moment, { Moment } from "moment";
+import type { Moment } from "moment";
+import { moment as obsidianMoment } from "obsidian";
 
 import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/data/constants";
 
-// TODO: Remove moment & use the obsidian one -> Check docs
+// Obsidian types its moment export as a namespace import, which TypeScript does not treat as
+// callable under esModuleInterop. It is the same moment instance Obsidian provides to plugins.
+export const moment = obsidianMoment as unknown as typeof import("moment");
 
 /**
  * Format as "YYYY-MM-DD"
