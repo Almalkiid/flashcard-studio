@@ -51,3 +51,4 @@ env.sh
 # AI Tooling
 .claude/
 .sourcerer/
+.e2e-artifacts/

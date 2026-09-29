@@ -1,8 +1,8 @@
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import SRPlugin from "src/main";
-import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { setDebugParser } from "src/parser";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 
 /**
  * Custom error class for plugin data errors.
@@ -20,6 +20,12 @@ export class PluginDataError extends Error {
 export class PluginDataManager {
     private plugin: SRPlugin;
     private _pluginData: PluginData | null = null;
+    private _isFirstRun: boolean = false;
+
+    /** True when the plugin started without saved settings, i.e. it was just installed in this vault. */
+    get isFirstRun(): boolean {
+        return this._isFirstRun;
+    }
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
@@ -62,6 +68,7 @@ export class PluginDataManager {
         if (!loadedData?.settings) {
             this._pluginData.settings.algorithm = SRAlgorithmType.FSRS;
         }
+        this._isFirstRun = !loadedData?.settings;
 
         setDebugParser(this._pluginData.settings.showParserDebugMessages);
     }

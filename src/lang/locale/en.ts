@@ -20,6 +20,26 @@ const en: IBaseLocale = {
     SKIP: "Skip",
     EDIT_CARD: "Edit Card",
     RESET_CARD_PROGRESS: "Reset card's progress",
+    WELCOME_TITLE: "Welcome to Cardwright",
+    WELCOME_LEAD: "Spaced repetition flashcards that live in your notes.",
+    WELCOME_WRITE_TITLE: "Write cards in any note",
+    WELCOME_WRITE_DESC:
+        "Tag a note with #flashcards. Write Question::Answer on one line, or put ? on its own line between a question and a longer answer. Highlight text to make a cloze.",
+    WELCOME_REVIEW_TITLE: "Review a few minutes a day",
+    WELCOME_REVIEW_DESC:
+        "Open the review from the ribbon or the command palette and rate each card. FSRS schedules every card just before you would forget it.",
+    WELCOME_HISTORY_TITLE: "Keep your progress everywhere",
+    WELCOME_HISTORY_DESC:
+        "Every answer is saved in your vault, so undo, limits and statistics work on all your devices.",
+    WELCOME_EXAMPLE:
+        "#flashcards\n\nWhat does FSRS stand for::Free Spaced Repetition Scheduler\n\nThe ==forgetting curve== shows how memory fades.",
+    WELCOME_MIGRATE:
+        "Coming from Spaced Repetition? Your cards and schedules already work. You can also bring over its settings.",
+    WELCOME_CREATE_SAMPLE: "Create a sample deck",
+    WELCOME_START_REVIEWING: "Start reviewing",
+    SHOW_WELCOME: "Show the welcome guide",
+    CREATE_SAMPLE_DECK: "Create a sample deck",
+    SAMPLE_DECK_CREATED: "Created a sample deck. Review it from the ribbon or the command palette.",
     UNDO_LAST_ANSWER: "Undo last answer",
     DAILY_LIMITS: "Daily limits",
     DAILY_LIMITS_DESC:

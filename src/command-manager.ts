@@ -4,6 +4,7 @@ import { unburyAllInText, unsuspendAllInText } from "src/data/card-meta";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { createSampleDeck, showWelcome } from "src/onboarding/onboarding";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import { UIManager, UIState } from "src/ui/ui-manager";
@@ -431,6 +432,22 @@ export class CommandManager {
                     void this.uiManager.openDeckContainer(FlashcardReviewMode.Cram, openFile);
                 }
                 return true;
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-show-welcome",
+            name: t("SHOW_WELCOME"),
+            callback: async () => {
+                await showWelcome(this.plugin);
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-create-sample-deck",
+            name: t("CREATE_SAMPLE_DECK"),
+            callback: async () => {
+                await createSampleDeck(this.plugin);
             },
         });
 

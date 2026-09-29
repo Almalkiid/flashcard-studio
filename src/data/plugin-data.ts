@@ -28,6 +28,8 @@ export interface PluginData {
     buryList: string[];
     historyDeck: string | null;
     scheduleData: ISerializedScheduleData;
+    // Whether the first-run welcome guide has been shown
+    welcomeShown?: boolean;
 }
 
 export const DEFAULT_DATA: PluginData = {

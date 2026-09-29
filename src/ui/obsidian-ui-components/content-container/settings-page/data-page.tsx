@@ -1,10 +1,10 @@
-import { normalizePath, Notice, Setting, SettingGroup } from "obsidian";
+import { normalizePath, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { cloneDefaultSettings, DEFAULT_SETTINGS } from "src/data/settings";
-import { mergeImportedSettings } from "src/data/settings-import";
 import { SettingsManager } from "src/data/settings-manager";
+import { importSpacedRepetitionSettings } from "src/data/spaced-repetition-migration";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
@@ -361,31 +361,6 @@ export class DataPage extends SettingsPage {
      * Copies the settings of the original Spaced Repetition plugin, when it is installed in this vault.
      */
     private async importSpacedRepetitionSettings(): Promise<void> {
-        const path = normalizePath(
-            `${this.plugin.app.vault.configDir}/plugins/obsidian-spaced-repetition/data.json`,
-        );
-        const adapter = this.plugin.app.vault.adapter;
-        if (!(await adapter.exists(path))) {
-            new Notice(t("SR_SETTINGS_NOT_FOUND"));
-            return;
-        }
-
-        let imported: unknown;
-        try {
-            imported = JSON.parse(await adapter.read(path));
-        } catch {
-            new Notice(t("SR_SETTINGS_NOT_FOUND"));
-            return;
-        }
-
-        const { settings, importedKeys } = mergeImportedSettings(
-            this.settingsManager.settings,
-            imported,
-        );
-        Object.assign(this.settingsManager.settings, settings);
-        await this.settingsManager.save();
-        this.dataManager.setupDataStoreAndAlgorithmInstances(this.settingsManager.settings);
-        new Notice(t("SR_SETTINGS_IMPORTED", { count: importedKeys.length }));
-        this.display();
+        if ((await importSpacedRepetitionSettings(this.plugin)) !== null) this.display();
     }
 }

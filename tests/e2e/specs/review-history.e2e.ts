@@ -145,6 +145,37 @@ describe("review history and card actions", function () {
     });
 
     afterEach(async function () {
+        if (this.currentTest?.state === "failed") {
+            // Keep evidence of what was on screen when a test failed (gitignored)
+            const mobile = await browser.executeObsidian(
+                ({ obsidian }) => obsidian.Platform.isMobile,
+            );
+            fs.mkdirSync(path.resolve(".e2e-artifacts"), { recursive: true });
+            await browser.saveScreenshot(
+                path.resolve(
+                    ".e2e-artifacts",
+                    `failure-${mobile ? "mobile" : "desktop"}-${Date.now()}.png`,
+                ),
+            );
+            console.log(
+                "Failure state:",
+                JSON.stringify(
+                    await browser.execute(() => ({
+                        modals: document.querySelectorAll(".modal-container").length,
+                        menus: document.querySelectorAll(".menu").length,
+                        views: Array.from(document.querySelectorAll(".sr-view")).map((v) =>
+                            (v as HTMLElement).innerText.slice(0, 200),
+                        ),
+                        deckHidden: Array.from(document.querySelectorAll(".sr-deck-container")).map(
+                            (d) => d.classList.contains("sr-is-hidden"),
+                        ),
+                        cardHidden: Array.from(document.querySelectorAll(".sr-card-container")).map(
+                            (d) => d.classList.contains("sr-is-hidden"),
+                        ),
+                    })),
+                ),
+            );
+        }
         await browser.keys("Escape");
     });
 

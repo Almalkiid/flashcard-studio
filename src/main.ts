@@ -9,6 +9,7 @@ import { SettingsManager } from "src/data/settings-manager";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { showWelcomeOnFirstRun } from "src/onboarding/onboarding";
 import { ReminderManager } from "src/scheduling/reminder-manager";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { renderReviewLog } from "src/ui/review-log-renderer";
@@ -73,6 +74,7 @@ export default class SRPlugin extends Plugin {
 
                 this.isInitialized = true;
                 this._reminderManager.restartReviewReminders();
+                await showWelcomeOnFirstRun(this);
             });
         } catch (error) {
             if (error instanceof PluginDataError || error instanceof Error) {
