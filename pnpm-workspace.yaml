@@ -13,3 +13,6 @@ allowBuilds:
 
 onlyBuiltDependencies:
     - "."
+
+patchedDependencies:
+    clozecraft: patches/clozecraft.patch

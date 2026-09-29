@@ -730,6 +730,21 @@ const en: IBaseLocale = {
     SESSION_RETENTION: "Retention",
     SESSION_STREAK: "day streak",
     SESSION_BACK_TO_DECKS: "Back to decks",
+    // M3b: card syntax
+    GROUP_CARD_SYNTAX: "Card syntax",
+    CALLOUT_CARD_TYPES: "Callout card types",
+    CALLOUT_CARD_TYPES_DESC:
+        'A callout of one of these types is a flashcard: its title is the front and its body is the back, for example "> [!question]- What is X?" followed by the answer on lines that also start with ">". Separate the types with commas. Leave empty to turn callout cards off.',
+    MULTILINE_CARDS_START_MARKER:
+        "Characters denoting the start of clozes and multiline flashcards",
+    MULTILINE_CARDS_START_MARKER_DESC:
+        'The end marker above lets the answer of a multiline card contain blank lines. Set a start marker as well and a card can contain blank lines, tables and several paragraphs everywhere, also in its question: put the start marker on a line of its own before the card and the end marker after it, for example "+++" for both. While this is set, multiline and cloze cards are only found between the two markers. Inline ("::") and callout cards need no markers. After changing it, wrap your existing multiline and cloze cards, or they will not be found.',
+    ATOMIC_CLOZES: "Cloze card is only the line with the cloze",
+    ATOMIC_CLOZES_DESC:
+        "Off: a cloze card is the whole paragraph around the cloze. On: it is only the line that holds the cloze. A paragraph that was reviewed before and shares one schedule stays whole. Has no effect while a start marker is set.",
+    LATEX_CLOZES: "Clozes in LaTeX math",
+    LATEX_CLOZES_DESC:
+        'Write "\\cloze{answer}{hint}" inside $...$ or $$...$$ math to hide the answer while reviewing. The hint is optional: use {} for none. In your notes the formula shows the answer.',
 };
 
 export default en;

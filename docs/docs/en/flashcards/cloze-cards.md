@@ -63,6 +63,89 @@ The first female ==prime minister== of Australia was ==Julia Gillard==
 These two cards are considered sibling cards. See [sibling cards](flashcards-overview.md#sibling-cards) regarding the
 [Bury sibling cards until the next day](../user-options.md#flashcard-review) scheduling option.
 
+## Atomic Clozes (Only the Line with the Cloze)
+
+By default a cloze card is the whole paragraph around the cloze, up to the next blank line:
+
+```
+The solar system
+Mercury is the ==closest== planet to the sun
+Venus is the ==hottest== planet
+```
+
+is one flashcard text, so both cards show all three lines. This is what you want when the lines belong together, and not
+when a list of facts is written without blank lines between them.
+
+Turn on `Cloze card is only the line with the cloze` in the [settings](../user-options.md#card-syntax) and each line
+with a cloze is a flashcard of its own: `Mercury is the ==closest== planet to the sun` and `Venus is the ==hottest== planet`.
+The line `The solar system` is not part of either.
+
+- A [scheduling comment](../data-storage.md) is written on the line under the cloze line it belongs to.
+- Several clozes in one line are several sibling cards, as always.
+- A `$$ ... $$` block of display math is one piece: if the cloze is in it, the whole block is the card.
+- A multiline card whose question contains a cloze stays a multiline card.
+- A paragraph that has already been reviewed, and has one scheduling comment for the whole paragraph, stays one card
+  for as long as that comment is there. Splitting it would leave its schedule without a card, and the schedule would be lost.
+- It has no effect while a [start marker](cards-with-blank-lines.md#blank-lines-in-the-question-and-several-paragraphs-start-marker) is set.
+
+The idea of atomic clozes is from upstream pull request #797, which was never merged.
+
+## Clozes in Math (LaTeX)
+
+The other cloze delimiters are unsuitable inside math: `==` and `**` change how the formula is rendered, and `{{...}}`
+collides with the braces of LaTeX. Inside inline (`$...$`) or block (`$$...$$`) math, use the `\cloze{answer}{hint}`
+macro instead, after turning on `Clozes in LaTeX math` in the [settings](../user-options.md#card-syntax).
+
+The hint is the second argument. Leave it empty (`{}`) when you don't need one.
+
+When you **read** a note, `\cloze{answer}{hint}` shows just the `answer`, so the formula looks normal. When you
+**review**, the answer is hidden on the front (shown as `[hint]`, or `[…]` with no hint) and shown on the back.
+
+For instance, the following note:
+
+```
+$$
+\cloze{c^2}{} = \cloze{a^2 + b^2}{Pythagoras}
+$$
+```
+
+Generates two sibling cards, with the following fronts:
+
+!!! note ""
+
+    <div class="grid" markdown>
+
+    !!! tip "Card 1 Initial View"
+
+        $$ [\ldots] = a^2 + b^2 $$
+
+    !!! tip "Card 2 Initial View"
+
+        $$ c^2 = [\text{Pythagoras}] $$
+
+    </div>
+
+!!! tip "After `Show Answer` Clicked (same for both cards)"
+
+    $$ c^2 = a^2 + b^2 $$
+
+The answer may contain braces, fractions, roots and other nested LaTeX, for example
+`\cloze{\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}}{}`.
+
+- `\cloze` works whatever [cloze patterns](#custom-cloze-patterns) are set.
+- A card can also have `==highlight==` clozes. They make cards of their own, listed before the cards of the math clozes.
+  In a card of a math cloze, a highlight shows its text without the marks.
+- A `$$` in an answer is kept as it is (a bug in the cloze library used to turn it into `$`).
+- A `\cloze` that is not inside math is a normal cloze: the answer is hidden and shown, without any math formatting.
+
+!!! note
+
+    The macro is taught to Obsidian's math renderer when the plugin starts with the setting on, and removed when the
+    setting is turned off or the plugin unloads. A note that is already open may show `\cloze` unrendered until you
+    switch to another note and back. If another plugin already defines `\cloze`, that definition is left alone.
+
+The `\cloze` macro is from upstream pull request #1584.
+
 ## Cloze Types
 
 ### Simplified Clozes

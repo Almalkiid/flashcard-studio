@@ -1,10 +1,12 @@
 import { Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
+import { normalizeCalloutTypes } from "src/data/data-structures/card/questions/callout-card";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { setClozeMathMacro } from "src/ui/cloze-math-macro";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
@@ -509,6 +511,96 @@ export class FlashcardsPage extends SettingsPage {
                             });
                     });
                 }
+            });
+
+        // M3b: card syntax
+        new SettingGroup(this.containerEl)
+            .setHeading(t("GROUP_CARD_SYNTAX"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("CALLOUT_CARD_TYPES"))
+                    .setDesc(t("CALLOUT_CARD_TYPES_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.settingsManager.settings.calloutCardTypes = [
+                                    ...DEFAULT_SETTINGS.calloutCardTypes,
+                                ];
+                                await this.settingsManager.save();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setPlaceholder(DEFAULT_SETTINGS.calloutCardTypes.join(", "))
+                            .setValue(this.settingsManager.settings.calloutCardTypes.join(", "))
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.settingsManager.settings.calloutCardTypes =
+                                        normalizeCalloutTypes(value.split(/[\s,]+/));
+                                    await this.settingsManager.save();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("MULTILINE_CARDS_START_MARKER"))
+                    .setDesc(t("MULTILINE_CARDS_START_MARKER_DESC"))
+                    .addExtraButton((button) => {
+                        button
+                            .setIcon("reset")
+                            .setTooltip(t("RESET_DEFAULT"))
+                            .onClick(async () => {
+                                this.settingsManager.settings.multilineCardStartMarker =
+                                    DEFAULT_SETTINGS.multilineCardStartMarker;
+                                await this.settingsManager.save();
+
+                                this.display();
+                            });
+                    })
+                    .addText((text) =>
+                        text
+                            .setPlaceholder("+++")
+                            .setValue(this.settingsManager.settings.multilineCardStartMarker)
+                            .onChange((value) => {
+                                applySettingsUpdate(async () => {
+                                    this.settingsManager.settings.multilineCardStartMarker =
+                                        value.trim();
+                                    await this.settingsManager.save();
+                                });
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("ATOMIC_CLOZES"))
+                    .setDesc(t("ATOMIC_CLOZES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.atomicClozes)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.atomicClozes = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("LATEX_CLOZES"))
+                    .setDesc(t("LATEX_CLOZES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.latexClozes)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.latexClozes = value;
+                                await this.settingsManager.save();
+                                await setClozeMathMacro(value);
+                            }),
+                    );
             });
     }
 }

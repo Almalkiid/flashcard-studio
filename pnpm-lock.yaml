@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  clozecraft: c32ca0a84590a4f8a458da2285cebd368fab6624f9f64713bac2ca4cf5a9c21b
+
 importers:
 
   .:
@@ -16,7 +19,7 @@ importers:
         version: 4.5.1
       clozecraft:
         specifier: ^0.4.0
-        version: 0.4.0
+        version: 0.4.0(patch_hash=c32ca0a84590a4f8a458da2285cebd368fab6624f9f64713bac2ca4cf5a9c21b)
       gridjs:
         specifier: ^6.2.0
         version: 6.2.0
@@ -6319,7 +6322,7 @@ snapshots:
   clone@1.0.4:
     optional: true
 
-  clozecraft@0.4.0: {}
+  clozecraft@0.4.0(patch_hash=c32ca0a84590a4f8a458da2285cebd368fab6624f9f64713bac2ca4cf5a9c21b): {}
 
   co@4.6.0: {}
 

@@ -44,6 +44,12 @@ so it needs network and takes a few minutes. Later runs reuse the cache.
   The default `latest/latest` resolved to Obsidian 1.13.7 on 2026-09-29.
 - `WDIO_MAX_INSTANCES=1` runs desktop and mobile one after the other instead of in parallel.
 
+## Disabling and enabling the plugin in a spec
+
+`obsidianPage.resetVault()` also removes the plugin's files from the vault, so a spec cannot disable and enable the
+plugin again after it has called it. A spec that reloads the plugin has to do that first, and it should be its own
+spec file, because each spec file gets a fresh Obsidian (see `specs/card-syntax-latex.e2e.ts`).
+
 ## Writing more specs
 
 Add `tests/e2e/specs/<name>.e2e.ts`. `smoke.e2e.ts` shows the pattern: wait for the plugin to

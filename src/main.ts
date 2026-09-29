@@ -11,6 +11,7 @@ import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
 import { showWelcomeOnFirstRun } from "src/onboarding/onboarding";
 import { ReminderManager } from "src/scheduling/reminder-manager";
+import { setClozeMathMacro } from "src/ui/cloze-math-macro";
 import { REVIEW_QUEUE_VIEW_TYPE } from "src/ui/obsidian-ui-components/item-views/review-queue-list-view";
 import { renderReviewLog } from "src/ui/review-log-renderer";
 import { UIManager } from "src/ui/ui-manager";
@@ -49,6 +50,9 @@ export default class SRPlugin extends Plugin {
             );
 
             this.app.workspace.onLayoutReady(async () => {
+                // M3b: teach MathJax the \cloze macro, if clozes in LaTeX math are on
+                void setClozeMathMacro(settingsManager.settings.latexClozes);
+
                 this.dataManager.loadData();
 
                 // Set the preferred locale if it is not the default
@@ -137,6 +141,8 @@ export default class SRPlugin extends Plugin {
     }
 
     onunload(): void {
+        // M3b: the \cloze macro must not outlive the plugin
+        void setClozeMathMacro(false);
         this.reminderManager.stopReviewReminders();
         this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).forEach((leaf) => leaf.detach());
         this.uiManager.destroy();
