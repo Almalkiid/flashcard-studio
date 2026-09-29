@@ -60,6 +60,16 @@ function copyIntoVault(fixture: string, relative: string): void {
     fs.copyFileSync(path.join(FIXTURES, fixture), vaultPath(relative));
 }
 
+/**
+ * Presses a button in the page. In the emulated phone a driver click is sometimes refused or lands beside the
+ * button: the driver computes points beyond the emulated screen, so the buttons here are pressed in the page.
+ */
+async function press(element: WebdriverIO.Element | ChainablePromiseElement): Promise<void> {
+    // A chained element has to be resolved first, or the page is handed the promise and not the element
+    const resolved = await element;
+    await browser.execute((target: HTMLElement) => target.click(), resolved);
+}
+
 async function waitForPlugin(): Promise<void> {
     await browser.waitUntil(
         () =>
@@ -129,7 +139,7 @@ async function setText(index: number, value: string): Promise<void> {
 async function clickPrimary(): Promise<void> {
     const button = browser.$(".sr-anki-modal .sr-anki-buttons button.mod-cta");
     await button.waitForEnabled({ timeoutMsg: "the primary button never became enabled" });
-    await button.click();
+    await press(button);
 }
 
 async function resultText(): Promise<string> {
@@ -334,7 +344,7 @@ describe("anki bridge", function () {
         for (const row of await rows) {
             if ((await row.getText()).trim() === "Spanish") {
                 // In the emulated phone the row can be under the edge of the modal, which a driver click refuses
-                await browser.execute((element: HTMLElement) => element.click(), row);
+                await press(row);
                 opened = true;
                 break;
             }
@@ -343,10 +353,10 @@ describe("anki bridge", function () {
 
         const showAnswer = browser.$(".sr-view .sr-card-container .sr-show-answer-button");
         await showAnswer.waitForClickable({ timeoutMsg: "no card front was shown" });
-        await showAnswer.click();
+        await press(showAnswer);
         const good = browser.$(".sr-view .sr-card-container .sr-good-button");
         await good.waitForClickable({ timeoutMsg: "Good was not shown" });
-        await good.click();
+        await press(good);
 
         await browser.waitUntil(() => readVault(note).includes("<!--SR:"), {
             timeoutMsg: "the answered card never got a schedule",
