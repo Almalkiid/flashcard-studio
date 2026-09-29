@@ -5,6 +5,7 @@ import { builtinModules } from "node:module";
 import path from "path";
 import prettier from "prettier";
 import process from "process";
+import { deflateRawSync } from "zlib";
 
 const prod = process.argv[2] === "production";
 
@@ -32,6 +33,23 @@ const moveToRootPlugin = {
     },
 };
 
+// Embeds .wasm files as deflate-compressed base64 text, so the plugin still ships as a single main.js
+// (Obsidian installs only main.js, manifest.json and styles.css). The Anki import and export code decodes and
+// inflates the sql.js binary lazily, when an import or export starts. Compression takes the 658 kB binary to
+// about 430 kB of base64 in the bundle.
+const embedWasmPlugin = {
+    name: "embed-wasm",
+    setup(build) {
+        build.onLoad({ filter: /\.wasm$/ }, (args) => {
+            const compressed = deflateRawSync(fs.readFileSync(args.path), { level: 9 });
+            return {
+                contents: `export default ${JSON.stringify(compressed.toString("base64"))};`,
+                loader: "js",
+            };
+        });
+    },
+};
+
 const context = await esbuild.context({
     entryPoints: ["src/main.ts"],
     bundle: true,
@@ -47,7 +65,7 @@ const context = await esbuild.context({
     loader: {
         ".css": "css",
     },
-    plugins: [moveToRootPlugin],
+    plugins: [embedWasmPlugin, moveToRootPlugin],
 });
 
 if (prod) {

@@ -8,9 +8,15 @@ export default {
     testEnvironment: "jsdom",
     setupFilesAfterEnv: ["jest-expect-message"],
     moduleNameMapper: {
+        // Jest would load a .wasm import as an ES module; the bundle gets it as base64 text (see embedded-wasm.cjs)
+        "^sql\\.js/dist/sql-wasm-browser\\.wasm$": "<rootDir>/tests/unit/helpers/embedded-wasm.cjs",
         "src/(.*)": "<rootDir>/src/$1",
     },
     moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node", "d.ts"],
+    // ankipack (Anki import and export) is published as ES modules only, so Jest has to compile it. The pattern
+    // also has to match pnpm's node_modules/.pnpm/ankipack@x/node_modules/ankipack layout.
+    transform: { "node_modules/(\\.pnpm/)?ankipack.*/dist/.+\\.js$": "ts-jest" },
+    transformIgnorePatterns: ["/node_modules/(?!(\\.pnpm/)?ankipack)"],
     roots: ["<rootDir>/src/", "<rootDir>/tests/unit/"],
     collectCoverageFrom: ["src/**"],
     coveragePathIgnorePatterns: [
