@@ -5,3 +5,6 @@ styles.css
 pnpm-lock.yaml
 docs/vaults/
 tests/vaults/
+tests/e2e/vault/
+.obsidian-cache
+.e2e-plugin

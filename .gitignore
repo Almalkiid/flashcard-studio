@@ -32,6 +32,10 @@ data.json
 # testing
 coverage
 tests/vaults/*/.obsidian
+# end-to-end tests (wdio-obsidian-service)
+.obsidian-cache
+.e2e-plugin
+tests/e2e/vault/.obsidian
 
 # mkdocs
 site/
