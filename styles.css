@@ -1268,6 +1268,64 @@ th.gridjs-th:last-child {
     --cursor: pointer;
   }
 }
+.sr-anki-modal .sr-anki-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sr-anki-modal .sr-anki-file-name {
+  display: block;
+  margin-top: var(--size-2-1);
+  overflow-wrap: anywhere;
+  color: var(--text-normal);
+}
+.sr-anki-modal .setting-item-control select {
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+.is-phone .sr-anki-modal .setting-item-control select,
+.is-phone .sr-anki-modal .setting-item-control input[type="text"] {
+  max-width: 72vw;
+}
+.sr-anki-modal .sr-anki-status {
+  min-height: 1.5em;
+  margin: var(--size-4-2) 0;
+  color: var(--text-muted);
+}
+.sr-anki-modal .sr-anki-status.sr-anki-error {
+  color: var(--text-error);
+}
+.sr-anki-modal .sr-anki-result-headline {
+  font-weight: var(--font-semibold);
+  overflow-wrap: anywhere;
+}
+.sr-anki-modal .sr-anki-result-details {
+  margin: var(--size-4-2) 0;
+  padding-left: var(--size-4-5);
+  color: var(--text-muted);
+}
+.sr-anki-modal .sr-anki-result-details li {
+  overflow-wrap: anywhere;
+}
+.sr-anki-modal .sr-anki-intro {
+  margin: 0 0 var(--size-4-2);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+.sr-anki-modal .sr-anki-buttons {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--size-4-2);
+  margin-top: var(--size-4-3);
+  padding: var(--size-4-2) 0;
+  background: var(--modal-background, var(--background-primary));
+}
 .sr-review-log {
   font-size: var(--font-ui-small);
 }

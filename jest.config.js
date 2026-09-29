@@ -49,6 +49,11 @@ export default {
         "src/scheduling/algorithms/fsrs/serialized-schedule-data.ts",
         "src/data/data-store/base/idata-store-algorithm.ts",
 
+        // M4: Anki import and export. The dialogs and the vault adapter need a running Obsidian, the end-to-end tests
+        // cover them
+        "src/import-export/ui/",
+        "src/import-export/obsidian-vault-host.ts",
+
         // debugging utils
         "src/utils/debug.ts",
 

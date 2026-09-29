@@ -448,7 +448,7 @@ export interface IBaseLocale {
     ANKI_IMPORT_ERR_NOT_A_PACKAGE: string;
     ANKI_IMPORT_ERR_UNSUPPORTED: string;
     ANKI_IMPORT_ERR_UNREADABLE: string;
-    ANKI_IMPORT_ERR_TEXT_EMPTY: string;
+    ANKI_IMPORT_ERR_EMPTY: string;
     ANKI_IMPORT_ERR_FAILED: string;
     ANKI_EXPORT_TITLE: string;
     ANKI_EXPORT_DESC: string;

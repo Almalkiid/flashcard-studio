@@ -527,7 +527,7 @@ const en: IBaseLocale = {
     ANKI_IMPORT_ERR_UNSUPPORTED:
         'This package was made by a version of Anki that this plugin cannot read yet. In Anki, export it again with "Support older Anki versions" turned on.',
     ANKI_IMPORT_ERR_UNREADABLE: "The package is damaged or incomplete (${detail}).",
-    ANKI_IMPORT_ERR_TEXT_EMPTY: "The file has no rows to import.",
+    ANKI_IMPORT_ERR_EMPTY: "The file has no notes to import.",
     ANKI_IMPORT_ERR_FAILED: "Import failed: ${detail}",
     ANKI_EXPORT_TITLE: "Export cards to Anki",
     ANKI_EXPORT_DESC:
