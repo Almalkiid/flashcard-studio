@@ -1,4 +1,10 @@
-import { DEFAULT_SETTINGS, SettingsUtil, SRSettings, upgradeSettings } from "src/data/settings";
+import {
+    cloneDefaultSettings,
+    DEFAULT_SETTINGS,
+    SettingsUtil,
+    SRSettings,
+    upgradeSettings,
+} from "src/data/settings";
 
 describe("SettingsUtil", () => {
     test("isPathInNoteIgnoreFolder", () => {
@@ -264,5 +270,19 @@ describe("SettingsUtil", () => {
             reviewReminderPlaySound: DEFAULT_SETTINGS.reviewReminderPlaySound,
             reviewReminderBounceDock: DEFAULT_SETTINGS.reviewReminderBounceDock,
         });
+    });
+});
+
+describe("cloneDefaultSettings", () => {
+    test("returns settings that share nothing with the defaults", () => {
+        const settings = cloneDefaultSettings();
+        expect(settings).toEqual(
+            JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as typeof DEFAULT_SETTINGS,
+        );
+
+        settings.flashcardTags.push("#changed");
+        settings.newCardsPerDay = 1;
+        expect(DEFAULT_SETTINGS.flashcardTags).not.toContain("#changed");
+        expect(DEFAULT_SETTINGS.newCardsPerDay).toBe(20);
     });
 });

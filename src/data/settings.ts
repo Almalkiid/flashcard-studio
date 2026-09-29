@@ -196,6 +196,14 @@ export const DEFAULT_SETTINGS: SRSettings = {
     preferredLocale: "-",
 };
 
+/**
+ * A deep copy of the default settings. Settings that are kept and edited must never be the shared DEFAULT_SETTINGS
+ * object, or share its arrays, or later edits would silently change the defaults.
+ */
+export function cloneDefaultSettings(): SRSettings {
+    return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as SRSettings;
+}
+
 export function upgradeSettings(settings: SRSettings) {
     if (settings.showRibbonIcon) {
         settings.showRibbonIcon = DEFAULT_SETTINGS.showRibbonIcon;

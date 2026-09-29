@@ -92,4 +92,18 @@ describe("smoke", function () {
         // Exactly one question was rescheduled.
         expect(readNoteFromDisk().split("<!--SR:").length - 1).toEqual(1);
     });
+
+    it("opens the note review queue with its content, not an empty pane (#1212)", async function () {
+        // The bug shows when no queue pane exists yet (the startup pane is off), so close any that is open
+        await browser.executeObsidian(({ app }) =>
+            app.workspace.detachLeavesOfType("review-queue-list-view"),
+        );
+        await browser.executeObsidianCommand(`${pluginId}:srs-open-review-queue-view`);
+        const viewType = await browser.executeObsidian(({ app }) =>
+            app.workspace
+                .getLeavesOfType("review-queue-list-view")
+                .map((leaf) => leaf.view.getViewType()),
+        );
+        expect(viewType).toEqual(["review-queue-list-view"]);
+    });
 });

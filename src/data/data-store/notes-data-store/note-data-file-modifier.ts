@@ -5,6 +5,7 @@ import { StorageType } from "src/data/data-store/base/data-store";
 import { IFileModifier as IFileModifier } from "src/data/data-store/base/file-modifier";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { withoutFrontmatterTags } from "src/utils/frontmatter-tags";
 
 // TODO: Implement this for each data store
 
@@ -116,16 +117,9 @@ export class NoteDataFileModifier implements IFileModifier {
         await this.plugin.app.fileManager.processFrontMatter(
             file,
             (frontmatter: Record<string, unknown>) => {
-                frontmatter["tags"] = (frontmatter["tags"] as string[]).filter((tag: string) => {
-                    let deleteTag = false;
-                    for (const tagToDelete of tagsToDelete.sort((a, b) => b.length - a.length)) {
-                        if (tag.startsWith(tagToDelete.replace("#", ""))) {
-                            deleteTag = true;
-                            break;
-                        }
-                    }
-                    return !deleteTag;
-                });
+                // Notes without tags, or with tags written as one string, used to throw here
+                const remaining = withoutFrontmatterTags(frontmatter["tags"], tagsToDelete);
+                if (remaining !== undefined) frontmatter["tags"] = remaining;
             },
         );
     }

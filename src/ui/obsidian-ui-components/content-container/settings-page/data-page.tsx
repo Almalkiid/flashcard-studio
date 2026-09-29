@@ -2,7 +2,7 @@ import { normalizePath, Notice, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DataStore } from "src/data/data-store/base/data-store";
-import { DEFAULT_SETTINGS } from "src/data/settings";
+import { cloneDefaultSettings, DEFAULT_SETTINGS } from "src/data/settings";
 import { mergeImportedSettings } from "src/data/settings-import";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
@@ -346,7 +346,9 @@ export class DataPage extends SettingsPage {
                                     t("CONFIRM_RESET_SETTINGS"),
                                     t("RESET_SETTINGS_CONFIRMATION"),
                                     async () => {
-                                        await this.settingsManager.saveSettings(DEFAULT_SETTINGS);
+                                        await this.settingsManager.saveSettings(
+                                            cloneDefaultSettings(),
+                                        );
                                         this.display();
                                     },
                                 ).open();

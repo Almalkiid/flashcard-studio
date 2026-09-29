@@ -1,5 +1,5 @@
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
-import { DEFAULT_SETTINGS, SRSettings, upgradeSettings } from "src/data/settings";
+import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 
@@ -47,7 +47,10 @@ export class PluginDataManager {
         const loadedData: PluginData = (await this.plugin.loadData()) as PluginData;
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
         this._pluginData = Object.assign({}, DEFAULT_DATA, loadedData);
-        this._pluginData.settings = Object.assign({}, DEFAULT_SETTINGS, this._pluginData.settings);
+        this._pluginData.settings = Object.assign(
+            cloneDefaultSettings(),
+            this._pluginData.settings,
+        );
 
         setDebugParser(this._pluginData.settings.showParserDebugMessages);
     }

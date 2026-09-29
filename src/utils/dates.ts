@@ -131,12 +131,13 @@ export class LiveDateProvider implements IDateProvider {
     get today(): Moment {
         let result: Moment = moment().startOf("day");
 
-        // Skip to old today behavior if dayBoundary is set and it is midnight to avoid day boundary issues
+        // A boundary of exactly midnight is the normal day. Any other time counts (#1423: this used to require
+        // the hour, minute and second to all be non-zero, so 03:00:00 was ignored).
         if (
             this.dayBoundary &&
-            this.dayBoundary.hour !== 0 &&
-            this.dayBoundary.minute !== 0 &&
-            this.dayBoundary.second !== 0
+            (this.dayBoundary.hour !== 0 ||
+                this.dayBoundary.minute !== 0 ||
+                this.dayBoundary.second !== 0)
         ) {
             const nowTime = moment();
             const customDayBoundary = moment()

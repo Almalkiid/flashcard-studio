@@ -68,6 +68,7 @@ export class LocaleManager implements ILocaleManager {
     public currentLocale: string; // The locale that is currently used
     public readonly loadedLocale: string; // The locale that is loaded by moment
     public readonly localeMap: { [k: string]: IBaseLocale }; // The locale map
+    private warnedMissingLocale: string | null = null;
 
     constructor() {
         // Load the current locale via moment
@@ -117,10 +118,15 @@ export class LocaleManager implements ILocaleManager {
      */
     public currentTranslation(): IBaseLocale {
         const currentLocale: string = LocaleManagerInstance.getInstance().currentLocale;
-        const currentLocaleMap: IBaseLocale = this.localeMap[currentLocale];
+        const currentLocaleMap: IBaseLocale | undefined = this.localeMap[currentLocale];
 
+        // Obsidian can run in a language this plugin has no translation for (#1644); use English then
         if (!currentLocaleMap) {
-            console.warn(`SRS error: Locale ${currentLocale} not found.`);
+            if (this.warnedMissingLocale !== currentLocale) {
+                console.warn(`Cardwright: no translation for "${currentLocale}", using English.`);
+                this.warnedMissingLocale = currentLocale;
+            }
+            return this.localeMap["en"];
         }
 
         return currentLocaleMap;

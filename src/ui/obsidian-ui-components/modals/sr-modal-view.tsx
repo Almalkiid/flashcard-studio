@@ -1,5 +1,5 @@
 import "src/ui/obsidian-ui-components/modals/modal-view.css";
-import { App, Modal, Platform } from "obsidian";
+import { App, debounce, Modal, Platform } from "obsidian";
 
 import { SettingsManager } from "src/data/settings-manager";
 import type SRPlugin from "src/main";
@@ -12,6 +12,15 @@ export class SRModalView extends Modal {
     private plugin: SRPlugin;
     private settingsManager: SettingsManager;
     private resizeObserver: ResizeObserver | null = null;
+
+    // A resize fires many callbacks; write data.json once it settles, so syncing doesn't churn on every frame
+    private readonly persistSize = debounce(
+        (): void => {
+            void this.plugin.dataManager.savePluginData();
+        },
+        1000,
+        true,
+    );
 
     constructor(
         app: App,
@@ -36,7 +45,7 @@ export class SRModalView extends Modal {
             );
 
             this.resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-                void this.onResize(entries);
+                this.onResize(entries);
             });
             this.resizeObserver.observe(this.modalEl);
         }
@@ -68,7 +77,7 @@ export class SRModalView extends Modal {
         this.contentManager.close();
     }
 
-    private async onResize(entries: ResizeObserverEntry[]) {
+    private onResize(entries: ResizeObserverEntry[]): void {
         const modalEl = entries[0].target as HTMLElement;
         const parent = modalEl.parentElement;
 
@@ -84,7 +93,7 @@ export class SRModalView extends Modal {
 
         this.setRoundedModalCorners(!(heightPercent >= 100 || widthPercent >= 100));
 
-        await this.saveSizeToSettings(
+        this.saveSizeToSettings(
             heightPercent,
             widthPercent,
             Platform.isMobile || EmulatedPlatform().isMobile,
@@ -108,20 +117,27 @@ export class SRModalView extends Modal {
         );
     }
 
-    private async saveSizeToSettings(
+    private saveSizeToSettings(
         heightPercent: number,
         widthPercent: number,
         isMobile: boolean,
-    ) {
+    ): void {
         if (isNaN(heightPercent) || isNaN(widthPercent)) return;
 
+        const settings = this.settingsManager.settings;
+        const [currentHeight, currentWidth] = isMobile
+            ? [settings.flashcardHeightPercentageMobile, settings.flashcardWidthPercentageMobile]
+            : [settings.flashcardHeightPercentage, settings.flashcardWidthPercentage];
+        // Opening the modal reports its size too; don't rewrite data.json when nothing changed
+        if (currentHeight === heightPercent && currentWidth === widthPercent) return;
+
         if (isMobile) {
-            this.settingsManager.settings.flashcardHeightPercentageMobile = heightPercent;
-            this.settingsManager.settings.flashcardWidthPercentageMobile = widthPercent;
+            settings.flashcardHeightPercentageMobile = heightPercent;
+            settings.flashcardWidthPercentageMobile = widthPercent;
         } else {
-            this.settingsManager.settings.flashcardHeightPercentage = heightPercent;
-            this.settingsManager.settings.flashcardWidthPercentage = widthPercent;
+            settings.flashcardHeightPercentage = heightPercent;
+            settings.flashcardWidthPercentage = widthPercent;
         }
-        await this.plugin.dataManager.savePluginData();
+        this.persistSize();
     }
 }

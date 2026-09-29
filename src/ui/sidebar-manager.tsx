@@ -61,6 +61,10 @@ export class SidebarManager {
     async openReviewQueueView(): Promise<void> {
         const reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
         if (!reviewQueueLeaf) return;
+        // A fresh sidebar leaf is empty until it is given the view (#1212: the pane opened blank)
+        if (reviewQueueLeaf.view.getViewType() !== REVIEW_QUEUE_VIEW_TYPE) {
+            await reviewQueueLeaf.setViewState({ type: REVIEW_QUEUE_VIEW_TYPE, active: true });
+        }
         await this.app.workspace.revealLeaf(reviewQueueLeaf);
     }
 }
