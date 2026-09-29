@@ -492,12 +492,14 @@ export class UIPreferencesPage extends SettingsPage {
                     .setName(t("LEARNER_NAME"))
                     .setDesc(t("LEARNER_NAME_DESC"))
                     .addText((text) =>
-                        text.setValue(this.settingsManager.settings.learnerName).onChange((value) => {
-                            this.applySettingsUpdate(async () => {
-                                this.settingsManager.settings.learnerName = value.trim();
-                                await this.settingsManager.save();
-                            });
-                        }),
+                        text
+                            .setValue(this.settingsManager.settings.learnerName)
+                            .onChange((value) => {
+                                this.applySettingsUpdate(async () => {
+                                    this.settingsManager.settings.learnerName = value.trim();
+                                    await this.settingsManager.save();
+                                });
+                            }),
                     );
             })
             .addSetting((setting: Setting) => {
