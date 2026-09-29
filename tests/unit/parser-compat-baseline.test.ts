@@ -35,6 +35,27 @@ interface ParsedSnapshot {
 
 type Baseline = Record<string, Record<string, ParsedSnapshot[]>>;
 
+/**
+ * Inputs that parse differently with an end marker set, on purpose: a card now ends at its scheduling
+ * comment (M3b, for issue #1402). Before, turning on an end marker merged scheduled cards that had no marker
+ * yet into one card, and every schedule but the first was deleted on the next write. The default-settings
+ * parse of these inputs is still compared with the baseline like every other one. For these inputs in
+ * end-marker mode the property that must hold instead is: no scheduling comment is lost, and no card
+ * holds two of them.
+ */
+const END_MARKER_SCHEDULE_GUARD = new Set([
+    "corpus/callout-sr-layout-1105",
+    "corpus/callout-with-cloze",
+    "corpus/cloze-multiline-paragraph-comment-at-end",
+    "corpus/cloze-with-schedule",
+    "corpus/multiline-with-schedule",
+]);
+
+const isIntentionallyChanged = (name: string, variant: string) =>
+    variant.startsWith("endMarker") && END_MARKER_SCHEDULE_GUARD.has(name);
+
+const SCHEDULE_COMMENT = /<!--SR:.+?-->/g;
+
 const SETTINGS_VARIANTS: Record<string, SRSettings> = {
     default: DEFAULT_SETTINGS,
     endMarkerDashes: { ...DEFAULT_SETTINGS, multilineCardEndMarker: "---" },
@@ -78,8 +99,10 @@ function readVaultNotes(): Record<string, string> {
     return notes;
 }
 
+const INPUTS: Record<string, string> = { ...readVaultNotes(), ...COMPAT_CORPUS };
+
 function buildAll(): Baseline {
-    const inputs: Record<string, string> = { ...readVaultNotes(), ...COMPAT_CORPUS };
+    const inputs = INPUTS;
     const result: Baseline = {};
     for (const name of Object.keys(inputs).sort()) {
         result[name] = {};
@@ -115,20 +138,46 @@ describe("parser backward compatibility (pre-M3b baseline)", () => {
 
     for (const name of Object.keys(baseline)) {
         for (const variant of Object.keys(SETTINGS_VARIANTS)) {
+            if (isIntentionallyChanged(name, variant)) {
+                test(`${name} [${variant}] loses no scheduling comment (end marker guard)`, () => {
+                    const parsed = current[name][variant];
+                    const commentsInNote = INPUTS[name].match(SCHEDULE_COMMENT) ?? [];
+                    const commentsPerCard = parsed.map(
+                        (c): string[] => c.text.match(SCHEDULE_COMMENT) ?? [],
+                    );
+
+                    expect(commentsPerCard.flat().sort()).toEqual([...commentsInNote].sort());
+                    for (const comments of commentsPerCard) {
+                        expect(comments.length).toBeLessThanOrEqual(1);
+                    }
+                });
+                continue;
+            }
             test(`${name} [${variant}] parses exactly as before`, () => {
                 expect(current[name]?.[variant]).toEqual(baseline[name][variant]);
             });
         }
     }
 
-    test("card counts per input are unchanged", () => {
+    test("card counts per input are unchanged (except the end marker guard)", () => {
         const counts = (b: Baseline) =>
             Object.fromEntries(
                 Object.entries(b).map(([n, v]) => [
                     n,
-                    Object.fromEntries(Object.entries(v).map(([k, cards]) => [k, cards.length])),
+                    Object.fromEntries(
+                        Object.entries(v)
+                            .filter(([k]) => !isIntentionallyChanged(n, k))
+                            .map(([k, cards]) => [k, cards.length]),
+                    ),
                 ]),
             );
         expect(counts(current)).toEqual(counts(baseline));
+    });
+
+    test("the default-settings parse of every input is identical to the baseline", () => {
+        for (const name of Object.keys(baseline)) {
+            expect(current[name].default).toEqual(baseline[name].default);
+            expect(current[name].allClozePatterns).toEqual(baseline[name].allClozePatterns);
+        }
     });
 });

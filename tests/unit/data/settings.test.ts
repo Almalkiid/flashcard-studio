@@ -5,6 +5,7 @@ import {
     SRSettings,
     upgradeSettings,
 } from "src/data/settings";
+import { parserOptionsFromSettings } from "src/parser";
 
 describe("SettingsUtil", () => {
     test("isPathInNoteIgnoreFolder", () => {
@@ -284,5 +285,78 @@ describe("cloneDefaultSettings", () => {
         settings.newCardsPerDay = 1;
         expect(DEFAULT_SETTINGS.flashcardTags).not.toContain("#changed");
         expect(DEFAULT_SETTINGS.newCardsPerDay).toBe(20);
+    });
+});
+
+// M3b: card syntax
+describe("card syntax settings", () => {
+    test("defaults do not change how a note parses, except that callout cards are on", () => {
+        expect(DEFAULT_SETTINGS.multilineCardStartMarker).toBe("");
+        expect(DEFAULT_SETTINGS.atomicClozes).toBe(false);
+        expect(DEFAULT_SETTINGS.latexClozes).toBe(false);
+        expect(DEFAULT_SETTINGS.calloutCardTypes).toEqual(["flashcard", "question", "card"]);
+    });
+
+    test("upgradeSettings fills in missing or invalid values", () => {
+        const settings = {
+            multilineCardStartMarker: 5,
+            calloutCardTypes: "question",
+            atomicClozes: "yes",
+            latexClozes: null,
+        } as unknown as SRSettings;
+
+        upgradeSettings(settings);
+
+        expect(settings).toMatchObject({
+            multilineCardStartMarker: "",
+            calloutCardTypes: ["flashcard", "question", "card"],
+            atomicClozes: false,
+            latexClozes: false,
+        });
+    });
+
+    test("upgradeSettings keeps valid values, including an empty callout list", () => {
+        const settings = {
+            multilineCardStartMarker: "+++",
+            calloutCardTypes: [],
+            atomicClozes: true,
+            latexClozes: true,
+        } as unknown as SRSettings;
+
+        upgradeSettings(settings);
+
+        expect(settings).toMatchObject({
+            multilineCardStartMarker: "+++",
+            calloutCardTypes: [],
+            atomicClozes: true,
+            latexClozes: true,
+        });
+    });
+
+    test("upgradeSettings gives the callout list its own array, not the shared default", () => {
+        const settings = {} as unknown as SRSettings;
+
+        upgradeSettings(settings);
+        settings.calloutCardTypes.push("extra");
+
+        expect(DEFAULT_SETTINGS.calloutCardTypes).toEqual(["flashcard", "question", "card"]);
+    });
+
+    test("the parser options carry every card syntax setting", () => {
+        const options = parserOptionsFromSettings({
+            ...DEFAULT_SETTINGS,
+            multilineCardStartMarker: "+++",
+            calloutCardTypes: ["card"],
+            atomicClozes: true,
+            latexClozes: true,
+        });
+
+        expect(options).toMatchObject({
+            multilineCardStartMarker: "+++",
+            calloutCardTypes: ["card"],
+            atomicClozes: true,
+            latexClozes: true,
+            multilineCardEndMarker: DEFAULT_SETTINGS.multilineCardEndMarker,
+        });
     });
 });

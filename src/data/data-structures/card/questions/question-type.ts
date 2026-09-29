@@ -1,5 +1,11 @@
 import { ClozeCrafter, IClozeFormatter } from "clozecraft";
 
+import { splitCalloutCard } from "src/data/data-structures/card/questions/callout-card";
+import {
+    containsMathCloze,
+    expandMathClozes,
+    replaceMathClozesWithAnswers,
+} from "src/data/data-structures/card/questions/math-cloze";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
@@ -92,10 +98,31 @@ class QuestionTypeMultiLineReversed implements IQuestionTypeHandler {
     }
 }
 
+// The title of a callout is the front and its body the back
+class QuestionTypeCallout implements IQuestionTypeHandler {
+    expand(questionText: string, _settings: SRSettings): CardFrontBack[] {
+        const card = splitCalloutCard(questionText);
+        return card === null ? [] : [new CardFrontBack(card.front, card.back)];
+    }
+}
+
+// Shows every cloze as its plain answer
+const plainAnswerFormatter: IClozeFormatter = {
+    asking: (answer?: string) => answer ?? "",
+    showingAnswer: (answer: string) => answer,
+    hiding: (answer?: string) => answer ?? "",
+};
+
 class QuestionTypeCloze implements IQuestionTypeHandler {
     expand(questionText: string, settings: SRSettings): CardFrontBack[] {
         const clozecrafter = new ClozeCrafter(settings.clozePatterns);
-        const clozeNote = clozecrafter.createClozeNote(questionText);
+
+        // M3b: `\cloze{answer}{hint}` macros make cards of their own, after the cards of the other clozes.
+        // In the other clozes' cards a macro shows its answer, and in the macros' cards the other clozes do.
+        const hasMathClozes = settings.latexClozes === true && containsMathCloze(questionText);
+        const clozeNote = clozecrafter.createClozeNote(
+            hasMathClozes ? replaceMathClozesWithAnswers(questionText) : questionText,
+        );
 
         // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
         const clozeFormatter = settings.convertClozePatternsToInputs
@@ -104,12 +131,22 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];
-        if (clozeNote === null) return result;
 
-        for (let i = 0; i < clozeNote.numCards; i++) {
-            front = clozeNote.getCardFront(i, clozeFormatter);
-            back = clozeNote.getCardBack(i, clozeFormatter);
-            result.push(new CardFrontBack(front, back));
+        if (clozeNote !== null) {
+            for (let i = 0; i < clozeNote.numCards; i++) {
+                front = clozeNote.getCardFront(i, clozeFormatter);
+                back = clozeNote.getCardBack(i, clozeFormatter);
+                result.push(new CardFrontBack(front, back));
+            }
+        }
+
+        if (hasMathClozes) {
+            const plainText = clozecrafter
+                .createClozeNote(questionText)
+                ?.getCardBack(0, plainAnswerFormatter);
+            for (const card of expandMathClozes(plainText ?? questionText, clozeFormatter)) {
+                result.push(new CardFrontBack(card.front, card.back));
+            }
         }
 
         return result;
@@ -162,6 +199,9 @@ export class QuestionTypeFactory {
                 break;
             case CardType.Cloze:
                 handler = new QuestionTypeCloze();
+                break;
+            case CardType.Callout:
+                handler = new QuestionTypeCallout();
                 break;
         }
         return handler;

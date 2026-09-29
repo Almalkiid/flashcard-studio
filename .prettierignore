@@ -8,3 +8,4 @@ tests/vaults/
 tests/e2e/vault/
 .obsidian-cache
 .e2e-plugin
+tests/unit/fixtures/parse-baseline.json

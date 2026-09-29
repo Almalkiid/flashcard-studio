@@ -24,6 +24,9 @@ export enum CardType {
     MultiLineBasic,
     MultiLineReversed,
     Cloze,
+    // A callout such as `> [!question] Title` with the answer in its body. Added last: the values above
+    // are used as numbers in tests and must not shift.
+    Callout,
 }
 
 // QuestionText comprises the following components:
@@ -222,7 +225,17 @@ export class Question {
         if (this.questionText.endsWithCodeBlock()) {
             result = false;
         }
+        // M3b: a callout card's schedule is always written on the line after the callout, outside of it
+        if (this.isCalloutCard) {
+            result = false;
+        }
         return result;
+    }
+
+    // M3b: for a callout card, the sr metadata callout is not used either: written inside the card's own callout,
+    // it would show up as text in the answer
+    private get isCalloutCard(): boolean {
+        return this.parsedQuestionInfo?.cardType === CardType.Callout;
     }
 
     setCardList(cards: Card[]): void {
@@ -236,6 +249,8 @@ export class Question {
         const hasSchedule: boolean = this.cards.some(
             (card) => card.hasSchedule || hasPersistentMeta(card.meta),
         );
+        const useCalloutForSchedule: boolean =
+            settings.useCalloutsForSchedulingComments && !this.isCalloutCard;
         if (hasSchedule) {
             result = result.trimEnd();
 
@@ -247,7 +262,7 @@ export class Question {
                 const isScheduleInSRMetadataCallout = result.includes(SR_METADATA_CALLOUT);
 
                 // Add the callout if the schedule is not in the metadata callout
-                if (settings.useCalloutsForSchedulingComments && !isScheduleInSRMetadataCallout) {
+                if (useCalloutForSchedule && !isScheduleInSRMetadataCallout) {
                     result += `${result.endsWith("\n") ? "" : "\n"}${SR_METADATA_CALLOUT} \n> `;
                 }
 
@@ -255,7 +270,7 @@ export class Question {
                     if (
                         this.isCardCommentsOnSameLine(settings) ||
                         isScheduleInSRMetadataCallout ||
-                        settings.useCalloutsForSchedulingComments
+                        useCalloutForSchedule
                     )
                         result += ` ${scheduleHtml} ${blockId}`;
                     else result += ` ${blockId}\n${scheduleHtml}`;
@@ -263,8 +278,7 @@ export class Question {
                     result +=
                         this.getHtmlCommentSeparator(
                             settings,
-                            isScheduleInSRMetadataCallout ||
-                                settings.useCalloutsForSchedulingComments,
+                            isScheduleInSRMetadataCallout || useCalloutForSchedule,
                         ) + scheduleHtml;
                 }
             } else {
@@ -291,7 +305,15 @@ export class Question {
         //      1. the topic path (if present),
         //      2. the question text
         //      3. the schedule HTML comment (if present)
-        const replacementText = this.formatForNote(settings);
+        let replacementText = this.formatForNote(settings);
+
+        // Only the first scheduling comment belongs to this question. Another one is the schedule of a card that
+        // ended up in the same text (for example two scheduled cards inside one card region). It must survive
+        // this rewrite: it is dropped from the question text, so without this it would be deleted.
+        const extraComments = (originalText.match(/<!--SR:.+?-->/g) ?? []).slice(1);
+        if (extraComments.length > 0 && replacementText.includes(SR_HTML_COMMENT_BEGIN)) {
+            replacementText += "\n" + extraComments.join("\n");
+        }
 
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {

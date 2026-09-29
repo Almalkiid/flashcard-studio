@@ -99,6 +99,16 @@ export interface SRSettings {
 
     preferredDateFormatForNoteReviewQueue: string;
     preferredLocale: string;
+
+    // M3b: card syntax
+    /** Empty (the default) means there are no card regions. See parser.ts. */
+    multilineCardStartMarker: string;
+    /** Callout types (`> [!type]`) that are cards. An empty list turns callout cards off. */
+    calloutCardTypes: string[];
+    /** A cloze card is only the line that holds the cloze, not the whole paragraph. */
+    atomicClozes: boolean;
+    /** `\cloze{answer}{hint}` is a cloze form inside `$...$` and `$$...$$` math. */
+    latexClozes: boolean;
 }
 
 export const DEFAULT_SETTINGS: SRSettings = {
@@ -195,6 +205,12 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showParserDebugMessages: false,
     preferredDateFormatForNoteReviewQueue: "MMM DD YYYY",
     preferredLocale: "-",
+
+    // M3b: card syntax
+    multilineCardStartMarker: "",
+    calloutCardTypes: ["flashcard", "question", "card"],
+    atomicClozes: false,
+    latexClozes: false,
 };
 
 /**
@@ -306,6 +322,20 @@ export function upgradeSettings(settings: SRSettings) {
         settings.reviewReminderBounceDock === undefined
     ) {
         settings.reviewReminderBounceDock = DEFAULT_SETTINGS.reviewReminderBounceDock;
+    }
+
+    // M3b: card syntax
+    if (typeof settings.multilineCardStartMarker !== "string") {
+        settings.multilineCardStartMarker = DEFAULT_SETTINGS.multilineCardStartMarker;
+    }
+    if (!Array.isArray(settings.calloutCardTypes)) {
+        settings.calloutCardTypes = [...DEFAULT_SETTINGS.calloutCardTypes];
+    }
+    if (typeof settings.atomicClozes !== "boolean") {
+        settings.atomicClozes = DEFAULT_SETTINGS.atomicClozes;
+    }
+    if (typeof settings.latexClozes !== "boolean") {
+        settings.latexClozes = DEFAULT_SETTINGS.latexClozes;
     }
 }
 
