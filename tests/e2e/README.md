@@ -51,3 +51,20 @@ finish initialising, `resetVault()`, drive the UI with `browser.$(...)`, then as
 file read from disk (`obsidianPage.getVaultPath()`). Type-check with
 `pnpm tsc -p tests/e2e/tsconfig.json`. The root `tsconfig.json` excludes `tests/e2e` because it
 loads Jest's globals, which clash with the WebdriverIO and Mocha ones.
+
+## The statistics spec and the screenshots
+
+`specs/statistics.e2e.ts` covers the statistics view, the card info modal and the end of session
+summary. Its last test builds a busy collection from `demo-data.ts` (65 cards in every state and half
+a year of review history, all derived from the current time and a fixed random seed) and writes the
+documentation screenshots to `docs/media/screenshots/`: `statistics-*`, `card-info-*` and
+`session-summary-*`, for desktop and for the emulated phone. Run it again to refresh them.
+
+Two things to know when writing tests that review cards:
+
+- Answering a card buries its question for the rest of the day in the plugin data, which
+  `resetVault()` does not reset. Clear it in `beforeEach` (see `clearBuryList`) or later tests find
+  fewer and fewer cards.
+- After an answer the note is rewritten and Obsidian re-indexes its tags asynchronously. Wait for
+  the tags (`waitForTags`) before opening anything that reloads the vault, or the deck tree is
+  briefly empty.
