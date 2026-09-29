@@ -404,4 +404,15 @@ export interface IBaseLocale {
     DEBUG_LOG: string;
     COPY: string;
     NO_DECKS_TO_REVIEW: string;
+
+    // M3b: card syntax
+    GROUP_CARD_SYNTAX: string;
+    CALLOUT_CARD_TYPES: string;
+    CALLOUT_CARD_TYPES_DESC: string;
+    MULTILINE_CARDS_START_MARKER: string;
+    MULTILINE_CARDS_START_MARKER_DESC: string;
+    ATOMIC_CLOZES: string;
+    ATOMIC_CLOZES_DESC: string;
+    LATEX_CLOZES: string;
+    LATEX_CLOZES_DESC: string;
 }
