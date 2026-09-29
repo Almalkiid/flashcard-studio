@@ -1,0 +1,58 @@
+.sr-review-log {
+    font-size: var(--font-ui-small);
+}
+
+.sr-review-log-summary {
+    color: var(--text-muted);
+    margin: var(--size-4-2) 0;
+}
+
+.sr-review-log-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sr-review-log-table th,
+.sr-review-log-table td {
+    padding: var(--size-4-1) var(--size-4-2);
+    border-bottom: 1px solid var(--background-modifier-border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.sr-review-log-table th {
+    color: var(--text-muted);
+    font-weight: var(--font-semibold);
+}
+
+.sr-review-log-card {
+    font-family: var(--font-monospace);
+    color: var(--text-faint);
+}
+
+.sr-review-log-rating {
+    font-weight: var(--font-semibold);
+}
+
+.sr-rating-1 {
+    color: var(--color-red);
+}
+
+.sr-rating-2 {
+    color: var(--color-orange);
+}
+
+.sr-rating-3 {
+    color: var(--color-green);
+}
+
+.sr-rating-4 {
+    color: var(--color-blue);
+}
+
+.is-phone .sr-review-log-table th:nth-child(2),
+.is-phone .sr-review-log-table td:nth-child(2),
+.is-phone .sr-review-log-table th:nth-child(4),
+.is-phone .sr-review-log-table td:nth-child(4) {
+    display: none;
+}

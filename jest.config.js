@@ -35,6 +35,8 @@ export default {
         "src/data/data-store/.*/.*file-modifier.ts",
         "src/note/next-note-review-handler.ts",
         "src/data/plugin-data.ts",
+        "src/data/review-log/obsidian-log-adapter.ts",
+        "src/data/review-log/device-id.ts",
         "src/utils/renderers.ts",
         "src/scheduling/algorithms/osr/obsidian-vault-notelink-info-finder.ts",
         "src/scheduling/algorithms/osr/serialized-schedule-data.ts",
