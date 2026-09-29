@@ -1,6 +1,6 @@
 import { t } from "src/lang/helpers";
-import { LocaleManagerInstance } from "src/lang/locale-manager";
 import en from "src/lang/locale/en";
+import { LocaleManagerInstance } from "src/lang/locale-manager";
 
 // #1644: the plugin failed to load when Obsidian's language had no translation (e.g. Swedish), because t() read
 // the missing translation map before falling back to English.
