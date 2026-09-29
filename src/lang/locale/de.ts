@@ -62,7 +62,7 @@ const de: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}j",
 
     // settings.ts
-    SETTINGS_HEADER: "Spaced Repetition",
+    SETTINGS_HEADER: "Cardwright",
     GROUP_TAGS_FOLDERS: "Tags & Ordner",
     GROUP_FLASHCARD_REVIEW: "Flashcard Review",
     GROUP_FLASHCARD_SEPARATORS: "Flashcard Separators",

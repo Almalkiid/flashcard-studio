@@ -1,6 +1,7 @@
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import SRPlugin from "src/main";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
 import { setDebugParser } from "src/parser";
 
 /**
@@ -46,11 +47,21 @@ export class PluginDataManager {
     async loadData(): Promise<void> {
         const loadedData: PluginData = (await this.plugin.loadData()) as PluginData;
         if (loadedData?.settings) upgradeSettings(loadedData.settings);
-        this._pluginData = Object.assign({}, DEFAULT_DATA, loadedData);
+        // Copies, so that editing the plugin data never changes the shared defaults (e.g. the bury list array)
+        this._pluginData = Object.assign(
+            JSON.parse(JSON.stringify(DEFAULT_DATA)) as PluginData,
+            loadedData,
+        );
         this._pluginData.settings = Object.assign(
             cloneDefaultSettings(),
             this._pluginData.settings,
         );
+
+        // New installs start on FSRS. Existing settings (including ones imported from Spaced Repetition) keep
+        // whatever algorithm they chose.
+        if (!loadedData?.settings) {
+            this._pluginData.settings.algorithm = SRAlgorithmType.FSRS;
+        }
 
         setDebugParser(this._pluginData.settings.showParserDebugMessages);
     }

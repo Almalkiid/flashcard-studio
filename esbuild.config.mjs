@@ -39,8 +39,9 @@ const context = await esbuild.context({
     format: "cjs",
     target: "es2018",
     logLevel: "info",
-    sourcemap: "inline",
+    sourcemap: prod ? false : "inline",
     sourcesContent: !prod,
+    minify: prod,
     treeShaking: true,
     outfile: "build/main.js",
     loader: {

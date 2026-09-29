@@ -2,6 +2,7 @@ import "src/ui/obsidian-ui-components/item-views/tab-view.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/data/constants";
+import { PRODUCT_NAME } from "src/data/product";
 import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
@@ -102,7 +103,7 @@ export class SRTabView extends ItemView {
      * @returns {string} The display text for the SRTabView.
      */
     getDisplayText() {
-        return "Spaced Repetition";
+        return PRODUCT_NAME;
     }
 
     /**

@@ -1,6 +1,7 @@
 import { Notice, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
+import { ALGORITHMS_DOCS_URL } from "src/data/product";
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
@@ -372,7 +373,7 @@ export class SchedulingPage extends SettingsPage {
                 );
 
             const elements: (HTMLElement | Text)[] = tHTML("CHECK_ALGORITHM_WIKI", {
-                algoUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/algorithms/",
+                algoUrl: ALGORITHMS_DOCS_URL,
             });
 
             algoSettingEl.descEl.empty();

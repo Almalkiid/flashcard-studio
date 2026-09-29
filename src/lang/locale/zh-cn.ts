@@ -57,7 +57,7 @@ const zhCN: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}年",
 
     // settings.ts
-    SETTINGS_HEADER: "间隔重复插件",
+    SETTINGS_HEADER: "Cardwright",
     GROUP_TAGS_FOLDERS: "标签和文件夹",
     GROUP_FLASHCARD_REVIEW: "闪卡复习",
     GROUP_FLASHCARD_SEPARATORS: "闪存卡分隔符",

@@ -2,6 +2,14 @@ import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { DebugLoggerInstance } from "src/data/debug-logger";
+import {
+    DISCUSSIONS_URL,
+    DOCS_URL,
+    ISSUES_URL,
+    RELEASES_URL,
+    REPOSITORY_URL,
+    ROADMAP_URL,
+} from "src/data/product";
 import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
@@ -128,7 +136,7 @@ export class MainPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("CHECK_WIKI", {
-                    wikiUrl: "https://stephenmwangi.com/obsidian-spaced-repetition/",
+                    wikiUrl: DOCS_URL,
                 });
 
                 setting.infoEl.empty();
@@ -139,7 +147,7 @@ export class MainPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("CHECK_ROADMAP", {
-                    roadMapUrl: "https://github.com/users/st3v3nmw/projects/6",
+                    roadMapUrl: ROADMAP_URL,
                 });
 
                 setting.infoEl.empty();
@@ -150,8 +158,7 @@ export class MainPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("CHECK_DEV_NEWS", {
-                    devNewsUrl:
-                        "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/categories/development-news",
+                    devNewsUrl: RELEASES_URL,
                 });
 
                 setting.infoEl.empty();
@@ -165,8 +172,7 @@ export class MainPage extends SettingsPage {
             .setHeading(t("HELP") + " & " + t("GROUP_CONTRIBUTING"))
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("GITHUB_DISCUSSIONS", {
-                    discussionsUrl:
-                        "https://github.com/st3v3nmw/obsidian-spaced-repetition/discussions/",
+                    discussionsUrl: DISCUSSIONS_URL,
                 });
 
                 setting.infoEl.empty();
@@ -177,7 +183,7 @@ export class MainPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("GITHUB_ISSUES", {
-                    issuesUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition/issues/",
+                    issuesUrl: ISSUES_URL,
                 });
 
                 setting.infoEl.empty();
@@ -188,7 +194,7 @@ export class MainPage extends SettingsPage {
             })
             .addSetting((setting: Setting) => {
                 const elements: (HTMLElement | Text)[] = tHTML("GITHUB_SOURCE_CODE", {
-                    githubProjectUrl: "https://github.com/st3v3nmw/obsidian-spaced-repetition",
+                    githubProjectUrl: REPOSITORY_URL,
                 });
 
                 setting.infoEl.empty();

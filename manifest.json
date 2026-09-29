@@ -1,12 +1,10 @@
 {
-    "id": "obsidian-spaced-repetition",
-    "name": "Spaced Repetition",
-    "version": "1.15.4",
+    "id": "cardwright",
+    "name": "Cardwright",
+    "version": "0.9.0",
     "minAppVersion": "1.11.0",
-    "description": "Fight the forgetting curve by reviewing flashcards & entire notes using spaced repetition. Organize your flashcards into decks and learn only the cards you need to recall.",
-    "author": "Stephen Mwangi",
-    "authorUrl": "https://github.com/st3v3nmw",
-    "helpUrl": "https://stephenmwangi.com/obsidian-spaced-repetition/",
-    "isDesktopOnly": false,
-    "fundingUrl": "https://ko-fi.com/M4M44DEN6"
+    "description": "Flashcards and note review with spaced repetition. FSRS scheduling, full review history, Anki style daily limits, statistics and a polished review screen for desktop and mobile.",
+    "author": "Almalkiid",
+    "authorUrl": "https://github.com/Almalkiid",
+    "isDesktopOnly": false
 }

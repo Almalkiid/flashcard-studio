@@ -70,7 +70,7 @@ const he: IBaseLocale = {
     YEARS_STR_IVL_MOBILE: "${interval}ש",
 
     // settings.ts
-    SETTINGS_HEADER: "חזרה מרווחת",
+    SETTINGS_HEADER: "Cardwright",
     GROUP_TAGS_FOLDERS: "תגיות ותיקיות",
     GROUP_FLASHCARD_REVIEW: "חזרה על כרטיסים",
     GROUP_FLASHCARD_SEPARATORS: "מפרידי כרטיסים",

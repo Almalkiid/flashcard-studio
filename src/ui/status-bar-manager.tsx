@@ -1,5 +1,6 @@
 import { request } from "obsidian";
 
+import { LATEST_RELEASE_API_URL, PRODUCT_NAME } from "src/data/product";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -188,14 +189,14 @@ export default class StatusBarManager {
         );
 
         if (updateItem !== undefined) {
-            updateItem.setText("Spaced Repetition: new update!");
+            updateItem.setText(`${PRODUCT_NAME}: new update!`);
         }
     }
 
     private async getNewestVersion(): Promise<string> {
         try {
             const response: string = await request({
-                url: "https://api.github.com/repos/st3v3nmw/obsidian-spaced-repetition/releases/latest",
+                url: LATEST_RELEASE_API_URL,
             });
             return (JSON.parse(response) as { tag_name: string }).tag_name;
         } catch (e) {

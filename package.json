@@ -1,10 +1,10 @@
 {
-    "name": "obsidian-spaced-repetition",
-    "version": "1.15.4",
-    "description": "Fight the forgetting curve by reviewing flashcards & entire notes.",
+    "name": "cardwright",
+    "version": "0.9.0",
+    "description": "Flashcards and note review with spaced repetition. FSRS scheduling, full review history, Anki style daily limits, statistics and a polished review screen for desktop and mobile.",
     "main": "main.js",
     "scripts": {
-        "build": "pnpm install && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+        "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
         "dev": "node esbuild.config.mjs",
         "format": "pnpm prettier --write . && pnpm eslint src/ tests/ --fix",
         "lint": "pnpm prettier --check . && pnpm eslint src/ tests/",
@@ -17,13 +17,12 @@
     "keywords": [
         "obsidian",
         "spaced repetition",
-        "flashcard",
-        "flashcards"
+        "flashcards",
+        "fsrs",
+        "anki",
+        "cloze"
     ],
-    "author": "Stephen Mwangi",
-    "maintainers": [
-        "Kyle Klus"
-    ],
+    "author": "Almalkiid",
     "license": "MIT",
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -80,5 +79,9 @@
     "engines": {
         "pnpm": ">=11.6.0"
     },
-    "engineStrict": true
+    "engineStrict": true,
+    "contributors": [
+        "Stephen Mwangi (original author)",
+        "Kyle Klus (maintainer of the original plugin)"
+    ]
 }

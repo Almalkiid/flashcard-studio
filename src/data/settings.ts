@@ -147,7 +147,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     showStatusBar: true,
     showCardStatusBarItem: true,
     showNoteStatusBarItem: true,
-    showUpdateAvailableStatusBarItem: true,
+    // Off by default: Obsidian and BRAT already announce updates, so no unprompted network request
+    showUpdateAvailableStatusBarItem: false,
     initiallyExpandAllSubdecksInTree: true,
     showContextInCards: true,
     showIntervalInReviewButtons: true,
