@@ -50,6 +50,23 @@ const embedWasmPlugin = {
     },
 };
 
+// ankipack reads node:fs/promises with a dynamic import, but only in Package.writeToFile, which the plugin never
+// calls (it saves through the vault API). The import is replaced by an empty module, so main.js has no Node import,
+// which the plugin has to work on mobile without.
+const stubNodeImportsPlugin = {
+    name: "stub-node-imports",
+    setup(build) {
+        build.onResolve({ filter: /^node:/ }, (args) => ({
+            path: args.path,
+            namespace: "stub-node",
+        }));
+        build.onLoad({ filter: /.*/, namespace: "stub-node" }, () => ({
+            contents: "export default {};",
+            loader: "js",
+        }));
+    },
+};
+
 const context = await esbuild.context({
     entryPoints: ["src/main.ts"],
     bundle: true,
@@ -65,7 +82,7 @@ const context = await esbuild.context({
     loader: {
         ".css": "css",
     },
-    plugins: [embedWasmPlugin, moveToRootPlugin],
+    plugins: [embedWasmPlugin, stubNodeImportsPlugin, moveToRootPlugin],
 });
 
 if (prod) {
