@@ -523,9 +523,7 @@ describe("statistics and insight", function () {
         await createFiles([...notes, ...buildDemoLogFiles(folder, buildDemoLog(now))]);
         await waitForTags(notes.map((note) => note.path));
 
-        // Several decks have cards, so the review opens on the deck list; start with the top deck. The Studio look
-        // shows its home screen instead of the deck tree, so pick the deck in the classic list.
-        await setSetting("reviewLook", "classic");
+        // Several decks have cards, so the review opens on the deck list; start with the top deck
         await openReview();
         await browser.$(".sr-view .fs-home-deck.is-clickable").waitForClickable({
             timeoutMsg: "the deck list was not shown",
@@ -541,7 +539,6 @@ describe("statistics and insight", function () {
         // Answer one card, so today has a real review as well as the history
         await answerNextCard("sr-good-button");
         await closeModals();
-        await setSetting("reviewLook", "studio");
 
         const mobile = await isMobile();
         // Give the statistics the whole window on desktop, so the two column layout shows
