@@ -25,6 +25,7 @@ import {
     renderRetrievability,
     renderStability,
 } from "src/ui/statistics-view/sections-cards";
+import { renderWeakAreas } from "src/ui/statistics-view/sections-insights";
 import {
     renderAnswerButtons,
     renderEmptyState,
@@ -232,6 +233,11 @@ export class StatisticsView extends ItemView {
         if (report.hasHistory) {
             renderDaily(grid, report, host, this.toggles);
             renderHeatmap(grid, report.heatmap, inputs.weekStart);
+            renderWeakAreas(
+                grid,
+                report.weakAreas,
+                this.plugin.dataManager.data.settings.fsrsDesiredRetention,
+            );
         }
         renderCardCounts(grid, report, host);
         renderForecast(grid, report, host);

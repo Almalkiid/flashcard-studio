@@ -21,6 +21,7 @@ import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
 import { streaks, todaySummary } from "src/stats/activity";
 import { trueRetention } from "src/stats/answers";
 import { buildSessionSummary } from "src/stats/session";
+import { weakAreas } from "src/stats/weak-areas";
 import { CardActions } from "src/ui/card-actions";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
@@ -630,17 +631,24 @@ export default class ContentManager {
             const last30 = trueRetention(entries, todayKey, dayKeyOf).find(
                 (row) => row.id === "last30",
             );
+            // The weakest deck under the retention target, if any
+            const target = this.settings.fsrsDesiredRetention;
+            const weakest = weakAreas(entries, [], todayKey, dayKeyOf, Date.now()).decks[0];
             return {
                 studiedToday: todaySummary(entries, todayKey, dayKeyOf).reviews,
                 streak: streaks(entries, todayKey, dayKeyOf).current,
                 retention: last30?.all.rate ?? null,
+                focus:
+                    weakest !== undefined && weakest.retention < target
+                        ? { deck: weakest.deck, retention: weakest.retention, target }
+                        : null,
             };
         } catch (error) {
             console.error(
                 "Flashcard Studio: could not read the review history for the home screen",
                 error,
             );
-            return { studiedToday: 0, streak: 0, retention: null };
+            return { studiedToday: 0, streak: 0, retention: null, focus: null };
         }
     }
 

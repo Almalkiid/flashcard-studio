@@ -39,6 +39,7 @@ import {
     rangeStartKey,
 } from "src/stats/scope";
 import { RANGE_DAYS, StatsCard, TimeRange } from "src/stats/types";
+import { WeakAreas, weakAreas } from "src/stats/weak-areas";
 
 export interface ReportOptions {
     nowMs: number;
@@ -81,6 +82,8 @@ export interface StatsReport {
     answerButtons: AnswerButtons;
     hourly: HourlyBucket[];
     retention: RetentionRow[];
+    /** Decks ranked by their last 30 days of recall, and the cards that keep being missed. */
+    weakAreas: WeakAreas;
 }
 
 /** How many days ahead the forecast looks for each range; the whole history looks a year ahead. */
@@ -139,5 +142,6 @@ export function buildStatsReport(
         answerButtons: answerButtons(rangeEntries),
         hourly: hourly(rangeEntries),
         retention: trueRetention(entries, todayKey, dayKeyOf),
+        weakAreas: weakAreas(entries, cards, todayKey, dayKeyOf, nowMs),
     };
 }

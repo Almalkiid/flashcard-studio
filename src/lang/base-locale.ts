@@ -63,6 +63,8 @@ export interface IBaseLocale {
     HOME_NEW_CARDS: string;
     HOME_ALL_DONE_SHORT: string;
     HOME_STUDY: string;
+    HOME_FOCUS: string;
+    HOME_FOCUS_DETAIL: string;
     OPEN_STATISTICS_SHORT: string;
     OPEN_SETTINGS_SHORT: string;
     LEARNER_NAME: string;
@@ -629,6 +631,14 @@ export interface IBaseLocale {
     STATS_MODE_SUCCESS: string;
     STATS_TRUE_RETENTION_TITLE: string;
     STATS_TRUE_RETENTION_NOTE: string;
+    STATS_WEAK_AREAS_TITLE: string;
+    STATS_WEAK_AREAS_NOTE: string;
+    STATS_WEAK_AREAS_EMPTY: string;
+    STATS_WEAK_REVIEWS: string;
+    STATS_WEAK_DUE: string;
+    STATS_WEAK_SLIPPING: string;
+    STATS_WEAK_TOTAL_SLIPPING: string;
+    STATS_WEAK_LEECHES: string;
     STATS_ROW_TODAY: string;
     STATS_ROW_YESTERDAY: string;
     STATS_ROW_LAST7: string;

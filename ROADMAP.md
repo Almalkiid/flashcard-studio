@@ -21,7 +21,9 @@ Flashcard Studio aims to be the best way to study with spaced repetition in Obsi
 - [x] **Review mistakes**: at the end of a session, study again the cards you just got wrong
 - [x] **Learn ahead limit**, as in Anki: with nothing else left, a card due within 20 minutes is shown instead of a wait
 - [ ] **Today's plan** on the home screen: due, new and weak-topic cards, with the time they take
-- [ ] **Weak areas**: decks and tags ranked by retention, cards you keep missing, what to focus on
+- [x] **Weak areas**: decks ranked by the last 30 days of recall against your target, and the cards you keep missing
+- [x] **Focus** on the home screen: the deck remembered least well, one tap to study it
+- [ ] Weak areas by tag
 - [ ] **Card browser**: search, filter by deck, state and tag, and edit in bulk
 - [ ] **Add and edit cards** in a form: deck, tags and the source the card came from
 - [ ] **Agent inbox**: cards and edits proposed by an AI agent wait for you to approve, edit or reject them

@@ -185,6 +185,60 @@
     color: var(--fs-text-3);
 }
 
+/* MARK: Focus */
+
+.fs-home-focus-slot:empty {
+    display: none;
+}
+
+.fs-home-focus {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-color: color-mix(in srgb, var(--fs-orange) 28%, var(--fs-border));
+    background: linear-gradient(120deg, var(--fs-orange-soft), transparent 70%), var(--fs-surface);
+}
+
+.fs-home-focus-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-home-focus-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fs-orange);
+}
+
+.fs-home-focus-icon {
+    display: flex;
+
+    & svg {
+        width: 13px;
+        height: 13px;
+        stroke-width: 2.4;
+    }
+}
+
+.fs-home-focus-deck {
+    margin-top: 2px;
+    font-size: var(--fs-body);
+    font-weight: 650;
+    color: var(--fs-text);
+}
+
+.fs-home-focus-detail {
+    margin-top: 1px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
 /* MARK: Decks */
 
 .fs-home-section {

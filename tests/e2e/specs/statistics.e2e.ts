@@ -604,6 +604,12 @@ describe("statistics and insight", function () {
 
         // Several decks have cards, so the review opens on the deck list; start with the top deck
         await openReview();
+        // The demo CIA deck is remembered least well, under the 90% target, so the home offers it as the focus
+        const focus = browser.$(".sr-view .fs-home-focus");
+        await focus.waitForDisplayed({ timeoutMsg: "no focus deck was offered" });
+        expect(await focus.$(".fs-home-focus-deck").getText()).toEqual("Cia › Part2");
+        await browser.pause(300);
+        await screenshot("home-focus");
         await browser.$(".sr-view .fs-home-deck.is-clickable").waitForClickable({
             timeoutMsg: "the deck list was not shown",
         });

@@ -23,6 +23,8 @@ interface DeckSpec {
     note: string;
     cards: [string, string][];
     weight: number;
+    /** How often a review in this deck is answered Again, so the decks differ in the Weak areas card. */
+    missRate: number;
 }
 
 const DECKS: DeckSpec[] = [
@@ -31,6 +33,7 @@ const DECKS: DeckSpec[] = [
         path: "flashcards/spanish",
         note: "Demo/Spanish.md",
         weight: 0.42,
+        missRate: 0.05,
         cards: [
             ["la casa", "the house"],
             ["el perro", "the dog"],
@@ -69,6 +72,7 @@ const DECKS: DeckSpec[] = [
         path: "flashcards/cia/part2",
         note: "Demo/CIA Part 2.md",
         weight: 0.33,
+        missRate: 0.21,
         cards: [
             ["What is inherent risk?", "Risk before any controls are applied"],
             ["What is residual risk?", "Risk that remains after controls"],
@@ -109,6 +113,7 @@ const DECKS: DeckSpec[] = [
         path: "flashcards/anatomy",
         note: "Demo/Anatomy.md",
         weight: 0.25,
+        missRate: 0.12,
         cards: [
             ["Largest bone in the body", "Femur"],
             ["Which nerve controls the diaphragm?", "Phrenic nerve"],
@@ -241,7 +246,15 @@ export function buildDemoLog(now: number): DemoEntry[] {
             const kindRoll = random();
             const k = kindRoll < 0.1 ? 0 : kindRoll < 0.18 ? 2 : 1;
             const ratingRoll = random();
-            const r = ratingRoll < 0.09 ? 1 : ratingRoll < 0.2 ? 2 : ratingRoll < 0.82 ? 3 : 4;
+            const miss = deck.missRate;
+            const r =
+                ratingRoll < miss
+                    ? 1
+                    : ratingRoll < miss + 0.11
+                      ? 2
+                      : ratingRoll < miss + 0.73
+                        ? 3
+                        : 4;
             const li = k === 1 ? Math.round(Math.exp(random() * Math.log(160))) : 0;
             const ivl = r === 1 ? 0.007 : Math.max(1, Math.round(li * (1.4 + random() * 1.8)));
             const entry: DemoEntry = {

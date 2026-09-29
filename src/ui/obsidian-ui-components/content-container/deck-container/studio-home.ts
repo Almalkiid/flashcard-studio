@@ -18,6 +18,8 @@ export interface HomeInsights {
     streak: number;
     /** True retention over the last 30 days, 0 to 1, or null without review answers. */
     retention: number | null;
+    /** The deck remembered least well in the last 30 days, when it is under the target. */
+    focus: { deck: string; retention: number; target: number } | null;
 }
 
 export interface HomeActions {
@@ -123,8 +125,13 @@ export function renderStudioHome(
     insightTile(tiles, "layers", "blue", String(cardsLearned), t("HOME_CARDS_LEARNED"));
     const retentionValue = insightTile(tiles, "bar-chart-2", "green", "–", t("HOME_RETENTION"));
 
+    // Filled in once the history is read, when a deck needs attention
+    const focusSlot = container.createDiv({ cls: "fs-home-focus-slot" });
+
     void actions.loadInsights().then((insights) => {
         showGoal(insights.studiedToday);
+        if (insights.focus !== null)
+            renderFocus(focusSlot, insights.focus, root, reviewSequencer, actions);
         streakValue.setText(String(insights.streak));
         retentionValue.setText(
             insights.retention === null ? "–" : `${Math.round(insights.retention * 100)}%`,
@@ -174,6 +181,47 @@ export function renderStudioHome(
             });
         }
     }
+}
+
+/**
+ * The deck that needs attention most, with a button to study it. Shown only when that deck has cards to study now.
+ */
+function renderFocus(
+    slot: HTMLElement,
+    focus: NonNullable<HomeInsights["focus"]>,
+    root: Deck,
+    reviewSequencer: IFlashcardReviewSequencer,
+    actions: HomeActions,
+): void {
+    const deck = flattenDecks(root.subdecks, 0)
+        .map((item) => item.deck)
+        .find((candidate) => candidate.getTopicPath().path.join("/") === focus.deck);
+    if (deck === undefined) return;
+    const stats = reviewSequencer.getDeckStats(deck.getTopicPath());
+    if (stats.dueCount + stats.newCount === 0) return;
+
+    const card = slot.createDiv({ cls: "fs-card fs-home-focus" });
+    createDeckTile(card, deck.deckName);
+    const text = card.createDiv({ cls: "fs-home-focus-text" });
+    const label = text.createDiv({ cls: "fs-home-focus-label" });
+    setIcon(label.createSpan({ cls: "fs-home-focus-icon" }), "target");
+    label.createSpan({ text: t("HOME_FOCUS") });
+    // The deck with its parent, leaving out a root that holds every deck (the flashcards tag)
+    let path = deck.getTopicPath().path;
+    if (root.subdecks.length === 1 && path.length > 1) path = path.slice(1);
+    text.createDiv({
+        cls: "fs-home-focus-deck",
+        text: path.slice(-2).map(readableDeckName).join(" › "),
+    });
+    text.createDiv({
+        cls: "fs-home-focus-detail",
+        text: t("HOME_FOCUS_DETAIL", {
+            rate: `${Math.round(focus.retention * 100)}%`,
+            target: `${Math.round(focus.target * 100)}%`,
+        }),
+    });
+    const study = card.createEl("button", { cls: "fs-home-study", text: t("HOME_STUDY") });
+    study.addEventListener("click", () => actions.startReviewOfDeck(deck));
 }
 
 function insightTile(
