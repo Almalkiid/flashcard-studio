@@ -7,6 +7,7 @@ import { NoteParser } from "src/note/note-parser";
 import { TextDirection } from "src/utils/strings";
 
 import { UnitTestSRFile } from "./helpers/unit-test-file";
+import { stripCardIds } from "./helpers/unit-test-helper";
 import { unitTestSetupStandardDataStoreAlgorithm } from "./helpers/unit-test-setup";
 
 const parser: NoteParser = new NoteParser(DEFAULT_SETTINGS);
@@ -77,6 +78,6 @@ Q1::A1
 Q3:::A3
 <!--SR:!2023-09-02,4,270!2023-09-02,5,270-->
 `;
-        expect(updatedText).toEqual(expectedText);
+        expect(stripCardIds(updatedText)).toEqual(expectedText);
     });
 });

@@ -1,3 +1,4 @@
+import { CardMeta, emptyCardMeta } from "src/data/card-meta";
 import { Question } from "src/data/data-structures/card/questions/question";
 import {
     RepetitionItem,
@@ -8,6 +9,7 @@ import {
 export class Card extends RepetitionItem {
     question: Question;
     cardIdx: number;
+    meta: CardMeta = emptyCardMeta();
 
     // visuals
     front: string = "";

@@ -156,3 +156,11 @@ export function unitTestCheckNoteFrontmatter(
     expect(frontmatter.get("sr-interval")).toEqual(expectedInterval + "");
     expect(frontmatter.get("sr-ease")).toEqual(expectedEase + "");
 }
+
+/**
+ * Removes the stable card ids (`,id=xxxxxx`) that Cardwright appends to schedule segments, so that tests
+ * written against upstream's exact comment text keep checking everything else. Ids have dedicated tests.
+ */
+export function stripCardIds(text: string): string {
+    return text.replace(/,id=[0-9a-z]{6}/g, "");
+}

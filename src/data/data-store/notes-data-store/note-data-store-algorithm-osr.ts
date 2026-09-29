@@ -1,3 +1,4 @@
+import { formatMetaTokens, generateCardId, hasPersistentMeta } from "src/data/card-meta";
 import { SR_HTML_COMMENT_BEGIN, SR_HTML_COMMENT_END } from "src/data/constants";
 import { IDataStoreAlgorithm } from "src/data/data-store/base/idata-store-algorithm";
 import { Card } from "src/data/data-structures/card/card";
@@ -43,16 +44,20 @@ export class NoteDataStoreAlgorithmOsr implements IDataStoreAlgorithm {
      */
     formatCardSchedule(card: Card) {
         if (card.hasSchedule && card.scheduleInfo) {
-            return card.scheduleInfo.formatScheduleAsSRHtmlComment();
+            if (!card.meta.id) card.meta.id = generateCardId();
+            return card.scheduleInfo.formatScheduleAsSRHtmlComment() + formatMetaTokens(card.meta);
         }
+
+        // An unreviewed card only gets an id once it has metadata to store (e.g. it was suspended)
+        if (hasPersistentMeta(card.meta) && !card.meta.id) card.meta.id = generateCardId();
 
         // A placeholder keeps the schedule indexes of an unreviewed sibling aligned. Under FSRS
         // it is written in the FSRS format, so that a comment can't be misread as holding real
         // SM-2 values. Legacy SM-2 placeholders still parse as an empty slot.
         if (this.settings.algorithm === SRAlgorithmType.FSRS) {
-            return FSRS_EMPTY_SCHEDULE_COMMENT;
+            return FSRS_EMPTY_SCHEDULE_COMMENT + formatMetaTokens(card.meta);
         }
 
-        return `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}`;
+        return `!${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${this.settings.baseEase}${formatMetaTokens(card.meta)}`;
     }
 }

@@ -8,7 +8,7 @@ import { NoteDueDateHistogram } from "src/scheduling/due-date-histogram";
 import { formatDateYYYYMMDD, setupStaticDateProvider20230906 } from "src/utils/dates";
 
 import { UnitTestOsrCore } from "../helpers/unit-test-core";
-import { unitTestCheckNoteFrontmatter } from "../helpers/unit-test-helper";
+import { stripCardIds, unitTestCheckNoteFrontmatter } from "../helpers/unit-test-helper";
 import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
 
 function checkDeckTreeCounts(
@@ -263,7 +263,9 @@ describe("Notes", () => {
                 The final schedule info "!2033-03-03,3,333" has been deleted
              */
             const file = osrCore.getFileByNoteName("A");
-            expect(file.content).toContain("<!--SR:!2024-05-22,1,230!2024-05-25,4,270-->");
+            expect(stripCardIds(file.content)).toContain(
+                "<!--SR:!2024-05-22,1,230!2024-05-25,4,270-->",
+            );
         });
     });
 });

@@ -1,5 +1,6 @@
 import { TagCache } from "obsidian";
 
+import { CardMeta, emptyCardMeta, parseCommentMeta } from "src/data/card-meta";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { RepItemStorageInfo } from "src/data/data-store/base/rep-item-storage-info";
 import { Card } from "src/data/data-structures/card/card";
@@ -135,15 +136,23 @@ export class NoteQuestionParser {
                     new RepItemStorageInfo(this.noteFile.path, question.questionText.textHash),
                 );
 
+            // Per-card metadata (id, suspended, buried, flag, leech) lives in the same comment, aligned by index
+            let cardMetaList: CardMeta[] = parseCommentMeta(question.questionText.original);
+
             // we have some extra scheduling dates to delete
             const correctLength = cardFrontBackList.length;
             if (cardScheduleInfoList.length > correctLength) {
                 question.hasChanged = true;
                 cardScheduleInfoList = cardScheduleInfoList.slice(0, correctLength);
             }
+            cardMetaList = cardMetaList.slice(0, correctLength);
 
             // Create the list of card objects, and attach to the question
-            const cardList: Card[] = this.createCardList(cardFrontBackList, cardScheduleInfoList);
+            const cardList: Card[] = this.createCardList(
+                cardFrontBackList,
+                cardScheduleInfoList,
+                cardMetaList,
+            );
             question.setCardList(cardList);
             result.push(question);
         }
@@ -185,6 +194,7 @@ export class NoteQuestionParser {
     private createCardList(
         cardFrontBackList: CardFrontBack[],
         cardScheduleInfoList: RepItemScheduleInfo[],
+        cardMetaList: CardMeta[],
     ): Card[] {
         const siblings: Card[] = [];
 
@@ -202,6 +212,7 @@ export class NoteQuestionParser {
             });
 
             cardObj.scheduleInfo = hasScheduleInfo ? schedule : null;
+            cardObj.meta = cardMetaList[i] ?? emptyCardMeta();
 
             siblings.push(cardObj);
         }

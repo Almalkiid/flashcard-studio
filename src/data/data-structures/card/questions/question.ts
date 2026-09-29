@@ -1,3 +1,4 @@
+import { hasPersistentMeta } from "src/data/card-meta";
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
@@ -231,7 +232,9 @@ export class Question {
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatTopicAndQuestion();
         const blockId: string = this.questionText.obsidianBlockId;
-        const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
+        const hasSchedule: boolean = this.cards.some(
+            (card) => card.hasSchedule || hasPersistentMeta(card.meta),
+        );
         if (hasSchedule) {
             result = result.trimEnd();
 

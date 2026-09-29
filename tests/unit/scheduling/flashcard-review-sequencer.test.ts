@@ -29,6 +29,7 @@ import {
 import { setupNextRandomNumber, setupStaticRandomNumberProvider } from "src/utils/numbers";
 
 import { UnitTestSRFile } from "../helpers/unit-test-file";
+import { stripCardIds } from "../helpers/unit-test-helper";
 import { unitTestSetupStandardDataStoreAlgorithm } from "../helpers/unit-test-setup";
 import { SampleItemDecks } from "../sample-items";
 
@@ -209,7 +210,7 @@ async function checkReviewResponseReviewMode(
         info.cardQ2PreReviewText,
         info.cardQ2PostReviewText,
     );
-    expect(await c.file.read()).toEqual(expectedText);
+    expect(stripCardIds(await c.file.read())).toEqual(expectedText);
 }
 
 async function checkReviewResponseCramMode(reviewResponse: ReviewResponse): Promise<TestContext> {
@@ -248,7 +249,7 @@ async function checkReviewResponseCramMode(reviewResponse: ReviewResponse): Prom
 
     // Note text remains the same
     const expectedText: string = c.originalText;
-    expect(await c.file.read()).toEqual(expectedText);
+    expect(stripCardIds(await c.file.read())).toEqual(expectedText);
 
     return c;
 }
@@ -512,7 +513,7 @@ describe("processReview", () => {
                 await c.reviewSequencer.processReview(ReviewResponse.Reset);
 
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
-                expect(await c.file.read()).toEqual(originalFileText);
+                expect(stripCardIds(await c.file.read())).toEqual(originalFileText);
                 checkQuestionPostponementListCount(c, 1);
 
                 c.reviewSequencer.skipCurrentCard();
@@ -704,7 +705,7 @@ Q1::A1
                 await c.reviewSequencer.processReview(ReviewResponse.Hard);
                 text = c.file.content;
                 let expectedCard1Review: string = "2023-09-07,1,230";
-                expect(text).toContain(
+                expect(stripCardIds(text)).toContain(
                     `<!--SR:!${expectedCard1Review}!2000-01-01,1,250!2000-01-01,1,250-->`,
                 );
                 checkQuestionPostponementListCount(c, 1);
@@ -724,7 +725,7 @@ Q1::A1
                 await c.reviewSequencer.processReview(ReviewResponse.Good);
                 text = c.file.content;
                 expectedCard1Review = "2023-09-09,2,230";
-                expect(text).toContain(
+                expect(stripCardIds(text)).toContain(
                     `<!--SR:!${expectedCard1Review}!2000-01-01,1,250!2000-01-01,1,250-->`,
                 );
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
@@ -740,7 +741,7 @@ Q1::A1
                 text = c.file.content;
                 expectedCard1Review = "2023-09-09,2,230";
                 const expectedCard2Review: string = "2023-09-12,4,270";
-                expect(text).toContain(
+                expect(stripCardIds(text)).toContain(
                     `<!--SR:!${expectedCard1Review}!${expectedCard2Review}!2000-01-01,1,250-->`,
                 );
                 expect(c.reviewSequencer.currentCard.front).toEqual("Q1");
@@ -1107,7 +1108,7 @@ $$\\huge F_g=\\frac {G m_1 m_2}{d^2}$$`;
 <!--SR:!2023-09-10,4,270-->`;
 
             const actual: string = await c.file.read();
-            expect(actual).toEqual(expectedFileText);
+            expect(stripCardIds(actual)).toEqual(expectedFileText);
         });
     });
 
@@ -1137,7 +1138,7 @@ ${indent}- bar?::baz
             // After reviewing, check the text (explicitly text includes the whitespace before "- bar?::baz"at)
             await c.reviewSequencer.processReview(ReviewResponse.Easy);
             const expectedText: string = `${text}<!--SR:!2023-09-10,4,270-->\n`;
-            expect(await c.file.read()).toEqual(expectedText);
+            expect(stripCardIds(await c.file.read())).toEqual(expectedText);
         });
     });
 
@@ -1567,7 +1568,7 @@ ${updatedStr}
 
 #flashcards Q3::A3`;
 
-        expect(await c.file.read()).toEqual(expectedText);
+        expect(stripCardIds(await c.file.read())).toEqual(expectedText);
     });
 });
 
@@ -1603,7 +1604,7 @@ async function checkupdateCurrentQuestionTextAndCards(
         console.warn(`Text not found: ${originalStr}`);
     }
     const expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
-    expect(await c.file.read()).toEqual(expectedFileText);
+    expect(stripCardIds(await c.file.read())).toEqual(expectedFileText);
     return c;
 }
 
@@ -1632,6 +1633,6 @@ async function checkupdateClozeCurrentQuestionTextAndCards(
         console.warn(`Text not found: ${originalStr}`);
     }
     const expectedFileText: string = c.originalText.replace(originalStr, updatedStr);
-    expect(await c.file.read()).toEqual(expectedFileText);
+    expect(stripCardIds(await c.file.read())).toEqual(expectedFileText);
     return c;
 }

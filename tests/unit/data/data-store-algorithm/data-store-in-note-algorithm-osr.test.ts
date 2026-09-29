@@ -27,7 +27,8 @@ describe("formatCardSchedule", () => {
         const card: Card = new Card({
             scheduleInfo,
         });
-        expect(instance.formatCardSchedule(card)).toEqual("!2023-10-06,25,263");
+        expect(instance.formatCardSchedule(card)).toEqual(`!2023-10-06,25,263,id=${card.meta.id}`);
+        expect(card.meta.id).toMatch(/^[0-9a-z]{6}$/);
     });
 
     test("Has schedule, but no due date", () => {
@@ -43,7 +44,7 @@ describe("formatCardSchedule", () => {
         const card: Card = new Card({
             scheduleInfo,
         });
-        expect(instance.formatCardSchedule(card)).toEqual("!2000-01-01,25,303");
+        expect(instance.formatCardSchedule(card)).toEqual(`!2000-01-01,25,303,id=${card.meta.id}`);
     });
 
     test("Formats FSRS schedules", () => {
@@ -66,7 +67,7 @@ describe("formatCardSchedule", () => {
         });
 
         expect(instance.formatCardSchedule(card)).toEqual(
-            "!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z",
+            `!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z,id=${card.meta.id}`,
         );
     });
 
