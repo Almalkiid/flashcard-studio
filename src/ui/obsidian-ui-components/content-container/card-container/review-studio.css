@@ -159,19 +159,19 @@
     }
 
     & .sr-session-answer-again {
-        background-color: var(--fs-red);
+        background-color: var(--fs-again);
     }
 
     & .sr-session-answer-hard {
-        background-color: var(--fs-orange);
+        background-color: var(--fs-hard);
     }
 
     & .sr-session-answer-good {
-        background-color: var(--fs-blue);
+        background-color: var(--fs-good);
     }
 
     & .sr-session-answer-easy {
-        background-color: var(--fs-green);
+        background-color: var(--fs-easy);
     }
 
     /* MARK: Card */
@@ -437,23 +437,23 @@
     }
 
     & .sr-response .sr-again-button {
-        --fs-rating: var(--fs-red);
-        --fs-rating-soft: var(--fs-red-soft);
+        --fs-rating: var(--fs-again);
+        --fs-rating-soft: var(--fs-again-soft);
     }
 
     & .sr-response .sr-hard-button {
-        --fs-rating: var(--fs-orange);
-        --fs-rating-soft: var(--fs-orange-soft);
+        --fs-rating: var(--fs-hard);
+        --fs-rating-soft: var(--fs-hard-soft);
     }
 
     & .sr-response .sr-good-button {
-        --fs-rating: var(--fs-blue);
-        --fs-rating-soft: var(--fs-blue-soft);
+        --fs-rating: var(--fs-good);
+        --fs-rating-soft: var(--fs-good-soft);
     }
 
     & .sr-response .sr-easy-button {
-        --fs-rating: var(--fs-green);
-        --fs-rating-soft: var(--fs-green-soft);
+        --fs-rating: var(--fs-easy);
+        --fs-rating-soft: var(--fs-easy-soft);
     }
 
     /* The Studio look uses its own icon, label and interval */

@@ -303,23 +303,23 @@
 }
 
 .fs-studio .sr-card-info-rating-pill.sr-rating-1 {
-    background-color: var(--fs-red-soft);
-    color: var(--fs-red);
+    background-color: var(--fs-again-soft);
+    color: var(--fs-again);
 }
 
 .fs-studio .sr-card-info-rating-pill.sr-rating-2 {
-    background-color: var(--fs-orange-soft);
-    color: var(--fs-orange);
+    background-color: var(--fs-hard-soft);
+    color: var(--fs-hard);
 }
 
 .fs-studio .sr-card-info-rating-pill.sr-rating-3 {
-    background-color: var(--fs-green-soft);
-    color: var(--fs-green);
+    background-color: var(--fs-good-soft);
+    color: var(--fs-good);
 }
 
 .fs-studio .sr-card-info-rating-pill.sr-rating-4 {
-    background-color: var(--fs-blue-soft);
-    color: var(--fs-blue);
+    background-color: var(--fs-easy-soft);
+    color: var(--fs-easy);
 }
 
 .is-phone .sr-card-info-table th,

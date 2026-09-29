@@ -34,10 +34,10 @@
     --sr-stats-c-count-suspended: var(--fs-text-3);
     --sr-stats-c-count-buried: color-mix(in srgb, var(--fs-teal) 72%, var(--fs-surface));
 
-    --sr-stats-c-again: var(--fs-red);
-    --sr-stats-c-hard: var(--fs-orange);
-    --sr-stats-c-good: var(--fs-green);
-    --sr-stats-c-easy: var(--fs-blue);
+    --sr-stats-c-again: var(--fs-again);
+    --sr-stats-c-hard: var(--fs-hard);
+    --sr-stats-c-good: var(--fs-good);
+    --sr-stats-c-easy: var(--fs-easy);
 
     --sr-stats-heat-0: var(--fs-surface-2);
     --sr-stats-heat-1: color-mix(in srgb, var(--fs-accent) 22%, var(--fs-surface));

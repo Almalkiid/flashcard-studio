@@ -24,6 +24,14 @@
   --fs-teal-soft: #e2f5f2;
   --fs-amber: #d97706;
   --fs-amber-soft: #fdf3dc;
+  --fs-again: var(--fs-red);
+  --fs-again-soft: var(--fs-red-soft);
+  --fs-hard: var(--fs-orange);
+  --fs-hard-soft: var(--fs-orange-soft);
+  --fs-good: var(--fs-blue);
+  --fs-good-soft: var(--fs-blue-soft);
+  --fs-easy: var(--fs-green);
+  --fs-easy-soft: var(--fs-green-soft);
   --fs-radius-xl: 24px;
   --fs-radius-lg: 20px;
   --fs-radius-md: 14px;
@@ -684,16 +692,16 @@ body.sr-reduced-bottom-fade-mask {
     border-radius: 0;
   }
   .sr-session-answer-again {
-    background-color: var(--fs-red);
+    background-color: var(--fs-again);
   }
   .sr-session-answer-hard {
-    background-color: var(--fs-orange);
+    background-color: var(--fs-hard);
   }
   .sr-session-answer-good {
-    background-color: var(--fs-blue);
+    background-color: var(--fs-good);
   }
   .sr-session-answer-easy {
-    background-color: var(--fs-green);
+    background-color: var(--fs-easy);
   }
   .sr-scroll-wrapper {
     position: relative;
@@ -910,20 +918,20 @@ body.sr-reduced-bottom-fade-mask {
     }
   }
   .sr-response .sr-again-button {
-    --fs-rating: var(--fs-red);
-    --fs-rating-soft: var(--fs-red-soft);
+    --fs-rating: var(--fs-again);
+    --fs-rating-soft: var(--fs-again-soft);
   }
   .sr-response .sr-hard-button {
-    --fs-rating: var(--fs-orange);
-    --fs-rating-soft: var(--fs-orange-soft);
+    --fs-rating: var(--fs-hard);
+    --fs-rating-soft: var(--fs-hard-soft);
   }
   .sr-response .sr-good-button {
-    --fs-rating: var(--fs-blue);
-    --fs-rating-soft: var(--fs-blue-soft);
+    --fs-rating: var(--fs-good);
+    --fs-rating-soft: var(--fs-good-soft);
   }
   .sr-response .sr-easy-button {
-    --fs-rating: var(--fs-green);
-    --fs-rating-soft: var(--fs-green-soft);
+    --fs-rating: var(--fs-easy);
+    --fs-rating-soft: var(--fs-easy-soft);
   }
   .sr-response-button > span.sr-small-text,
   .sr-response-button > span.sr-large-text {
@@ -2328,20 +2336,20 @@ body:not(.is-mobile)
   font-weight: 650;
 }
 .fs-studio .sr-card-info-rating-pill.sr-rating-1 {
-  background-color: var(--fs-red-soft);
-  color: var(--fs-red);
+  background-color: var(--fs-again-soft);
+  color: var(--fs-again);
 }
 .fs-studio .sr-card-info-rating-pill.sr-rating-2 {
-  background-color: var(--fs-orange-soft);
-  color: var(--fs-orange);
+  background-color: var(--fs-hard-soft);
+  color: var(--fs-hard);
 }
 .fs-studio .sr-card-info-rating-pill.sr-rating-3 {
-  background-color: var(--fs-green-soft);
-  color: var(--fs-green);
+  background-color: var(--fs-good-soft);
+  color: var(--fs-good);
 }
 .fs-studio .sr-card-info-rating-pill.sr-rating-4 {
-  background-color: var(--fs-blue-soft);
-  color: var(--fs-blue);
+  background-color: var(--fs-easy-soft);
+  color: var(--fs-easy);
 }
 .is-phone .sr-card-info-table th,
 .is-phone .sr-card-info-table td {
@@ -2974,10 +2982,10 @@ th.gridjs-th:last-child {
     var(--fs-teal) 72%,
     var(--fs-surface)
   );
-  --sr-stats-c-again: var(--fs-red);
-  --sr-stats-c-hard: var(--fs-orange);
-  --sr-stats-c-good: var(--fs-green);
-  --sr-stats-c-easy: var(--fs-blue);
+  --sr-stats-c-again: var(--fs-again);
+  --sr-stats-c-hard: var(--fs-hard);
+  --sr-stats-c-good: var(--fs-good);
+  --sr-stats-c-easy: var(--fs-easy);
   --sr-stats-heat-0: var(--fs-surface-2);
   --sr-stats-heat-1: color-mix(
     in srgb,
