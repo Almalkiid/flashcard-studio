@@ -447,6 +447,20 @@ export class CommandManager {
         });
 
         this.plugin.addCommand({
+            id: "srs-suspend-current-card",
+            name: t("SUSPEND_CARD"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => this.runCardAction(checking, "suspend"),
+        });
+
+        this.plugin.addCommand({
+            id: "srs-bury-current-card",
+            name: t("BURY_CARD"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => this.runCardAction(checking, "bury"),
+        });
+
+        this.plugin.addCommand({
             id: "srs-unsuspend-cards-in-note",
             name: t("UNSUSPEND_NOTE_CARDS"),
             repeatable: false,
@@ -489,6 +503,25 @@ export class CommandManager {
                 new Notice(doneMessage);
                 await this.plugin.dataManager.sync();
             });
+        }
+        return true;
+    }
+
+    /**
+     * Runs a card action on the card being reviewed, for the command palette, hotkeys and mobile toolbar buttons.
+     */
+    private runCardAction(checking: boolean, action: "suspend" | "bury"): boolean {
+        const contentManager = this.uiManager.contentManager;
+        const reviewing =
+            this.plugin.isInitialized &&
+            contentManager !== null &&
+            (this.uiManager.uiState === UIState.CardFront ||
+                this.uiManager.uiState === UIState.CardBack);
+        if (!reviewing) return false;
+
+        if (!checking) {
+            const actions = contentManager.cardActions;
+            void (action === "suspend" ? actions.suspend() : actions.bury());
         }
         return true;
     }

@@ -96,6 +96,7 @@ export default class ContentManager {
     private undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
     // When the current card was shown, to record how long the answer took
     private cardShownAt: number = 0;
+    public readonly cardActions: CardActions = this._createCardActions();
 
     constructor(
         app: App,
@@ -134,7 +135,7 @@ export default class ContentManager {
             () => void this._showAnswer(),
             this._jumpToCurrentCard.bind(this),
             this._displayCurrentCardInfoNotice.bind(this),
-            this._createCardActions(),
+            this.cardActions,
             closeModal,
         );
     }
