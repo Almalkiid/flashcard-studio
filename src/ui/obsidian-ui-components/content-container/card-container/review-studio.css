@@ -589,7 +589,7 @@
             inset 0 1px 0 rgb(255 255 255 / 4%);
     }
 
-    & .sr-response-button > span.sr-button-label {
+    & .sr-response-button:not(.sr-show-answer-button) > span.sr-button-label {
         color: color-mix(in srgb, var(--fs-rating) 80%, white);
     }
 }

@@ -1,24 +1,49 @@
 # Flashcard Studio
 
-**Flashcards that live in your notes, with the scheduling and control you know from Anki.**
+**Flashcards that live in your notes, with the scheduling and control you know from Anki, and a study screen made for focus.**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/hero-dark.png">
+  <img alt="Flashcard Studio on a phone: the home screen with the daily goal and a focus deck, a question, a session in progress with its answer-coloured progress bar, and the statistics" src="docs/media/hero-light.png">
+</picture>
 
 Flashcard Studio turns the Markdown you already write into spaced repetition flashcards, and schedules them with [FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm), the modern algorithm Anki uses. It keeps a full review history, so you can undo an answer and see how your memory is doing. Every card and every review stays in plain files in your vault, and it works the same on desktop and on your phone.
 
 > Flashcard Studio is a fork of [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) by Stephen Mwangi, maintained by Kyle Klus. It keeps that plugin's card syntax and schedule format, so your existing cards work unchanged, and you can switch back at any time. See [Credits](#credits).
 
-## Why Flashcard Studio
+## Highlights
 
-|                                       | Spaced Repetition | Flashcard Studio |
-| ------------------------------------- | ----------------- | ---------------- |
-| Cards written in plain Markdown       | ✓                 | ✓                |
-| FSRS scheduling                       | ✓                 | ✓                |
-| Review history of every answer        |                   | ✓                |
-| Undo last answer                      |                   | ✓                |
-| Daily new card and review limits      |                   | ✓                |
-| Suspend, bury and flag cards          |                   | ✓                |
-| Leech detection                       |                   | ✓                |
-| Sync without conflicts across devices |                   | ✓                |
-| Works on iPhone, iPad and Android     | ✓                 | ✓                |
+- **A study screen made for focus.** One card at a time, with the deck and "4 / 17" at the top and a progress bar that fills with the colour of each answer you give. Tap to reveal, then answer with soft tiles that show when you will see the card again.
+- **Know where you are weak.** The statistics rank your decks by how well you remembered them in the last 30 days, against your target, and the home screen puts the weakest one first with one tap to study it.
+- **Fix mistakes while they are fresh.** At the end of a session, **Review mistakes** goes over exactly the cards you missed.
+- **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
+- **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
+- **Bring your Anki decks.** Import `.apkg` and text files with their media and decks, and export back to Anki.
+- **Your data stays yours.** Cards and schedules are plain text in your notes, and the review history is plain files that sync between devices without conflicts.
+- **Light and dark, desktop and phone.**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/statistics-desktop.png">
+  <img alt="The statistics on the desktop: reviews today, retention, day streak and study time, and the reviews per day" src="docs/media/screenshots/statistics-desktop-light.png">
+</picture>
+
+## Compared with Spaced Repetition
+
+|                                                      | Spaced Repetition | Flashcard Studio |
+| ---------------------------------------------------- | ----------------- | ---------------- |
+| Cards written in plain Markdown                      | ✓                 | ✓                |
+| FSRS scheduling                                      | ✓                 | ✓                |
+| Works on iPhone, iPad and Android                    | ✓                 | ✓                |
+| Review history of every answer                       |                   | ✓                |
+| Undo last answer                                     |                   | ✓                |
+| Daily new card and review limits                     |                   | ✓                |
+| Suspend, bury and flag cards; leech detection        |                   | ✓                |
+| FSRS learning steps, learn ahead limit and optimizer |                   | ✓                |
+| Custom study (forgotten, ahead, preview, by deck)    |                   | ✓                |
+| Heatmap, true retention, study time and weak areas   |                   | ✓                |
+| Review mistakes after a session                      |                   | ✓                |
+| Import from and export to Anki                       |                   | ✓                |
+| Sync without conflicts across devices                |                   | ✓                |
 
 ## Writing cards
 

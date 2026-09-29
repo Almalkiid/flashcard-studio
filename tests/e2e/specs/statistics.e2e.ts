@@ -610,6 +610,17 @@ describe("statistics and insight", function () {
         expect(await focus.$(".fs-home-focus-deck").getText()).toEqual("Cia › Part2");
         await browser.pause(300);
         await screenshot("home-focus");
+        if (TAKE_SCREENSHOTS) {
+            const setBodyTheme = (light: boolean) =>
+                browser.execute((useLight: boolean) => {
+                    document.body.classList.toggle("theme-light", useLight);
+                    document.body.classList.toggle("theme-dark", !useLight);
+                }, light);
+            await setBodyTheme(true);
+            await browser.pause(300);
+            await screenshot("home-focus-light");
+            await setBodyTheme(false);
+        }
         await browser.$(".sr-view .fs-home-deck.is-clickable").waitForClickable({
             timeoutMsg: "the deck list was not shown",
         });

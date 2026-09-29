@@ -57,6 +57,10 @@ async function setTheme(light: boolean): Promise<void> {
 async function screenshot(name: string): Promise<void> {
     if (!takeScreenshots) return;
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    // Obsidian's notices (such as "Created a sample deck") would cover the top of the screen
+    await browser.execute(() => {
+        document.querySelectorAll(".notice").forEach((notice) => notice.remove());
+    });
     await browser.saveScreenshot(
         path.join(SCREENSHOT_DIR, `${name}-${(await isMobile()) ? "mobile" : "desktop"}.png`),
     );

@@ -1046,7 +1046,7 @@ body.sr-reduced-bottom-fade-mask {
       inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 22%, transparent),
       inset 0 1px #ffffff0a;
   }
-  .sr-response-button > span.sr-button-label {
+  .sr-response-button:not(.sr-show-answer-button) > span.sr-button-label {
     color: color-mix(in srgb, var(--fs-rating) 80%, white);
   }
 }
