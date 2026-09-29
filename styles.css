@@ -130,8 +130,21 @@
     var(--safe-area-inset-bottom)
   ) !important;
 }
+.sr-tab-view-content {
+  width: var(--sr-view-width);
+  max-width: var(--sr-view-width);
+  height: var(--sr-view-height);
+  max-height: var(--sr-view-height);
+}
 .sr-tab-view-content.sr-center-view {
   margin: auto;
+}
+body.sr-reduced-bottom-fade-mask {
+  --view-bottom-fade-mask: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5) 0%,
+    #000000 calc(16px - 0px)
+  );
 }
 
 /* src/ui/obsidian-ui-components/content-container/card-container/card-container.css */
@@ -163,6 +176,15 @@
   }
   & .sr-content .cloze-input {
     height: 1.4rem;
+  }
+  & .sr-content .cloze-answer-correct,
+  & .sr-content .cloze-answer-wrong {
+    color: green;
+    text-decoration: none;
+  }
+  & .sr-content .cloze-answer-incorrect {
+    color: red;
+    text-decoration: line-through;
   }
 }
 @media only screen and (orientation: landscape) {
@@ -664,6 +686,12 @@ body:not(.is-mobile)
   max-width: 100%;
   max-height: 100%;
 }
+#sr-modal-view.sr-modal-rounded {
+  border-radius: var(--modal-radius);
+}
+#sr-modal-view.sr-modal-square {
+  border-radius: 0;
+}
 #sr-modal-view .sr-modal-content {
   overflow: visible;
   padding: 0;
@@ -791,6 +819,12 @@ body:not(.is-phone) .sr-settings-page-content {
   height: 100%;
   width: 100%;
   position: relative;
+}
+.sr-chart-summary-center {
+  text-align: center;
+}
+.sr-chart-summary-right {
+  text-align: right;
 }
 .gridjs *,
 .gridjs :after,

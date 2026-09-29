@@ -1,4 +1,4 @@
-import moment, { Moment } from "moment";
+import type { Moment } from "moment";
 
 import { Question } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
@@ -11,7 +11,7 @@ import { osrSchedule } from "src/scheduling/algorithms/osr/note-scheduling";
 import { NoteLinkStat, OsrNoteGraph } from "src/scheduling/algorithms/osr/osr-note-graph";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
-import { globalDateProvider } from "src/utils/dates";
+import { globalDateProvider, moment } from "src/utils/dates";
 
 /**
  * Represents a scheduling algorithm that uses the OSR algorithm.

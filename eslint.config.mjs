@@ -1,5 +1,5 @@
 import eslint from "@eslint/js";
-// import obsidianmd from "eslint-plugin-obsidianmd";
+import obsidianmd from "eslint-plugin-obsidianmd";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
@@ -8,7 +8,7 @@ export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
-    // ...obsidianmd.configs.recommended, // TODO: Enable this once we have a proper code base
+    ...obsidianmd.configs.recommended,
     {
         languageOptions: {
             parserOptions: {
@@ -16,59 +16,18 @@ export default tseslint.config(
             },
         },
     },
-    // TODO: Remove the conversion to warnings once we have a proper code base
     {
         rules: {
-            "no-var": "error",
-            "prefer-const": "error",
-            "prefer-rest-params": "warn",
-            "prefer-spread": "warn",
-            "@typescript-eslint/await-thenable": "warn",
-            "@typescript-eslint/ban-ts-comment": "warn",
-            "@typescript-eslint/no-array-constructor": "warn",
-            "@typescript-eslint/no-array-delete": "warn",
-            "@typescript-eslint/no-base-to-string": "warn",
-            "@typescript-eslint/no-duplicate-enum-values": "warn",
-            "@typescript-eslint/no-duplicate-type-constituents": "warn",
-            "@typescript-eslint/no-empty-object-type": "warn",
-            "@typescript-eslint/no-explicit-any": "warn",
-            "@typescript-eslint/no-extra-non-null-assertion": "warn",
-            "@typescript-eslint/no-floating-promises": "warn",
-            "@typescript-eslint/no-for-in-array": "warn",
-            "no-implied-eval": "error",
-            "@typescript-eslint/no-implied-eval": "warn",
-            "@typescript-eslint/no-misused-new": "warn",
-            "@typescript-eslint/no-misused-promises": "warn",
-            "@typescript-eslint/no-namespace": "warn",
-            "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
-            "@typescript-eslint/no-redundant-type-constituents": "warn",
-            "@typescript-eslint/no-require-imports": "error",
-            "@typescript-eslint/no-this-alias": "error",
-            "@typescript-eslint/no-unnecessary-type-assertion": "warn",
-            "@typescript-eslint/no-unnecessary-type-constraint": "warn",
-            "@typescript-eslint/no-unsafe-argument": "warn",
-            "@typescript-eslint/no-unsafe-assignment": "warn",
-            "@typescript-eslint/no-unsafe-call": "warn",
-            "@typescript-eslint/no-unsafe-declaration-merging": "warn",
-            "@typescript-eslint/no-unsafe-enum-comparison": "warn",
-            "@typescript-eslint/no-unsafe-function-type": "warn",
-            "@typescript-eslint/no-unsafe-member-access": "warn",
-            "@typescript-eslint/no-unsafe-return": "warn",
-            "@typescript-eslint/no-unsafe-unary-minus": "warn",
-            "no-unused-expressions": "warn",
-            "@typescript-eslint/no-unused-expressions": "warn",
-            "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": "warn",
-            "@typescript-eslint/no-wrapper-object-types": "warn",
-            "@typescript-eslint/only-throw-error": "warn",
-            "@typescript-eslint/prefer-as-const": "warn",
-            "@typescript-eslint/prefer-namespace-keyword": "warn",
-            "@typescript-eslint/prefer-promise-reject-errors": "warn",
-            "@typescript-eslint/require-await": "warn",
-            "@typescript-eslint/restrict-plus-operands": "warn",
-            "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/triple-slash-reference": "warn",
-            "@typescript-eslint/unbound-method": "warn",
+            "obsidianmd/ui/sentence-case": [
+                "warn",
+                {
+                    enforceCamelCaseLower: true,
+                    // FSRS and OSR are scheduling algorithm acronyms; "Repetition" is part of the plugin name
+                    ignoreWords: ["FSRS", "OSR", "Repetition"],
+                    // ignoreWords does not apply to the first word of a string
+                    ignoreRegex: ["^FSRS "],
+                },
+            ],
         },
     },
     {
@@ -80,7 +39,10 @@ export default tseslint.config(
             "linebreak-style": 0,
             quotes: ["warn", "double", "avoid-escape"],
             semi: ["error", "always"],
-            camelcase: ["error"],
+            camelcase: [
+                "error",
+                { allow: ["PrevDeckComplete_Sequential", "PrevDeckComplete_Random"] },
+            ],
             "@typescript-eslint/no-unused-vars": [
                 "error",
                 {
@@ -149,6 +111,13 @@ export default tseslint.config(
         files: ["tests/**"],
         rules: {
             "@typescript-eslint/no-require-imports": "off",
+            // Tests are not shipped with the plugin (the community directory scan ignores them)
+            "no-undef": "off",
+            "eslint-comments/require-description": "off",
+            "eslint-comments/disable-enable-pair": "off",
+            "obsidianmd/rule-custom-message": "off",
+            "obsidianmd/no-nodejs-modules": "off",
+            "obsidianmd/hardcoded-config-path": "off",
         },
     },
 );

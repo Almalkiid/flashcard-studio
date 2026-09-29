@@ -215,8 +215,8 @@ export class DataManager {
         await this.loadVault();
 
         if (this.settingsManager.settings.showSchedulingDebugMessages) {
-            console.log(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
-            console.log(
+            console.debug(`SR: ${t("DECKS")}`, this.osrCore.reviewableDeckTree);
+            console.debug(
                 "SR: " +
                     t("SYNC_TIME_TAKEN", {
                         t: Date.now() - now.valueOf(),

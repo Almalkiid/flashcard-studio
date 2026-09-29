@@ -19,6 +19,14 @@
     position: relative;
 }
 
+.sr-chart-summary-center {
+    text-align: center;
+}
+
+.sr-chart-summary-right {
+    text-align: right;
+}
+
 /* MARK: gridjs -> NoteStatsComponent */
 
 .gridjs *,

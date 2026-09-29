@@ -1,3 +1,5 @@
+import type { Moment } from "moment";
+
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import {
@@ -35,7 +37,7 @@ export class CommentParser {
                 lastReviewStr,
             ] = fields;
 
-            const parsedDueDate: moment.Moment | null = parseFsrsTimestamp(dueDateStr);
+            const parsedDueDate: Moment | null = parseFsrsTimestamp(dueDateStr);
 
             if (!parsedDueDate) {
                 return null;
@@ -63,7 +65,7 @@ export class CommentParser {
         interval: number,
         ease: number,
     ): RepItemScheduleInfo | null {
-        const dueDate: moment.Moment = DateUtil.dateStrToMoment(dueDateStr);
+        const dueDate: Moment = DateUtil.dateStrToMoment(dueDateStr);
         if (
             dueDate === null ||
             dueDate.format(PREFERRED_DATE_FORMAT) === RepItemScheduleInfoOsr.dummyDueDateForNewCard

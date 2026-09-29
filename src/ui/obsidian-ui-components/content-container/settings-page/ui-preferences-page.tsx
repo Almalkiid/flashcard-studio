@@ -172,7 +172,6 @@ export class UIPreferencesPage extends SettingsPage {
                                     ? this.settingsManager.settings.flashcardHeightPercentageMobile
                                     : this.settingsManager.settings.flashcardHeightPercentage,
                             )
-                            .setDynamicTooltip()
                             .onChange(async (value) => {
                                 if (isMobile) {
                                     this.settingsManager.settings.flashcardHeightPercentageMobile =
@@ -215,7 +214,6 @@ export class UIPreferencesPage extends SettingsPage {
                                     ? this.settingsManager.settings.flashcardWidthPercentageMobile
                                     : this.settingsManager.settings.flashcardWidthPercentage,
                             )
-                            .setDynamicTooltip()
                             .onChange(async (value) => {
                                 if (isMobile) {
                                     this.settingsManager.settings.flashcardWidthPercentageMobile =
@@ -480,7 +478,6 @@ export class UIPreferencesPage extends SettingsPage {
                         slider
                             .setLimits(0, 5000, 100)
                             .setValue(this.settingsManager.settings.reviewButtonDelay)
-                            .setDynamicTooltip()
                             .onChange(async (value) => {
                                 this.settingsManager.settings.reviewButtonDelay = value;
                                 await this.settingsManager.save();

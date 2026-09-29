@@ -108,8 +108,9 @@ export abstract class SRTFile implements ISRFile {
         const result: Map<string, string> = new Map<string, string>();
 
         for (const [key, value] of Object.entries(frontmatter)) {
-            const v = Array.isArray(value) && value.length > 0 ? value[0] : value;
-            const vStr: string = v + "";
+            const vStr: string = String(
+                Array.isArray(value) && value.length > 0 ? value[0] : value,
+            );
             result.set(key, vStr);
         }
 

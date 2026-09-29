@@ -10,7 +10,6 @@ import {
 export class SidebarManager {
     private plugin: SRPlugin;
     private settingsManager: SettingsManager;
-    private reviewQueueListView: ReviewQueueListView | null = null;
 
     private get app(): App {
         return this.plugin.app;
@@ -22,8 +21,9 @@ export class SidebarManager {
     }
 
     redraw(): void {
-        if (this.reviewQueueListView === null) return;
-        this.reviewQueueListView.redraw();
+        for (const leaf of this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE)) {
+            if (leaf.view instanceof ReviewQueueListView) leaf.view.redraw();
+        }
     }
 
     private getActiveLeaf(type: string): WorkspaceLeaf | null {
@@ -37,12 +37,12 @@ export class SidebarManager {
 
     init(): void {
         this.plugin.registerView(REVIEW_QUEUE_VIEW_TYPE, (leaf) => {
-            return (this.reviewQueueListView = new ReviewQueueListView(
+            return new ReviewQueueListView(
                 leaf,
                 this.plugin.nextNoteReviewHandler,
                 this.settingsManager.settings,
                 this.plugin,
-            ));
+            );
         });
     }
 

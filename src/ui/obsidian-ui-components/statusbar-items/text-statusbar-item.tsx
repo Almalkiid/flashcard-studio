@@ -58,7 +58,7 @@ export default class TextStatusBarItem extends IconStatusBarItem {
     }
 
     protected createTextSegment(text: string | DocumentFragment): void {
-        const segment = activeDocument.createElement("span");
+        const segment = createSpan();
         segment.setText(text);
         this.addSegment(segment);
     }

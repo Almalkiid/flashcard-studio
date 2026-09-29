@@ -13,7 +13,7 @@ import {
     Tooltip,
 } from "chart.js";
 import { Setting, SettingGroup } from "obsidian";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- h is the JSX factory, only referenced by compiled JSX
 import h from "vhtml";
 
 import { DataManager } from "src/data/data-manager";

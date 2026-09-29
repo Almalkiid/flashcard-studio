@@ -1,11 +1,11 @@
-import moment, { Moment } from "moment";
+import type { Moment } from "moment";
 import { FileManager, HeadingCache, MetadataCache, TFile, Vault } from "obsidian";
 
 import { ALLOWED_DATE_FORMATS, PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { ISRFile, SRTFile } from "src/data/data-structures/file/sr-file";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
-import { formatDate } from "src/utils/dates";
+import { formatDate, moment } from "src/utils/dates";
 
 /**
  * Represents a file from the Obsidian vault with some additional functionality for scheduling data.
@@ -67,12 +67,14 @@ export class SRNoteTFile extends SRTFile implements ISRNoteTFile {
         const interval: number = scheduleInfo.interval;
         const ease: number = scheduleInfo.latestEase;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await this.fileManager.processFrontMatter(this.tfile, (frontmatter: any) => {
-            frontmatter["sr-due"] = dueString;
-            frontmatter["sr-interval"] = interval;
-            frontmatter["sr-ease"] = ease;
-        });
+        await this.fileManager.processFrontMatter(
+            this.tfile,
+            (frontmatter: Record<string, unknown>) => {
+                frontmatter["sr-due"] = dueString;
+                frontmatter["sr-interval"] = interval;
+                frontmatter["sr-ease"] = ease;
+            },
+        );
     }
 
     /**
@@ -94,10 +96,12 @@ export class SRNoteTFile extends SRTFile implements ISRNoteTFile {
         const existing = await this.getNoteId();
         if (existing) return existing;
         const id = crypto.randomUUID();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await this.fileManager.processFrontMatter(this.tfile, (frontmatter: any) => {
-            frontmatter["sr-id"] = id;
-        });
+        await this.fileManager.processFrontMatter(
+            this.tfile,
+            (frontmatter: Record<string, unknown>) => {
+                frontmatter["sr-id"] = id;
+            },
+        );
         return id;
     }
 

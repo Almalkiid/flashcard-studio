@@ -221,7 +221,7 @@ export class Deck {
      */
     getTopicPath(): TopicPath {
         const list: string[] = [];
-        // eslint-disable-next-line  @typescript-eslint/no-this-alias
+        // eslint-disable-next-line @typescript-eslint/no-this-alias -- starting point for walking up the parent chain
         let deck: Deck = this;
         // The root deck may have a dummy deck name, which we don't want
         // So we first check that this isn't the root deck
@@ -241,7 +241,7 @@ export class Deck {
      * @returns {Deck} - The root deck of the deck.
      */
     getRootDeck(): Deck {
-        // eslint-disable-next-line  @typescript-eslint/no-this-alias
+        // eslint-disable-next-line @typescript-eslint/no-this-alias -- starting point for walking up the parent chain
         let deck: Deck = this;
         while (!deck.isRootDeck) {
             if (deck.parent === null) {
@@ -433,7 +433,7 @@ export class Deck {
     debugLogToConsole(desc: string | null = null, indent: number = 0) {
         let str: string = desc !== null && desc !== undefined ? `${desc}: ` : "";
         str += this.toString(indent);
-        console.log(str);
+        console.debug(str);
     }
 
     /**

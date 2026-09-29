@@ -1,10 +1,8 @@
-/* eslint-disable no-undef */
 /* eslint-disable getter-return */
 
 module.exports = {
-    moment: {
-        locale: jest.fn(() => "en"),
-    },
+    // Obsidian ships moment to plugins; the real package stands in for it in tests.
+    moment: require("moment"),
     PluginSettingTab: jest.fn().mockImplementation(),
     Platform: {
         get isMobile() {

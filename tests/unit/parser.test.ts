@@ -865,7 +865,7 @@ describe("Multiline cards with empty answers", () => {
 describe("Parser debug messages", () => {
     test("Messages disabled", () => {
         // replace console error log with an empty mock function
-        const logSpy = jest.spyOn(window.console, "log").mockImplementation(() => {});
+        const logSpy = jest.spyOn(window.console, "debug").mockImplementation(() => {});
         setDebugParser(false);
 
         parse("", parserOptions);
@@ -877,7 +877,7 @@ describe("Parser debug messages", () => {
 
     test("Messages enabled", () => {
         // replace console error log with an empty mock function
-        const logSpy = jest.spyOn(window.console, "log").mockImplementation(() => {});
+        const logSpy = jest.spyOn(window.console, "debug").mockImplementation(() => {});
         setDebugParser(true);
 
         parse("", parserOptions);

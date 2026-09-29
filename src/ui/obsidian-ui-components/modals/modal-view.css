@@ -6,6 +6,14 @@
     max-height: 100%;
 }
 
+#sr-modal-view.sr-modal-rounded {
+    border-radius: var(--modal-radius);
+}
+
+#sr-modal-view.sr-modal-square {
+    border-radius: 0;
+}
+
 #sr-modal-view .sr-modal-content {
     overflow: visible;
     padding: 0;

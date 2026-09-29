@@ -1,4 +1,4 @@
-import { Moment } from "moment";
+import type { Moment } from "moment";
 
 import { PREFERRED_DATE_FORMAT } from "src/data/constants";
 import { ISerializedScheduleEntry } from "src/data/plugin-data";

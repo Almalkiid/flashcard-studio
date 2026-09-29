@@ -17,8 +17,7 @@ export class FlashcardEditModal extends Modal {
     private saveButton: ButtonComponent;
 
     private resolvePromise: ((input: string) => void) | null = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private rejectPromise: ((reason?: any) => void) | null = null;
+    private rejectPromise: ((reason?: unknown) => void) | null = null;
     private didSaveChanges = false;
     private readonly modalText: string;
     private textDirection: TextDirection;

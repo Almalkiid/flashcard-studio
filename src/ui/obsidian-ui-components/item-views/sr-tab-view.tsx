@@ -132,10 +132,7 @@ export class SRTabView extends ItemView {
             activeDocument.body.classList.contains("is-phone") &&
             activeDocument.body.classList.contains("is-floating-nav")
         ) {
-            activeDocument.body.style.setProperty(
-                "--view-bottom-fade-mask",
-                "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(16px - 0px))",
-            );
+            activeDocument.body.addClass("sr-reduced-bottom-fade-mask");
         }
 
         if (this.settings === null || this.plugin === null) {
@@ -161,7 +158,6 @@ export class SRTabView extends ItemView {
      * Ensures that resources associated with these views are properly released.
      */
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     async onClose() {
         // Resets the changes made in onOpen
         if (activeDocument.body.classList.contains("is-mobile")) {
@@ -176,10 +172,7 @@ export class SRTabView extends ItemView {
             activeDocument.body.classList.contains("is-phone") &&
             activeDocument.body.classList.contains("is-floating-nav")
         ) {
-            activeDocument.body.style.setProperty(
-                "--view-bottom-fade-mask",
-                "linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, #000000 calc(34px - 0px + 12px))",
-            );
+            activeDocument.body.removeClass("sr-reduced-bottom-fade-mask");
         }
 
         if (this.contentManager) this.contentManager.close();
@@ -188,10 +181,8 @@ export class SRTabView extends ItemView {
     private setSize(widthPercent: number, heightPercent: number) {
         if (!this.viewContentEl) return;
         this.viewContentEl.setCssProps({
-            width: widthPercent + "%",
-            "max-width": widthPercent + "%",
-            height: heightPercent + "%",
-            "max-height": heightPercent + "%",
+            "--sr-view-width": widthPercent + "%",
+            "--sr-view-height": heightPercent + "%",
         });
     }
 }

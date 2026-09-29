@@ -12,19 +12,23 @@ LocaleManagerInstance.instance = new LocaleManager();
  * @param params Parameters to insert into the translation string
  * @returns {string}
  */
-function insertParameters(translation: string, params: Record<string, unknown>): string {
+function insertParameters(translation: string, params: Record<string, string | number>): string {
     // https://stackoverflow.com/a/41015840/
     // Retrieve names of parameters
     const names: string[] = Object.keys(params);
     // Retrieve values of parameters
-    const vals: unknown[] = Object.values(params);
+    const vals: (string | number)[] = Object.values(params);
 
-    function replaceNamesWithValues(translation: string, names: string[], vals: unknown[]): string {
+    function replaceNamesWithValues(
+        translation: string,
+        names: string[],
+        vals: (string | number)[],
+    ): string {
         let result: string = translation;
 
         for (let i = 0; i < names.length; i++) {
             const name: string = names[i];
-            const value: string = `${vals[i]}`; // Force string conversion of value
+            const value: string = String(vals[i]); // Force string conversion of value
 
             // Replace name with value
             result = result.replace("${" + name + "}", value);
@@ -43,7 +47,10 @@ function insertParameters(translation: string, params: Record<string, unknown>):
  * @param params Parameters to insert into the translation
  * @returns {string} The translation
  */
-export function t(translationKey: keyof IBaseLocale, params?: Record<string, unknown>): string {
+export function t(
+    translationKey: keyof IBaseLocale,
+    params?: Record<string, string | number>,
+): string {
     const currentLocale: string = LocaleManagerInstance.getInstance().currentLocale;
     const currentLocaleMap: IBaseLocale = LocaleManagerInstance.getInstance().currentTranslation();
 
@@ -66,7 +73,7 @@ export function t(translationKey: keyof IBaseLocale, params?: Record<string, unk
  */
 export function tHTML(
     translationKey: keyof IBaseLocale,
-    params?: Record<string, unknown>,
+    params?: Record<string, string | number>,
 ): (HTMLElement | Text)[] {
     return parseHTMLTags(t(translationKey, params)).map(
         (translationElement: ITranslationElement) => translationElement.element,
@@ -121,7 +128,7 @@ export function parseHTMLTags(translation: string): ITranslationElement[] {
                 const href: string = linkMatch[1];
                 const text: string = linkMatch[2];
 
-                const anchorElement: HTMLElement = activeDocument.createElement("a");
+                const anchorElement: HTMLElement = createEl("a");
                 anchorElement.setAttribute("href", href);
                 anchorElement.setText(text);
 
@@ -144,7 +151,7 @@ export function parseHTMLTags(translation: string): ITranslationElement[] {
                 // Here I just assume that the text is the inner text else the function will fail
                 const text: string = codeMatch[1];
 
-                const codeElement: HTMLElement = activeDocument.createElement("code");
+                const codeElement: HTMLElement = createEl("code");
                 codeElement.setText(text);
 
                 resultArray.push({
