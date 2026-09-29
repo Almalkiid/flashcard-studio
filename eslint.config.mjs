@@ -108,6 +108,13 @@ export default tseslint.config(
         },
     },
     {
+        // M4: WebdriverIO's chainable elements are promises at run time, which the type information does not show
+        files: ["tests/e2e/**"],
+        rules: {
+            "@typescript-eslint/await-thenable": "off",
+        },
+    },
+    {
         files: ["tests/**"],
         rules: {
             "@typescript-eslint/no-require-imports": "off",

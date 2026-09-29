@@ -556,6 +556,32 @@ export class CommandManager {
                 await exportRevlogCsv(this.plugin);
             },
         });
+
+        // M4: Anki import and export. The dialogs are loaded when a command runs, so that none of their code (nor
+        // sql.js and ankipack behind them) is evaluated while the plugin starts.
+        this.plugin.addCommand({
+            id: "srs-import-anki-deck",
+            name: t("ANKI_IMPORT_CMD"),
+            callback: async () => {
+                const { AnkiImportModal } = await import("src/import-export/ui/anki-import-modal");
+                new AnkiImportModal(this.plugin).open();
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-export-anki",
+            name: t("ANKI_EXPORT_CMD"),
+            callback: async () => {
+                if (!this.plugin.isInitialized) {
+                    new Notice(t("ANKI_EXPORT_NOT_READY"));
+                    return;
+                }
+                // The decks listed are the ones of the last sync, so make sure they are up to date
+                await this.plugin.dataManager.sync();
+                const { AnkiExportModal } = await import("src/import-export/ui/anki-export-modal");
+                new AnkiExportModal(this.plugin).open();
+            },
+        });
     }
 
     /**
