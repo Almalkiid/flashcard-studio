@@ -670,6 +670,7 @@ export interface IBaseLocale {
     SESSION_RETENTION: string;
     SESSION_STREAK: string;
     SESSION_BACK_TO_DECKS: string;
+    SESSION_REVIEW_MISTAKES: string;
     // M3b: card syntax
     GROUP_CARD_SYNTAX: string;
     CALLOUT_CARD_TYPES: string;

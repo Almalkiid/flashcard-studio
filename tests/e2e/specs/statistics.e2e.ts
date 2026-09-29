@@ -23,6 +23,7 @@ interface PluginWithData {
     dataManager: {
         data: { settings: Record<string, unknown> };
         settingsManager: { save: () => Promise<void> };
+        refreshAlgorithmParameters: (settings: Record<string, unknown>) => void;
     };
 }
 interface AppWithPlugins {
@@ -64,6 +65,8 @@ async function setSetting(key: string, value: unknown): Promise<void> {
             if (plugin === undefined) throw new Error("the plugin is not loaded");
             plugin.dataManager.data.settings[settingKey] = settingValue;
             await plugin.dataManager.settingsManager.save();
+            // As the settings screen does, so scheduling settings such as learning steps take effect
+            plugin.dataManager.refreshAlgorithmParameters(plugin.dataManager.data.settings);
         },
         pluginId,
         key,
@@ -254,6 +257,9 @@ describe("statistics and insight", function () {
         await setSetting("openViewInNewTabMobile", false);
         // A fixed order makes "the first card" the same card in every session
         await setSetting("flashcardCardOrder", "DueFirstSequential");
+        // The default learning steps, which a test may change
+        await setSetting("fsrsLearningSteps", "1m 10m");
+        await setSetting("fsrsRelearningSteps", "10m");
     });
 
     afterEach(async function () {
@@ -469,6 +475,52 @@ describe("statistics and insight", function () {
             .$(".sr-stats-view .sr-stats-root")
             .waitForExist({ timeoutMsg: "Open statistics did not open the view" });
         await browser.waitUntil(async () => (await stat("reviews")) === String(answered));
+    });
+
+    it("offers to review the cards answered Again, then studies only those", async function () {
+        const questionShown = () =>
+            browser.execute(
+                (selector: string) =>
+                    Array.from(
+                        document.querySelectorAll(
+                            `${selector} .sr-content > :not(.sr-context, .fs-reveal-hint)`,
+                        ),
+                    )
+                        .map((element) => element.textContent)
+                        .join("\n"),
+                REVIEW_CARD,
+            );
+        // A missed card waits a day instead of coming back after a minute, so the session can end with a mistake in it
+        await setSetting("fsrsLearningSteps", "1d");
+        await setSetting("fsrsRelearningSteps", "1d");
+        await openReview();
+        await browser.$(`${REVIEW_CARD} .sr-show-answer-button`).waitForClickable();
+        const missed = await questionShown();
+        await answerNextCard("sr-again-button");
+        await finishSession();
+
+        const mistakes = browser.$(".sr-session-summary-mistakes");
+        await mistakes.waitForDisplayed({ timeoutMsg: "Review mistakes was not offered" });
+        expect(await mistakes.getText()).toContain("1");
+        await browser.pause(700);
+        await screenshot("session-summary-mistakes");
+        await mistakes.click();
+
+        // Only the missed card comes back
+        await browser
+            .$(`${REVIEW_CARD} .sr-show-answer-button`)
+            .waitForClickable({ timeoutMsg: "the missed card was not shown" });
+        expect(await browser.$(`${REVIEW_CARD} .fs-card-counter`).getText()).toEqual("1 / 1");
+        expect(await questionShown()).toEqual(missed);
+
+        // Once it is done (custom study is cram: Again or Easy), the normal decks are back
+        await answerNextCard("sr-easy-button");
+        await browser.waitUntil(
+            async () =>
+                (await browser.$(".sr-view .sr-deck-container:not(.sr-is-hidden)").isDisplayed()) &&
+                (await browser.$(".sr-view .sr-deck-container .sr-title").getText()) === "Decks",
+            { timeoutMsg: "the normal decks did not come back after the mistakes" },
+        );
     });
 
     it("Back to decks leaves the summary for the deck list", async function () {

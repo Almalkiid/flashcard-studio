@@ -7,6 +7,10 @@ import { formatCount, formatDuration, formatPercent } from "src/ui/statistics-vi
 
 export interface SessionSummaryActions {
     onBackToDecks: () => void;
+    /** How many cards were answered Again in this session. */
+    mistakes: number;
+    /** Studies those cards again. */
+    onReviewMistakes: () => void;
     onOpenStatistics: () => void;
     /** Takes back the last answer, which the answer toast would offer but cannot on this screen. */
     onUndo: () => void;
@@ -75,8 +79,23 @@ export function renderSessionSummary(
     }
 
     const buttons = panel.createDiv({ cls: "sr-session-summary-actions" });
+    // With mistakes to go over, that is the next step; otherwise going back is
+    if (actions.mistakes > 0) {
+        const mistakes = buttons.createEl("button", {
+            cls: "fs-primary-button sr-session-summary-mistakes",
+            attr: { type: "button" },
+        });
+        setIcon(mistakes.createSpan({ cls: "sr-session-summary-mistakes-icon" }), "rotate-ccw");
+        mistakes.createSpan({
+            text: t("SESSION_REVIEW_MISTAKES", { count: formatCount(actions.mistakes) }),
+        });
+        mistakes.addEventListener("click", actions.onReviewMistakes);
+    }
     const back = buttons.createEl("button", {
-        cls: "fs-primary-button sr-session-summary-back",
+        cls:
+            actions.mistakes > 0
+                ? "sr-session-summary-secondary sr-session-summary-back"
+                : "fs-primary-button sr-session-summary-back",
         text: t("SESSION_BACK_TO_DECKS"),
         attr: { type: "button" },
     });

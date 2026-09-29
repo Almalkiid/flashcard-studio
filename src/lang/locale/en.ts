@@ -76,7 +76,8 @@ const en: IBaseLocale = {
     OPEN_STATISTICS_SHORT: "Statistics",
     OPEN_SETTINGS_SHORT: "Settings",
     LEARNER_NAME: "Your name",
-    LEARNER_NAME_DESC: "Shown in the greeting on the home screen. Leave it empty for a greeting without a name.",
+    LEARNER_NAME_DESC:
+        "Shown in the greeting on the home screen. Leave it empty for a greeting without a name.",
     STUDIO_ANSWER: "Answer",
     STAR_CARD: "Star card",
     TAP_TO_REVEAL: "Tap to reveal",
@@ -771,6 +772,7 @@ const en: IBaseLocale = {
     SESSION_RETENTION: "Retention",
     SESSION_STREAK: "day streak",
     SESSION_BACK_TO_DECKS: "Back to decks",
+    SESSION_REVIEW_MISTAKES: "Review mistakes (${count})",
     // M3b: card syntax
     GROUP_CARD_SYNTAX: "Card syntax",
     CALLOUT_CARD_TYPES: "Callout card types",

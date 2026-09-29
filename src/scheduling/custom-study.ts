@@ -10,13 +10,14 @@ import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 /**
  * What a custom study session shows, like the options of Anki's Custom Study.
  *
- * - `forgotten`: cards answered Again in the last `days` days (1 is today). Cram, nothing is rescheduled.
+ * - `forgotten`: cards answered Again in the last `days` days (1 is today), or since `sinceMs` when it is set (the
+ *   start of a session, for "Review mistakes"). Cram, nothing is rescheduled.
  * - `ahead`: cards that fall due within the next `days` days. Reviewed like any review, so FSRS reschedules them.
  * - `preview`: the first `count` new cards. Cram, so they stay new.
  * - `filter`: cards picked by deck, state, flag colour or leech mark. Cram.
  */
 export type CustomStudySpec =
-    | { type: "forgotten"; days: number }
+    | { type: "forgotten"; days: number; sinceMs?: number }
     | { type: "ahead"; days: number }
     | { type: "preview"; count: number }
     | {

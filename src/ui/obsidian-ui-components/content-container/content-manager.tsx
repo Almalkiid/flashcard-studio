@@ -10,7 +10,7 @@ import SRPlugin from "src/main";
 import { Note } from "src/note/note";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { customStudyMode, CustomStudySpec } from "src/scheduling/custom-study";
+import { customStudyMode, CustomStudySpec, forgottenCardIds } from "src/scheduling/custom-study";
 import {
     DeckStats,
     FlashcardReviewMode,
@@ -102,6 +102,8 @@ export default class ContentManager {
     private sessionStartMs: number = 0;
     // The answers given in the current session, oldest first, for the progress bar
     private sessionAnswers: ReviewResponse[] = [];
+    // After "Review mistakes", the mode to go back to once those cards are done; null otherwise
+    private returnAfterCustomStudy: FlashcardReviewMode | null = null;
     private readonly closeModal: (() => void) | undefined;
 
     // Shared by every queue this screen loads, so the last answer of a deck can still be undone
@@ -258,7 +260,11 @@ export default class ContentManager {
             if (this.reviewSequencer.hasPendingCards) {
                 await this._showPendingState();
             } else if (!(await this._showSessionSummary())) {
-                await this._showDecksList(true);
+                if (this.returnAfterCustomStudy !== null) {
+                    await this._changeReviewMode(this.returnAfterCustomStudy);
+                } else {
+                    await this._showDecksList(true);
+                }
             }
             return;
         }
@@ -328,8 +334,15 @@ export default class ContentManager {
             );
             if (summary.reviews === 0) return false;
 
+            const sessionStartMs = this.sessionStartMs;
             this.cardContainer.showSessionSummary(summary, {
                 onBackToDecks: () => void this._showDecksList(true),
+                mistakes: forgottenCardIds(entries, sessionStartMs).size,
+                onReviewMistakes: () =>
+                    void this._startCustomStudy(
+                        { type: "forgotten", days: 1, sinceMs: sessionStartMs },
+                        true,
+                    ),
                 onUndo: () => void this._undoLastAnswer(),
                 onOpenStatistics: () => {
                     this.closeModal?.();
@@ -715,6 +728,7 @@ export default class ContentManager {
 
     private async _changeReviewMode(reviewMode: FlashcardReviewMode) {
         // Picking a mode goes back to the normal decks
+        this.returnAfterCustomStudy = null;
         this.reviewQueueLoader.setCustomStudy(null);
         this.reviewQueueLoader.setReviewMode(reviewMode);
         this.reviewMode = reviewMode;
@@ -735,8 +749,14 @@ export default class ContentManager {
     /**
      * Serves a custom study session in this review screen, in place of the normal decks. When no card matches, the
      * normal decks stay.
+     *
+     * @param startNow - Go straight to the cards, and back to the normal decks once they are done ("Review
+     * mistakes"), instead of showing the decks of the session.
      */
-    private async _startCustomStudy(spec: CustomStudySpec): Promise<void> {
+    private async _startCustomStudy(
+        spec: CustomStudySpec,
+        startNow: boolean = false,
+    ): Promise<void> {
         const previousSpec = this.reviewQueueLoader.getCustomStudy();
         const previousMode = this.reviewMode;
 
@@ -755,6 +775,13 @@ export default class ContentManager {
 
         this.reviewSequencer = sequencer;
         this.deckContainer.closeList();
+        if (startNow) {
+            this.returnAfterCustomStudy = previousMode;
+            this.cardContainer.closeSession();
+            await this._startReviewOfDeck(sequencer.originalDeckTree);
+            return;
+        }
+        this.returnAfterCustomStudy = null;
         await this._showDecksList();
     }
 

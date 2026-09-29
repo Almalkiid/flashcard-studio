@@ -170,10 +170,12 @@ export class ReviewQueueLoader {
         if (spec.type !== "forgotten") return context;
 
         // "The last N days" counts today as the first day
-        const sinceMs: number = globalDateProvider.today
-            .clone()
-            .subtract(Math.max(1, spec.days) - 1, "d")
-            .valueOf();
+        const sinceMs: number =
+            spec.sinceMs ??
+            globalDateProvider.today
+                .clone()
+                .subtract(Math.max(1, spec.days) - 1, "d")
+                .valueOf();
         try {
             const entries = await this.plugin.dataManager.reviewLog.readMonths(
                 monthsBetween(sinceMs, nowMs),
