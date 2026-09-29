@@ -1,5 +1,7 @@
 import { Notice } from "obsidian";
+import { State } from "ts-fsrs";
 
+import { CardMeta, cloneCardMeta } from "src/data/card-meta";
 import { TICKS_PER_DAY } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { Card } from "src/data/data-structures/card/card";
@@ -12,13 +14,42 @@ import {
 import { Deck } from "src/data/data-structures/deck/deck";
 import { IDeckTreeIterator } from "src/data/data-structures/deck/deck-tree-iterator";
 import { TopicPath } from "src/data/data-structures/deck/topic-path";
+import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
+import { t } from "src/lang/helpers";
 import { Note } from "src/note/note";
 import { ISRAlgorithm } from "src/scheduling/algorithms/base/isr-algorithm";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
+import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
+import { DailyLimits } from "src/scheduling/daily-limits";
 import { DueDateHistogram } from "src/scheduling/due-date-histogram";
+import { buildReviewLogEntry } from "src/scheduling/review-log-builder";
 import { globalDateProvider } from "src/utils/dates";
+import { MultiLineTextFinder } from "src/utils/strings";
+
+/**
+ * Where answers are recorded. Implemented by ReviewLogStore; tests use an in-memory fake.
+ */
+export interface IReviewLogSink {
+    append(entry: ReviewLogEntry): Promise<void>;
+    remove(entry: ReviewLogEntry): Promise<boolean>;
+}
+
+const MAX_UNDO_STEPS = 20;
+
+interface UndoRecord {
+    card: Card;
+    question: Question;
+    prevSchedule: RepItemScheduleInfo | null;
+    prevMeta: CardMeta;
+    preAnswerText: string;
+    postAnswerText: string;
+    entry: ReviewLogEntry;
+    histogramIncrementKey: number;
+    histogramDecrementKey: number | null;
+    wasPostponed: boolean;
+}
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -38,9 +69,16 @@ export interface IFlashcardReviewSequencer {
     getSubDecksWithCardsInQueue(deck: Deck): Deck[];
     skipCurrentCard(): void;
     determineCardSchedule(response: ReviewResponse, card: Card): RepItemScheduleInfo;
-    processReview(response: ReviewResponse): Promise<void>;
+    processReview(response: ReviewResponse, durationMs?: number): Promise<void>;
     updateCurrentQuestionTextAndCards(text: string): Promise<void>;
     deleteCurrentCardFromNote(): Promise<void>;
+
+    get canUndo(): boolean;
+    get lastLoggedEntry(): ReviewLogEntry | null;
+    undoLastAnswer(): Promise<boolean>;
+    suspendCurrentCard(): Promise<void>;
+    buryCurrentCard(): Promise<void>;
+    setFlagCurrentCard(flag: number): Promise<void>;
 }
 
 /**
@@ -138,6 +176,10 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
     private dueDateFlashcardHistogram: DueDateHistogram;
     private pendingCards: PendingCard[] = [];
     private currentTopicPath: TopicPath = TopicPath.emptyPath;
+    private reviewLog: IReviewLogSink | null;
+    private dailyLimits: DailyLimits | null;
+    private undoStack: UndoRecord[] = [];
+    private _lastLoggedEntry: ReviewLogEntry | null = null;
 
     constructor(
         reviewMode: FlashcardReviewMode,
@@ -146,6 +188,8 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         srsAlgorithm: ISRAlgorithm,
         questionPostponementList: IQuestionPostponementList,
         dueDateFlashcardHistogram: DueDateHistogram,
+        reviewLog: IReviewLogSink | null = null,
+        dailyLimits: DailyLimits | null = null,
     ) {
         this.reviewMode = reviewMode;
         this.cardSequencer = cardSequencer;
@@ -153,6 +197,16 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.srsAlgorithm = srsAlgorithm;
         this.questionPostponementList = questionPostponementList;
         this.dueDateFlashcardHistogram = dueDateFlashcardHistogram;
+        this.reviewLog = reviewLog;
+        this.dailyLimits = dailyLimits;
+    }
+
+    get canUndo(): boolean {
+        return this.undoStack.length > 0;
+    }
+
+    get lastLoggedEntry(): ReviewLogEntry | null {
+        return this._lastLoggedEntry;
     }
 
     get hasCurrentCard(): boolean {
@@ -215,6 +269,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         this.wakeDuePendingCards();
         this.cardSequencer.setIteratorTopicPath(topicPath);
         this.cardSequencer.nextRepItem();
+        this.skipOverLimitedCards();
     }
 
     refreshCurrentDeck(): void {
@@ -230,8 +285,14 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             .getDeck(topicPath)
             .getDistinctRepItemCount(RepItemState.AnyItem, true);
         const remainingDeck: Deck = this.remainingDeckTree.getDeck(topicPath);
-        const newCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.NewItem, true);
-        const dueCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.DueItem, true);
+        let newCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.NewItem, true);
+        let dueCount: number = remainingDeck.getDistinctRepItemCount(RepItemState.DueItem, true);
+        if (this.limitsApply) {
+            // Learning cards are never limited, so only the review-state share of the due count is capped
+            const learningCount = this.countDistinctLearningCards(remainingDeck);
+            newCount = Math.min(newCount, this.dailyLimits.remainingNew());
+            dueCount = Math.min(dueCount, learningCount + this.dailyLimits.remainingReviews());
+        }
 
         // Sry for the long variable names, but I needed all these distinct counts in the UI
         const newCardsInQueueOfThisDeckCount = remainingDeck.getDistinctRepItemCount(
@@ -283,50 +344,112 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
 
     skipCurrentCard(): void {
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+        this.skipOverLimitedCards();
     }
 
     private deleteCurrentCard(): void {
         this.cardSequencer.deleteCurrentRepItemFromAllDecks();
     }
 
-    async processReview(response: ReviewResponse): Promise<void> {
+    async processReview(response: ReviewResponse, durationMs: number = 0): Promise<void> {
         switch (this.reviewMode) {
             case FlashcardReviewMode.Review:
-                await this.processReviewReviewMode(response);
+                await this.processReviewReviewMode(response, durationMs);
                 break;
 
-            case FlashcardReviewMode.Cram:
+            case FlashcardReviewMode.Cram: {
+                const card = this.currentCard;
                 this.processReviewCramMode(response);
+                await this.appendToReviewLog(
+                    buildReviewLogEntry(
+                        card,
+                        response,
+                        card.scheduleInfo,
+                        durationMs,
+                        true,
+                        globalDateProvider.now.valueOf(),
+                    ),
+                );
                 break;
+            }
         }
+        this.skipOverLimitedCards();
     }
 
-    async processReviewReviewMode(response: ReviewResponse): Promise<void> {
+    async processReviewReviewMode(response: ReviewResponse, durationMs: number = 0): Promise<void> {
         let shortTermRequeue: "none" | "immediate" | "pending" = "none";
+        let removeFromSession = false;
         if (response !== ReviewResponse.Reset || this.currentCard.hasSchedule) {
-            const oldSchedule = this.currentCard.scheduleInfo;
+            const card: Card = this.currentCard;
+            const question: Question = this.currentQuestion;
+            const oldSchedule = card.scheduleInfo;
+            const prevMeta: CardMeta = cloneCardMeta(card.meta);
+            const preAnswerText: string = question.questionText.original;
+            const wasPostponed: boolean = this.questionPostponementList.includes(question);
 
             // We need to update the schedule if:
             //  (1) the user reviewed with easy/good/hard (either a new or due card),
             //  (2) or reset a due card
             // Nothing to do if a user resets a new card
-            this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);
-            shortTermRequeue = this.getShortTermRequeueMode(this.currentCard.scheduleInfo);
+            card.scheduleInfo = this.determineCardSchedule(response, card);
+            const leech: boolean = this.markLeech(response, oldSchedule, card);
+            removeFromSession = card.meta.suspended;
+            shortTermRequeue = removeFromSession
+                ? "none"
+                : this.getShortTermRequeueMode(card.scheduleInfo);
 
             // Update the source file with the updated schedule
-            await DataStore.getInstance().writeSchedule(this.currentQuestion);
+            await DataStore.getInstance().writeSchedule(question);
 
-            if (oldSchedule) {
-                this.dueDateFlashcardHistogram.decrement(dueDateHistogramKey(oldSchedule));
+            const histogramDecrementKey: number | null = oldSchedule
+                ? dueDateHistogramKey(oldSchedule)
+                : null;
+            const histogramIncrementKey: number = dueDateHistogramKey(card.scheduleInfo);
+            if (histogramDecrementKey !== null) {
+                this.dueDateFlashcardHistogram.decrement(histogramDecrementKey);
             }
-            this.dueDateFlashcardHistogram.increment(
-                dueDateHistogramKey(this.currentCard.scheduleInfo),
+            this.dueDateFlashcardHistogram.increment(histogramIncrementKey);
+
+            const entry = buildReviewLogEntry(
+                card,
+                response,
+                oldSchedule,
+                durationMs,
+                false,
+                globalDateProvider.now.valueOf(),
             );
+            await this.appendToReviewLog(entry);
+            this.dailyLimits?.record(entry);
+
+            this.undoStack.push({
+                card,
+                question,
+                prevSchedule: oldSchedule,
+                prevMeta,
+                preAnswerText,
+                postAnswerText: question.questionText.original,
+                entry,
+                histogramIncrementKey,
+                histogramDecrementKey,
+                wasPostponed,
+            });
+            if (this.undoStack.length > MAX_UNDO_STEPS) this.undoStack.shift();
+
+            if (leech) {
+                const lapses = (card.scheduleInfo as RepItemScheduleInfoFsrs).lapses;
+                new Notice(
+                    t(card.meta.suspended ? "LEECH_SUSPENDED" : "LEECH_TAGGED", {
+                        lapses,
+                    }),
+                );
+            }
         } else if (response === ReviewResponse.Reset) {
             shortTermRequeue = "immediate";
         }
 
-        if (shortTermRequeue === "pending") {
+        if (removeFromSession) {
+            this.deleteCurrentCard();
+        } else if (shortTermRequeue === "pending") {
             await this.handlePendingRequeue();
         } else if (shortTermRequeue === "immediate" || response === ReviewResponse.Reset) {
             if (this.settings.burySiblingCards) {
@@ -485,5 +608,191 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         await DataStore.getInstance().delete(question);
         this._originalDeckTree.deleteQuestionFromAllDecks(question, false);
         this.cardSequencer.deleteCurrentQuestionFromAllDecks();
+    }
+
+    /**
+     * Reverts the most recent answer of this session: the note, the review log, today's limits and the queue.
+     *
+     * @returns False when there is nothing to undo, or when the note changed since the answer (then nothing is touched).
+     */
+    async undoLastAnswer(): Promise<boolean> {
+        const record = this.undoStack.pop();
+        if (!record) return false;
+
+        const { card, question } = record;
+        const fileText: string = await question.note.file.read();
+
+        // Put back the exact text the question had before the answer, so undo leaves no trace in the note
+        const restoredText: string | null =
+            question.questionText.original === record.postAnswerText
+                ? MultiLineTextFinder.findAndReplace(
+                      fileText,
+                      record.postAnswerText,
+                      record.preAnswerText,
+                  )
+                : null;
+        if (restoredText === null) {
+            new Notice(t("UNDO_FAILED_NOTE_CHANGED"));
+            return false;
+        }
+        await question.note.file.write(restoredText);
+        question.questionText = QuestionText.create(
+            record.preAnswerText,
+            question.questionText.textDirection,
+            this.settings,
+        );
+        card.scheduleInfo = record.prevSchedule;
+        card.meta = cloneCardMeta(record.prevMeta);
+
+        if (this.reviewLog) {
+            try {
+                await this.reviewLog.remove(record.entry);
+            } catch (error) {
+                console.error(
+                    "Cardwright: could not remove the undone answer from the review log",
+                    error,
+                );
+            }
+        }
+        this.dailyLimits?.unrecord(record.entry);
+        if (this._lastLoggedEntry === record.entry) this._lastLoggedEntry = null;
+
+        this.dueDateFlashcardHistogram.decrement(record.histogramIncrementKey);
+        if (record.histogramDecrementKey !== null) {
+            this.dueDateFlashcardHistogram.increment(record.histogramDecrementKey);
+        }
+        if (!record.wasPostponed && this.questionPostponementList.includes(question)) {
+            this.questionPostponementList.remove(question);
+            await this.questionPostponementList.write();
+        }
+
+        this.pendingCards = this.pendingCards.filter((pending) => pending.card !== card);
+        this.remainingDeckTree.deleteCardFromAllDecks(card, false);
+        this.remainingDeckTree.prependRepItem(question.topicPathList, card);
+        if (!this.cardSequencer.setCurrentRepItem(card, this.currentTopicPath)) {
+            this.refreshCurrentDeck();
+        }
+        return true;
+    }
+
+    async suspendCurrentCard(): Promise<void> {
+        await this.updateCurrentCardMeta((meta) => {
+            meta.suspended = true;
+        }, true);
+    }
+
+    /**
+     * Hides the current card until tomorrow (after the day boundary).
+     */
+    async buryCurrentCard(): Promise<void> {
+        const tomorrow: string = globalDateProvider.today.clone().add(1, "d").format("YYYY-MM-DD");
+        await this.updateCurrentCardMeta((meta) => {
+            meta.buryUntil = tomorrow;
+        }, true);
+    }
+
+    /**
+     * @param flag - 1 to 7 for Anki's flag colours, 0 to remove the flag.
+     */
+    async setFlagCurrentCard(flag: number): Promise<void> {
+        if (!Number.isInteger(flag) || flag < 0 || flag > 7) return;
+        await this.updateCurrentCardMeta((meta) => {
+            meta.flag = flag;
+        }, false);
+    }
+
+    private async updateCurrentCardMeta(
+        mutate: (meta: CardMeta) => void,
+        removeFromSession: boolean,
+    ): Promise<void> {
+        if (!this.hasCurrentCard) return;
+        mutate(this.currentCard.meta);
+        await DataStore.getInstance().writeSchedule(this.currentQuestion);
+        if (removeFromSession) {
+            this.cardSequencer.deleteCurrentRepItemFromAllDecks();
+            this.skipOverLimitedCards();
+        }
+    }
+
+    /**
+     * Marks the card as a leech when an Again on a review card brings its lapses to the threshold, and again every
+     * half threshold after that, as Anki does.
+     *
+     * @returns Whether the card was marked in this answer.
+     */
+    private markLeech(
+        response: ReviewResponse,
+        oldSchedule: RepItemScheduleInfo | null,
+        card: Card,
+    ): boolean {
+        const threshold: number = this.settings.leechThreshold;
+        const schedule = card.scheduleInfo;
+        if (
+            response !== ReviewResponse.Again ||
+            !threshold ||
+            threshold <= 0 ||
+            !(oldSchedule instanceof RepItemScheduleInfoFsrs) ||
+            oldSchedule.state !== State.Review ||
+            !(schedule instanceof RepItemScheduleInfoFsrs)
+        ) {
+            return false;
+        }
+
+        const repeatEvery: number = Math.max(1, Math.ceil(threshold / 2));
+        const lapses: number = schedule.lapses;
+        if (lapses < threshold || (lapses - threshold) % repeatEvery !== 0) return false;
+
+        card.meta.leech = true;
+        if (this.settings.leechAction === "suspend") card.meta.suspended = true;
+        return true;
+    }
+
+    private async appendToReviewLog(entry: ReviewLogEntry): Promise<void> {
+        this._lastLoggedEntry = entry;
+        if (!this.reviewLog) return;
+        try {
+            await this.reviewLog.append(entry);
+        } catch (error) {
+            console.error("Cardwright: could not write the review log", error);
+        }
+    }
+
+    private get limitsApply(): boolean {
+        return this.dailyLimits !== null && this.reviewMode === FlashcardReviewMode.Review;
+    }
+
+    private isLimitedByReviewAllowance(card: Card): boolean {
+        const schedule = card.scheduleInfo;
+        if (schedule instanceof RepItemScheduleInfoFsrs) return schedule.state === State.Review;
+        return schedule !== null;
+    }
+
+    /**
+     * Drops cards from this session while the current card is over today's new or review allowance.
+     * Learning and relearning cards are never limited.
+     */
+    private skipOverLimitedCards(): void {
+        if (!this.limitsApply) return;
+        while (this.hasCurrentCard) {
+            const card: Card = this.currentCard;
+            const overLimit: boolean = card.isNew
+                ? this.dailyLimits.remainingNew() <= 0
+                : this.isLimitedByReviewAllowance(card) && this.dailyLimits.remainingReviews() <= 0;
+            if (!overLimit) break;
+            this.cardSequencer.deleteCurrentRepItemFromAllDecks();
+        }
+    }
+
+    private countDistinctLearningCards(deck: Deck): number {
+        const learning = new Set<Card>();
+        const visit = (current: Deck): void => {
+            for (const item of current.dueRepItems) {
+                const card = item;
+                if (!card.isNew && !this.isLimitedByReviewAllowance(card)) learning.add(card);
+            }
+            current.subdecks.forEach(visit);
+        };
+        visit(deck);
+        return learning.size;
     }
 }

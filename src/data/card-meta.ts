@@ -128,3 +128,36 @@ export function generateCardId(): string {
     for (const byte of bytes) id += ID_ALPHABET[byte % ID_ALPHABET.length];
     return id;
 }
+
+export function cloneCardMeta(meta: CardMeta): CardMeta {
+    return { ...meta, extras: [...meta.extras] };
+}
+
+/**
+ * Removes the tokens matching `shouldRemove` from every segment of every `<!--SR:...-->` comment in a note,
+ * leaving all other text byte-identical. Only tokens after a segment's fixed fields are considered.
+ */
+function removeMetaTokensInText(text: string, shouldRemove: (token: string) => boolean): string {
+    return text.replace(/<!--SR:(.+?)-->/g, (_match: string, comment: string) => {
+        const segments = comment.split("!").map((segment) => {
+            if (segment.length === 0) return segment;
+            const fields = segment.split(",");
+            const fixedFieldCount =
+                fields[0] === FSRS_COMMENT_PREFIX ? FSRS_FIXED_FIELDS : SM2_FIXED_FIELDS;
+            const fixed = fields.slice(0, fixedFieldCount);
+            const tokens = fields.slice(fixedFieldCount).filter((token) => !shouldRemove(token));
+            return [...fixed, ...tokens].join(",");
+        });
+        return `<!--SR:${segments.join("!")}-->`;
+    });
+}
+
+/** Unsuspends every card in a note's text. */
+export function unsuspendAllInText(text: string): string {
+    return removeMetaTokensInText(text, (token) => token === "susp");
+}
+
+/** Unburies every card in a note's text. */
+export function unburyAllInText(text: string): string {
+    return removeMetaTokensInText(text, (token) => token.startsWith("bury="));
+}

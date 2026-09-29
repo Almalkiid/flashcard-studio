@@ -1,9 +1,11 @@
+import { isBuried } from "src/data/card-meta";
 import { Card, Card as RepetitionItem } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { IQuestionPostponementList } from "src/data/data-structures/card/questions/question-postponement-list";
 import { TopicPath, TopicPathList } from "src/data/data-structures/deck/topic-path";
-import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
+import { RepetitionItemType, RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import { globalDateProvider } from "src/utils/dates";
 
 // The same card can be added to multiple decks e.g.
 //      #flashcards/language/words
@@ -526,10 +528,15 @@ export class DeckTreeFilter {
         deckTree: Deck,
         reviewMode: FlashcardReviewMode,
     ): Deck {
-        return deckTree.copyWithRepItemFilter(
-            (repItem: RepetitionItem) =>
+        const todayYmd: string = globalDateProvider.today.format("YYYY-MM-DD");
+        return deckTree.copyWithRepItemFilter((repItem: RepetitionItem) => {
+            // Suspended and buried cards are left out of every session, including cram
+            const meta = repItem.repItemType === RepetitionItemType.Card ? repItem.meta : null;
+            if (meta && (meta.suspended || isBuried(meta, todayYmd))) return false;
+            return (
                 (reviewMode === FlashcardReviewMode.Cram || repItem.isNew || repItem.isDue) &&
-                !questionPostponementList.includes(repItem.question),
-        );
+                !questionPostponementList.includes(repItem.question)
+            );
+        });
     }
 }

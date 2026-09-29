@@ -81,11 +81,17 @@ export interface SRSettings {
     maxLinkFactor: number;
     fsrsDesiredRetention: number;
     startOfDay: string;
+    leechThreshold: number;
+    leechAction: "tag" | "suspend";
+    dailyLimitsEnabled: boolean;
+    newCardsPerDay: number;
+    reviewsPerDay: number;
 
     // storage
     dataStore: StorageType;
     cardCommentOnSameLine: boolean;
     scheduleDataVaultLocation: string;
+    reviewLogFolder: string;
 
     // logging
     showSchedulingDebugMessages: boolean;
@@ -171,11 +177,17 @@ export const DEFAULT_SETTINGS: SRSettings = {
     maxLinkFactor: 1.0,
     fsrsDesiredRetention: 0.9,
     startOfDay: "00:00:00",
+    leechThreshold: 8,
+    leechAction: "suspend",
+    dailyLimitsEnabled: true,
+    newCardsPerDay: 20,
+    reviewsPerDay: 200,
 
     // storage
     dataStore: StorageType.NOTES,
     cardCommentOnSameLine: false,
     scheduleDataVaultLocation: "Spaced Repetition",
+    reviewLogFolder: "Cardwright/Review log",
 
     // logging
     showSchedulingDebugMessages: false,

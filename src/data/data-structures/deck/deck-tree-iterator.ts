@@ -69,6 +69,14 @@ export interface IDeckTreeIterator {
      * @returns {boolean} - True if there is a next repetition item, false otherwise.
      */
     nextRepItem(): boolean;
+    /**
+     * Makes a specific repetition item current, e.g. a card that was just put back by undo.
+     *
+     * @param {Card} repItem - The card, which must already be in the base deck tree.
+     * @param {TopicPath} topicPath - The topic path being iterated over.
+     * @returns {boolean} - True if the item was found under the topic path and is now current.
+     */
+    setCurrentRepItem(repItem: Card, topicPath: TopicPath): boolean;
 }
 
 class SingleDeckIterator {
@@ -191,6 +199,10 @@ class SingleDeckIterator {
         this.deck.deleteRepItemAtIndex(this.cardIdx, this.cardListType);
         this.deck.appendRepItemToRootDeck(card);
         this.setNoCurrentCard();
+    }
+
+    setCurrentCard(cardListType: RepItemState, cardIdx: number): void {
+        this.setCardListType(cardListType, cardIdx);
     }
 
     setNoCurrentCard() {
@@ -396,6 +408,22 @@ export class DeckTreeIterator implements IDeckTreeIterator {
         this.setDeckIdx(deckIdx);
         this.singleDeckIterator.setNewOrDueCardIdx(cardIdx);
         return true;
+    }
+
+    setCurrentRepItem(repItem: Card, topicPath: TopicPath): boolean {
+        this.setIteratorTopicPath(topicPath);
+        for (let deckIdx = 0; deckIdx < this.deckArray.length; deckIdx++) {
+            const deck: Deck = this.deckArray[deckIdx];
+            for (const listType of [RepItemState.NewItem, RepItemState.DueItem]) {
+                const cardIdx = deck.getRepItemListForRepItemState(listType).indexOf(repItem);
+                if (cardIdx >= 0) {
+                    this.setDeckIdx(deckIdx);
+                    this.singleDeckIterator.setCurrentCard(listType, cardIdx);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     deleteCurrentQuestionFromAllDecks(): boolean {

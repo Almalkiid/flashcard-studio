@@ -2,6 +2,7 @@ import { hasPersistentMeta } from "src/data/card-meta";
 import {
     OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX,
     OBSIDIAN_TAG_AT_STARTOFLINE_REGEX,
+    SR_HTML_COMMENT_BEGIN,
     SR_METADATA_CALLOUT as SR_METADATA_CALLOUT,
 } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
@@ -272,6 +273,11 @@ export class Question {
                 }
             }
         } else {
+            // When a schedule comment is being removed (e.g. an undone first answer), drop the separator that was
+            // added before it, so the note returns to exactly how it was
+            if (this.questionText.original.includes(SR_HTML_COMMENT_BEGIN))
+                result = result.trimEnd();
+
             // No schedule, so the block ID always comes after the question text, without anything after it
             if (blockId) result += ` ${blockId}`;
         }
