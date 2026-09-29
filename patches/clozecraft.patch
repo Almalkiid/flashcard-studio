@@ -1,0 +1,98 @@
+diff --git a/dist/implementation/ClozeNoteClassic.js b/dist/implementation/ClozeNoteClassic.js
+index 5b34ad78aec72235aabd9772e24360dcc8166496..5d4aa0ba91ff663064c0059532fd3455399c487e 100644
+--- a/dist/implementation/ClozeNoteClassic.js
++++ b/dist/implementation/ClozeNoteClassic.js	
+@@ -46,10 +46,10 @@ class ClozeNoteClassic extends ClozeNote_1.ClozeNote {
+         let frontText = this.raw;
+         for (const deletion of this._clozeDeletions) {
+             if (deletion.seq !== cardIndex + 1) {
+-                frontText = frontText.replace(deletion.raw, deletion.answer); // Just show
++                frontText = frontText.replace(deletion.raw, () => deletion.answer); // Just show
+                 continue;
+             }
+-            frontText = frontText.replace(deletion.raw, formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
++            frontText = frontText.replace(deletion.raw, () => formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
+         }
+         return frontText;
+     }
+@@ -63,10 +63,10 @@ class ClozeNoteClassic extends ClozeNote_1.ClozeNote {
+         let backText = this.raw;
+         for (const deletion of this._clozeDeletions) {
+             if (deletion.seq === cardIndex + 1) {
+-                backText = backText.replace(deletion.raw, formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
++                backText = backText.replace(deletion.raw, () => formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
+             }
+             else {
+-                backText = backText.replace(deletion.raw, deletion.answer); // Just show
++                backText = backText.replace(deletion.raw, () => deletion.answer); // Just show
+             }
+         }
+         return backText;
+diff --git a/dist/implementation/ClozeNoteOL.js b/dist/implementation/ClozeNoteOL.js
+index c2e0c58f10b2933573610a294502fd9e2b27591d..57e601776eafac02af6bf01eeda7c0d8dd1750bb 100644
+--- a/dist/implementation/ClozeNoteOL.js
++++ b/dist/implementation/ClozeNoteOL.js	
+@@ -55,13 +55,13 @@ class ClozeNoteOL extends ClozeNote_1.ClozeNote {
+             }
+             switch (clozeAction) {
+                 case "a":
+-                    frontText = frontText.replace(deletion.raw, formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
++                    frontText = frontText.replace(deletion.raw, () => formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
+                     break;
+                 case "h":
+-                    frontText = frontText.replace(deletion.raw, formatter.hiding(deletion.answer, deletion.hint)); // Just hide
++                    frontText = frontText.replace(deletion.raw, () => formatter.hiding(deletion.answer, deletion.hint)); // Just hide
+                     break;
+                 case "s":
+-                    frontText = frontText.replace(deletion.raw, deletion.answer); // Just show
++                    frontText = frontText.replace(deletion.raw, () => deletion.answer); // Just show
+                     break;
+             }
+         }
+@@ -86,13 +86,13 @@ class ClozeNoteOL extends ClozeNote_1.ClozeNote {
+             }
+             switch (clozeAction) {
+                 case "a":
+-                    backText = backText.replace(deletion.raw, formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
++                    backText = backText.replace(deletion.raw, () => formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
+                     break;
+                 case "h":
+-                    backText = backText.replace(deletion.raw, formatter.hiding(deletion.answer, deletion.hint)); // Just hide
++                    backText = backText.replace(deletion.raw, () => formatter.hiding(deletion.answer, deletion.hint)); // Just hide
+                     break;
+                 case "s":
+-                    backText = backText.replace(deletion.raw, deletion.answer); // Just show
++                    backText = backText.replace(deletion.raw, () => deletion.answer); // Just show
+                     break;
+             }
+         }
+diff --git a/dist/implementation/ClozeNoteSimple.js b/dist/implementation/ClozeNoteSimple.js
+index f784876fa954c0815800c1caa8b877db5bb3bcc2..3d07870c6e23fc0764467a4119631974afec6439 100644
+--- a/dist/implementation/ClozeNoteSimple.js
++++ b/dist/implementation/ClozeNoteSimple.js	
+@@ -40,10 +40,10 @@ class ClozeNoteSimple extends ClozeNote_1.ClozeNote {
+         let frontText = this.raw;
+         for (const deletion of this._clozeDeletions) {
+             if (deletion.seq !== cardIndex + 1) {
+-                frontText = frontText.replace(deletion.raw, deletion.answer); // Just show
++                frontText = frontText.replace(deletion.raw, () => deletion.answer); // Just show
+                 continue;
+             }
+-            frontText = frontText.replace(deletion.raw, formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
++            frontText = frontText.replace(deletion.raw, () => formatter.asking(deletion.answer, deletion.hint)); // Hide asked cloze
+         }
+         return frontText;
+     }
+@@ -57,10 +57,10 @@ class ClozeNoteSimple extends ClozeNote_1.ClozeNote {
+         let backText = this.raw;
+         for (const deletion of this._clozeDeletions) {
+             if (deletion.seq === cardIndex + 1) {
+-                backText = backText.replace(deletion.raw, formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
++                backText = backText.replace(deletion.raw, () => formatter.showingAnswer(deletion.answer, deletion.hint)); // Show as answer
+             }
+             else {
+-                backText = backText.replace(deletion.raw, deletion.answer); // Just show
++                backText = backText.replace(deletion.raw, () => deletion.answer); // Just show
+             }
+         }
+         return backText;
