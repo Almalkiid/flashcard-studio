@@ -9,7 +9,9 @@ import {
     FlashcardReviewMode,
     IFlashcardReviewSequencer as IFlashcardReviewSequencer,
 } from "src/scheduling/flashcard-review-sequencer";
-import DeckListComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list";
+import DeckListComponent, {
+    HomeServices,
+} from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list";
 import DeckListHeaderComponent from "src/ui/obsidian-ui-components/content-container/deck-container/deck-list-header";
 
 export class DeckContainer {
@@ -23,6 +25,7 @@ export class DeckContainer {
         startReviewOfDeck: (deck: Deck) => void,
         closeModal?: () => void,
         openCustomStudy?: () => void,
+        homeServices: HomeServices | null = null,
     ) {
         // Build ui
         this.containerEl = parentEl.createDiv();
@@ -35,7 +38,7 @@ export class DeckContainer {
             openCustomStudy,
         );
 
-        this.deckList = new DeckListComponent(this.containerEl, startReviewOfDeck);
+        this.deckList = new DeckListComponent(this.containerEl, startReviewOfDeck, homeServices);
     }
 
     /**
@@ -47,7 +50,9 @@ export class DeckContainer {
         reviewMode: FlashcardReviewMode,
         customStudyActive: boolean = false,
     ) {
-        this.containerEl.toggleClass("sr-look-studio", settings.reviewLook !== "classic");
+        const studio = settings.reviewLook !== "classic";
+        this.containerEl.toggleClass("sr-look-studio", studio);
+        this.containerEl.toggleClass("fs-studio", studio);
 
         // Redraw in case the stats have changed
         this.deckListHeader.updateReviewMode(reviewMode);

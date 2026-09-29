@@ -7,8 +7,9 @@ import { obsidianPage } from "wdio-obsidian-service";
 // Runs once per capability in wdio.conf.mts: desktop, and emulated mobile.
 // Set SCREENSHOTS=1 to also save README screenshots of the review screen to docs/media/screenshots.
 
-const pluginId = (JSON.parse(fs.readFileSync(path.resolve("manifest.json"), "utf8")) as { id: string })
-    .id;
+const pluginId = (
+    JSON.parse(fs.readFileSync(path.resolve("manifest.json"), "utf8")) as { id: string }
+).id;
 const SCREENSHOT_DIR = path.resolve("docs/media/screenshots");
 const takeScreenshots = process.env.SCREENSHOTS === "1";
 
@@ -120,6 +121,7 @@ describe("review screen", function () {
         for (const light of [false, true]) {
             await setTheme(light);
             await openFirstCard();
+            await browser.pause(400);
             await screenshot(`review-front${light ? "-light" : ""}`);
             await browser.$(".sr-view .sr-card-container .sr-show-answer-button").click();
             await browser.$(".sr-view .sr-card-container .sr-good-button").waitForDisplayed();
@@ -127,6 +129,36 @@ describe("review screen", function () {
             await screenshot(`review-back${light ? "-light" : ""}`);
             await browser.keys("Escape");
         }
+    });
+
+    it("captures a session in progress for the README", async function () {
+        if (!takeScreenshots) this.skip();
+        await obsidianPage.resetVault();
+        await browser.waitUntil(
+            () =>
+                browser.executeObsidian(({ app }) => {
+                    const file = app.vault.getFileByPath("CIA/Part1/Deck.md");
+                    return (app.metadataCache.getFileCache(file)?.tags ?? []).length > 0;
+                }),
+            { timeoutMsg: "the deck note was never indexed" },
+        );
+        await openFirstCard();
+        const card = ".sr-view .sr-card-container";
+        for (const rating of ["good", "hard", "easy"]) {
+            await browser.$(`${card} .sr-show-answer-button`).click();
+            await browser.$(`${card} .sr-${rating}-button`).waitForClickable();
+            await browser.pause(150);
+            await browser.$(`${card} .sr-${rating}-button`).click();
+            await browser.$(`${card} .sr-show-answer-button`).waitForClickable();
+        }
+        await browser.$(`${card} .sr-show-answer-button`).click();
+        await browser.$(`${card} .sr-good-button`).waitForDisplayed();
+        await browser.pause(500);
+        for (const light of [false, true]) {
+            await setTheme(light);
+            await screenshot(`review-session${light ? "-light" : ""}`);
+        }
+        await browser.keys("Escape");
     });
 
     it("captures the deck list for the README", async function () {

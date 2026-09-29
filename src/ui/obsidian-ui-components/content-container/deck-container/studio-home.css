@@ -1,183 +1,229 @@
-/* Studio look: the home screen that replaces the deck table (hero card for today, a tile for every deck). */
+/* Studio home (the deck list in the Studio look). Built only from the tokens in src/ui/design/studio-tokens.css. */
 
-.sr-home {
-    --sr-home-card: var(--background-primary);
-    --sr-home-radius: 16px;
-    --sr-home-hero-from: var(--interactive-accent);
-    --sr-home-hero-to: color-mix(in srgb, var(--interactive-accent) 55%, var(--color-blue));
-
+.fs-home {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-2);
-    max-width: 760px;
+    gap: 14px;
+    width: 100%;
+    max-width: 640px;
     margin: 0 auto;
-    padding: var(--size-4-2) 0 var(--size-4-6);
+    padding: 6px 2px 28px;
 }
 
-.theme-dark .sr-home {
-    --sr-home-card: var(--background-secondary);
-}
+/* MARK: Greeting */
 
-/* MARK: Hero */
-
-.sr-home-hero {
-    position: relative;
-    overflow: hidden;
-    padding: 22px 24px 24px;
-    border-radius: 22px;
-    color: var(--text-on-accent);
-    background:
-        radial-gradient(120% 90% at 100% 0%, rgb(255 255 255 / 22%), transparent 55%),
-        radial-gradient(80% 60% at 0% 100%, rgb(0 0 0 / 18%), transparent 60%),
-        linear-gradient(135deg, var(--sr-home-hero-from), var(--sr-home-hero-to));
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 25%),
-        0 1px 2px rgb(0 0 0 / 10%),
-        0 18px 40px -18px color-mix(in srgb, var(--interactive-accent) 65%, transparent);
-}
-
-.sr-home-hero.is-done {
-    --sr-home-hero-from: var(--color-green);
-    --sr-home-hero-to: color-mix(in srgb, var(--color-green) 60%, var(--color-cyan));
-}
-
-.sr-home-hero-decoration {
-    position: absolute;
-    right: -18px;
-    bottom: -22px;
-    opacity: 0.16;
-    pointer-events: none;
-
-    & svg {
-        width: 150px;
-        height: 150px;
-        stroke-width: 1.4;
-    }
-}
-
-.sr-home-hero-label {
+.fs-home-head {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    opacity: 0.85;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 4px 4px;
 }
 
-.sr-home-hero-label-icon {
-    display: flex;
-
-    & svg {
-        width: 14px;
-        height: 14px;
-    }
+.fs-home-greeting {
+    font-size: var(--fs-title);
+    font-weight: 500;
+    color: var(--fs-text);
+    letter-spacing: -0.01em;
 }
 
-.sr-home-hero-number {
-    margin-top: 10px;
-    font-size: 34px;
-    font-weight: 700;
+.fs-home-name {
+    font-size: var(--fs-display);
+    font-weight: 750;
+    letter-spacing: -0.025em;
     line-height: 1.1;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
+    color: var(--fs-text);
 }
 
-.sr-home-hero-detail {
+.fs-home-tagline {
     margin-top: 6px;
-    font-size: var(--font-ui-small);
-    opacity: 0.88;
-    max-width: 30em;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
 }
 
-/* Two classes, to outrank Obsidian's own button colours */
-.sr-home .sr-home-study-now {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 18px;
-    height: 44px;
-    padding: 0 20px 0 22px;
-    border-radius: 999px;
-    border: none;
-    font-size: var(--font-ui-medium);
-    font-weight: var(--font-semibold);
-    color: color-mix(in srgb, var(--sr-home-hero-from) 88%, black) !important;
-    background-color: rgb(255 255 255 / 96%) !important;
-    box-shadow:
-        0 1px 2px rgb(0 0 0 / 12%),
-        0 8px 20px -8px rgb(0 0 0 / 35%);
-    cursor: pointer;
-    transition:
-        transform 120ms ease,
-        box-shadow 120ms ease;
-
-    &:hover {
-        transform: translateY(-1px);
-        box-shadow:
-            0 2px 4px rgb(0 0 0 / 12%),
-            0 12px 26px -10px rgb(0 0 0 / 40%);
-    }
-
-    &:active {
-        transform: translateY(0) scale(0.98);
-    }
-}
-
-.sr-home-study-now-icon {
+.fs-home-head-buttons {
     display: flex;
+    gap: 8px;
+}
+
+.fs-studio .fs-round-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--fs-border);
+    color: var(--fs-text-2) !important;
+    background-color: var(--fs-surface) !important;
+    box-shadow: var(--fs-shadow);
+    cursor: pointer;
 
     & svg {
         width: 18px;
         height: 18px;
     }
+
+    &:hover {
+        color: var(--fs-text) !important;
+    }
+}
+
+/* MARK: Daily goal */
+
+.fs-home-goal {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: transform 120ms ease;
+
+    &:active {
+        transform: scale(0.99);
+    }
+}
+
+.fs-home-ring {
+    --fs-ring: 0;
+
+    flex: none;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background:
+        radial-gradient(closest-side, var(--fs-surface) 76%, transparent 77%),
+        conic-gradient(var(--fs-accent) calc(var(--fs-ring) * 360deg), var(--fs-accent-soft) 0);
+    transition: background 400ms ease;
+}
+
+.fs-home-goal-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-home-goal-label {
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    color: var(--fs-text-2);
+}
+
+.fs-home-goal-number {
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.fs-home-goal-done {
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    color: var(--fs-text);
+}
+
+.fs-home-goal-target {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--fs-text-2);
+}
+
+.fs-home-goal-detail {
+    margin-top: 2px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
+.fs-home-chevron {
+    display: flex;
+    color: var(--fs-text-3);
+
+    & svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* MARK: Insight tiles */
+
+.fs-home-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.fs-home-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px 12px;
+    text-align: center;
+}
+
+.fs-home-tile-icon {
+    display: flex;
+    color: var(--fs-tile);
+
+    & svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 2;
+    }
+}
+
+.fs-home-tile-value {
+    margin-top: 8px;
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fs-text);
+}
+
+.fs-home-tile-label {
+    margin-top: 1px;
+    font-size: var(--fs-micro);
+    color: var(--fs-text-3);
 }
 
 /* MARK: Decks */
 
-.sr-home-section-title {
-    margin: 18px 6px 6px;
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-faint);
-}
-
-.sr-home-deck-list {
+.fs-home-section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 6px;
 }
 
-.sr-home-deck {
-    display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) auto;
+.fs-home-section-title {
+    padding: 0 4px;
+    font-size: var(--fs-headline);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--fs-text);
+}
+
+.fs-home-decks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fs-home-deck {
+    display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 14px 12px 12px;
-    border-radius: var(--sr-home-radius);
-    background-color: var(--sr-home-card);
-    border: 1px solid var(--background-modifier-border);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    padding: 12px 14px;
     transition:
-        transform 140ms ease,
-        box-shadow 140ms ease,
-        border-color 140ms ease;
+        transform 120ms ease,
+        box-shadow 140ms ease;
 
     &[data-depth="1"] {
-        margin-left: 22px;
+        margin-left: 18px;
     }
 
-    &[data-depth="2"] {
-        margin-left: 44px;
-    }
-
-    &[data-depth="3"],
-    &[data-depth="4"] {
-        margin-left: 66px;
+    &[data-depth="2"],
+    &[data-depth="3"] {
+        margin-left: 36px;
     }
 
     &.is-clickable {
@@ -186,13 +232,7 @@
 
     &.is-clickable:hover,
     &.is-clickable:focus-visible {
-        transform: translateY(-1px);
-        border-color: color-mix(
-            in srgb,
-            var(--interactive-accent) 35%,
-            var(--background-modifier-border)
-        );
-        box-shadow: 0 10px 24px -12px rgb(0 0 0 / 28%);
+        box-shadow: var(--fs-shadow-lg);
         outline: none;
     }
 
@@ -200,176 +240,61 @@
         transform: scale(0.99);
     }
 
-    &.is-done {
-        opacity: 0.72;
+    &.is-done .fs-icon-tile {
+        filter: grayscale(0.6);
+        opacity: 0.7;
+    }
+
+    &.is-done .fs-home-chevron {
+        color: var(--fs-green);
     }
 }
 
-.sr-home-deck-monogram {
-    --sr-monogram: var(--interactive-accent);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--sr-monogram);
-    background-color: color-mix(in srgb, var(--sr-monogram) 15%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sr-monogram) 22%, transparent);
-}
-
-.sr-monogram-2 {
-    --sr-monogram: var(--color-blue);
-}
-
-.sr-monogram-3 {
-    --sr-monogram: var(--color-green);
-}
-
-.sr-monogram-4 {
-    --sr-monogram: var(--color-orange);
-}
-
-.sr-monogram-5 {
-    --sr-monogram: var(--color-pink);
-}
-
-.sr-monogram-6 {
-    --sr-monogram: var(--color-cyan);
-}
-
-.sr-monogram-7 {
-    --sr-monogram: var(--color-purple);
-}
-
-.sr-home-deck-body {
+.fs-home-deck-text {
+    flex: 1;
     min-width: 0;
 }
 
-.sr-home-deck-name {
-    font-size: var(--font-ui-medium);
-    font-weight: var(--font-semibold);
-    color: var(--text-normal);
+.fs-home-deck-name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--fs-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.sr-home-deck-meta {
-    margin-top: 1px;
-    font-size: var(--font-ui-smaller);
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
+.fs-home-deck-sub {
+    margin-top: 2px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
 }
 
-.sr-home-deck-progress {
-    margin-top: 8px;
-    height: 3px;
-    border-radius: 3px;
-    background-color: var(--background-modifier-border);
-    overflow: hidden;
-}
-
-.sr-home-deck-progress-fill {
-    height: 100%;
-    width: 100%;
-    transform-origin: left center;
-    transform: scaleX(var(--sr-deck-seen, 0));
-    border-radius: inherit;
-    background-color: color-mix(in srgb, var(--interactive-accent) 75%, transparent);
-}
-
-.sr-home-deck-chips {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.sr-home-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 24px;
-    padding: 0 9px;
-    border-radius: 999px;
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-semibold);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-
-    &.is-due {
-        color: var(--color-green);
-        background-color: color-mix(in srgb, var(--color-green) 14%, transparent);
-    }
-
-    &.is-new {
-        color: var(--color-blue);
-        background-color: color-mix(in srgb, var(--color-blue) 14%, transparent);
-    }
-
-    &.is-done {
-        color: var(--text-muted);
-        background-color: var(--background-modifier-hover);
-    }
-}
-
-.sr-home-chip-icon {
-    display: flex;
-
-    & svg {
-        width: 12px;
-        height: 12px;
-    }
-}
-
-.sr-home-deck-chevron {
-    display: flex;
-    color: var(--text-faint);
-
-    & svg {
-        width: 18px;
-        height: 18px;
-    }
+.fs-studio .fs-home-study {
+    flex: none;
+    height: 34px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--fs-font);
+    font-size: var(--fs-caption);
+    font-weight: 650;
+    color: var(--fs-on-accent) !important;
+    background-color: var(--fs-accent) !important;
+    box-shadow: 0 6px 14px -8px color-mix(in srgb, var(--fs-accent) 80%, transparent);
+    cursor: pointer;
 }
 
 /* MARK: Phones */
 
-.is-phone .sr-home {
-    padding-top: var(--size-4-1);
-}
-
-.is-phone .sr-home-hero {
-    padding: 18px 20px 20px;
-}
-
-.is-phone .sr-home-hero-number {
-    font-size: 30px;
-}
-
-.is-phone .sr-home-study-now {
-    width: 100%;
-    justify-content: center;
-    height: 48px;
-}
-
-.is-phone .sr-home-deck {
-    &[data-depth="1"] {
-        margin-left: 14px;
-    }
-
-    &[data-depth="2"],
-    &[data-depth="3"],
-    &[data-depth="4"] {
-        margin-left: 28px;
-    }
+.is-phone .fs-home {
+    padding-top: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .sr-home-study-now,
-    .sr-home-deck {
+    .fs-home-goal,
+    .fs-home-deck,
+    .fs-home-ring {
         transition: none;
     }
 }

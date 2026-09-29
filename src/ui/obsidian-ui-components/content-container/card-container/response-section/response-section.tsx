@@ -66,6 +66,12 @@ export default class ResponseSectionComponent {
                 await processReview(ReviewResponse.Easy);
             },
         });
+
+        // Icons for the Studio look (hidden by CSS in the Classic look)
+        this.againButton.setLeadingIcon("rotate-ccw");
+        this.hardButton.setLeadingIcon("gauge");
+        this.goodButton.setLeadingIcon("check");
+        this.easyButton.setLeadingIcon("chevrons-right");
     }
 
     public resetResponseButtons() {

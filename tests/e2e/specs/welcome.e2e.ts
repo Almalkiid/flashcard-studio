@@ -45,7 +45,7 @@ describe("welcome guide", function () {
                 if (await showAnswer.isDisplayed()) return true;
                 const deckRow = browser
                     .$(".sr-view .sr-deck-container")
-                    .$(".tag-pane-tag-self*=getting-started");
+                    .$(".fs-home-deck-name=Getting started");
                 if (await deckRow.isClickable()) await deckRow.click();
                 return false;
             },

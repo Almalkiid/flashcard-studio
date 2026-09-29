@@ -334,15 +334,13 @@ describe("anki bridge", function () {
 
         await browser.executeObsidianCommand(`${pluginId}:srs-review-flashcards`);
         // Several decks: the list comes first. Open the Spanish deck, which holds the note above
-        const rows = browser.$$(
-            ".sr-view .sr-deck-container:not(.sr-is-hidden) .tag-pane-tag-self",
-        );
+        const rows = browser.$$(".sr-view .sr-deck-container:not(.sr-is-hidden) .fs-home-deck");
         await browser.waitUntil(async () => (await rows.length) > 0, {
             timeoutMsg: "the deck list never showed",
         });
         let opened = false;
         for (const row of await rows) {
-            if ((await row.getText()).trim() === "Spanish") {
+            if ((await row.$(".fs-home-deck-name").getText()).trim() === "Spanish") {
                 // In the emulated phone the row can be under the edge of the modal, which a driver click refuses
                 await press(row);
                 opened = true;

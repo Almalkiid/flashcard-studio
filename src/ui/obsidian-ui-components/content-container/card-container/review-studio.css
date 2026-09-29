@@ -1,134 +1,214 @@
 /*
- * Studio look for the review screen (the default; "Classic" keeps the original plugin's look).
+ * Studio look for the study screen (the default; "Classic" keeps the original plugin's look).
  *
- * The card is a sheet resting on a quiet surface, set in comfortable reading type. Answer buttons are tinted in
- * the rating's colour and show the next interval under their name. Everything is built from the theme's
- * variables so it follows light and dark themes and any community theme.
+ * Follows the owner's reference designs: a slim top bar with "4 / 17", a thin progress bar, one large card with a
+ * star in its corner and a "Tap to reveal" hint, a green "Answer" label, and soft tinted answer tiles with an icon,
+ * the name and the next interval. Colours, radii and shadows come from src/ui/design/studio-tokens.css.
  */
 
 .sr-card-container.sr-look-studio {
-    --sr-studio-surface: var(--background-secondary);
-    --sr-studio-card: var(--background-primary);
-    --sr-studio-radius: 24px;
-    --sr-studio-card-shadow:
-        0 1px 1px rgb(0 0 0 / 3%), 0 2px 6px rgb(0 0 0 / 4%), 0 12px 28px -8px rgb(0 0 0 / 12%),
-        0 32px 64px -32px rgb(0 0 0 / 22%);
-    --sr-studio-highlight: rgb(255 255 255 / 70%);
-    --sr-rating-again: var(--color-red);
-    --sr-rating-hard: var(--color-orange);
-    --sr-rating-good: var(--color-green);
-    --sr-rating-easy: var(--color-blue);
-
-    /* A faint glow of the theme's accent above a quiet surface */
+    /* A soft pool of the accent colour behind the card */
     background:
         radial-gradient(
-            110% 55% at 50% -12%,
-            color-mix(in srgb, var(--interactive-accent) 11%, transparent),
-            transparent 62%
+            90% 55% at 50% 0%,
+            color-mix(in srgb, var(--fs-accent) 7%, transparent),
+            transparent 70%
         ),
-        var(--sr-studio-surface);
+        var(--fs-bg);
 
-    /* MARK: Toolbar: ghost buttons and a quiet deck name */
+    /* MARK: Top bar */
 
-    & .sr-card-toolbar .sr-button.mod-raised,
-    & .sr-card-toolbar .sr-button.clickable-icon {
-        background: transparent !important;
-        box-shadow: none !important;
-        color: var(--text-muted);
+    & .sr-card-toolbar {
+        position: relative;
+        border: none;
+        background: transparent;
+        padding: 4px 12px 0;
     }
 
-    & .sr-card-toolbar .sr-button.mod-raised:hover,
-    & .sr-card-toolbar .sr-button.clickable-icon:hover {
-        background-color: color-mix(in srgb, var(--text-normal) 7%, transparent);
-        color: var(--text-normal);
+    & .sr-card-toolbar .sr-info-section,
+    & .sr-card-toolbar .sr-edit-button,
+    & .sr-card-toolbar .sr-reset-button,
+    & .sr-card-toolbar .sr-skip-button,
+    & .sr-card-toolbar > .sr-divider,
+    & .sr-card-toolbar .sr-short-menu-button {
+        display: none !important;
     }
 
-    /* MARK: Session progress */
+    & .sr-card-toolbar .sr-extended-menu-button {
+        display: flex !important;
+    }
 
+    & .sr-card-toolbar .sr-button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid var(--fs-border) !important;
+        border-radius: 50%;
+        background-color: var(--fs-surface) !important;
+        box-shadow: var(--fs-shadow) !important;
+        color: var(--fs-text-2) !important;
+
+        & svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        &:hover {
+            color: var(--fs-text) !important;
+        }
+    }
+
+    /* The card's deck over "4 / 17", centred in the bar */
+    & .fs-card-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: calc(100% - 180px);
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        pointer-events: none;
+    }
+
+    & .fs-card-title-deck {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+        font-size: var(--fs-caption);
+        font-weight: 600;
+        color: var(--fs-text);
+
+        & span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        & .fs-icon-tile {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+
+            & svg {
+                width: 11px;
+                height: 11px;
+                stroke-width: 2.4;
+            }
+        }
+    }
+
+    & .fs-card-title-deck:empty {
+        display: none;
+    }
+
+    & .fs-card-counter {
+        font-size: var(--fs-micro);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+        color: var(--fs-text-3);
+    }
+
+    & .fs-card-title-deck:empty + .fs-card-counter {
+        font-size: var(--fs-body);
+        color: var(--fs-text);
+    }
+
+    /* MARK: Progress */
+
+    /* Progress: filled as far as the session has come, each answer a segment in its rating's colour */
     & .sr-session-progress {
-        height: 3px;
-        margin: 0 var(--size-4-4);
-        border-radius: 3px;
-        background-color: var(--background-modifier-border);
+        height: 5px;
+        margin: 10px 22px 0;
+        border-radius: 5px;
+        background-color: var(--fs-border);
         overflow: hidden;
     }
 
     & .sr-session-progress-fill {
+        display: flex;
+        gap: 2px;
         height: 100%;
-        width: 100%;
-        transform-origin: left center;
-        transform: scaleX(var(--sr-progress, 0));
-        background-color: var(--interactive-accent);
+        width: calc(var(--sr-progress, 0) * 100%);
         border-radius: inherit;
-        transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        background-color: var(--fs-accent);
+        transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+        &.sr-has-answers {
+            background-color: transparent;
+        }
+
+        &.sr-many-answers {
+            gap: 0;
+        }
     }
 
-    /* MARK: The card */
+    & .sr-session-answer {
+        flex: 1;
+        min-width: 1px;
+        border-radius: 2px;
+        background-color: var(--fs-accent);
+        animation: fs-segment-in 320ms ease both;
+    }
+
+    & .sr-many-answers .sr-session-answer {
+        border-radius: 0;
+    }
+
+    & .sr-session-answer-again {
+        background-color: var(--fs-red);
+    }
+
+    & .sr-session-answer-hard {
+        background-color: var(--fs-orange);
+    }
+
+    & .sr-session-answer-good {
+        background-color: var(--fs-blue);
+    }
+
+    & .sr-session-answer-easy {
+        background-color: var(--fs-green);
+    }
+
+    /* MARK: Card */
 
     & .sr-scroll-wrapper {
         position: relative;
-        padding: var(--size-4-4) var(--size-4-6) calc(var(--size-4-4) + 14px);
+        padding: 18px 20px 14px;
         justify-content: center;
     }
 
-    /* Two cards peek out below the current one, like a deck in your hand */
-    & .sr-scroll-wrapper::before,
-    & .sr-scroll-wrapper::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        border-radius: var(--sr-studio-radius);
-        background-color: var(--sr-studio-card);
-        border: 1px solid var(--background-modifier-border);
-        pointer-events: none;
-    }
-
-    & .sr-scroll-wrapper::before {
-        width: min(calc(100% - 2 * var(--size-4-6) - 28px), 692px);
-        top: calc(var(--size-4-4) + 20px);
-        bottom: calc(var(--size-4-4) + 5px);
-        transform: translateX(-50%);
-        opacity: 0.75;
-        box-shadow: 0 6px 16px -8px rgb(0 0 0 / 12%);
-    }
-
-    & .sr-scroll-wrapper::after {
-        width: min(calc(100% - 2 * var(--size-4-6) - 56px), 664px);
-        top: calc(var(--size-4-4) + 40px);
-        bottom: calc(var(--size-4-4) - 4px);
-        transform: translateX(-50%);
-        opacity: 0.45;
-    }
-
-    & .sr-scroll-wrapper.sr-is-hidden::before,
-    & .sr-scroll-wrapper.sr-is-hidden::after {
-        display: none;
+    /* The star shows a starred card, so it needs no coloured edge as well */
+    & .sr-scroll-wrapper.sr-flag-2 {
+        --sr-flag-color: transparent;
     }
 
     & .sr-scroll-wrapper .sr-content {
-        position: relative;
-        z-index: 1;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
-        max-width: 720px;
-        padding: 1.9em 2.1em;
-        border-radius: var(--sr-studio-radius);
-        background-color: var(--sr-studio-card);
-        border: 1px solid var(--background-modifier-border);
+        max-width: 680px;
+        padding: 26px 26px 20px;
+        border-radius: var(--fs-radius-xl);
+        background-color: var(--fs-surface);
+        border: 1px solid var(--fs-border);
         box-shadow:
-            inset 0 1px 0 var(--sr-studio-highlight),
-            inset 5px 0 0 var(--sr-flag-color, transparent),
-            var(--sr-studio-card-shadow);
-        font-size: calc(var(--font-text-size) * 1.08);
-        line-height: 1.65;
-        letter-spacing: -0.005em;
+            inset 4px 0 0 var(--sr-flag-color, transparent),
+            var(--fs-shadow-lg);
+        font-family: var(--fs-font);
+        font-size: 17px;
+        line-height: 1.55;
+        color: var(--fs-text);
     }
 
-    /* Even spacing between blocks: flex items do not collapse margins, so set them explicitly */
+    /* Even spacing between blocks (flex items do not collapse margins) */
     & .sr-content > * {
         margin-top: 0;
-        margin-bottom: 0.7em;
+        margin-bottom: 0.75em;
     }
 
     & .sr-content > :last-child {
@@ -136,275 +216,396 @@
     }
 
     & .sr-content > hr {
-        margin: 1em 0 1.1em;
+        display: none;
     }
 
-    /* The question reads like a headline: large, and centred on the card until the answer is shown */
-    & .sr-content:not(.sr-answer-shown) > :not(.sr-context) {
-        font-size: 1.32em;
-        font-weight: var(--font-semibold);
-        line-height: 1.38;
-        letter-spacing: -0.014em;
+    /* The context line (note › heading) as a quiet caption */
+    & .sr-context {
+        padding-right: 36px;
+        font-size: var(--fs-caption);
+        font-style: normal;
+        font-weight: 500;
+        color: var(--fs-text-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Front: the question, large, between the top of the card and the hint */
+    & .sr-content:not(.sr-answer-shown) > :not(.sr-context, .fs-reveal-hint) {
+        padding: 0 8px;
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1.35;
+        letter-spacing: -0.018em;
         text-align: center;
         text-wrap: balance;
     }
 
-    & .sr-content:not(.sr-answer-shown) > :not(.sr-context):first-of-type,
+    & .sr-content:not(.sr-answer-shown) > :first-child:not(.sr-context),
     & .sr-content:not(.sr-answer-shown) > .sr-context + * {
         margin-top: auto;
     }
 
-    & .sr-content:not(.sr-answer-shown) > :last-child {
-        margin-bottom: auto;
+    & .sr-content:not(.sr-answer-shown) {
+        cursor: pointer;
     }
 
-    /* Once answered, the question stays a heading above the answer */
-    & .sr-content.sr-answer-shown > :not(.sr-context, hr, hr ~ *) {
-        font-size: 1.16em;
-        font-weight: var(--font-semibold);
-        line-height: 1.4;
-        letter-spacing: -0.01em;
+    & .sr-content:not(.sr-answer-shown) > .sr-context {
+        padding: 0 36px;
+        text-align: center;
+    }
+
+    & .fs-reveal-hint {
+        margin-top: auto !important;
+        padding-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: var(--fs-caption);
+        font-weight: 500;
+        color: var(--fs-text-3);
+    }
+
+    & .sr-answer-shown .fs-reveal-hint {
+        display: none;
+    }
+
+    & .fs-reveal-hint-icon {
+        display: flex;
+
+        & svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    /* Back: the question stays as a quiet line above the "Answer" label, the answer leads */
+    & .sr-content.sr-answer-shown > :not(.sr-context, hr, .fs-answer-pill, .fs-answer-pill ~ *) {
+        font-size: var(--fs-body);
+        font-weight: 500;
+        line-height: 1.45;
+        color: var(--fs-text-3);
+    }
+
+    & .fs-answer-pill {
+        align-self: flex-start;
+        margin-bottom: 12px !important;
+        color: var(--fs-green);
+        background-color: var(--fs-green-soft);
+    }
+
+    &
+        .sr-content.sr-answer-shown
+        > .fs-answer-pill:not(:first-child, .sr-context + .fs-answer-pill) {
+        margin-top: 10px;
+    }
+
+    & .sr-content.sr-answer-shown > .fs-answer-pill ~ * {
+        font-size: 18px;
+        line-height: 1.55;
+        animation: fs-reveal 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     & .sr-content strong {
-        color: var(--text-accent);
-        font-weight: var(--font-semibold);
+        font-weight: 650;
+        color: var(--fs-text);
     }
 
     & .sr-content ul,
     & .sr-content ol {
-        padding-inline-start: 1.25em;
+        padding-inline-start: 1.3em;
     }
 
     & .sr-content li {
-        margin: 0.3em 0;
+        margin: 0.35em 0;
     }
 
     & .sr-content li::marker {
-        color: var(--text-faint);
+        color: var(--fs-accent);
     }
 
-    & .sr-content hr {
-        backdrop-filter: none;
-        border: none;
-        height: 1px;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            color-mix(in srgb, var(--interactive-accent) 55%, transparent) 18%,
-            color-mix(in srgb, var(--interactive-accent) 55%, transparent) 82%,
-            transparent
-        );
-    }
-
+    /* Callouts read as the reference's "Key points" box */
     & .sr-content .callout {
-        border-radius: var(--radius-m);
-        font-size: 0.92em;
+        margin-top: 4px;
+        padding: 14px 16px;
+        border: none;
+        border-radius: var(--fs-radius-md);
+        background-color: var(--fs-surface-2);
+        mix-blend-mode: normal;
+        font-size: var(--fs-body);
     }
 
-    /* The context line (note > heading) sits quietly above the card text */
-    & .sr-context {
-        font-size: var(--font-ui-smaller);
-        font-style: normal;
-        font-weight: var(--font-medium);
-        color: var(--text-faint);
-        letter-spacing: 0.02em;
-        text-align: center;
-        margin-bottom: 1em;
+    & .sr-content .callout-title {
+        gap: 6px;
+        font-size: var(--fs-caption);
+        font-weight: 650;
+        color: var(--fs-text);
     }
 
-    /* The answer fades in when revealed */
-    & .sr-content.sr-answer-shown > hr ~ * {
-        animation: sr-studio-reveal 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    & .sr-content .callout-icon {
+        color: var(--fs-accent);
     }
 
-    /* MARK: Answer buttons */
+    & .sr-content .callout-content {
+        color: var(--fs-text-2);
+    }
+
+    /* Star in the card's corner (sets the orange flag) */
+    & .fs-card-star {
+        position: absolute;
+        z-index: 2;
+        top: 30px;
+        right: max(32px, calc((100% - 720px) / 2 + 32px));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: var(--fs-text-3) !important;
+        cursor: pointer;
+
+        & svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        &:hover,
+        &.is-on {
+            color: var(--fs-amber) !important;
+        }
+
+        &.is-on svg {
+            fill: currentColor;
+        }
+    }
+
+    & .sr-scroll-wrapper.sr-is-hidden .fs-card-star {
+        display: none;
+    }
+
+    /* MARK: Answer tiles */
 
     & .sr-response {
         gap: 10px;
-        padding: var(--size-4-2) var(--size-4-6) var(--size-4-6);
-        border-top: none;
-        max-width: calc(720px + 2 * var(--size-4-6));
         width: 100%;
+        max-width: 720px;
         margin: 0 auto;
+        padding: 4px 20px 22px;
+        border-top: none;
     }
 
-    /* Tactile buttons: tinted in the rating's colour, a soft top highlight and a gentle press */
     & .sr-response .sr-response-button {
-        --sr-rating: var(--interactive-accent);
+        --fs-rating: var(--fs-accent);
+        --fs-rating-soft: var(--fs-accent-soft);
 
         height: auto;
-        min-height: 60px;
+        min-height: 76px;
+        margin: 0;
+        padding: 10px 4px;
         line-height: 1.2;
-        padding: 10px 6px;
-        border-radius: 16px;
-        border: 1px solid color-mix(in srgb, var(--sr-rating) 26%, transparent);
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--sr-rating) 15%, var(--sr-studio-card)),
-            color-mix(in srgb, var(--sr-rating) 9%, var(--sr-studio-card))
-        ) !important;
-        color: color-mix(in srgb, var(--sr-rating) 82%, var(--text-normal)) !important;
+        border: none;
+        border-radius: var(--fs-radius-md);
+        background-color: var(--fs-rating-soft) !important;
+        color: var(--fs-rating) !important;
         box-shadow:
-            inset 0 1px 0 var(--sr-studio-highlight),
-            0 1px 2px rgb(0 0 0 / 5%),
-            0 6px 14px -8px color-mix(in srgb, var(--sr-rating) 45%, transparent);
+            inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 12%, transparent),
+            inset 0 1px 0 rgb(255 255 255 / 55%);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 3px;
+        gap: 4px;
+        font-family: var(--fs-font);
         transition:
             transform 90ms ease,
-            box-shadow 140ms ease,
             filter 140ms ease;
-    }
 
-    & .sr-response .sr-response-button:hover {
-        filter: brightness(1.03) saturate(1.08);
-        box-shadow:
-            inset 0 1px 0 var(--sr-studio-highlight),
-            0 2px 4px rgb(0 0 0 / 6%),
-            0 10px 22px -10px color-mix(in srgb, var(--sr-rating) 60%, transparent);
-    }
+        &:hover {
+            filter: brightness(0.97) saturate(1.1);
+        }
 
-    & .sr-response .sr-response-button:active {
-        transform: translateY(1px) scale(0.975);
-        box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
+        &:active {
+            transform: scale(0.96);
+        }
     }
 
     & .sr-response .sr-again-button {
-        --sr-rating: var(--sr-rating-again);
+        --fs-rating: var(--fs-red);
+        --fs-rating-soft: var(--fs-red-soft);
     }
 
     & .sr-response .sr-hard-button {
-        --sr-rating: var(--sr-rating-hard);
+        --fs-rating: var(--fs-orange);
+        --fs-rating-soft: var(--fs-orange-soft);
     }
 
     & .sr-response .sr-good-button {
-        --sr-rating: var(--sr-rating-good);
+        --fs-rating: var(--fs-blue);
+        --fs-rating-soft: var(--fs-blue-soft);
     }
 
     & .sr-response .sr-easy-button {
-        --sr-rating: var(--sr-rating-easy);
+        --fs-rating: var(--fs-green);
+        --fs-rating-soft: var(--fs-green-soft);
     }
 
-    /* The Studio look uses its own two-line label */
+    /* The Studio look uses its own icon, label and interval */
     & .sr-response-button > span.sr-small-text,
     & .sr-response-button > span.sr-large-text {
         display: none !important;
     }
 
+    & .sr-response-button > span.sr-button-icon {
+        display: flex;
+
+        & svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.2;
+        }
+    }
+
     & .sr-response-button > span.sr-button-label {
         display: block;
-        font-weight: var(--font-semibold);
-        font-size: var(--font-ui-medium);
+        font-size: var(--fs-body);
+        font-weight: 650;
     }
 
     & .sr-response-button.sr-has-interval > span.sr-button-interval {
         display: block;
-        font-size: var(--font-ui-smaller);
+        font-size: var(--fs-micro);
+        font-weight: 500;
         font-variant-numeric: tabular-nums;
-        opacity: 0.75;
+        color: var(--fs-text-3);
     }
 
-    /* Show answer: a single accent button */
+    /* Show answer: one clear primary button */
     & .sr-response .sr-response-button.sr-show-answer-button {
-        --sr-rating: var(--interactive-accent);
-
-        min-height: 56px;
-        border-radius: 999px;
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--interactive-accent) 86%, white),
-            var(--interactive-accent)
-        ) !important;
-        color: var(--text-on-accent) !important;
-        border-color: transparent;
-        box-shadow:
-            inset 0 1px 0 rgb(255 255 255 / 28%),
-            0 1px 2px rgb(0 0 0 / 10%),
-            0 12px 28px -10px color-mix(in srgb, var(--interactive-accent) 70%, transparent);
+        min-height: 54px;
+        background-color: var(--fs-accent) !important;
+        color: var(--fs-on-accent) !important;
+        box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--fs-accent) 80%, transparent);
     }
 
-    & .sr-response .sr-response-button.sr-show-answer-button > span.sr-button-label {
-        font-size: var(--font-ui-medium);
-        letter-spacing: 0.01em;
+    & .sr-response .sr-response-button.sr-show-answer-button > span.sr-button-icon {
+        display: none;
     }
 
-    /* Keyboard hints: small and quiet, top right of each button */
+    /* The card already says which key reveals the answer */
+    & .sr-response .sr-response-button.sr-show-answer-button::after {
+        display: none;
+    }
+
+    /* Keyboard hints: a small digit in the tile's corner */
     & .sr-response-button::after {
         color: currentColor !important;
         opacity: 0.45;
         box-shadow: none !important;
-        border: 1px solid currentColor;
-        border-radius: 5px !important;
-        font-size: 9px !important;
-        padding: 1px 4px !important;
-        top: 5px;
-        right: 6px !important;
+        border: none;
+        font-family: var(--fs-font) !important;
+        font-size: 10px !important;
+        font-weight: 650;
+        padding: 0 !important;
+        top: 8px;
+        right: 10px !important;
         bottom: unset !important;
     }
 
-    /* The answer toast matches the card */
+    /* The answer toast */
+    /* The answer toast drops in under the progress bar, clear of the answer tiles */
     & .sr-answer-toast {
+        top: 66px;
+        bottom: auto;
+        padding: 6px 6px 6px 16px;
         border-radius: 999px;
-        border: 1px solid var(--background-modifier-border);
-        background-color: var(--sr-studio-card);
-        box-shadow: var(--sr-studio-card-shadow);
-    }
-}
-
-/* In dark themes the card is lifted: slightly lighter than the surface, with a deeper shadow */
-.theme-dark .sr-card-container.sr-look-studio {
-    --sr-studio-surface: var(--background-primary);
-    --sr-studio-card: var(--background-secondary);
-    --sr-studio-highlight: rgb(255 255 255 / 6%);
-    --sr-studio-card-shadow:
-        0 1px 2px rgb(0 0 0 / 35%), 0 8px 24px rgb(0 0 0 / 30%), 0 24px 56px rgb(0 0 0 / 25%);
-}
-
-.sr-card-container.sr-look-studio {
-    /* Deck badge in the toolbar, in the theme's accent instead of a fixed blue */
-    & .sr-chosen-deck-info.sr-bg-blue {
-        background-color: color-mix(in srgb, var(--interactive-accent) 16%, transparent) !important;
-        color: var(--text-accent) !important;
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--interactive-accent) 35%, transparent);
+        border: 1px solid var(--fs-border);
+        background-color: var(--fs-surface);
+        color: var(--fs-text);
+        box-shadow: var(--fs-shadow-lg);
+        font-family: var(--fs-font);
+        font-size: var(--fs-caption);
+        animation-name: fs-toast-in;
     }
 
-    & .sr-chosen-deck-info .sr-divider {
-        --divider-color: color-mix(in srgb, var(--interactive-accent) 45%, transparent) !important;
-        border-color: color-mix(in srgb, var(--interactive-accent) 45%, transparent) !important;
-        background-color: color-mix(in srgb, var(--interactive-accent) 45%, transparent) !important;
+    & .sr-answer-toast-interval {
+        color: var(--fs-text-3);
     }
 
-    /* Clozes. The cloze markup sets its colour inline (#2196f3), so it is matched on that and restyled:
-       a quiet chip for the hidden text, the accent colour for the revealed answer. */
+    & .sr-answer-toast-undo {
+        height: 28px;
+        padding: 0 12px;
+        border: none;
+        border-radius: 999px;
+        font-family: var(--fs-font);
+        font-size: var(--fs-caption);
+        font-weight: 650;
+        color: var(--fs-accent) !important;
+        background-color: var(--fs-accent-soft) !important;
+        box-shadow: none !important;
+    }
+
+    /* Clozes: a quiet chip for the hidden text, the accent for the revealed answer (the cloze markup sets its
+       colour inline, #2196f3, so it is matched on that) */
     & .sr-content:not(.sr-answer-shown) span[style*="#2196f3"] {
-        color: var(--text-accent) !important;
-        background-color: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
-        border-radius: 6px;
+        color: var(--fs-accent) !important;
+        background-color: var(--fs-accent-soft);
+        border-radius: 7px;
         padding: 0.05em 0.45em;
-        font-weight: var(--font-semibold);
         letter-spacing: 0.04em;
     }
 
     & .sr-content.sr-answer-shown span[style*="#2196f3"] {
-        color: var(--text-accent) !important;
-        font-weight: var(--font-semibold);
-        background: linear-gradient(
-                transparent 62%,
-                color-mix(in srgb, var(--interactive-accent) 22%, transparent) 62%
-            )
-            no-repeat;
-        border-radius: 2px;
-        padding: 0 0.1em;
+        color: var(--fs-accent) !important;
+        font-weight: 650;
     }
 
     & .sr-content .cloze-input {
-        border-radius: 6px;
-        border: 1px solid color-mix(in srgb, var(--interactive-accent) 45%, transparent);
-        background-color: color-mix(in srgb, var(--interactive-accent) 8%, transparent);
+        border-radius: 8px;
+        border: 1px solid color-mix(in srgb, var(--fs-accent) 45%, transparent);
+        background-color: var(--fs-accent-soft);
+    }
+}
+
+.theme-dark .sr-card-container.sr-look-studio {
+    background:
+        radial-gradient(
+            80% 50% at 50% 0%,
+            color-mix(in srgb, var(--fs-accent) 13%, transparent),
+            transparent 70%
+        ),
+        var(--fs-bg);
+
+    & .sr-response .sr-response-button:not(.sr-show-answer-button) {
+        background-color: color-mix(in srgb, var(--fs-rating) 9%, var(--fs-surface)) !important;
+        box-shadow:
+            inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 22%, transparent),
+            inset 0 1px 0 rgb(255 255 255 / 4%);
+    }
+
+    & .sr-response-button > span.sr-button-label {
+        color: color-mix(in srgb, var(--fs-rating) 80%, white);
+    }
+}
+
+/* With custom hotkeys, Space may not reveal the answer, so the hint keeps its place but says nothing */
+body:not(.is-mobile) .sr-card-container.sr-look-studio.sr-custom-hotkeys .fs-reveal-hint {
+    visibility: hidden;
+}
+
+/* Studio-only pieces stay hidden in the Classic look */
+.sr-card-container:not(.sr-look-studio) {
+    & .fs-card-title,
+    & .fs-card-star,
+    & .fs-reveal-hint,
+    & .fs-answer-pill {
+        display: none;
     }
 }
 
@@ -431,31 +632,58 @@ body:not(.is-mobile) .sr-card-container.sr-keys-anki:not(.sr-custom-hotkeys) {
 
 .is-phone .sr-card-container.sr-look-studio {
     & .sr-session-progress {
-        margin: 0 var(--size-4-3);
+        margin: 4px 18px 0;
     }
 
     & .sr-scroll-wrapper {
-        padding: var(--size-4-3) var(--size-4-4) 24px;
+        padding: 14px 16px 12px;
     }
 
     & .sr-scroll-wrapper .sr-content {
-        padding: 1.25em 1.3em;
-        font-size: calc(var(--font-text-size) * 1.05);
+        padding: 22px 20px 18px;
+    }
+
+    & .fs-card-star {
+        top: 24px;
+        right: 26px;
     }
 
     & .sr-response {
-        padding: var(--size-4-1) var(--size-4-3) calc(var(--size-4-3) + env(safe-area-inset-bottom));
+        gap: 8px;
+        padding: 2px 16px calc(16px + env(safe-area-inset-bottom));
     }
 
     & .sr-response .sr-response-button {
-        min-height: 56px;
+        min-height: 72px;
     }
 }
 
-@keyframes sr-studio-reveal {
+@keyframes fs-toast-in {
     from {
         opacity: 0;
-        transform: translateY(4px);
+        transform: translate(-50%, -8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes fs-segment-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fs-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
     }
 
     to {
@@ -466,13 +694,17 @@ body:not(.is-mobile) .sr-card-container.sr-keys-anki:not(.sr-custom-hotkeys) {
 
 @media (prefers-reduced-motion: reduce) {
     .sr-card-container.sr-look-studio {
-        & .sr-content.sr-answer-shown > hr ~ * {
+        & .sr-content.sr-answer-shown > .fs-answer-pill ~ * {
             animation: none;
         }
 
         & .sr-session-progress-fill,
         & .sr-response .sr-response-button {
             transition: none;
+        }
+
+        & .sr-session-answer {
+            animation: none;
         }
     }
 }

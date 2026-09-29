@@ -1,3 +1,5 @@
+import { setIcon } from "obsidian";
+
 import SRButtonComponent from "src/ui/sr-button";
 
 export default class SRResponseButtonComponent extends SRButtonComponent {
@@ -41,6 +43,15 @@ export default class SRResponseButtonComponent extends SRButtonComponent {
             this.largeText.setText(props.text);
             this.labelText.setText(props.text);
         }
+    }
+
+    /**
+     * Adds an icon above the label, used by the Studio look.
+     */
+    public setLeadingIcon(icon: string) {
+        const iconEl = createSpan({ cls: "sr-button-icon" });
+        setIcon(iconEl, icon);
+        this.buttonEl.prepend(iconEl);
     }
 
     public setLabelAndInterval(label: string, interval: string) {

@@ -91,7 +91,7 @@ describe("buildStatsReport", () => {
         expect(report.hasHistory).toBe(false);
     });
 
-    test("aggregates 50 000 entries and 5 000 cards in under half a second", () => {
+    test("aggregates 50 000 entries and 5 000 cards in well under two seconds", () => {
         const many: ReviewLogEntry[] = [];
         const start = new Date("2024-10-01T00:00:00Z").getTime();
         for (let i = 0; i < 50000; i++) {
@@ -121,6 +121,8 @@ describe("buildStatsReport", () => {
         const report = buildStatsReport(many, manyCards, options({ range: "all" }));
         const elapsed = Date.now() - begin;
         expect(report.heatmap.total).toBeGreaterThan(0);
-        expect(elapsed).toBeLessThan(500);
+        // Typically 50 to 80 ms. The budget catches an accidentally quadratic aggregation (seconds), not a busy
+        // machine: a tighter limit failed at 526 ms while other test runs shared the CPU.
+        expect(elapsed).toBeLessThan(2000);
     });
 });

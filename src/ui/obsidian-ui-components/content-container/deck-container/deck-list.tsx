@@ -5,7 +5,13 @@ import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
-import { renderStudioHome } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
+import {
+    HomeActions,
+    renderStudioHome,
+} from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
+
+/** What the Studio home needs from outside the deck list. */
+export type HomeServices = Omit<HomeActions, "startReviewOfDeck" | "learnerName">;
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;
@@ -27,9 +33,15 @@ export default class DeckListComponent {
     private totalCardsText: HTMLDivElement;
 
     private startReviewOfDeck: (deck: Deck) => void;
+    private homeServices: HomeServices | null;
 
-    public constructor(parentEl: HTMLElement, startReviewOfDeck: (deck: Deck) => void) {
+    public constructor(
+        parentEl: HTMLElement,
+        startReviewOfDeck: (deck: Deck) => void,
+        homeServices: HomeServices | null = null,
+    ) {
         this.startReviewOfDeck = startReviewOfDeck;
+        this.homeServices = homeServices;
         // Prep main container
         this.scrollWrapper = parentEl.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
@@ -104,7 +116,7 @@ export default class DeckListComponent {
 
         // Prep tree container
         this.treeContainer = this.content.createDiv("sr-tree-container");
-        this.homeEl = this.content.createDiv("sr-home");
+        this.homeEl = this.content.createDiv("fs-home");
     }
 
     /**
@@ -120,12 +132,19 @@ export default class DeckListComponent {
             reviewSequencer.originalDeckTree.getTopicPath(),
         );
 
-        const studio = settings.reviewLook !== "classic" && originDeckStats.totalCount > 0;
+        const studio =
+            settings.reviewLook !== "classic" &&
+            originDeckStats.totalCount > 0 &&
+            this.homeServices !== null;
         this.treeHeaderRow.toggleClass("sr-is-hidden", studio);
         this.treeContainer.toggleClass("sr-is-hidden", studio);
         this.homeEl.toggleClass("sr-is-hidden", !studio);
         if (studio) {
-            renderStudioHome(this.homeEl, reviewSequencer, this.startReviewOfDeck);
+            renderStudioHome(this.homeEl, reviewSequencer, {
+                ...this.homeServices,
+                startReviewOfDeck: this.startReviewOfDeck,
+                learnerName: settings.learnerName,
+            });
             return;
         }
 

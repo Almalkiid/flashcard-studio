@@ -489,6 +489,19 @@ export class UIPreferencesPage extends SettingsPage {
             .setHeading(t("REVIEW_SCREEN"))
             .addSetting((setting: Setting) => {
                 setting
+                    .setName(t("LEARNER_NAME"))
+                    .setDesc(t("LEARNER_NAME_DESC"))
+                    .addText((text) =>
+                        text.setValue(this.settingsManager.settings.learnerName).onChange((value) => {
+                            this.applySettingsUpdate(async () => {
+                                this.settingsManager.settings.learnerName = value.trim();
+                                await this.settingsManager.save();
+                            });
+                        }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
                     .setName(t("REVIEW_LOOK"))
                     .setDesc(t("REVIEW_LOOK_DESC"))
                     .addDropdown((dropdown) =>

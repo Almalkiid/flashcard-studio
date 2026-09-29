@@ -1,6 +1,6 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
 import "src/ui/obsidian-ui-components/content-container/card-container/review-studio.css";
-import { App, Platform } from "obsidian";
+import { App, Platform, setIcon } from "obsidian";
 
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
@@ -33,6 +33,9 @@ import { RenderMarkdownWrapper } from "src/utils/renderers";
 
 const ANSWER_LABELS = ["Reset", "Again", "Hard", "Good", "Easy"];
 
+/** The star in the Studio card's corner stands for Anki's orange flag. */
+const STAR_FLAG = 2;
+
 // TODO: Refactor cloze rendering into the renderers file
 export class CardContainer {
     private app: App;
@@ -60,6 +63,7 @@ export class CardContainer {
     private jumpToCardHandler: () => Promise<void>;
     private actions: CardActions;
     private answerToast: HTMLDivElement | null = null;
+    private starButton: HTMLButtonElement;
     private answerToastTimeout: number | null = null;
     private summaryEl: HTMLElement | null = null;
 
@@ -125,6 +129,24 @@ export class CardContainer {
 
         this.content = this.scrollWrapper.createDiv();
         this.content.addClass("sr-content");
+
+        // Studio: a star in the card's corner, and tapping the question reveals the answer
+        this.starButton = this.scrollWrapper.createEl("button", {
+            cls: "fs-card-star",
+            attr: { "aria-label": t("STAR_CARD") },
+        });
+        setIcon(this.starButton, "star");
+        this.starButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const flag = this.actions.currentFlag();
+            void this.actions.setFlag(flag === STAR_FLAG ? 0 : STAR_FLAG);
+        });
+        this.content.addEventListener("click", (event) => {
+            if (!this.view.hasClass("sr-look-studio") || this.cardState !== CardState.Front) return;
+            const target = event.target as HTMLElement | null;
+            if (target?.closest("a, input, button, .cloze-input")) return;
+            this.showAnswerHandler();
+        });
 
         this.response = new ResponseSectionComponent(
             this.view,
@@ -208,6 +230,14 @@ export class CardContainer {
     public showFlag(flag: number): void {
         for (let i = 1; i <= FLAG_COUNT; i++) this.scrollWrapper.removeClass(`sr-flag-${i}`);
         if (flag > 0) this.scrollWrapper.addClass(`sr-flag-${flag}`);
+        this.starButton.toggleClass("is-on", flag === STAR_FLAG);
+    }
+
+    /**
+     * Shows the answers given in this session in the progress bar.
+     */
+    public setSessionAnswers(responses: readonly ReviewResponse[]): void {
+        this.toolbar.setSessionAnswers(responses);
     }
 
     /**
@@ -271,6 +301,16 @@ export class CardContainer {
 
         // Update card content
         await this.drawCardFrontContent(sessionData, settings);
+        if (this.view.hasClass("sr-look-studio")) {
+            const hint = this.content.createDiv({ cls: "fs-reveal-hint" });
+            setIcon(hint.createSpan({ cls: "fs-reveal-hint-icon" }), "pointer");
+            hint.createSpan({
+                text:
+                    Platform.isMobile || EmulatedPlatform().isMobile
+                        ? t("TAP_TO_REVEAL")
+                        : t("PRESS_SPACE_TO_REVEAL"),
+            });
+        }
         this.animateCardIn();
 
         // Update response buttons
@@ -325,6 +365,18 @@ export class CardContainer {
     }
 
     /**
+     * Studio: a green "Answer" label where the answer starts (after the question, or at the top of a cloze card).
+     */
+    private insertAnswerLabel(): void {
+        const label = createDiv({ cls: "fs-pill fs-answer-pill", text: t("STUDIO_ANSWER") });
+        const divider = this.content.querySelector(":scope > hr");
+        const context = this.content.querySelector(":scope > .sr-context");
+        if (divider) divider.after(label);
+        else if (context) context.after(label);
+        else this.content.prepend(label);
+    }
+
+    /**
      * Slides a new card into place in the Studio look (not when the system asks for reduced motion).
      */
     private animateCardIn(): void {
@@ -346,6 +398,7 @@ export class CardContainer {
     private applyAppearance(settings: SRSettings): void {
         const studio = settings.reviewLook !== "classic";
         this.view.toggleClass("sr-look-studio", studio);
+        this.view.toggleClass("fs-studio", studio);
         this.view.toggleClass("sr-look-classic", !studio);
         this.view.toggleClass("sr-keys-anki", settings.answerKeys === "anki");
     }
@@ -498,6 +551,7 @@ export class CardContainer {
         // Evaluate cloze answers
         this._evaluateClozeAnswers();
         this.content.addClass("sr-answer-shown");
+        if (this.view.hasClass("sr-look-studio")) this.insertAnswerLabel();
 
         // Show response buttons
         this.response.showRatingButtons(

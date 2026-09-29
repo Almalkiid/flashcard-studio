@@ -109,6 +109,8 @@ export interface SRSettings {
     answerKeys: AnswerKeys;
     /** "studio" is the refined default review screen; "classic" keeps the original plugin's look. */
     reviewLook: "studio" | "classic";
+    /** Shown in the home screen greeting; empty for none. */
+    learnerName: string;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -225,6 +227,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     fsrsWeights: "",
     answerKeys: "original",
     reviewLook: "studio",
+    learnerName: "",
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

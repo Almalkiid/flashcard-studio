@@ -18,10 +18,13 @@ import {
     UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
 import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
+import { streaks, todaySummary } from "src/stats/activity";
+import { trueRetention } from "src/stats/answers";
 import { buildSessionSummary } from "src/stats/session";
 import { CardActions } from "src/ui/card-actions";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
+import { HomeInsights } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
 import { CardInfoModal } from "src/ui/obsidian-ui-components/modals/card-info-modal";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { CustomStudyModal } from "src/ui/obsidian-ui-components/modals/custom-study-modal";
@@ -97,6 +100,8 @@ export default class ContentManager {
     private pendingResumeTimeout: number | null = null;
     // When the current review session started, to summarise it when it ends; 0 outside a session
     private sessionStartMs: number = 0;
+    // The answers given in the current session, oldest first, for the progress bar
+    private sessionAnswers: ReviewResponse[] = [];
     private readonly closeModal: (() => void) | undefined;
 
     // Shared by every queue this screen loads, so the last answer of a deck can still be undone
@@ -129,6 +134,14 @@ export default class ContentManager {
             (deck) => void this._startReviewOfDeck(deck),
             closeModal,
             () => this._openCustomStudy(),
+            {
+                loadInsights: () => this._loadHomeInsights(),
+                openStatistics: () => {
+                    this.closeModal?.();
+                    void this.uiManager.openStatisticsView();
+                },
+                openSettings: () => this._openPluginSettings(),
+            },
         );
 
         this.cardContainer = new CardContainer(
@@ -219,6 +232,8 @@ export default class ContentManager {
 
     private async _reviewDeck(deck: Deck): Promise<void> {
         this.sessionStartMs = Date.now();
+        this.sessionAnswers = [];
+        this.cardContainer.setSessionAnswers(this.sessionAnswers);
         this.deckContainer.closeList();
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
@@ -568,6 +583,10 @@ export default class ContentManager {
 
         const durationMs: number = activeWindow.performance.now() - this.cardShownAt;
         await this.reviewSequencer.processReview(response, durationMs);
+        if (response !== ReviewResponse.Reset) {
+            this.sessionAnswers.push(response);
+            this.cardContainer.setSessionAnswers(this.sessionAnswers);
+        }
         const entry = this.reviewSequencer.lastLoggedEntry;
         await this._showNextCard();
         // The session summary has its own undo button; the toast would sit on top of its buttons
@@ -578,6 +597,48 @@ export default class ContentManager {
         ) {
             this.cardContainer.showAnswerToast(entry);
         }
+    }
+
+    // MARK: Studio home
+
+    /**
+     * Today's count, the streak and 30-day retention for the home screen, from every device's review log.
+     */
+    private async _loadHomeInsights(): Promise<HomeInsights> {
+        try {
+            const entries = await this.dataManager.reviewLog.readAll();
+            const dayKeyOf = currentDayKeyFn();
+            const todayKey = dayKeyOf(Date.now());
+            const last30 = trueRetention(entries, todayKey, dayKeyOf).find(
+                (row) => row.id === "last30",
+            );
+            return {
+                studiedToday: todaySummary(entries, todayKey, dayKeyOf).reviews,
+                streak: streaks(entries, todayKey, dayKeyOf).current,
+                retention: last30?.all.rate ?? null,
+            };
+        } catch (error) {
+            console.error(
+                "Flashcard Studio: could not read the review history for the home screen",
+                error,
+            );
+            return { studiedToday: 0, streak: 0, retention: null };
+        }
+    }
+
+    /**
+     * Opens Obsidian's settings on this plugin's tab. The settings dialog is not part of Obsidian's public API.
+     */
+    private _openPluginSettings(): void {
+        const setting = (
+            this.app as unknown as {
+                setting?: { open: () => void; openTabById: (id: string) => void };
+            }
+        ).setting;
+        if (!setting) return;
+        this.closeModal?.();
+        setting.open();
+        setting.openTabById(this.plugin.manifest.id);
     }
 
     // MARK: Card actions (undo, bury, suspend, flag)
@@ -628,6 +689,8 @@ export default class ContentManager {
                 }
                 return;
             case UndoResult.Requeued:
+                this.sessionAnswers.pop();
+                this.cardContainer.setSessionAnswers(this.sessionAnswers);
                 this._clearPendingResumeTimeout();
                 await this._showNextCard();
                 if (this.sessionData !== null) {

@@ -2,8 +2,10 @@ import "src/ui/obsidian-ui-components/content-container/card-container/toolbar/t
 import { Platform } from "obsidian";
 
 import { Deck } from "src/data/data-structures/deck/deck";
+import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { DeckStats } from "src/scheduling/flashcard-review-sequencer";
 import { CardActions } from "src/ui/card-actions";
+import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
 import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
@@ -20,6 +22,8 @@ export default class CardToolbarComponent {
     private extendedMenuButton: CardMenuButtonComponent;
     private shortMenuButton: CardMenuButtonComponent;
     private progressFill: HTMLDivElement;
+    private counterEl: HTMLDivElement;
+    private titleDeckEl: HTMLDivElement;
 
     public constructor(
         parentEl: HTMLElement,
@@ -50,6 +54,10 @@ export default class CardToolbarComponent {
         centerSpacer.addClass("sr-center-spacer");
 
         this.infoSection = new DeckInfoComponent(this.toolbar);
+        // Studio shows the card's deck over a plain "4 / 17" instead of the deck badge
+        const title = this.toolbar.createDiv({ cls: "fs-card-title" });
+        this.titleDeckEl = title.createDiv({ cls: "fs-card-title-deck" });
+        this.counterEl = title.createDiv({ cls: "fs-card-counter" });
 
         this.toolbar.createDiv().addClass("sr-flex-spacer");
 
@@ -127,6 +135,20 @@ export default class CardToolbarComponent {
     }
 
     /**
+     * Colours the session's progress bar by the answers given so far, one segment per answer, oldest first.
+     */
+    public setSessionAnswers(responses: readonly ReviewResponse[]): void {
+        this.progressFill.empty();
+        this.progressFill.toggleClass("sr-has-answers", responses.length > 0);
+        this.progressFill.toggleClass("sr-many-answers", responses.length > 60);
+        for (const response of responses) {
+            this.progressFill.createDiv({
+                cls: `sr-session-answer sr-session-answer-${ReviewResponse[response].toLowerCase()}`,
+            });
+        }
+    }
+
+    /**
      * Updates the deck info section
      * @param chosenDeck - The chosen deck
      * @param currentDeck - The current deck
@@ -151,6 +173,18 @@ export default class CardToolbarComponent {
         const ratio =
             totalCardsInSession > 0 ? Math.min(1, Math.max(0, done / totalCardsInSession)) : 0;
         this.progressFill.setCssProps({ "--sr-progress": ratio.toFixed(4) });
+        this.counterEl.setText(
+            totalCardsInSession > 0
+                ? `${Math.min(done + 1, totalCardsInSession)} / ${totalCardsInSession}`
+                : "",
+        );
+
+        const deckPath = currentDeck.getTopicPath().path;
+        this.titleDeckEl.empty();
+        if (deckPath.length > 0) {
+            createDeckTile(this.titleDeckEl, currentDeck.deckName);
+            this.titleDeckEl.createSpan({ text: deckPath.map(readableDeckName).join(" – ") });
+        }
 
         this.infoSection.updateInfo(
             chosenDeck.deckName,
@@ -170,6 +204,8 @@ export default class CardToolbarComponent {
      */
     public markSessionComplete(): void {
         this.progressFill.setCssProps({ "--sr-progress": "1" });
+        const total = this.counterEl.getText().split("/")[1]?.trim();
+        if (total) this.counterEl.setText(`${total} / ${total}`);
         this.infoSection.markChosenDeckComplete();
     }
 

@@ -90,9 +90,10 @@ async function isMobile(): Promise<boolean> {
 
 async function screenshot(name: string): Promise<void> {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-    if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
-        path.join(SCREENSHOT_DIR, `${name}-${(await isMobile()) ? "mobile" : "desktop"}.png`),
-    );
+    if (TAKE_SCREENSHOTS)
+        await browser.saveScreenshot(
+            path.join(SCREENSHOT_DIR, `${name}-${(await isMobile()) ? "mobile" : "desktop"}.png`),
+        );
 }
 
 /** Shows the front of the next card, then its answer. */
@@ -517,16 +518,16 @@ describe("statistics and insight", function () {
 
         // Several decks have cards, so the review opens on the deck list; start with the top deck
         await openReview();
-        await browser.$(".sr-view .sr-tree-container .sr-tree-item-row").waitForClickable({
+        await browser.$(".sr-view .fs-home-deck.is-clickable").waitForClickable({
             timeoutMsg: "the deck list was not shown",
         });
         await browser.execute(() => {
             const rows = Array.from(
-                document.querySelectorAll<HTMLElement>(
-                    ".sr-view .sr-tree-container .sr-tree-item-row",
-                ),
+                document.querySelectorAll<HTMLElement>(".sr-view .fs-home-deck"),
             );
-            rows.find((row) => (row.textContent ?? "").startsWith("flashcards"))?.click();
+            rows.find(
+                (row) => row.querySelector(".fs-home-deck-name")?.textContent === "Flashcards",
+            )?.click();
         });
         // Answer one card, so today has a real review as well as the history
         await answerNextCard("sr-good-button");
@@ -557,12 +558,13 @@ describe("statistics and insight", function () {
         const slices = mobile ? [640, 1500, 2400] : [700, 1400, 2100];
         for (const [index, top] of slices.entries()) {
             await scrollStatistics(top);
-            if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
-                path.join(
-                    SCREENSHOT_DIR,
-                    `statistics-${mobile ? "mobile" : "desktop"}-${index + 2}.png`,
-                ),
-            );
+            if (TAKE_SCREENSHOTS)
+                await browser.saveScreenshot(
+                    path.join(
+                        SCREENSHOT_DIR,
+                        `statistics-${mobile ? "mobile" : "desktop"}-${index + 2}.png`,
+                    ),
+                );
         }
 
         // A theme change redraws the charts in the new colours. Switching the body classes is what Obsidian does.
@@ -576,13 +578,18 @@ describe("statistics and insight", function () {
         await browser.pause(1200);
         await scrollStatistics(0);
         expect(await canvasCount()).toBeGreaterThanOrEqual(7);
-        if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
-            path.join(SCREENSHOT_DIR, `statistics-${mobile ? "mobile" : "desktop"}-light.png`),
-        );
+        if (TAKE_SCREENSHOTS)
+            await browser.saveScreenshot(
+                path.join(SCREENSHOT_DIR, `statistics-${mobile ? "mobile" : "desktop"}-light.png`),
+            );
         await scrollStatistics(mobile ? 640 : 700);
-        if (TAKE_SCREENSHOTS) await browser.saveScreenshot(
-            path.join(SCREENSHOT_DIR, `statistics-${mobile ? "mobile" : "desktop"}-light-2.png`),
-        );
+        if (TAKE_SCREENSHOTS)
+            await browser.saveScreenshot(
+                path.join(
+                    SCREENSHOT_DIR,
+                    `statistics-${mobile ? "mobile" : "desktop"}-light-2.png`,
+                ),
+            );
         await setLight(false);
         if (!mobile) await browser.executeObsidian(({ app }) => app.workspace.leftSplit.expand());
     });

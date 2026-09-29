@@ -3,148 +3,199 @@ import { setIcon } from "obsidian";
 
 import { Deck } from "src/data/data-structures/deck/deck";
 import { t } from "src/lang/helpers";
+import { RepItemState } from "src/scheduling/algorithms/base/repetition-item";
 import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-review-sequencer";
+import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 
 /** A rough answer time used for the "about N min" estimate. */
 const SECONDS_PER_CARD = 10;
-const MONOGRAM_COLOURS = 7;
-
-function studyMinutes(cards: number): number {
-    return Math.max(1, Math.round((cards * SECONDS_PER_CARD) / 60));
-}
 
 /**
- * A stable colour for a deck's monogram, so a deck keeps its colour between sessions.
+ * What the home screen shows about the learner, read from the review history (so it arrives asynchronously).
  */
-function monogramColour(name: string): number {
-    let hash = 0;
-    for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-    return (hash % MONOGRAM_COLOURS) + 1;
+export interface HomeInsights {
+    studiedToday: number;
+    streak: number;
+    /** True retention over the last 30 days, 0 to 1, or null without review answers. */
+    retention: number | null;
 }
 
-function readableDeckName(name: string): string {
-    return name.replace(/[-_]+/g, " ").trim();
+export interface HomeActions {
+    startReviewOfDeck: (deck: Deck) => void;
+    loadInsights: () => Promise<HomeInsights>;
+    openStatistics: () => void;
+    openSettings: () => void;
+    learnerName: string;
 }
 
-function countLabel(count: number): string {
-    return count === 1 ? t("HOME_ONE_CARD") : t("HOME_CARDS", { count });
+function greeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return t("HOME_GOOD_MORNING");
+    if (hour < 18) return t("HOME_GOOD_AFTERNOON");
+    return t("HOME_GOOD_EVENING");
+}
+
+function deckSubtitle(stats: DeckStats): string {
+    if (stats.dueCount > 0 && stats.newCount > 0) {
+        return t("HOME_DUE_AND_NEW", { due: stats.dueCount, newCount: stats.newCount });
+    }
+    if (stats.dueCount > 0) return t("HOME_DUE_TODAY", { count: stats.dueCount });
+    if (stats.newCount > 0) return t("HOME_NEW_CARDS", { count: stats.newCount });
+    return t("HOME_ALL_DONE_SHORT");
+}
+
+function roundIconButton(
+    parent: HTMLElement,
+    icon: string,
+    label: string,
+    onClick: () => void,
+): void {
+    const button = parent.createEl("button", {
+        cls: "fs-round-button",
+        attr: { "aria-label": label },
+    });
+    setIcon(button, icon);
+    button.addEventListener("click", onClick);
 }
 
 /**
- * The Studio look's deck list: a hero card for today's study and a tile for every deck.
+ * The Studio home: a greeting, today's goal, three insight tiles and the decks to continue.
  */
 export function renderStudioHome(
     container: HTMLElement,
     reviewSequencer: IFlashcardReviewSequencer,
-    startReviewOfDeck: (deck: Deck) => void,
+    actions: HomeActions,
 ): void {
     container.empty();
     const root: Deck = reviewSequencer.originalDeckTree;
     const rootStats: DeckStats = reviewSequencer.getDeckStats(root.getTopicPath());
+    const toStudy = rootStats.dueCount + rootStats.newCount;
+    const totalNew = root.getDistinctRepItemCount(RepItemState.NewItem, true);
+    const cardsLearned = Math.max(0, rootStats.totalCount - totalNew);
 
-    renderHero(container, rootStats, () => startReviewOfDeck(root));
-
-    const decks = container.createDiv({ cls: "sr-home-section" });
-    decks.createDiv({ cls: "sr-home-section-title", text: t("HOME_DECKS") });
-    const list = decks.createDiv({ cls: "sr-home-deck-list" });
-    for (const deck of root.subdecks) {
-        renderDeckTile(list, deck, 0, reviewSequencer, startReviewOfDeck);
-    }
-}
-
-function renderHero(container: HTMLElement, stats: DeckStats, studyNow: () => void): void {
-    const toStudy = stats.dueCount + stats.newCount;
-    const hero = container.createDiv({ cls: "sr-home-hero" });
-    hero.toggleClass("is-done", toStudy === 0);
-
-    const decoration = hero.createDiv({ cls: "sr-home-hero-decoration" });
-    setIcon(decoration, toStudy === 0 ? "check-circle-2" : "layers");
-
-    const label = hero.createDiv({ cls: "sr-home-hero-label" });
-    setIcon(label.createSpan({ cls: "sr-home-hero-label-icon" }), "sun");
-    label.createSpan({ text: t("HOME_TODAY") });
-
-    if (toStudy === 0) {
-        hero.createDiv({ cls: "sr-home-hero-number", text: t("HOME_ALL_DONE_TITLE") });
-        hero.createDiv({ cls: "sr-home-hero-detail", text: t("HOME_ALL_DONE_DESC") });
-        return;
-    }
-
-    hero.createDiv({ cls: "sr-home-hero-number", text: countLabel(toStudy) });
-    const parts: string[] = [];
-    if (stats.newCount > 0) parts.push(t("HOME_NEW_CHIP", { count: stats.newCount }));
-    if (stats.dueCount > 0) parts.push(t("HOME_DUE_CHIP", { count: stats.dueCount }));
-    parts.push(t("HOME_MINUTES", { minutes: studyMinutes(toStudy) }));
-    hero.createDiv({ cls: "sr-home-hero-detail", text: parts.join("  ·  ") });
-
-    const button = hero.createEl("button", { cls: "sr-home-study-now" });
-    button.createSpan({ text: t("STUDY_NOW") });
-    setIcon(button.createSpan({ cls: "sr-home-study-now-icon" }), "arrow-right");
-    button.addEventListener("click", studyNow);
-}
-
-function renderDeckTile(
-    list: HTMLElement,
-    deck: Deck,
-    depth: number,
-    reviewSequencer: IFlashcardReviewSequencer,
-    startReviewOfDeck: (deck: Deck) => void,
-): void {
-    const stats = reviewSequencer.getDeckStats(deck.getTopicPath());
-    const toStudy = stats.dueCount + stats.newCount;
-    const seen = Math.max(0, stats.totalCount - stats.newCount);
-
-    const tile = list.createDiv({ cls: "sr-home-deck" });
-    tile.setAttribute("data-depth", String(Math.min(depth, 4)));
-    tile.toggleClass("is-done", toStudy === 0);
-
-    const monogram = tile.createDiv({
-        cls: `sr-home-deck-monogram sr-monogram-${monogramColour(deck.deckName)}`,
-        text: readableDeckName(deck.deckName).charAt(0).toUpperCase(),
+    // Greeting
+    const head = container.createDiv({ cls: "fs-home-head" });
+    const hello = head.createDiv({ cls: "fs-home-hello" });
+    hello.createDiv({
+        cls: "fs-home-greeting",
+        text: greeting() + (actions.learnerName ? "," : ""),
     });
-    monogram.setAttribute("aria-hidden", "true");
+    if (actions.learnerName) hello.createDiv({ cls: "fs-home-name", text: actions.learnerName });
+    hello.createDiv({ cls: "fs-home-tagline", text: t("HOME_TAGLINE") });
+    const headButtons = head.createDiv({ cls: "fs-home-head-buttons" });
+    roundIconButton(headButtons, "bar-chart-3", t("OPEN_STATISTICS_SHORT"), actions.openStatistics);
+    roundIconButton(headButtons, "settings", t("OPEN_SETTINGS_SHORT"), actions.openSettings);
 
-    const body = tile.createDiv({ cls: "sr-home-deck-body" });
-    body.createDiv({ cls: "sr-home-deck-name", text: readableDeckName(deck.deckName) });
-    const meta = body.createDiv({ cls: "sr-home-deck-meta", text: countLabel(stats.totalCount) });
-    meta.setAttribute("aria-label", t("TOTAL_CARDS"));
-    const progress = body.createDiv({ cls: "sr-home-deck-progress" });
-    progress.createDiv({ cls: "sr-home-deck-progress-fill" }).setCssProps({
-        "--sr-deck-seen": stats.totalCount > 0 ? (seen / stats.totalCount).toFixed(4) : "0",
-    });
-
-    const chips = tile.createDiv({ cls: "sr-home-deck-chips" });
-    if (toStudy === 0) {
-        const done = chips.createSpan({ cls: "sr-home-chip is-done" });
-        setIcon(done.createSpan({ cls: "sr-home-chip-icon" }), "check");
-        done.createSpan({ text: t("HOME_DECK_DONE") });
-    } else {
-        if (stats.dueCount > 0) {
-            chips.createSpan({
-                cls: "sr-home-chip is-due",
-                text: t("HOME_DUE_CHIP", { count: stats.dueCount }),
-            });
-        }
-        if (stats.newCount > 0) {
-            chips.createSpan({
-                cls: "sr-home-chip is-new",
-                text: t("HOME_NEW_CHIP", { count: stats.newCount }),
-            });
-        }
-        setIcon(chips.createSpan({ cls: "sr-home-deck-chevron" }), "chevron-right");
-        tile.addClass("is-clickable");
-        tile.setAttribute("role", "button");
-        tile.setAttribute("tabindex", "0");
-        tile.addEventListener("click", () => startReviewOfDeck(deck));
-        tile.addEventListener("keydown", (event: KeyboardEvent) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                startReviewOfDeck(deck);
-            }
+    // Daily goal
+    const goal = container.createDiv({ cls: "fs-card fs-home-goal" });
+    const ring = goal.createDiv({ cls: "fs-home-ring" });
+    const goalText = goal.createDiv({ cls: "fs-home-goal-text" });
+    goalText.createDiv({ cls: "fs-home-goal-label", text: t("HOME_DAILY_GOAL") });
+    const goalNumber = goalText.createDiv({ cls: "fs-home-goal-number" });
+    const goalDetail = goalText.createDiv({ cls: "fs-home-goal-detail" });
+    const chevron = goal.createDiv({ cls: "fs-home-chevron" });
+    setIcon(chevron, "chevron-right");
+    goal.addEventListener("click", () => actions.startReviewOfDeck(root));
+    const showGoal = (studied: number) => {
+        const target = studied + toStudy;
+        const progress = target > 0 ? studied / target : 1;
+        ring.setCssProps({ "--fs-ring": progress.toFixed(4) });
+        goalNumber.empty();
+        goalNumber.createSpan({ cls: "fs-home-goal-done", text: String(studied) });
+        goalNumber.createSpan({
+            cls: "fs-home-goal-target",
+            text: ` / ${target} ${t("HOME_CARDS_WORD")}`,
         });
-    }
+        goalDetail.setText(
+            toStudy === 0
+                ? t("HOME_ALL_DONE_DESC")
+                : t("HOME_LEFT_TODAY", {
+                      count: toStudy,
+                      minutes: Math.max(1, Math.round((toStudy * SECONDS_PER_CARD) / 60)),
+                  }),
+        );
+    };
+    showGoal(0);
 
-    for (const subdeck of deck.subdecks) {
-        renderDeckTile(list, subdeck, depth + 1, reviewSequencer, startReviewOfDeck);
+    // Insight tiles
+    const tiles = container.createDiv({ cls: "fs-home-tiles" });
+    const streakValue = insightTile(tiles, "flame", "orange", "–", t("HOME_DAY_STREAK"));
+    insightTile(tiles, "layers", "blue", String(cardsLearned), t("HOME_CARDS_LEARNED"));
+    const retentionValue = insightTile(tiles, "bar-chart-2", "green", "–", t("HOME_RETENTION"));
+
+    void actions.loadInsights().then((insights) => {
+        showGoal(insights.studiedToday);
+        streakValue.setText(String(insights.streak));
+        retentionValue.setText(
+            insights.retention === null ? "–" : `${Math.round(insights.retention * 100)}%`,
+        );
+    });
+
+    // Decks
+    const section = container.createDiv({ cls: "fs-home-section" });
+    section.createDiv({ cls: "fs-home-section-title", text: t("HOME_CONTINUE_STUDYING") });
+    const list = section.createDiv({ cls: "fs-home-decks" });
+    // Tree order, so subdecks stay under their parent
+    let studyButtonShown = false;
+    for (const { deck, depth } of flattenDecks(root.subdecks, 0)) {
+        const stats = reviewSequencer.getDeckStats(deck.getTopicPath());
+        const open = stats.dueCount + stats.newCount > 0;
+        const row = list.createDiv({ cls: "fs-card fs-home-deck" });
+        row.setAttribute("data-depth", String(Math.min(depth, 3)));
+        row.toggleClass("is-done", !open);
+
+        createDeckTile(row, deck.deckName);
+
+        const text = row.createDiv({ cls: "fs-home-deck-text" });
+        text.createDiv({ cls: "fs-home-deck-name", text: readableDeckName(deck.deckName) });
+        text.createDiv({ cls: "fs-home-deck-sub", text: deckSubtitle(stats) });
+
+        if (open && !studyButtonShown) {
+            studyButtonShown = true;
+            const study = row.createEl("button", { cls: "fs-home-study", text: t("HOME_STUDY") });
+            study.addEventListener("click", (event) => {
+                event.stopPropagation();
+                actions.startReviewOfDeck(deck);
+            });
+        } else {
+            setIcon(row.createDiv({ cls: "fs-home-chevron" }), open ? "chevron-right" : "check");
+        }
+
+        if (open) {
+            row.addClass("is-clickable");
+            row.setAttribute("role", "button");
+            row.setAttribute("tabindex", "0");
+            row.addEventListener("click", () => actions.startReviewOfDeck(deck));
+            row.addEventListener("keydown", (event: KeyboardEvent) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    actions.startReviewOfDeck(deck);
+                }
+            });
+        }
     }
+}
+
+function insightTile(
+    parent: HTMLElement,
+    icon: string,
+    tone: string,
+    value: string,
+    label: string,
+): HTMLElement {
+    const tile = parent.createDiv({ cls: "fs-card fs-home-tile" });
+    const iconEl = tile.createDiv({ cls: `fs-home-tile-icon fs-tone-${tone}` });
+    setIcon(iconEl, icon);
+    const valueEl = tile.createDiv({ cls: "fs-home-tile-value", text: value });
+    tile.createDiv({ cls: "fs-home-tile-label", text: label });
+    return valueEl;
+}
+
+function flattenDecks(decks: Deck[], depth: number): { deck: Deck; depth: number }[] {
+    const result: { deck: Deck; depth: number }[] = [];
+    for (const deck of decks) {
+        result.push({ deck, depth });
+        result.push(...flattenDecks(deck.subdecks, depth + 1));
+    }
+    return result;
 }
