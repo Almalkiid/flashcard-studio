@@ -52,6 +52,7 @@ cards are defined.
 | [Multi-line Basic](q-and-a-cards.md#multi-line-basic)                   | flashcard defines the front and back of a single card.                                        |
 | [Multi-line Bidirectional](q-and-a-cards.md#multi-line-bidirectional)   | flashcard defines two cards.                                                                  |
 | [Cloze](cloze-cards.md)                                                 | flashcard defines multiple cards, the number of cards based on the number of cloze deletions. |
+| [Callout](callout-cards.md)                                             | flashcard defines the front (the callout title) and back (its body) of a single card.         |
 
 ### Sibling Cards
 
@@ -65,7 +66,8 @@ only one sibling card is available for review on a single day.
 By default, the end of a multiline flashcard is denoted by a blank line at the end of the flashcard text.
 This means that blank lines can not be included within the text.
 
-See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included.
+See [Cards with Blank Lines](cards-with-blank-lines.md) if blank lines need to be included. With a start and an end marker
+a card can have several paragraphs, tables and lists on both sides.
 
 ---
 

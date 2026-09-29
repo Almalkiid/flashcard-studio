@@ -36,12 +36,20 @@ Question and answer both ways:::Reversed card
 - Add value and improve an organisation's operations
 
 The CAE reports ==functionally== to the ==board==.
+
+> [!question]- What is the capital of France?
+> Paris
 ```
 
 - `Question::Answer`: single-line card.
 - `Question:::Answer`: single-line card, reviewed in both directions.
 - `?` on its own line: multi-line card (`??` for both directions).
 - `==highlight==`, `**bold**` or `{{curly braces}}`: cloze deletions.
+- A callout of type `flashcard`, `question` or `card`: a card. The title is the front and the body is the back.
+- With a start and an end marker set in the settings (for example `+++` on the line before and after a card), a card can
+  have blank lines, tables and several paragraphs, also in its question.
+- Two more options in the settings: a cloze card that is only the line with the cloze, and `\cloze{answer}{hint}` for
+  clozes inside LaTeX math.
 
 Images, audio, LaTeX, code and footnotes work inside cards, because Obsidian renders them.
 
@@ -97,6 +105,13 @@ It includes fixes that community members contributed to the original plugin but 
 - #1587 by Lorite
 - #1623 by Sheldon Corkery
 - #1635 by paulclrt
+
+The card syntax owes the following to pull requests that were not merged into the original plugin:
+
+- #1652 by xiang2x: card regions with a start marker.
+- #1584 by ievlevpn: `\cloze{answer}{hint}` in LaTeX math.
+- #797 by Stefanuk12: a cloze card that is only the line with the cloze.
+- #1283: the idea of callout cards.
 
 Scheduling uses [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) by the Open Spaced Repetition project.
 
