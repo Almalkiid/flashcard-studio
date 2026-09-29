@@ -485,6 +485,25 @@ export class UIPreferencesPage extends SettingsPage {
                     );
             });
 
+        new SettingGroup(this.containerEl)
+            .setHeading(t("REVIEW_SCREEN"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("REVIEW_LOOK"))
+                    .setDesc(t("REVIEW_LOOK_DESC"))
+                    .addDropdown((dropdown) =>
+                        dropdown
+                            .addOption("studio", t("REVIEW_LOOK_STUDIO"))
+                            .addOption("classic", t("REVIEW_LOOK_CLASSIC"))
+                            .setValue(this.settingsManager.settings.reviewLook)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.reviewLook =
+                                    value === "classic" ? "classic" : "studio";
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
+
         // M3a: scheduling
         new SettingGroup(this.containerEl)
             .setHeading(t("ANSWER_KEYS"))

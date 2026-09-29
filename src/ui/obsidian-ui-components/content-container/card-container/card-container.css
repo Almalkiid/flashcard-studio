@@ -73,43 +73,37 @@
     }
 }
 
-/* Card flags (Anki colours) shown as a left border on the card */
-.sr-scroll-wrapper.sr-flag-1,
-.sr-scroll-wrapper.sr-flag-2,
-.sr-scroll-wrapper.sr-flag-3,
-.sr-scroll-wrapper.sr-flag-4,
-.sr-scroll-wrapper.sr-flag-5,
-.sr-scroll-wrapper.sr-flag-6,
-.sr-scroll-wrapper.sr-flag-7 {
-    border-left: 4px solid transparent;
-}
-
+/* Card flags (Anki colours): Studio draws them as a bar on the card, Classic as a border */
 .sr-scroll-wrapper.sr-flag-1 {
-    border-left-color: var(--color-red);
+    --sr-flag-color: var(--color-red);
 }
 
 .sr-scroll-wrapper.sr-flag-2 {
-    border-left-color: var(--color-orange);
+    --sr-flag-color: var(--color-orange);
 }
 
 .sr-scroll-wrapper.sr-flag-3 {
-    border-left-color: var(--color-green);
+    --sr-flag-color: var(--color-green);
 }
 
 .sr-scroll-wrapper.sr-flag-4 {
-    border-left-color: var(--color-blue);
+    --sr-flag-color: var(--color-blue);
 }
 
 .sr-scroll-wrapper.sr-flag-5 {
-    border-left-color: var(--color-pink);
+    --sr-flag-color: var(--color-pink);
 }
 
 .sr-scroll-wrapper.sr-flag-6 {
-    border-left-color: var(--color-cyan);
+    --sr-flag-color: var(--color-cyan);
 }
 
 .sr-scroll-wrapper.sr-flag-7 {
-    border-left-color: var(--color-purple);
+    --sr-flag-color: var(--color-purple);
+}
+
+.sr-look-classic .sr-scroll-wrapper[class*="sr-flag-"] {
+    border-left: 4px solid var(--sr-flag-color, transparent);
 }
 
 /* Short-lived confirmation of the last answer, with undo */

@@ -31,6 +31,11 @@ export interface IBaseLocale {
     SHOW_WELCOME: string;
     CREATE_SAMPLE_DECK: string;
     SAMPLE_DECK_CREATED: string;
+    REVIEW_SCREEN: string;
+    REVIEW_LOOK: string;
+    REVIEW_LOOK_DESC: string;
+    REVIEW_LOOK_STUDIO: string;
+    REVIEW_LOOK_CLASSIC: string;
     UNDO_LAST_ANSWER: string;
     DAILY_LIMITS: string;
     DAILY_LIMITS_DESC: string;

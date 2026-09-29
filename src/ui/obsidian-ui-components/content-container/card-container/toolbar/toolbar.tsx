@@ -19,6 +19,7 @@ export default class CardToolbarComponent {
     private resetButton: ResetButtonComponent;
     private extendedMenuButton: CardMenuButtonComponent;
     private shortMenuButton: CardMenuButtonComponent;
+    private progressFill: HTMLDivElement;
 
     public constructor(
         parentEl: HTMLElement,
@@ -112,6 +113,10 @@ export default class CardToolbarComponent {
         );
 
         // If we don't have a close modal, we don't need the close button
+        // A slim bar under the toolbar showing how much of this session is done
+        const progress = parentEl.createDiv({ cls: "sr-session-progress" });
+        this.progressFill = progress.createDiv({ cls: "sr-session-progress-fill" });
+
         if (closeModal === undefined) return;
 
         const closeButtonClasses = [
@@ -142,6 +147,11 @@ export default class CardToolbarComponent {
         currentDeckTotalCardsInQueue: number,
         flashcardCardOrder: string,
     ) {
+        const done = totalCardsInSession - chosenDeckStats.cardsInQueueCount;
+        const ratio =
+            totalCardsInSession > 0 ? Math.min(1, Math.max(0, done / totalCardsInSession)) : 0;
+        this.progressFill.setCssProps({ "--sr-progress": ratio.toFixed(4) });
+
         this.infoSection.updateInfo(
             chosenDeck.deckName,
             totalCardsInSession,

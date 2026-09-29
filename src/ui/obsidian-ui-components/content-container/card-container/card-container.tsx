@@ -1,4 +1,5 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
+import "src/ui/obsidian-ui-components/content-container/card-container/review-studio.css";
 import { App, Platform } from "obsidian";
 
 import { CardType } from "src/data/data-structures/card/questions/question";
@@ -93,6 +94,7 @@ export class CardContainer {
         this.view.addClasses(["sr-container", "sr-card-container", "sr-is-hidden"]);
 
         this.setCustomHotKeyState(settings.useCustomHotkeys);
+        this.applyAppearance(settings);
 
         this.toolbar = new CardToolbarComponent(
             this.view,
@@ -263,6 +265,8 @@ export class CardContainer {
 
         this._updateInfoBar(sessionData, settings.flashcardCardOrder);
         this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
+        this.applyAppearance(settings);
+        this.content.removeClass("sr-answer-shown");
 
         // Update card content
         await this.drawCardFrontContent(sessionData, settings);
@@ -316,6 +320,17 @@ export class CardContainer {
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
+    }
+
+    /**
+     * Applies the review screen's look and the key hints for the chosen answer keys. Called on every draw, so a
+     * settings change shows on the next card.
+     */
+    private applyAppearance(settings: SRSettings): void {
+        const studio = settings.reviewLook !== "classic";
+        this.view.toggleClass("sr-look-studio", studio);
+        this.view.toggleClass("sr-look-classic", !studio);
+        this.view.toggleClass("sr-keys-anki", settings.answerKeys === "anki");
     }
 
     public drawPendingState(nextPendingDueUnix: number): void {
@@ -435,6 +450,7 @@ export class CardContainer {
         determineButtonSchedule: (response: ReviewResponse) => RepItemScheduleInfo | null,
     ) {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
+        this.applyAppearance(settings);
         this.cardState = sessionData.cardData.currentCardState;
 
         this.toolbar.setResetButtonDisabled(false);
@@ -464,6 +480,7 @@ export class CardContainer {
 
         // Evaluate cloze answers
         this._evaluateClozeAnswers();
+        this.content.addClass("sr-answer-shown");
 
         // Show response buttons
         this.response.showRatingButtons(

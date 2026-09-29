@@ -108,8 +108,9 @@ export default class ResponseSectionComponent {
 
         if (reviewMode === FlashcardReviewMode.Cram) {
             this.responseEl.addClass("is-cram");
-            this.againButton.setButtonText(`${againButtonText}`);
-            this.easyButton.setButtonText(`${easyButtonText}`);
+            // setButtonText would replace the button's inner spans, so set the texts through them
+            this._setupEaseButton(this.againButton, againButtonText, null, false);
+            this._setupEaseButton(this.easyButton, easyButtonText, null, false);
 
             if (this.againButton.buttonEl.hasClass("sr-is-hidden")) {
                 this.againButton.buttonEl.removeClass("sr-is-hidden");
@@ -163,6 +164,10 @@ export default class ResponseSectionComponent {
         schedule: RepItemScheduleInfo | null,
         showInterval: boolean,
     ) {
+        button.setLabelAndInterval(
+            buttonName,
+            showInterval ? formatScheduleInterval(schedule, true) : "",
+        );
         if (showInterval) {
             button.setSmallText(formatScheduleInterval(schedule, true));
             button.setLargeText(`${buttonName} - ${formatScheduleInterval(schedule, false)}`);

@@ -107,6 +107,8 @@ export interface SRSettings {
     fsrsEnableFuzz: boolean;
     fsrsWeights: string;
     answerKeys: AnswerKeys;
+    /** "studio" is the refined default review screen; "classic" keeps the original plugin's look. */
+    reviewLook: "studio" | "classic";
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -222,6 +224,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     // Empty means FSRS's default weights
     fsrsWeights: "",
     answerKeys: "original",
+    reviewLook: "studio",
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

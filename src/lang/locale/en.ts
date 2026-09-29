@@ -40,6 +40,12 @@ const en: IBaseLocale = {
     SHOW_WELCOME: "Show the welcome guide",
     CREATE_SAMPLE_DECK: "Create a sample deck",
     SAMPLE_DECK_CREATED: "Created a sample deck. Review it from the ribbon or the command palette.",
+    REVIEW_SCREEN: "Review screen",
+    REVIEW_LOOK: "Look",
+    REVIEW_LOOK_DESC:
+        "Studio shows each card as a sheet on a quiet background, with tinted answer buttons that show the next interval. Classic keeps the original look.",
+    REVIEW_LOOK_STUDIO: "Studio",
+    REVIEW_LOOK_CLASSIC: "Classic",
     UNDO_LAST_ANSWER: "Undo last answer",
     DAILY_LIMITS: "Daily limits",
     DAILY_LIMITS_DESC:
