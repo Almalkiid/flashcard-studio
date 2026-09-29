@@ -55,6 +55,9 @@ describe("buildStatsReport", () => {
         expect(month.forecast.days).toHaveLength(30);
         expect(month.answerButtons.young.total).toEqual(3);
         expect(all.answerButtons.young.total).toEqual(4);
+        expect(month.rangeActiveDays).toEqual(2);
+        expect(all.rangeActiveDays).toEqual(3);
+        expect(month.rangeSummary.reviews).toEqual(3);
         expect(month.today).toEqual(all.today);
         expect(month.heatmap.total).toEqual(all.heatmap.total);
         // All history starts at the first entry, 2026-06-01, which is more than a year of weekly buckets away

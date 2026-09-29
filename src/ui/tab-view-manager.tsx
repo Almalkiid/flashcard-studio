@@ -5,6 +5,7 @@ import { SettingsManager } from "src/data/settings-manager";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
+import { STATISTICS_VIEW_TYPE, StatisticsView } from "src/ui/statistics-view/statistics-view";
 import { TabViewType } from "src/utils/types";
 
 /**
@@ -35,6 +36,10 @@ export default class TabViewManager {
                     this.reviewQueueLoader,
                 );
             },
+        },
+        {
+            type: STATISTICS_VIEW_TYPE,
+            viewCreator: (leaf) => new StatisticsView(leaf, this.plugin),
         },
     ];
 

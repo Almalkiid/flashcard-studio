@@ -477,6 +477,32 @@ export class CommandManager {
         });
 
         this.plugin.addCommand({
+            id: "srs-card-info",
+            name: t("VIEW_CARD_INFO"),
+            repeatable: false,
+            checkCallback: (checking: boolean) => {
+                const contentManager = this.uiManager.contentManager;
+                const reviewing =
+                    this.plugin.isInitialized &&
+                    contentManager !== null &&
+                    (this.uiManager.uiState === UIState.CardFront ||
+                        this.uiManager.uiState === UIState.CardBack);
+                if (!reviewing) return false;
+                if (!checking) contentManager._showCardInfo();
+                return true;
+            },
+        });
+
+        this.plugin.addCommand({
+            id: "srs-open-statistics",
+            name: t("OPEN_STATISTICS"),
+            callback: async () => {
+                if (!this.plugin.isInitialized) return;
+                await this.uiManager.openStatisticsView();
+            },
+        });
+
+        this.plugin.addCommand({
             id: "srs-open-review-queue-view",
             name: t("OPEN_REVIEW_QUEUE_VIEW"),
             callback: async () => {

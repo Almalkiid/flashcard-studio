@@ -70,6 +70,8 @@ export interface StatsReport {
     dailyGranularity: Granularity;
     /** The summary of everything answered in the time range. */
     rangeSummary: ActivitySummary;
+    /** Study days in the time range with at least one answer. */
+    rangeActiveDays: number;
     forecast: Forecast;
     cardCounts: CardCounts;
     intervals: Histogram;
@@ -127,6 +129,7 @@ export function buildStatsReport(
         ),
         dailyGranularity,
         rangeSummary: summarizeEntries(rangeEntries),
+        rangeActiveDays: streaks(rangeEntries, todayKey, dayKeyOf).activeDays,
         forecast: forecast(cards, { todayKey, dayKeyOf, days: FORECAST_DAYS[range] }),
         cardCounts: cardCounts(cards),
         intervals: intervalHistogram(cards),

@@ -15,6 +15,7 @@ import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view"
 import { SRSettingTab } from "src/ui/obsidian-ui-components/settings-tab";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import { SidebarManager } from "src/ui/sidebar-manager";
+import { STATISTICS_VIEW_TYPE } from "src/ui/statistics-view/statistics-view";
 import StatusBarManager from "src/ui/status-bar-manager";
 import TabViewManager from "src/ui/tab-view-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -430,6 +431,14 @@ export class UIManager {
             this.openFlashcardModal(reviewQueueLoader);
         }
         this.focusObsidianWindow();
+    }
+
+    /**
+     * Opens the statistics view in a tab, or brings the one that is already open to the front.
+     */
+    public async openStatisticsView(): Promise<void> {
+        if (!this.plugin.isInitialized) return;
+        await this.tabViewManager.openTabView(STATISTICS_VIEW_TYPE, "tab");
     }
 
     public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {
