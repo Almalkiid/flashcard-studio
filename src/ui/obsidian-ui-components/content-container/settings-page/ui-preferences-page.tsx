@@ -7,6 +7,7 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { speechAvailable } from "src/ui/speech";
 import { UIManager } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -558,6 +559,9 @@ export class UIPreferencesPage extends SettingsPage {
                     );
             });
 
+        // Read aloud, on devices that can speak
+        if (speechAvailable()) this.addReadAloudSettings();
+
         // M3a: scheduling
         new SettingGroup(this.containerEl)
             .setHeading(t("ANSWER_KEYS"))
@@ -573,6 +577,70 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.settingsManager.settings.answerKeys =
                                     value === "anki" ? "anki" : "original";
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
+    }
+
+    private addReadAloudSettings(): void {
+        const settings = this.settingsManager.settings;
+        new SettingGroup(this.containerEl)
+            .setHeading(t("READ_ALOUD"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("READ_QUESTION_ALOUD"))
+                    .setDesc(t("READ_QUESTION_ALOUD_DESC"))
+                    .addToggle((toggle) =>
+                        toggle.setValue(settings.readQuestionAloud).onChange(async (value) => {
+                            settings.readQuestionAloud = value;
+                            await this.settingsManager.save();
+                        }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("READ_ANSWER_ALOUD"))
+                    .setDesc(t("READ_ANSWER_ALOUD_DESC"))
+                    .addToggle((toggle) =>
+                        toggle.setValue(settings.readAnswerAloud).onChange(async (value) => {
+                            settings.readAnswerAloud = value;
+                            await this.settingsManager.save();
+                        }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SPEECH_VOICE"))
+                    .setDesc(t("SPEECH_VOICE_DESC"))
+                    .addDropdown((dropdown) => {
+                        // Devices load their voices a moment after start, and may add more later
+                        const fill = () => {
+                            dropdown.selectEl.empty();
+                            dropdown.addOption("", t("SPEECH_VOICE_AUTOMATIC"));
+                            for (const voice of activeWindow.speechSynthesis.getVoices()) {
+                                dropdown.addOption(voice.voiceURI, `${voice.name} (${voice.lang})`);
+                            }
+                            dropdown.setValue(settings.speechVoice);
+                        };
+                        fill();
+                        activeWindow.speechSynthesis.addEventListener("voiceschanged", fill);
+                        dropdown.onChange(async (value) => {
+                            settings.speechVoice = value;
+                            await this.settingsManager.save();
+                        });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SPEECH_RATE"))
+                    .setDesc(t("SPEECH_RATE_DESC"))
+                    .addSlider((slider) =>
+                        slider
+                            .setLimits(0.5, 2, 0.1)
+                            .setValue(settings.speechRate)
+                            .onChange(async (value) => {
+                                settings.speechRate = value;
                                 await this.settingsManager.save();
                             }),
                     );

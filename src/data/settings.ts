@@ -120,6 +120,13 @@ export interface SRSettings {
     ignoreAccentsWhenTyping: boolean;
     /** The options of a multiple choice card show in a new order each time. */
     shuffleChoices: boolean;
+    // Read aloud with the device's voices
+    readQuestionAloud: boolean;
+    readAnswerAloud: boolean;
+    /** The voiceURI of the voice to read with; empty picks one by language. */
+    speechVoice: string;
+    /** 1 is the voice's normal speed. */
+    speechRate: number;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -243,6 +250,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     typeAnswers: false,
     ignoreAccentsWhenTyping: false,
     shuffleChoices: true,
+    readQuestionAloud: false,
+    readAnswerAloud: false,
+    speechVoice: "",
+    speechRate: 1,
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

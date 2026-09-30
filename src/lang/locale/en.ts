@@ -106,6 +106,20 @@ const en: IBaseLocale = {
     TYPED_ANSWER_PLACEHOLDER: "Type the answer",
     TYPED_PRESS_ENTER: "Press Enter to check",
     // End study modes: multiple choice, typed answers
+    // Read aloud
+    READ_ALOUD: "Read aloud",
+    READ_QUESTION_ALOUD: "Read the question aloud when shown",
+    READ_QUESTION_ALOUD_DESC:
+        "Uses your device's own voices, so it works offline. The speaker button in a card reads the side you see.",
+    READ_ANSWER_ALOUD: "Read the answer aloud when shown",
+    READ_ANSWER_ALOUD_DESC: "Images, code and math are skipped. Cloze blanks are read as “blank”.",
+    SPEECH_VOICE: "Voice",
+    SPEECH_VOICE_DESC:
+        "The voices come from your device. Automatic picks one that speaks your Obsidian language.",
+    SPEECH_VOICE_AUTOMATIC: "Automatic",
+    SPEECH_RATE: "Speed",
+    SPEECH_RATE_DESC: "1 is the voice's normal speed.",
+    // End read aloud
     DAILY_LIMITS: "Daily limits",
     DAILY_LIMITS_DESC:
         "Cap how many new cards you learn and how many reviews you do each day, like Anki. Learning steps are never capped.",

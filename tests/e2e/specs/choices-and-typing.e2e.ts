@@ -147,6 +147,22 @@ async function suggestedRating(): Promise<string | null> {
     }, `${CARD} .sr-response-button.fs-suggested`);
 }
 
+/** Replaces the device's speech with a recorder, so the tests can read what would have been said. */
+async function recordSpeech(): Promise<void> {
+    await browser.execute(() => {
+        const w = window as unknown as { __spoken: string[]; speechSynthesis: SpeechSynthesis };
+        w.__spoken = [];
+        w.speechSynthesis.speak = (utterance: SpeechSynthesisUtterance) => {
+            w.__spoken.push(utterance.text);
+        };
+        w.speechSynthesis.cancel = () => undefined;
+    });
+}
+
+async function spoken(): Promise<string[]> {
+    return browser.execute(() => (window as unknown as { __spoken: string[] }).__spoken);
+}
+
 async function typeAnswer(text: string): Promise<void> {
     const input = browser.$(`${CARD} .fs-typed-input`);
     await input.waitForDisplayed({ timeoutMsg: "no field to type the answer in" });
@@ -168,6 +184,8 @@ describe("multiple choice cards and typed answers", function () {
             shuffleChoices: false,
             typeAnswers: false,
             ignoreAccentsWhenTyping: false,
+            readQuestionAloud: false,
+            readAnswerAloud: false,
             reviewLook: "studio",
         });
     });
@@ -473,5 +491,71 @@ describe("multiple choice cards and typed answers", function () {
                 ).setConfig("nativeMenus", value);
             }, nativeMenus);
         }
+    });
+    it("the speaker button reads the side that is showing", async function () {
+        await useNote(TYPED_NOTE);
+        await recordSpeech();
+        await openTypedCard();
+
+        const speaker = browser.$(`${CARD} .fs-speak-button`);
+        await speaker.waitForClickable({ timeoutMsg: "no speaker button" });
+        await speaker.click();
+        expect(await spoken()).toEqual(["What does CAE stand for?"]);
+
+        await browser.$(`${CARD} .sr-show-answer-button`).click();
+        await waitForBack();
+        await speaker.click();
+        // Only the answer, not the question again
+        expect((await spoken()).slice(-1)).toEqual(["Chief Audit Executive."]);
+    });
+
+    it("reads the question and the answer by itself when asked", async function () {
+        await setSettings({ readQuestionAloud: true, readAnswerAloud: true });
+        await useNote(TYPED_NOTE);
+        await recordSpeech();
+        await openTypedCard();
+
+        await browser.waitUntil(async () => (await spoken()).length === 1, {
+            timeoutMsg: "the question was not read",
+        });
+        expect(await spoken()).toEqual(["What does CAE stand for?"]);
+
+        await browser.$(`${CARD} .sr-show-answer-button`).click();
+        await waitForBack();
+        await browser.waitUntil(async () => (await spoken()).length === 2, {
+            timeoutMsg: "the answer was not read",
+        });
+        expect(await spoken()).toEqual(["What does CAE stand for?", "Chief Audit Executive."]);
+    });
+
+    it("a multiple choice card reads its options, then the right answer and why", async function () {
+        await useNote(CHOICE_NOTE);
+        await recordSpeech();
+        await openChoiceCard(4);
+
+        const speaker = browser.$(`${CARD} .fs-speak-button`);
+        await speaker.click();
+        expect(await spoken()).toEqual([
+            "Which body should approve the internal audit charter? The chief audit executive. The board. The external auditor. Senior management.",
+        ]);
+
+        await chooseOption(0);
+        await waitForBack();
+        await speaker.click();
+        expect((await spoken()).slice(-1)).toEqual([
+            "The board. Why. The board approves the charter; the CAE drafts it and senior management reviews it.",
+        ]);
+    });
+
+    it("the R key reads the card on desktop", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(TYPED_NOTE);
+        await recordSpeech();
+        await openTypedCard();
+
+        await browser.keys("r");
+        await browser.waitUntil(async () => (await spoken()).length === 1, {
+            timeoutMsg: "the R key did not read the card",
+        });
     });
 });

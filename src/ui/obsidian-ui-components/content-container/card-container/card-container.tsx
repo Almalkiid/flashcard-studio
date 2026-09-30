@@ -48,6 +48,7 @@ import {
     SessionSummaryActions,
 } from "src/ui/obsidian-ui-components/content-container/session-summary/session-summary";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
+import { joinSpeech, pickVoice, speakableText, Speaker, speechAvailable } from "src/ui/speech";
 import { moment } from "src/utils/dates";
 import { escapeHtml } from "src/utils/escape-html";
 import { formatIntervalCompact } from "src/utils/format-interval";
@@ -89,6 +90,7 @@ export class CardContainer {
     /** The menu's "Type answers" for this session; null follows the setting. */
     private typeAnswersOverride: boolean | null = null;
     private lastSession: { sessionData: SessionData; settings: SRSettings } | null = null;
+    private speaker = new Speaker();
 
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
@@ -160,6 +162,7 @@ export class CardContainer {
             isOn: () => this.typeAnswersOn(),
             toggle: () => this.toggleTypeAnswers(),
         });
+        this.toolbar.setSpeakHandler(() => this.readAloud());
 
         this.scrollWrapper = this.view.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
@@ -228,6 +231,7 @@ export class CardContainer {
         this.hideSessionSummary();
         this.typeAnswersOverride = null;
         this.resetStudyAids();
+        this.speaker.stop();
         activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
     }
@@ -244,6 +248,7 @@ export class CardContainer {
         // The toast of the previous answer would sit on top of the summary's buttons
         this.hideAnswerToast();
         this.toolbar.markSessionComplete();
+        this.speaker.stop();
         // No card is being shown, so the review shortcuts must do nothing
         this.cardState = CardState.Closed;
         this.view.addClass("sr-summary-open");
@@ -328,6 +333,7 @@ export class CardContainer {
     }
 
     public async drawCardFront(sessionData: SessionData, settings: SRSettings) {
+        this.speaker.stop();
         this.hideSessionSummary();
         this.toolbar.setResetButtonDisabled(true);
         // Update current deck info
@@ -397,6 +403,8 @@ export class CardContainer {
                 firstInput.focus();
             }
         }
+
+        if (settings.readQuestionAloud) this.readAloud();
     }
 
     private drawCardContext(sessionData: SessionData, settings: SRSettings) {
@@ -517,6 +525,65 @@ export class CardContainer {
         if (this.cardState === CardState.Front && this.lastSession !== null) {
             void this.drawCardFront(this.lastSession.sessionData, this.lastSession.settings);
         }
+    }
+
+    // #endregion
+
+    // #region -> Read aloud
+
+    /**
+     * Reads the side of the card that is showing, with the chosen voice (see src/ui/speech.ts). Does nothing where
+     * the device cannot speak.
+     */
+    public readAloud(): void {
+        if (
+            !speechAvailable() ||
+            this.lastSession === null ||
+            this.cardState === CardState.Closed
+        ) {
+            return;
+        }
+        const settings = this.lastSession.settings;
+        const voice = pickVoice(
+            activeWindow.speechSynthesis.getVoices(),
+            settings.speechVoice,
+            moment.locale(),
+        );
+        const rate = Math.min(2, Math.max(0.5, settings.speechRate || 1));
+        this.speaker.speak(joinSpeech(this.speechParts()), voice, rate);
+    }
+
+    /**
+     * What is worth reading on the visible side: the question and the options, or the answer and its explanation.
+     * The context line, the hints and the fields to type in are left out.
+     */
+    private speechParts(): string[] {
+        const back = this.cardState === CardState.Back;
+        const choiceRoot = this.content.querySelector<HTMLElement>(".fs-choice-root");
+        if (choiceRoot !== null) {
+            const parts = back
+                ? [".fs-choice.is-correct .fs-choice-text", ".fs-choice-explanation-text"]
+                : [".fs-choice-question", ".fs-choice-lead", ".fs-choice-text"];
+            return Array.from(choiceRoot.querySelectorAll<HTMLElement>(parts.join(","))).map(
+                speakableText,
+            );
+        }
+
+        const clone = this.content.cloneNode(true) as HTMLElement;
+        clone
+            .querySelectorAll(".sr-context, .fs-reveal-hint, .fs-answer-pill, .fs-typed")
+            .forEach((el) => el.remove());
+        if (back) {
+            // The answer starts after the divider between it and the question (a cloze card has none)
+            const divider = clone.querySelector(":scope > hr");
+            while (divider?.previousSibling) divider.previousSibling.remove();
+            divider?.remove();
+            // A typed answer: the expected text, not what was typed as well
+            if (clone.querySelector(".fs-typed-expected") !== null) {
+                clone.querySelector(".fs-typed-typed")?.remove();
+            }
+        }
+        return [speakableText(clone)];
     }
 
     // #endregion
@@ -695,6 +762,7 @@ export class CardContainer {
         this.applyAppearance(settings);
         this.cardState = sessionData.cardData.currentCardState;
         this.lastSession = { sessionData, settings };
+        this.speaker.stop();
 
         // What was typed or chosen on the front, before the content is rebuilt
         if (this.typedInput !== null) {
@@ -787,6 +855,8 @@ export class CardContainer {
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setSRViewInFocus(true);
         this.response.againButton.buttonEl.focus();
+
+        if (settings.readAnswerAloud) this.readAloud();
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
@@ -867,6 +937,12 @@ export class CardContainer {
             case "KeyJ":
                 void this.jumpToCardHandler();
                 consumeKeyEvent();
+                break;
+            case "KeyR":
+                if (speechAvailable()) {
+                    this.readAloud();
+                    consumeKeyEvent();
+                }
                 break;
             case "Enter":
             case "NumpadEnter":

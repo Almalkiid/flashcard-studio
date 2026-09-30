@@ -92,6 +92,18 @@ export interface IBaseLocale {
     TYPED_ANSWER_PLACEHOLDER: string;
     TYPED_PRESS_ENTER: string;
     // End study modes: multiple choice, typed answers
+    // Read aloud
+    READ_ALOUD: string;
+    READ_QUESTION_ALOUD: string;
+    READ_QUESTION_ALOUD_DESC: string;
+    READ_ANSWER_ALOUD: string;
+    READ_ANSWER_ALOUD_DESC: string;
+    SPEECH_VOICE: string;
+    SPEECH_VOICE_DESC: string;
+    SPEECH_VOICE_AUTOMATIC: string;
+    SPEECH_RATE: string;
+    SPEECH_RATE_DESC: string;
+    // End read aloud
     DAILY_LIMITS: string;
     DAILY_LIMITS_DESC: string;
     NEW_CARDS_PER_DAY: string;

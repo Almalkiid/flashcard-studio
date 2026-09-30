@@ -14,7 +14,9 @@ import CardMenuButtonComponent, {
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
+import SpeakButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/speak-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
+import { speechAvailable } from "src/ui/speech";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 export default class CardToolbarComponent {
@@ -26,6 +28,7 @@ export default class CardToolbarComponent {
     private progressFill: HTMLDivElement;
     private counterEl: HTMLDivElement;
     private titleDeckEl: HTMLDivElement;
+    private speakHandler: (() => void) | null = null;
 
     public constructor(
         parentEl: HTMLElement,
@@ -62,6 +65,17 @@ export default class CardToolbarComponent {
         this.counterEl = title.createDiv({ cls: "fs-card-counter" });
 
         this.toolbar.createDiv().addClass("sr-flex-spacer");
+
+        // Read aloud, on devices that can speak
+        if (speechAvailable()) {
+            new SpeakButtonComponent(
+                this.toolbar,
+                () => this.speakHandler?.(),
+                EmulatedPlatform().isPhone || Platform.isPhone
+                    ? ["mod-raised"]
+                    : ["clickable-icon"],
+            );
+        }
 
         new EditButtonComponent(
             this.toolbar,
@@ -134,6 +148,13 @@ export default class CardToolbarComponent {
         ];
 
         new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
+    }
+
+    /**
+     * What the speaker button does when it is pressed.
+     */
+    public setSpeakHandler(handler: () => void): void {
+        this.speakHandler = handler;
     }
 
     /**
