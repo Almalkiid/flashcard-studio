@@ -16,6 +16,7 @@ import { ObsidianLogAdapter } from "src/data/review-log/obsidian-log-adapter";
 import { ReviewLogStore } from "src/data/review-log/review-log-store";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
+import { isInExamsFolder } from "src/exam/exam-results-file";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
@@ -155,8 +156,10 @@ export class DataManager {
             this.osrCore.loadInitialStateOfCore();
 
             for (const noteFile of notes) {
-                // The review log is history, not cards; skipping it keeps start-up fast on phones
-                if (this.isInReviewLogFolder(noteFile.path)) continue;
+                // The review log and the exams are history, not cards; skipping them keeps start-up fast on phones
+                if (this.isInReviewLogFolder(noteFile.path) || isInExamsFolder(noteFile.path)) {
+                    continue;
+                }
 
                 // Skip files in the note ignore folder
                 if (
@@ -291,6 +294,9 @@ export class DataManager {
      * @returns {Promise<Note | null>} - A promise that resolves with the loaded note or null if not found.
      */
     async loadNote(noteFile: TFile): Promise<Note | null> {
+        // An exam's file is a record of the exam, never a note with cards: opening it and reviewing "this note" must not
+        // read a card out of its title or its questions, and write a schedule into it
+        if (isInExamsFolder(noteFile.path)) return null;
         const loader: NoteFileLoader = new NoteFileLoader(this.settingsManager.settings);
         const srFile: ISRNoteTFile = this.createSRNoteTFile(noteFile);
         const folderTopicPath: TopicPath = TopicPath.getFolderPathFromFilename(

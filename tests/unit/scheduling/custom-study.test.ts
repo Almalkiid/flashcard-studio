@@ -13,6 +13,8 @@ import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item
 import {
     allowanceFor,
     buildCustomStudyTree,
+    cardKey,
+    chosenCardsIn,
     customStudyMode,
     customStudyPredicate,
     CustomStudySpec,
@@ -24,6 +26,7 @@ import {
     isInDeck,
     limitCards,
     monthsBetween,
+    placeKey,
 } from "src/scheduling/custom-study";
 import { DailyLimits } from "src/scheduling/daily-limits";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
@@ -46,6 +49,10 @@ interface CardOptions {
     leech?: boolean;
     suspended?: boolean;
     buryUntil?: string;
+    /** Where the card is written, for a card that has no id yet. */
+    path?: string;
+    hash?: string;
+    cardIdx?: number;
 }
 
 function makeCard(options: CardOptions = {}): Card {
@@ -57,7 +64,11 @@ function makeCard(options: CardOptions = {}): Card {
     meta.buryUntil = options.buryUntil ?? null;
 
     const deckPaths = (options.deck ?? ["CIA/Part1"]).map((path) => new TopicPath(path.split("/")));
-    const question = { topicPathList: new TopicPathList(deckPaths) } as Question;
+    const question = {
+        topicPathList: new TopicPathList(deckPaths),
+        note: { filePath: options.path ?? "CIA/Part1.md" },
+        questionText: { textHash: options.hash ?? "h0" },
+    } as Question;
 
     const scheduleInfo =
         options.dueInDays === undefined
@@ -73,7 +84,7 @@ function makeCard(options: CardOptions = {}): Card {
                   0,
                   moment(NOW - 10 * DAY),
               );
-    return new Card({ question, meta, scheduleInfo });
+    return new Card({ question, meta, scheduleInfo, cardIdx: options.cardIdx ?? 0 });
 }
 
 const context = (forgottenIds: string[] = []) => ({
@@ -205,6 +216,7 @@ describe("customStudyPredicate", () => {
 
 describe("customStudyMode", () => {
     test("only review ahead reschedules; everything else is cram", () => {
+        expect(customStudyMode({ type: "cards", ids: ["a"] })).toBe(FlashcardReviewMode.Cram);
         expect(customStudyMode({ type: "ahead", days: 1 })).toBe(FlashcardReviewMode.Review);
         expect(customStudyMode({ type: "forgotten", days: 1 })).toBe(FlashcardReviewMode.Cram);
         expect(customStudyMode({ type: "preview", count: 1 })).toBe(FlashcardReviewMode.Cram);
@@ -396,5 +408,87 @@ describe("today's limit override", () => {
             { extraNew: 1, extraReviews: 1 },
         );
         expect(limits.remainingNew()).toBe(Infinity);
+    });
+});
+
+describe("cards: the ones an exam missed", () => {
+    test("cardKey is the card's id, or where the card is written when it has none yet", () => {
+        expect(cardKey(makeCard({ id: "abc123" }))).toBe("abc123");
+        const fresh = makeCard({ path: "CIA/Charter.md", hash: "h9", cardIdx: 1 });
+        expect(cardKey(fresh)).toBe("CIA/Charter.md|h9|1");
+        // The same text on another line of another note is another card
+        expect(cardKey(makeCard({ path: "CIA/Other.md", hash: "h9", cardIdx: 1 }))).not.toBe(
+            cardKey(fresh),
+        );
+    });
+
+    test("takes exactly the listed cards, by id or by place", () => {
+        const fresh = makeCard({ path: "CIA/Charter.md", hash: "h9" });
+        const predicate = customStudyPredicate(
+            { type: "cards", ids: ["a", cardKey(fresh)] },
+            context(),
+        );
+        expect(predicate(makeCard({ id: "a", dueInDays: 5 }))).toBe(true);
+        expect(predicate(makeCard({ id: "b", dueInDays: 5 }))).toBe(false);
+        expect(predicate(fresh)).toBe(true);
+        expect(predicate(makeCard({ path: "CIA/Charter.md", hash: "other" }))).toBe(false);
+    });
+
+    test("a suspended card is left out, a buried one is not: the person asked for it", () => {
+        const predicate = customStudyPredicate({ type: "cards", ids: ["a", "b"] }, context());
+        expect(predicate(makeCard({ id: "a", suspended: true }))).toBe(false);
+        expect(predicate(makeCard({ id: "b", buryUntil: "2023-09-08" }))).toBe(true);
+    });
+
+    test("a session of the missed cards keeps only those cards, in their decks", () => {
+        const tree = new Deck("root", null);
+        const cards = [
+            makeCard({ id: "a", deck: ["CIA/Part1"] }),
+            makeCard({ id: "b", deck: ["CIA/Part1"], dueInDays: 2 }),
+            makeCard({ id: "c", deck: ["CIA/Part2"] }),
+        ];
+        for (const card of cards) tree.appendRepItem(card.question.topicPathList, card);
+        const filtered = buildCustomStudyTree(tree, { type: "cards", ids: ["a", "c"] }, context());
+        expect(filtered.getDistinctRepItemCount(RepItemState.AnyItem, true)).toBe(2);
+        expect(filtered.getDeck(new TopicPath(["CIA", "Part2"]))).not.toBeNull();
+    });
+});
+
+describe("cards, after the cards have changed since the exam", () => {
+    test("placeKey is where the card is written, whether or not it has an id", () => {
+        expect(placeKey(makeCard({ path: "CIA/Charter.md", hash: "h9", cardIdx: 1 }))).toBe(
+            "CIA/Charter.md|h9|1",
+        );
+        expect(placeKey(makeCard({ id: "abc123", path: "CIA/Charter.md", hash: "h9" }))).toBe(
+            "CIA/Charter.md|h9|0",
+        );
+    });
+
+    test("a card that gained an id since the exam is still found by the place it was listed under", () => {
+        const before = makeCard({ path: "CIA/Charter.md", hash: "h9" });
+        const listed = cardKey(before);
+        // Answered on the phone since: the same card, now with an id
+        const after = makeCard({ id: "k3f9a2", path: "CIA/Charter.md", hash: "h9" });
+        expect(cardKey(after)).toBe("k3f9a2");
+        const predicate = customStudyPredicate({ type: "cards", ids: [listed] }, context());
+        expect(predicate(after)).toBe(true);
+        // and by its id, when the exam listed it after it had one
+        const byId = customStudyPredicate({ type: "cards", ids: ["k3f9a2"] }, context());
+        expect(byId(after)).toBe(true);
+    });
+
+    test("a card whose text changed is not found, and chosenCardsIn counts the ones that are", () => {
+        const tree = new Deck("root", null);
+        const cards = [
+            makeCard({ id: "a", deck: ["CIA/Part1"] }),
+            makeCard({ path: "CIA/N.md", hash: "old", deck: ["CIA/Part1"] }),
+            makeCard({ id: "c", deck: ["CIA/Part2", "CIA/Part1"] }),
+        ];
+        for (const card of cards) tree.appendRepItem(card.question.topicPathList, card);
+        const ids = ["a", "CIA/N.md|new|0", "c", "gone"];
+        const found = chosenCardsIn(tree, ids);
+        // "c" is in two decks and counts once; the edited card and the one that was deleted are lost
+        expect(found.map((card) => cardKey(card)).sort()).toEqual(["a", "c"]);
+        expect(chosenCardsIn(tree, [])).toEqual([]);
     });
 });

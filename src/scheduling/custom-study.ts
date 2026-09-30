@@ -15,6 +15,7 @@ import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
  * - `ahead`: cards that fall due within the next `days` days. Reviewed like any review, so FSRS reschedules them.
  * - `preview`: the first `count` new cards. Cram, so they stay new.
  * - `filter`: cards picked by deck, state, flag colour or leech mark. Cram.
+ * - `cards`: exactly the listed cards, by {@link cardKey} ("Study the ones I missed" after an exam). Cram.
  */
 export type CustomStudySpec =
     | { type: "forgotten"; days: number; sinceMs?: number }
@@ -30,7 +31,8 @@ export type CustomStudySpec =
           leechOnly: boolean;
           /** The most cards to study; 0 for no limit. */
           count: number;
-      };
+      }
+    | { type: "cards"; ids: string[] };
 
 /**
  * What the predicates need to know about the moment the session starts.
@@ -41,6 +43,23 @@ export interface CustomStudyContext {
     todayYmd: string;
     /** Ids of the cards answered Again in the period, from the review log. Only needed for `forgotten`. */
     forgottenIds: ReadonlySet<string>;
+}
+
+/**
+ * Where a card is written: its note, its text and which card of that text it is. It does not change when the card gets
+ * an id, but it does when the card's text is edited or the note is moved.
+ */
+export function placeKey(card: Card): string {
+    const question = card.question;
+    return `${question.note?.filePath ?? ""}|${question.questionText?.textHash ?? ""}|${card.cardIdx ?? 0}`;
+}
+
+/**
+ * A card's id, or, for a card that has none yet (a card gets its id when its first schedule is written), where it is
+ * written. Stable while the session it names lasts; a list made earlier is also matched by {@link placeKey}.
+ */
+export function cardKey(card: Card): string {
+    return card.meta.id !== null ? card.meta.id : placeKey(card);
 }
 
 export function customStudyMode(spec: CustomStudySpec): FlashcardReviewMode {
@@ -95,6 +114,13 @@ export function customStudyPredicate(
             return (card) => available(card) && isDueWithin(card, spec.days, context.nowMs);
         case "preview":
             return (card) => available(card) && card.isNew;
+        case "cards": {
+            // Chosen by name, so a card buried until tomorrow is still studied; only a suspended card is not
+            // By its id or by its place: a card that was listed without an id has one by now if it was answered since
+            const wanted = new Set(spec.ids);
+            return (card) =>
+                !card.meta.suspended && (wanted.has(cardKey(card)) || wanted.has(placeKey(card)));
+        }
         case "filter":
             return (card) => {
                 if (!available(card)) return false;
@@ -105,6 +131,25 @@ export function customStudyPredicate(
                 return spec.decks.length === 0 || spec.decks.some((deck) => isInDeck(card, deck));
             };
     }
+}
+
+/**
+ * The cards of a tree that a `cards` session would show for these ids, each once (a card in several decks counts once).
+ * Fewer than the ids means some cards were edited, moved or deleted since the list was made.
+ */
+export function chosenCardsIn(tree: Deck, ids: string[]): Card[] {
+    if (ids.length === 0) return [];
+    const predicate = customStudyPredicate(
+        { type: "cards", ids },
+        { nowMs: 0, todayYmd: "", forgottenIds: new Set<string>() },
+    );
+    const found = new Set<Card>();
+    for (const deck of tree.toDeckArray()) {
+        for (const item of [...deck.newRepItems, ...deck.dueRepItems]) {
+            if (item instanceof Card && predicate(item)) found.add(item);
+        }
+    }
+    return [...found];
 }
 
 /**

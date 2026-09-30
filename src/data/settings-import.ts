@@ -25,6 +25,8 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "readAnswerAloud",
     "speechVoice",
     "speechRate",
+    // Exams
+    "examPassPercent",
     // The Studio look
     "reviewLook",
     "learnerName",

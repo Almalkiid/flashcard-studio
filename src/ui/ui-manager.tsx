@@ -1,13 +1,20 @@
 import "src/ui/styles.css";
 import { Menu, MenuItem, Notice, Platform, TAbstractFile, TFile, WorkspaceLeaf } from "obsidian";
 
+import { SR_TAB_VIEW } from "src/data/constants";
 import { DataStore } from "src/data/data-store/base/data-store";
 import { SettingsManager } from "src/data/settings-manager";
+import { ExamStart } from "src/exam/exam";
+import { unfinishedExams } from "src/exam/exam-draft-store";
+import { cardsChangedText } from "src/exam/exam-render";
+import { ExamResumeModal } from "src/exam/exam-resume";
+import { ExamSetupModal } from "src/exam/exam-setup-modal";
+import { readExamResults } from "src/exam/exam-store";
 import { appIcon } from "src/icons/app-icon";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
-import { CustomStudySpec } from "src/scheduling/custom-study";
+import { chosenCardsIn, CustomStudySpec } from "src/scheduling/custom-study";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
@@ -59,6 +66,8 @@ export class UIManager {
 
     private plugin: SRPlugin;
     private settingsManager: SettingsManager;
+    // The exam an exam tab is about to show; the tab takes it when it opens
+    private pendingExam: ExamStart | null = null;
     private ribbonIcon: HTMLElement | null = null;
     private externalModalObserver: MutationObserver | null = null;
 
@@ -442,6 +451,73 @@ export class UIManager {
     public async openStatisticsView(): Promise<void> {
         if (!this.plugin.isInitialized) return;
         await this.tabViewManager.openTabView(STATISTICS_VIEW_TYPE, "tab");
+    }
+
+    /**
+     * Opens the exam setup. `onStart` gets the exam when the person chooses Start; by default it is taken in the
+     * Studio's desktop shell when that is open, and in a tab of its own otherwise.
+     */
+    public async openExamSetup(onStart?: (start: ExamStart) => void): Promise<void> {
+        if (!this.plugin.isInitialized) return;
+        // The decks and cards listed are the ones of the last sync, so make sure they are up to date
+        await this.plugin.dataManager.sync();
+        const recent = await readExamResults(this.plugin.app, 5);
+        new ExamSetupModal(
+            this.plugin,
+            recent,
+            unfinishedExams(this.plugin),
+            onStart ?? ((start) => void this.startExam(start)),
+        ).open();
+    }
+
+    /**
+     * When Obsidian starts with an exam that was not finished, offers to take it up again or drop it. Nothing happens
+     * without one.
+     */
+    public offerExamResume(): void {
+        const drafts = unfinishedExams(this.plugin);
+        if (drafts.length === 0) return;
+        new ExamResumeModal(this.plugin, drafts, (start) => void this.startExam(start)).open();
+    }
+
+    /**
+     * "Study the ones I missed" from an exam in a tab: a session of exactly those cards. Cards that were edited or
+     * deleted since the exam cannot be found, and the person is told; with none found nothing opens and the results
+     * stay on screen.
+     *
+     * @returns Whether the session opened.
+     */
+    public async studyMissed(ids: string[]): Promise<boolean> {
+        if (!this.plugin.isInitialized) return false;
+        await this.plugin.dataManager.sync();
+        const found = chosenCardsIn(this.plugin.dataManager.osrCore.reviewableDeckTree, ids).length;
+        if (found === 0) {
+            new Notice(t("EXAM_MISSED_NONE"));
+            return false;
+        }
+        if (found < ids.length) new Notice(cardsChangedText(ids.length - found));
+        await this.openDeckContainer(FlashcardReviewMode.Cram, undefined, { type: "cards", ids });
+        return true;
+    }
+
+    /** Takes an exam where it belongs: in the desktop Studio when it is open and free, else in a tab. */
+    public async startExam(start: ExamStart): Promise<void> {
+        const studio = this.contentManager;
+        if (studio !== null && studio.canRunExam) {
+            const leaf = this.plugin.app.workspace.getLeavesOfType(SR_TAB_VIEW)[0];
+            if (leaf !== undefined) await this.plugin.app.workspace.revealLeaf(leaf);
+            studio.runExam(start);
+            return;
+        }
+        this.pendingExam = start;
+        await this.tabViewManager.openExamTab();
+    }
+
+    /** Hands the waiting exam to the tab that shows it; null when there is none. */
+    public takePendingExam(): ExamStart | null {
+        const exam = this.pendingExam;
+        this.pendingExam = null;
+        return exam;
     }
 
     public openFlashcardModal(reviewQueueLoader: ReviewQueueLoader): void {

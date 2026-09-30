@@ -1,11 +1,18 @@
 import { App, MarkdownView, Notice, Platform } from "obsidian";
 
+import { NotePickerModal } from "src/ai/note-picker-modal";
+import { openGenerateCards } from "src/ai/open-generate-cards";
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { CardType, Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
+import { ExamStart, examSummary } from "src/exam/exam";
+import { persistenceFor } from "src/exam/exam-draft-store";
+import { cardsChangedText } from "src/exam/exam-render";
+import { ExamRunner } from "src/exam/exam-run";
+import { readExamResults, saveExamResult } from "src/exam/exam-store";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
@@ -157,6 +164,10 @@ export default class ContentManager {
     private panelLogReading: Promise<void> | null = null;
     // What the desktop home reads from the review log and the cards, read once each time the home is shown
     private desktopData: Promise<DesktopData> | null = null;
+    // An exam taken in the desktop shell, and the element it is drawn in; null when there is none
+    private examRunner: ExamRunner | null = null;
+    private examHost: HTMLElement | null = null;
+    private isClosed = false;
 
     // Shared by every queue this screen loads, so the last answer of a deck can still be undone
     private undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
@@ -195,6 +206,7 @@ export default class ContentManager {
             () => this._openCustomStudy(),
             {
                 loadInsights: () => this._loadHomeInsights(),
+                openExams: () => this._openExams(),
                 openStatistics: () => {
                     this.closeModal?.();
                     void this.uiManager.openStatisticsView();
@@ -222,12 +234,22 @@ export default class ContentManager {
         );
     }
 
-    /** Whether a study session is in progress: from its first card until the screen is back on the deck list. */
+    /**
+     * Whether a study session or an exam is in progress: from its first card until the screen is back on the deck list.
+     * The screen is not rebuilt for another layout meanwhile, which would drop it.
+     */
     public get inSession(): boolean {
-        return this.sessionStartMs !== 0;
+        return this.sessionStartMs !== 0 || this.examRunner !== null;
+    }
+
+    /** Whether an exam can be taken in this screen: the desktop shell is open and no study session is going. */
+    public get canRunExam(): boolean {
+        return this.desktop !== null && !this.isClosed && !this.inSession;
     }
 
     public close() {
+        this.isClosed = true;
+        this._closeExam();
         this._clearPendingResumeTimeout();
         this.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
@@ -878,11 +900,15 @@ export default class ContentManager {
      *
      * @param startNow - Go straight to the cards, and back to the normal decks once they are done ("Review
      * mistakes"), instead of showing the decks of the session.
+     * @param beforeShow - Called once the session is known to have cards, just before it is drawn: whatever it replaces
+     * (the results of an exam) stays on screen until then.
+     * @returns Whether a session started.
      */
     private async _startCustomStudy(
         spec: CustomStudySpec,
         startNow: boolean = false,
-    ): Promise<void> {
+        beforeShow?: () => void,
+    ): Promise<boolean> {
         const previousSpec = this.reviewQueueLoader.getCustomStudy();
         const previousMode = this.reviewMode;
 
@@ -891,41 +917,139 @@ export default class ContentManager {
         this.reviewQueueLoader.setReviewMode(this.reviewMode);
         const sequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
 
-        if (sequencer.originalDeckTree.getDistinctRepItemCount(RepItemState.AnyItem, true) === 0) {
-            new Notice(t("CUSTOM_STUDY_NO_CARDS"));
+        const found = sequencer.originalDeckTree.getDistinctRepItemCount(
+            RepItemState.AnyItem,
+            true,
+        );
+        if (found === 0) {
+            new Notice(spec.type === "cards" ? t("EXAM_MISSED_NONE") : t("CUSTOM_STUDY_NO_CARDS"));
             this.reviewQueueLoader.setCustomStudy(previousSpec);
             this.reviewMode = previousMode;
             this.reviewQueueLoader.setReviewMode(previousMode);
-            return;
+            return false;
+        }
+        // Cards that were edited or deleted since the exam cannot be found: say so, rather than quietly study fewer
+        if (spec.type === "cards" && found < spec.ids.length) {
+            new Notice(cardsChangedText(spec.ids.length - found));
         }
 
+        beforeShow?.();
         this.reviewSequencer = sequencer;
         this.deckContainer.closeList();
         if (startNow) {
             this.returnAfterCustomStudy = previousMode;
             this.cardContainer.closeSession();
             await this._startReviewOfDeck(sequencer.originalDeckTree);
-            return;
+            return true;
         }
         this.returnAfterCustomStudy = null;
         await this._showDecksList();
+        return true;
     }
 
     // MARK: Desktop
 
     /**
-     * What the navigation of the desktop shell does. Exams and Create with AI are left out until those features
-     * exist, and the shell hides their items.
+     * What the navigation of the desktop shell does.
      */
     private _desktopActions(): DesktopShellActions {
         return {
-            openHome: () => void this._showDecksList(),
-            startReviewOfDeck: (deck) => void this._startReviewOfDeck(deck),
+            // What replaces the main area first asks about an exam that is going, whose answers would be lost
+            openHome: () => this._afterExam(() => void this._showDecksList()),
+            startReviewOfDeck: (deck) => this._afterExam(() => void this._startReviewOfDeck(deck)),
+            openExams: () => this._openExams(),
             // The card browser is still to come; until then this opens the custom study filter
-            openBrowse: () => this._openCustomStudy(),
+            openBrowse: () => this._afterExam(() => this._openCustomStudy()),
             openStatistics: () => void this.uiManager.openStatisticsView(),
+            openAiGenerator: () => this._openAiGenerator(),
             openSettings: () => this._openPluginSettings(),
         };
+    }
+
+    // MARK: Exams
+
+    /** The exam setup; Start takes the exam here, in the main area on the desktop, in a tab on the phone. */
+    private _openExams(): void {
+        // A click on Exams during an exam stays on the exam
+        if (this.examRunner?.isRunning === true) return;
+        void this.uiManager.openExamSetup((start) => {
+            if (this.desktop !== null) {
+                this.runExam(start);
+                return;
+            }
+            this.closeModal?.();
+            void this.uiManager.startExam(start);
+        });
+    }
+
+    /**
+     * Takes an exam in the main area of the desktop shell, in place of the home or the session. The sidebar shrinks
+     * to its rail, as while studying.
+     */
+    public runExam(start: ExamStart): void {
+        const desktop = this.desktop;
+        // The Studio may have been closed while the setup was open: there is nowhere to draw the exam then
+        if (desktop === null || this.isClosed) return;
+        this._closeExam();
+        this._clearPendingResumeTimeout();
+        this.sessionStartMs = 0;
+        this.deckContainer.closeList();
+        this.cardContainer.closeSession();
+        this._stopStudyClock();
+        desktop.setClock(null);
+        desktop.setSection("exams");
+        desktop.setRail(true);
+
+        const host = desktop.mainEl.createDiv({ cls: "fs-exam-host" });
+        this.examHost = host;
+        this.examRunner = new ExamRunner(host, {
+            plugin: this.plugin,
+            setup: start.setup,
+            questions: start.questions,
+            ignoreAccents: this.settings.ignoreAccentsWhenTyping,
+            save: (result) => saveExamResult(this.app, result),
+            resume: start.resume,
+            ...persistenceFor(this.plugin),
+            // The results stay on screen until the session has cards to show
+            onStudyMissed: (ids) => {
+                void this._startCustomStudy({ type: "cards", ids }, true, () => this._closeExam());
+            },
+            onClose: () => {
+                this._closeExam();
+                void this._showDecksList();
+            },
+        });
+        this.examRunner.start();
+    }
+
+    private _closeExam(): void {
+        this.examRunner?.destroy();
+        this.examRunner = null;
+        this.examHost?.remove();
+        this.examHost = null;
+        this.desktop?.setRail(false);
+    }
+
+    /** Runs `action` once the exam that is going has been left (after asking), or at once when there is none. */
+    private _afterExam(action: () => void): void {
+        const runner = this.examRunner;
+        if (runner === null) {
+            action();
+            return;
+        }
+        runner.requestLeave(() => {
+            this._closeExam();
+            action();
+        });
+    }
+
+    /** "Create with AI": choose a note, then the same dialog as the command in a note. */
+    private _openAiGenerator(): void {
+        new NotePickerModal(this.app, (file) => {
+            void this.app.vault
+                .cachedRead(file)
+                .then((text) => openGenerateCards(this.plugin, file, text, false));
+        }).open();
     }
 
     /**
@@ -970,6 +1094,11 @@ export default class ContentManager {
                     });
                 }
                 return details;
+            },
+            openExams: () => this._openExams(),
+            lastExam: async () => {
+                const [last] = await readExamResults(this.app, 1);
+                return last === undefined ? null : examSummary(last);
             },
             modeLabel: () => {
                 if (this.reviewQueueLoader.getCustomStudy() !== null) return t("CUSTOM_STUDY");

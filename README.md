@@ -16,6 +16,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 - **A study screen made for focus.** One card at a time, with the deck and "4 / 17" at the top and a progress bar that fills with the colour of each answer you give. Tap to reveal, then answer with soft tiles that show when you will see the card again.
 - **Know where you are weak.** The statistics rank your decks by how well you remembered them in the last 30 days, against your target, and the home screen puts the weakest one first with one tap to study it.
 - **Fix mistakes while they are fresh.** At the end of a session, **Review mistakes** goes over exactly the cards you missed.
+- **Practise like the real thing.** Timed exams from your multiple choice cards, with a question map, a score against your pass mark and the score of each deck, and one tap to study what you missed.
 - **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
 - **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI or a local model), look them over, and add only the ones you want.
@@ -43,6 +44,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 | Custom study (forgotten, ahead, preview, by deck)    |                   | ✓                |
 | Heatmap, true retention, study time and weak areas   |                   | ✓                |
 | Review mistakes after a session                      |                   | ✓                |
+| Exams with a timer, a score and results to study     |                   | ✓                |
 | Import from and export to Anki                       |                   | ✓                |
 | Sync without conflicts across devices                |                   | ✓                |
 
@@ -159,9 +161,33 @@ Turn on **Type the answer** in the settings, or **Type answers** in the card men
 
 Cloze cards get a field in place of each blank, and the same rules mark them right or wrong. That part follows the setting; the card menu switch does not change it.
 
+An image occlusion card asks for the label of the mask it is about, when that label is short plain text. The picture with the outlined mask is the answer, and what you typed is checked under it.
+
 ### Read aloud
 
 The speaker button in the card, or the **R** key, reads the side you see with your device's own voices, offline. Images, code and math are skipped, and a cloze blank is read as "blank". A multiple choice card reads its options, and after you answer, the right one and the explanation. In the settings you can read the question or the answer aloud as soon as it shows, and choose the voice and the speed. Where a device cannot speak, the button and the settings are not shown.
+
+## Exams
+
+Run **Flashcard Studio: Take an exam** from the command palette, press **Take an exam** on the home screen, or choose **Exams** in the desktop sidebar. Choose the decks, the number of questions, a time limit (or none) and which cards to ask: **Multiple choice only**, or **All cards**, where a card with a short plain answer is typed and any other card is one you mark yourself after looking at the answer. An image occlusion card is typed too when the label of its mask is short plain text. Two presets fill it in: **Quick check** (20 questions, no limit) and **CIA simulation** (125 questions, 150 minutes). Cloze cards and suspended cards are never asked, and an exam never changes the schedule of a card.
+
+The exam shows one question at a time, with "12 / 125" and the time left at the top. The time turns orange under five minutes, and the exam is submitted when it reaches zero. Flag a question to come back to it. The question map, beside the question on a desktop and a sheet from the bottom on a phone, shows what is answered and what is flagged, and jumps to any question. Press 1 to 9 to choose an option, the left and right arrows to move, F to flag and Enter to go on; the keys are read by where they are on the keyboard, so they work on an Arabic or an AZERTY layout, and they only work while the exam is the pane you are in. **Submit** asks first, and says how many questions are unanswered or flagged.
+
+Your progress is saved as you go: after every answer, flag and move, and every 15 seconds. If you close the tab, or quit Obsidian, the exam is still there. Obsidian offers to **Resume exam** when it starts, and **Exams** lists it first. A timed exam keeps its deadline: time passes while it is closed, as in a real exam, and one that ran out is submitted as you left it. **Discard** (two presses) or **Leave** in the exam throws it away.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/exam-question-desktop.png">
+  <img alt="An exam question on the desktop: the number of the question and the time at the top, a question with three options, and the question map beside it" src="docs/media/screenshots/exam-question-light-desktop.png">
+</picture>
+
+The results show your score against the pass mark, the time taken, the score of each deck, and every question with your answer, the right one and the explanation. The pass mark is 75% until you change it in **Settings, Exams**. The CIA reports a scaled score, so this is a practice target, not the official pass mark. **Study the ones I missed** starts a review of exactly those cards, and a question left unanswered counts as missed.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/exam-results-desktop.png">
+  <img alt="The results of an exam: 50%, not passed, 1 of 2 right, the score of each deck and the question that was missed, opened with its right and wrong options marked" src="docs/media/screenshots/exam-results-light-desktop.png">
+</picture>
+
+Each exam is saved as one plain file in `Flashcard Studio/Exams/`, for example `2026-09-30 1405 exam.md`: a summary table, and one JSON line for each question. The setup lists your last five exams and starts from the last one, so a retake is one press of **Start exam**.
 
 ## AI cards
 
@@ -180,6 +206,7 @@ Many local servers cut a long note short without saying so (Ollama's default con
 
 - **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the original plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the original plugin ignores.
 - **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
+- **Your exams** are in `Flashcard Studio/Exams/`, one Markdown file each. Like the review log, they are never read as cards. An exam in progress is kept in the plugin's `data.json` until it is submitted or discarded.
 - **Settings** are in the plugin's `data.json`.
 
 These plain files make it easy for scripts or AI assistants to read your progress and add cards.

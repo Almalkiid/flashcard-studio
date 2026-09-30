@@ -56,6 +56,18 @@ export default {
 
         // AI-generated cards: the dialog needs a running Obsidian, the end-to-end tests cover it
         "src/ai/generate-cards-modal.ts",
+        "src/ai/note-picker-modal.ts",
+        "src/ai/open-generate-cards.ts",
+
+        // Exams: the screens and the vault files need a running Obsidian, the end-to-end tests cover them
+        "src/exam/exam-render.ts",
+        "src/exam/exam-resume.ts",
+        "src/exam/exam-results-view.ts",
+        "src/exam/exam-run.ts",
+        "src/exam/exam-setup-modal.ts",
+        "src/exam/exam-store.ts",
+        "src/exam/exam-view.ts",
+
         // Image occlusion: the editor, the picker and the wiring need a running Obsidian, the end-to-end tests cover
         // them. The geometry, the model and the block format are unit tested.
         "src/occlusion/occlusion-editor-modal.ts",

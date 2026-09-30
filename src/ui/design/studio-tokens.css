@@ -56,6 +56,9 @@
     --fs-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 8px 24px -6px rgb(15 23 42 / 8%);
     --fs-shadow-lg: 0 2px 4px rgb(15 23 42 / 4%), 0 24px 48px -16px rgb(15 23 42 / 18%);
 
+    /* What dims the screen behind a dialog or a sheet */
+    --fs-scrim: rgb(15 23 42 / 42%);
+
     /* Type */
     --fs-font: var(--font-interface, -apple-system, "SF Pro Text", system-ui, sans-serif);
     --fs-display: 30px;
@@ -100,6 +103,7 @@
 
     --fs-shadow: 0 1px 0 rgb(255 255 255 / 3%) inset, 0 8px 24px -8px rgb(0 0 0 / 50%);
     --fs-shadow-lg: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 24px 48px -16px rgb(0 0 0 / 60%);
+    --fs-scrim: rgb(0 0 0 / 62%);
 }
 
 /* Shared building blocks */

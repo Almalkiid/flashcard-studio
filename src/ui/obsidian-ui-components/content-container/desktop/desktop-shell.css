@@ -50,6 +50,11 @@
     grid-template-columns: 64px minmax(0, 1fr) 312px;
 }
 
+/* An exam keeps the rail but has no side panel: its own question map is in the exam */
+.fs-desktop-shell.is-rail:not(.is-study) {
+    grid-template-columns: 64px minmax(0, 1fr);
+}
+
 .fs-desktop-main {
     /* Lets the screens in it react to the room they have, not to the window */
     container: fs-main / inline-size;
@@ -285,32 +290,32 @@
     flex: 1 0 12px;
 }
 
-/* MARK: Rail (while studying) */
+/* MARK: Rail (while studying, and during an exam) */
 
-.fs-desktop-shell.is-study .fs-desktop-side {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-side {
     align-items: center;
     gap: 8px;
     padding: 18px 0;
 }
 
-.fs-desktop-shell.is-study .fs-desktop-brand {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-brand {
     padding: 0 0 10px;
 }
 
-.fs-desktop-shell.is-study .fs-desktop-nav {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav {
     gap: 8px;
 }
 
-.fs-desktop-shell.is-study .fs-desktop-brand-name,
-.fs-desktop-shell.is-study .fs-desktop-nav-label,
-.fs-desktop-shell.is-study .fs-desktop-nav-badge,
-.fs-desktop-shell.is-study .fs-desktop-nav-tag,
-.fs-desktop-shell.is-study .fs-desktop-decks-label,
-.fs-desktop-shell.is-study .fs-desktop-tree {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-brand-name,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-label,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-badge,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-tag,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-decks-label,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-tree {
     display: none;
 }
 
-.fs-desktop-shell.is-study .fs-desktop-nav-item {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-item {
     justify-content: center;
     width: 40px;
     height: 40px;
@@ -319,8 +324,8 @@
     color: var(--fs-text-3);
 }
 
-.fs-desktop-shell.is-study .fs-desktop-nav-item.is-active,
-.fs-desktop-shell.is-study .fs-desktop-nav-item:hover {
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-item.is-active,
+.fs-desktop-shell:is(.is-study, .is-rail) .fs-desktop-nav-item:hover {
     color: var(--fs-text);
 }
 

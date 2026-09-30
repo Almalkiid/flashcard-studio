@@ -46,8 +46,7 @@ export function layoutToShow(current: boolean, context: LayoutContext): boolean 
 export type DesktopSection = "home" | "study" | "exams" | "browse" | "statistics" | "ai";
 
 /**
- * What the shell's navigation does. A feature that does not exist yet (Exams, Create with AI) has no action, and its
- * item is not shown at all.
+ * What the shell's navigation does. An item whose action is absent is not shown at all.
  */
 export interface DesktopShellActions {
     openHome(): void;
@@ -142,6 +141,11 @@ export class DesktopShell {
             el.toggleClass("is-active", key === section);
             el.setAttribute("aria-current", key === section ? "page" : "false");
         }
+    }
+
+    /** Shrinks the sidebar to its icon rail, without the study side panel: an exam takes the room. */
+    setRail(on: boolean): void {
+        this.rootEl.toggleClass("is-rail", on);
     }
 
     /** The count beside Study in the navigation: the cards to study now. */
