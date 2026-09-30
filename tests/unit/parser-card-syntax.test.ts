@@ -729,3 +729,63 @@ describe("atomic clozes and display math ($$ ... $$ is not cut in two)", () => {
         ]);
     });
 });
+
+describe("image occlusion blocks", () => {
+    const block = "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+    test("a block is one card, with the schedule comment after it", () => {
+        expect(parseT(block + "\n<!--SR:!fsrs,x-->", base)).toEqual([
+            [CardType.ImageOcclusion, block + "\n<!--SR:!fsrs,x-->", 0, 4],
+        ]);
+    });
+    test("cards before and after a block are kept", () => {
+        const text = "Q1::A1\n\n" + block + "\n\nQ2::A2";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([
+            CardType.SingleLineBasic,
+            CardType.ImageOcclusion,
+            CardType.SingleLineBasic,
+        ]);
+    });
+    test("an unclosed block does not swallow the rest of the note", () => {
+        const text = "```image-occlusion\nimage: [[h.png]]\n\nQ::A";
+        expect(parseT(text, base).map((c) => c[0])).toContain(CardType.SingleLineBasic);
+    });
+    test("other code blocks are unchanged", () => {
+        expect(parseT("```js\nconst a = 1;\n```", base)).toEqual([]);
+    });
+    test("the schedule may sit in the metadata callout after the block", () => {
+        const callout = "> [!sr|card-metadata] \n>  <!--SR:!fsrs,x-->";
+        expect(parseT(block + "\n" + callout, base)).toEqual([
+            [CardType.ImageOcclusion, block + "\n" + callout, 0, 5],
+        ]);
+    });
+    test("a block right under a paragraph still starts its own card", () => {
+        expect(parseT("Some intro text\n" + block, base)).toEqual([
+            [CardType.ImageOcclusion, block, 1, 4],
+        ]);
+    });
+    test("a block inside another card's answer stays part of that card", () => {
+        const text = "Q\n?\nA\n" + block;
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+    });
+    test("a block inside a card region is left to the region", () => {
+        const region: ParserOptions = {
+            ...base,
+            multilineCardStartMarker: "<<<",
+            multilineCardEndMarker: ">>>",
+        };
+        expect(parseT("<<<\n" + block + "\n>>>", region).map((c) => c[0])).not.toContain(
+            CardType.ImageOcclusion,
+        );
+    });
+    test("a fence longer than three characters, and a tilde fence, close on their own kind", () => {
+        const long =
+            "````image-occlusion\nimage: h.png\nmask: a rect 0 0 .5 .5 | A\n```\nmore\n````";
+        expect(parseT(long, base)).toEqual([[CardType.ImageOcclusion, long, 0, 5]]);
+        const tilde = "~~~image-occlusion\nimage: h.png\nmask: a rect 0 0 .5 .5 | A\n~~~";
+        expect(parseT(tilde, base)).toEqual([[CardType.ImageOcclusion, tilde, 0, 3]]);
+    });
+    test("a malformed block is still one card here, and expands to no cards later", () => {
+        const bad = "```image-occlusion\nnothing useful\n```";
+        expect(parseT(bad, base).map((c) => c[0])).toEqual([CardType.ImageOcclusion]);
+    });
+});

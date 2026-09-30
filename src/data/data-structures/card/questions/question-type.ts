@@ -8,6 +8,7 @@ import {
 } from "src/data/data-structures/card/questions/math-cloze";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
+import { occlusionSourceOf, parseOcclusionBlock } from "src/occlusion/occlusion-block";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
@@ -103,6 +104,26 @@ class QuestionTypeCallout implements IQuestionTypeHandler {
     expand(questionText: string, _settings: SRSettings): CardFrontBack[] {
         const card = splitCalloutCard(questionText);
         return card === null ? [] : [new CardFrontBack(card.front, card.back)];
+    }
+}
+
+// Task B3 replaces this with occlusionCardMarkdown
+const occlusionCardText = (index: number, side: "front" | "back"): string =>
+    "image-occlusion:" + index + ":" + side;
+
+// One card per mask. A block that does not parse makes no cards, like a callout that is not complete
+class QuestionTypeImageOcclusion implements IQuestionTypeHandler {
+    expand(questionText: string, _settings: SRSettings): CardFrontBack[] {
+        const source = occlusionSourceOf(questionText);
+        const block = source === null ? null : parseOcclusionBlock(source);
+        if (block === null) return [];
+        return block.masks.map(
+            (_mask, index) =>
+                new CardFrontBack(
+                    occlusionCardText(index, "front"),
+                    occlusionCardText(index, "back"),
+                ),
+        );
     }
 }
 
@@ -202,6 +223,9 @@ export class QuestionTypeFactory {
                 break;
             case CardType.Callout:
                 handler = new QuestionTypeCallout();
+                break;
+            case CardType.ImageOcclusion:
+                handler = new QuestionTypeImageOcclusion();
                 break;
         }
         return handler;

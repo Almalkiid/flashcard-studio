@@ -102,3 +102,28 @@ test("CardType.Cloze", () => {
         ),
     ]);
 });
+
+describe("CardType.ImageOcclusion", () => {
+    const block =
+        "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```";
+
+    test("one card per mask, in mask order", () => {
+        expect(CardFrontBackUtil.expand(CardType.ImageOcclusion, block, DEFAULT_SETTINGS)).toEqual([
+            new CardFrontBack("image-occlusion:0:front", "image-occlusion:0:back"),
+            new CardFrontBack("image-occlusion:1:front", "image-occlusion:1:back"),
+        ]);
+    });
+
+    test("a block that does not parse makes no cards", () => {
+        expect(
+            CardFrontBackUtil.expand(
+                CardType.ImageOcclusion,
+                "```image-occlusion\nnothing\n```",
+                DEFAULT_SETTINGS,
+            ),
+        ).toEqual([]);
+        expect(
+            CardFrontBackUtil.expand(CardType.ImageOcclusion, "plain text", DEFAULT_SETTINGS),
+        ).toEqual([]);
+    });
+});

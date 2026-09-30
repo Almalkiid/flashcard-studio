@@ -27,6 +27,8 @@ export enum CardType {
     // A callout such as `> [!question] Title` with the answer in its body. Added last: the values above
     // are used as numbers in tests and must not shift.
     Callout,
+    // An image with masks on it, in a fenced `image-occlusion` block: one card per mask.
+    ImageOcclusion,
 }
 
 // QuestionText comprises the following components:
@@ -227,6 +229,10 @@ export class Question {
         }
         // M3b: a callout card's schedule is always written on the line after the callout, outside of it
         if (this.isCalloutCard) {
+            result = false;
+        }
+        // An occlusion block ends with its closing fence, which nothing can follow, whatever the fence is made of
+        if (this.parsedQuestionInfo?.cardType === CardType.ImageOcclusion) {
             result = false;
         }
         return result;

@@ -252,6 +252,50 @@ A:::B
     });
 });
 
+describe("Image occlusion cards", () => {
+    const FSRS = "!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z";
+    const block = (fence: string) =>
+        `${fence}image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n${fence}`;
+
+    test("One card per mask, with the schedules of the comment in mask order", async () => {
+        const noteText: string = `#flashcards\n${block("```")}\n<!--SR:!2000-01-01,1,250${FSRS}-->\n`;
+        const questionList: Question[] = await parserWithDefaultSettings.createQuestionList(
+            new UnitTestSRFile(noteText),
+            TextDirection.Ltr,
+            TopicPath.emptyPath,
+            true,
+        );
+
+        expect(questionList).toHaveLength(1);
+        expect(questionList[0].questionType).toEqual(CardType.ImageOcclusion);
+        expect(questionList[0].cards).toHaveLength(2);
+        expect(questionList[0].cards[0].scheduleInfo).toBeNull();
+        expect(questionList[0].cards[1].scheduleInfo).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    });
+
+    test.each(["```", "~~~"])(
+        "The schedule is written on the line after a %s block, even when comments go on the same line",
+        async (fence: string) => {
+            const settings: SRSettings = { ...DEFAULT_SETTINGS, cardCommentOnSameLine: true };
+            const questionList: Question[] = await createTestNoteQuestionParser(
+                settings,
+            ).createQuestionList(
+                new UnitTestSRFile(`#flashcards\n${block(fence)}\n<!--SR:${FSRS}-->\n`),
+                TextDirection.Ltr,
+                TopicPath.emptyPath,
+                true,
+            );
+
+            // The card that has a schedule is given an id
+            expect(questionList[0].formatForNote(settings)).toMatch(
+                new RegExp(
+                    `^${fence}image-occlusion[^]*\n${fence}\n<!--SR:${FSRS},id=\\w+!2000-01-01,1,250-->$`,
+                ),
+            );
+        },
+    );
+});
+
 describe("Single question in the text (with block identifier)", () => {
     test("SingleLineBasic: No schedule info", async () => {
         const noteText: string = `#flashcards
