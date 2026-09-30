@@ -75,7 +75,7 @@ export const config: WebdriverIO.Config = {
 
     // Every spec starts in a fresh vault, where the plugin shows its first-run welcome guide. Close it so specs
     // start from a clean workspace; tests/e2e/specs/welcome.e2e.ts reopens it on purpose.
-    before: async () => {
+    before: async (_capabilities, specs) => {
         const { browser } = await import("@wdio/globals");
         const pluginId = (
             JSON.parse(readFileSync(path.resolve("manifest.json"), "utf8")) as { id: string }
@@ -95,5 +95,29 @@ export const config: WebdriverIO.Config = {
         const welcome = browser.$(".sr-welcome-modal");
         if (await welcome.isExisting()) await browser.keys("Escape");
         await welcome.waitForExist({ reverse: true, timeout: 5000 });
+
+        // A new install on desktop opens the Studio as a tab, with the desktop interface. Every other spec was
+        // written for the modal (Escape closes it), so it keeps the modal; desktop.e2e.ts tests the default.
+        if (!specs.some((spec) => spec.endsWith("desktop.e2e.ts"))) {
+            await browser.executeObsidian(async ({ app }, id) => {
+                const plugin = (
+                    app as unknown as {
+                        plugins: {
+                            plugins: Record<
+                                string,
+                                {
+                                    dataManager: {
+                                        data: { settings: Record<string, unknown> };
+                                        settingsManager: { save: () => Promise<void> };
+                                    };
+                                }
+                            >;
+                        };
+                    }
+                ).plugins.plugins[id];
+                plugin.dataManager.data.settings.openViewInNewTab = false;
+                await plugin.dataManager.settingsManager.save();
+            }, pluginId);
+        }
     },
 };

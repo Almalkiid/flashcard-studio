@@ -18,7 +18,7 @@ import {
 import { currentDayKeyFn, toStatsCard } from "src/ui/statistics-view/stats-data";
 import { formatAnswerTime, formatIntervalCompact } from "src/utils/format-interval";
 
-const STATE_KEYS: Record<StatsCard["state"], keyof IBaseLocale> = {
+export const STATE_KEYS: Record<StatsCard["state"], keyof IBaseLocale> = {
     new: "FSRS_STATE_NEW",
     learning: "FSRS_STATE_LEARNING",
     review: "FSRS_STATE_REVIEW",

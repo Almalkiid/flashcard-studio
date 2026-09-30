@@ -764,4 +764,42 @@ export interface IBaseLocale {
     STATS_METRIC_LONGEST: string;
     STATS_CARD_MATURITY_TITLE: string;
     // End design: statistics
+    // Design: desktop
+    DESKTOP_NAV_HOME: string;
+    DESKTOP_NAV_STUDY: string;
+    DESKTOP_NAV_EXAMS: string;
+    DESKTOP_NAV_BROWSE: string;
+    DESKTOP_NAV_AI: string;
+    DESKTOP_BADGE_AI: string;
+    DESKTOP_HOME_DUE_SUMMARY: string;
+    DESKTOP_HOME_NOTHING_DUE: string;
+    DESKTOP_TAKE_EXAM: string;
+    DESKTOP_STUDY_ALL: string;
+    DESKTOP_TABLE_DECK: string;
+    DESKTOP_TABLE_LEARN: string;
+    DESKTOP_TABLE_RETENTION: string;
+    DESKTOP_ACTIVITY: string;
+    DESKTOP_ACTIVITY_SUMMARY: string;
+    DESKTOP_COMING_UP: string;
+    DESKTOP_NEXT_7_DAYS: string;
+    DESKTOP_LAST_EXAM: string;
+    DESKTOP_EXAM_PASSED: string;
+    DESKTOP_EXAM_NOT_PASSED: string;
+    DESKTOP_EXAM_RETAKE: string;
+    DESKTOP_EXAM_DETAIL: string;
+    DESKTOP_WHEN_TODAY: string;
+    DESKTOP_WHEN_YESTERDAY: string;
+    DESKTOP_PANEL_THIS_CARD: string;
+    DESKTOP_PANEL_THIS_SESSION: string;
+    DESKTOP_PANEL_KEYS: string;
+    DESKTOP_PANEL_LAST_SEEN: string;
+    DESKTOP_PANEL_RECALL: string;
+    DESKTOP_PANEL_LEFT: string;
+    DESKTOP_PANEL_LEFT_VALUE: string;
+    DESKTOP_LAST_SEEN_YESTERDAY: string;
+    DESKTOP_LAST_SEEN_DAYS: string;
+    DESKTOP_KEY_RATE: string;
+    DESKTOP_KEY_SPACE: string;
+    DESKTOP_KEY_JUMP: string;
+    // End design: desktop
 }

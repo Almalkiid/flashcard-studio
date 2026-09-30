@@ -9,9 +9,16 @@ import {
     HomeActions,
     renderStudioHome,
 } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
+import {
+    DesktopHomeServices,
+    renderDesktopHome,
+} from "src/ui/obsidian-ui-components/content-container/desktop/desktop-home";
 
 /** What the Studio home needs from outside the deck list. */
-export type HomeServices = Omit<HomeActions, "startReviewOfDeck" | "learnerName">;
+export type HomeServices = Omit<HomeActions, "startReviewOfDeck" | "learnerName"> & {
+    /** Set inside the desktop shell: the deck list then draws the desktop home in place of the Studio home. */
+    desktop?: DesktopHomeServices;
+};
 
 export default class DeckListComponent {
     private scrollWrapper: HTMLDivElement;
@@ -140,11 +147,22 @@ export default class DeckListComponent {
         this.treeContainer.toggleClass("sr-is-hidden", studio);
         this.homeEl.toggleClass("sr-is-hidden", !studio);
         if (studio) {
-            renderStudioHome(this.homeEl, reviewSequencer, {
-                ...this.homeServices,
+            const { desktop, ...services } = this.homeServices;
+            const actions = {
+                ...services,
                 startReviewOfDeck: this.startReviewOfDeck,
                 learnerName: settings.learnerName,
-            });
+            };
+            if (desktop === undefined) {
+                renderStudioHome(this.homeEl, reviewSequencer, actions);
+            } else {
+                renderDesktopHome(this.homeEl, reviewSequencer, {
+                    ...actions,
+                    ...desktop,
+                    retentionTarget: settings.fsrsDesiredRetention,
+                    modeLabel: desktop.modeLabel(),
+                });
+            }
             return;
         }
 

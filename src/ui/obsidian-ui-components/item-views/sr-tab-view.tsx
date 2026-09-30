@@ -1,4 +1,6 @@
 import "src/ui/obsidian-ui-components/item-views/tab-view.css";
+import "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell.css";
+import "src/ui/obsidian-ui-components/content-container/desktop/desktop-home.css";
 import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/data/constants";
@@ -6,6 +8,7 @@ import { PRODUCT_NAME } from "src/data/product";
 import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
+import { useDesktopLayout } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -32,6 +35,11 @@ export class SRTabView extends ItemView {
     private viewContainerEl: HTMLElement | null = null;
     private viewContentEl: HTMLElement | null = null;
     private settings: SRSettings | null = null;
+    private resizeObserver: ResizeObserver | null = null;
+    // Whether the content on screen is drawn with the desktop shell, so a resize only rebuilds it when that changes
+    private desktopLayout: boolean = false;
+    private rebuilding: boolean = false;
+    private rebuildAgain: boolean = false;
 
     constructor(
         leaf: WorkspaceLeaf,
@@ -141,17 +149,78 @@ export class SRTabView extends ItemView {
             return;
         }
 
-        this.contentManager = new ContentManager(
-            this.app,
-            this.plugin,
-            this.reviewQueueLoader,
-            this.settings,
-            this.viewContentEl,
-        );
-        if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
-        this.plugin.uiManager.setContentManager(this.contentManager);
+        await this.buildContent();
 
-        await this.contentManager.open();
+        // The desktop layout needs a wide pane: a narrow split, or a window made narrower, gets the phone layout
+        this.resizeObserver = new ResizeObserver(() => {
+            if (this.wantsDesktopLayout() !== this.desktopLayout) void this.buildContent();
+        });
+        this.resizeObserver.observe(this.viewContainerEl);
+    }
+
+    /**
+     * Whether the pane is wide enough for the desktop layout, on a desktop. The Classic look keeps the layout it has
+     * always had.
+     */
+    private wantsDesktopLayout(): boolean {
+        if (this.viewContainerEl === null || this.settings === null) return false;
+        const isMobile: boolean = Platform.isMobile || EmulatedPlatform().isMobile;
+        return (
+            this.settings.reviewLook !== "classic" &&
+            useDesktopLayout(isMobile, this.viewContainerEl.clientWidth)
+        );
+    }
+
+    /**
+     * Draws the deck list and the cards, in the desktop shell or in the phone layout, whichever the pane calls for.
+     * Called again when the pane changes width across the limit.
+     */
+    private async buildContent(): Promise<void> {
+        if (
+            this.viewContainerEl === null ||
+            this.viewContentEl === null ||
+            this.reviewQueueLoader === null ||
+            this.settings === null ||
+            this.plugin === null
+        )
+            return;
+        // A resize during a rebuild is picked up when this one is done
+        if (this.rebuilding) {
+            this.rebuildAgain = true;
+            return;
+        }
+        this.rebuilding = true;
+        try {
+            do {
+                this.rebuildAgain = false;
+                this.desktopLayout = this.wantsDesktopLayout();
+                // Closing the old content lets go of the keyboard, which the new content takes back
+                const inFocus = this.plugin.uiManager?.isSRInFocus ?? false;
+                this.contentManager?.close();
+                this.viewContentEl.empty();
+                this.viewContainerEl.toggleClass("fs-desktop-view", this.desktopLayout);
+                this.viewContentEl.toggleClass("fs-desktop-root", this.desktopLayout);
+
+                this.contentManager = new ContentManager(
+                    this.app,
+                    this.plugin,
+                    this.reviewQueueLoader,
+                    this.settings,
+                    this.viewContentEl,
+                    undefined,
+                    this.desktopLayout,
+                );
+                if (this.plugin.uiManager === null) {
+                    throw new Error("UI manager not initialized!!!");
+                }
+                this.plugin.uiManager.setContentManager(this.contentManager);
+                this.plugin.uiManager.setSRViewInFocus(inFocus);
+
+                await this.contentManager.open();
+            } while (this.rebuildAgain);
+        } finally {
+            this.rebuilding = false;
+        }
     }
 
     /**
@@ -176,6 +245,8 @@ export class SRTabView extends ItemView {
             activeDocument.body.removeClass("sr-reduced-bottom-fade-mask");
         }
 
+        this.resizeObserver?.disconnect();
+        this.resizeObserver = null;
         if (this.contentManager) this.contentManager.close();
     }
 

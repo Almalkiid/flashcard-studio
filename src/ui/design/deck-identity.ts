@@ -18,6 +18,11 @@ function hashOf(text: string): number {
     return hash;
 }
 
+/** The deck's colour name (`blue`, `teal`, ...), the tone class `fs-tone-<name>` from studio-tokens.css. */
+export function deckToneOf(deckName: string): string {
+    return DECK_TONES[hashOf(deckName) % DECK_TONES.length];
+}
+
 export function readableDeckName(name: string): string {
     const words = name.replace(/[-_]+/g, " ").trim();
     return words.charAt(0).toUpperCase() + words.slice(1);

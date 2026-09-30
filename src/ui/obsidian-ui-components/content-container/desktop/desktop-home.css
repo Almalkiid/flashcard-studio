@@ -1,0 +1,644 @@
+/*
+ * The desktop home: greeting and actions, goal and stats, focus and last exam, the decks table, activity and the
+ * coming days. Built only from the tokens in src/ui/design/studio-tokens.css.
+ */
+
+/* MARK: Frame */
+
+.fs-desktop-shell .sr-deck-container.fs-desktop-decks.sr-look-studio {
+    background-color: var(--fs-bg);
+
+    & .sr-deck-list-header {
+        display: none;
+    }
+
+    & .sr-content {
+        padding: 0;
+    }
+}
+
+.fs-desktop-shell .fs-home.fs-desktop-home {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 30px 36px 40px;
+}
+
+.fs-desktop-home .fs-dh-row {
+    gap: 16px;
+}
+
+/* No cards yet: the deck list's own message, in the desktop frame */
+.fs-desktop-shell .fs-desktop-decks {
+    & .sr-header-row {
+        display: none;
+    }
+
+    & .sr-no-decks-to-review {
+        max-width: 620px;
+        margin: 64px auto;
+        padding: 0 var(--size-4-8);
+        font-style: normal;
+        line-height: 1.6;
+        text-align: center;
+        color: var(--fs-text-2);
+    }
+}
+
+/* MARK: Greeting */
+
+.fs-dh-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.fs-dh-title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--fs-text);
+}
+
+.fs-dh-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 13.5px;
+    color: var(--fs-text-2);
+}
+
+.fs-dh-mode {
+    cursor: pointer;
+}
+
+.fs-dh-mode-close {
+    display: flex;
+    margin-right: -4px;
+
+    & svg {
+        width: 13px;
+        height: 13px;
+    }
+}
+
+.fs-dh-actions {
+    display: flex;
+    flex: none;
+    gap: 12px;
+}
+
+.fs-dh-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid var(--fs-border-strong);
+    border-radius: 11px;
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--fs-text);
+    background-color: var(--fs-surface);
+    cursor: pointer;
+    transition:
+        transform 100ms ease,
+        filter 120ms ease;
+
+    &:hover {
+        filter: brightness(0.98);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--fs-accent);
+        outline-offset: 2px;
+    }
+
+    &.is-primary {
+        border-color: transparent;
+        color: var(--fs-on-accent);
+        background-color: var(--fs-accent);
+        box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--fs-accent) 60%, transparent);
+    }
+
+    &.is-primary:hover {
+        filter: brightness(1.06);
+    }
+}
+
+.fs-dh-button-icon {
+    display: flex;
+
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.fs-dh-button.is-primary .fs-dh-button-icon svg {
+    fill: currentColor;
+    stroke: none;
+}
+
+/* MARK: Goal and stats */
+
+.fs-dh-top {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.fs-dh-goal {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 22px;
+    cursor: pointer;
+
+    & .fs-home-goal-done {
+        font-size: 30px;
+    }
+
+    & .fs-home-goal-target {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    & .fs-home-goal-detail {
+        font-size: 12.5px;
+    }
+}
+
+.fs-dh-ring {
+    width: 76px;
+    height: 76px;
+}
+
+.fs-dh-goal-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-dh-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: hidden;
+
+    /* One card with three cells, in place of the phone's three cards */
+    & .fs-home-tile {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "icon value"
+            "icon label";
+        align-content: center;
+        align-items: center;
+        column-gap: 14px;
+        padding: 18px 20px;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        text-align: left;
+        background: transparent;
+    }
+
+    & .fs-home-tile + .fs-home-tile {
+        border-left: 1px solid var(--fs-border);
+    }
+
+    & .fs-home-tile-icon {
+        grid-area: icon;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: var(--fs-tile-soft);
+    }
+
+    & .fs-home-tile-value {
+        grid-area: value;
+        margin-top: 0;
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    & .fs-home-tile-label {
+        grid-area: label;
+        margin-top: 0;
+        font-size: 12.5px;
+    }
+}
+
+/* MARK: Focus and last exam */
+
+.fs-desktop-home .fs-dh-middle {
+    display: flex;
+    align-items: stretch;
+
+    &.is-empty {
+        display: none;
+    }
+
+    & > .fs-dh-focus {
+        flex: 7 1 0;
+        min-width: 0;
+    }
+
+    & > .fs-dh-exam-slot {
+        flex: 5 1 0;
+        min-width: 0;
+    }
+
+    & > :empty {
+        display: none;
+    }
+
+    & .fs-home-focus,
+    & .fs-dh-exam {
+        height: 100%;
+    }
+}
+
+.fs-desktop-home .fs-home-focus {
+    gap: 16px;
+    padding: 18px 22px;
+
+    & .fs-home-focus-deck {
+        margin-top: 3px;
+        font-size: 15.5px;
+        font-weight: 700;
+    }
+
+    & .fs-home-focus-detail {
+        font-size: 12.5px;
+    }
+}
+
+.fs-dh-exam {
+    --fs-arc: var(--fs-red);
+    --fs-arc-soft: var(--fs-red-soft);
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+
+    &.is-passed {
+        --fs-arc: var(--fs-green);
+        --fs-arc-soft: var(--fs-green-soft);
+    }
+}
+
+.fs-dh-exam .fs-dh-exam-ring {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--fs-text);
+    background:
+        radial-gradient(closest-side, var(--fs-surface) 78%, transparent 79%),
+        conic-gradient(var(--fs-arc) calc(var(--fs-ring) * 360deg), var(--fs-arc-soft) 0);
+}
+
+.fs-dh-exam-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-dh-exam-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fs-arc);
+}
+
+.fs-dh-exam-title {
+    margin-top: 3px;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--fs-text);
+}
+
+.fs-dh-exam-detail {
+    font-size: 12.5px;
+    color: var(--fs-text-3);
+}
+
+/* MARK: Decks table */
+
+.fs-dh-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    align-items: start;
+}
+
+.fs-dh-decks {
+    padding: 6px 0 4px;
+    overflow-x: auto;
+}
+
+.fs-dh-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+
+    & th {
+        padding: 14px 16px 10px;
+        border: none;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-align: left;
+        text-transform: uppercase;
+        color: var(--fs-text-3);
+        background: transparent;
+    }
+
+    & td {
+        padding: 11px 16px;
+        border: none;
+        border-top: 1px solid var(--fs-border);
+        white-space: nowrap;
+        color: var(--fs-text);
+        background: transparent;
+    }
+
+    & .is-num {
+        width: 64px;
+        text-align: right;
+    }
+
+    & .is-retention {
+        padding-left: 28px;
+    }
+
+    & .is-action {
+        width: 1%;
+        text-align: right;
+    }
+
+    & td.is-new {
+        color: var(--fs-blue);
+    }
+
+    & td.is-learn {
+        color: var(--fs-orange);
+    }
+
+    & td.is-due {
+        color: var(--fs-green);
+    }
+
+    & td.is-zero {
+        color: var(--fs-text-3);
+    }
+}
+
+.fs-dh-deck {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    & .fs-icon-tile {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+
+        & svg {
+            width: 17px;
+            height: 17px;
+        }
+    }
+}
+
+.fs-dh-deck-text {
+    min-width: 0;
+}
+
+.fs-dh-deck-name {
+    font-weight: 600;
+    color: var(--fs-text);
+}
+
+.fs-dh-deck-sub {
+    font-size: 12px;
+    color: var(--fs-text-3);
+}
+
+.fs-dh-bar {
+    position: relative;
+    display: inline-block;
+    width: 110px;
+    height: 6px;
+    vertical-align: middle;
+    border-radius: 99px;
+    background-color: var(--fs-surface-2);
+    box-shadow: inset 0 0 0 1px var(--fs-border);
+
+    & i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--fs-fill, 0%);
+        border-radius: 99px;
+        background-color: var(--fs-green);
+    }
+
+    &.is-below i {
+        background-color: var(--fs-orange);
+    }
+
+    /* The retention aimed for */
+    & b {
+        position: absolute;
+        top: -3px;
+        left: var(--fs-target, 90%);
+        width: 2px;
+        height: 12px;
+        border-radius: 1px;
+        background-color: var(--fs-text-3);
+    }
+}
+
+.fs-dh-rate {
+    margin-left: 8px;
+    font-size: 12.5px;
+    color: var(--fs-text-2);
+}
+
+.fs-desktop-shell .fs-dh-study {
+    height: 30px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 9px;
+    font-family: var(--fs-font);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--fs-accent) !important;
+    background-color: var(--fs-accent-soft) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(0.96);
+    }
+}
+
+.fs-dh-done {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--fs-text-3);
+    background-color: var(--fs-surface-2);
+}
+
+/* MARK: Activity and coming days */
+
+.fs-dh-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.fs-dh-panel {
+    padding: 18px 20px;
+}
+
+.fs-dh-panel-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--fs-text);
+}
+
+.fs-dh-panel-note {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--fs-text-3);
+}
+
+.fs-dh-heat {
+    display: grid;
+    grid-template-columns: repeat(var(--fs-weeks, 26), minmax(0, 1fr));
+    grid-template-rows: repeat(7, auto);
+    grid-auto-flow: column;
+    gap: 3px;
+    margin-top: 14px;
+}
+
+.fs-dh-heat-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background-color: var(--fs-surface-2);
+    box-shadow: inset 0 0 0 1px var(--fs-border);
+
+    &.is-l1 {
+        background-color: color-mix(in srgb, var(--fs-accent) 25%, var(--fs-surface-2));
+    }
+
+    &.is-l2 {
+        background-color: color-mix(in srgb, var(--fs-accent) 45%, var(--fs-surface-2));
+    }
+
+    &.is-l3 {
+        background-color: color-mix(in srgb, var(--fs-accent) 70%, var(--fs-surface-2));
+    }
+
+    &.is-l4 {
+        background-color: var(--fs-accent);
+    }
+
+    &[class*="is-l"] {
+        box-shadow: none;
+    }
+}
+
+.fs-dh-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 116px;
+    margin-top: 14px;
+}
+
+.fs-dh-bar-col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 100%;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--fs-text-3);
+}
+
+.fs-dh-bar-count {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--fs-text-2);
+}
+
+.fs-dh-bar-fill {
+    /* --fs-h is a share of the room above the day label, 0 to 100 */
+    width: 100%;
+    height: calc(var(--fs-h, 0) * 0.66px);
+    border-radius: 6px 6px 3px 3px;
+    background-color: var(--fs-accent-soft);
+}
+
+.fs-dh-bar-col.is-today .fs-dh-bar-fill {
+    background-color: var(--fs-accent);
+}
+
+/* A narrow main area (a small window, or a split pane): the rows stack, so nothing is squeezed */
+@container fs-main (max-width: 1000px) {
+    .fs-dh-top,
+    .fs-dh-bottom {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fs-dh-side {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fs-dh-middle {
+        flex-direction: column;
+    }
+
+    .fs-desktop-shell .fs-home.fs-desktop-home {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-dh-button {
+        transition: none;
+    }
+}

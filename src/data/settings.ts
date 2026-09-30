@@ -186,7 +186,9 @@ export const DEFAULT_SETTINGS: SRSettings = {
     reviewButtonDelay: 0,
     showDeleteButtonInCardView: false,
     showDeleteButtonInFileMenu: false,
-    openViewInNewTab: false,
+    // On for new installs: on desktop the Studio then opens as a tab with the desktop interface. Settings load over
+    // these defaults, so an install that saved its choice keeps it. The phone keeps the modal.
+    openViewInNewTab: true,
     openViewInNewTabMobile: false,
     useCustomHotkeys: false,
     useCalloutsForSchedulingComments: false,

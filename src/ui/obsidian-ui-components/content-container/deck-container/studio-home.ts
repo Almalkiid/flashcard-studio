@@ -8,7 +8,7 @@ import { DeckStats, IFlashcardReviewSequencer } from "src/scheduling/flashcard-r
 import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 
 /** A rough answer time used for the "about N min" estimate. */
-const SECONDS_PER_CARD = 10;
+export const SECONDS_PER_CARD = 10;
 
 /**
  * What the home screen shows about the learner, read from the review history (so it arrives asynchronously).
@@ -30,7 +30,7 @@ export interface HomeActions {
     learnerName: string;
 }
 
-function greeting(): string {
+export function greeting(): string {
     const hour = new Date().getHours();
     if (hour < 12) return t("HOME_GOOD_MORNING");
     if (hour < 18) return t("HOME_GOOD_AFTERNOON");
@@ -186,7 +186,7 @@ export function renderStudioHome(
 /**
  * The deck that needs attention most, with a button to study it. Shown only when that deck has cards to study now.
  */
-function renderFocus(
+export function renderFocus(
     slot: HTMLElement,
     focus: NonNullable<HomeInsights["focus"]>,
     root: Deck,
@@ -224,7 +224,7 @@ function renderFocus(
     study.addEventListener("click", () => actions.startReviewOfDeck(deck));
 }
 
-function insightTile(
+export function insightTile(
     parent: HTMLElement,
     icon: string,
     tone: string,

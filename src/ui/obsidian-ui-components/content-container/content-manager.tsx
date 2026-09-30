@@ -4,6 +4,7 @@ import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
 import { Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
+import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
@@ -18,20 +19,44 @@ import {
     UndoRecord,
 } from "src/scheduling/flashcard-review-sequencer";
 import { UndoHistory, UndoResult } from "src/scheduling/undo-history";
-import { streaks, todaySummary } from "src/stats/activity";
+import { heatmap, streaks, todaySummary } from "src/stats/activity";
 import { trueRetention } from "src/stats/answers";
+import { forecast } from "src/stats/cards";
+import { DayKeyFn } from "src/stats/day-keys";
+import { filterEntriesByDeck } from "src/stats/scope";
 import { buildSessionSummary } from "src/stats/session";
-import { weakAreas } from "src/stats/weak-areas";
+import { StatsCard } from "src/stats/types";
+import { WEAK_AREA_MIN_REVIEWS, weakAreas } from "src/stats/weak-areas";
 import { CardActions } from "src/ui/card-actions";
 import { CardContainer } from "src/ui/obsidian-ui-components/content-container/card-container/card-container";
 import { DeckContainer } from "src/ui/obsidian-ui-components/content-container/deck-container/deck-container";
 import { HomeInsights } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
+import {
+    buildCardInfoData,
+    CardInfoData,
+    FORECAST_DAYS,
+    forecastForHome,
+    learningCount,
+    summarizeSessionAnswers,
+} from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
+import {
+    DeckDetail,
+    DesktopHomeServices,
+} from "src/ui/obsidian-ui-components/content-container/desktop/desktop-home";
+import {
+    DesktopShell,
+    DesktopShellActions,
+} from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
+import {
+    renderStudySidePanel,
+    updateStudyPanelTime,
+} from "src/ui/obsidian-ui-components/content-container/desktop/study-side-panel";
 import { CardInfoModal } from "src/ui/obsidian-ui-components/modals/card-info-modal";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { CustomStudyModal } from "src/ui/obsidian-ui-components/modals/custom-study-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
-import { currentDayKeyFn } from "src/ui/statistics-view/stats-data";
+import { collectStatsCards, currentDayKeyFn, toStatsCard } from "src/ui/statistics-view/stats-data";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import { moment } from "src/utils/dates";
 import EmulatedPlatform from "src/utils/platform-detector";
@@ -75,6 +100,18 @@ export interface SessionData {
     currentNote: Note;
 }
 
+/** What the desktop home reads from the review log and the cards. */
+interface DesktopData {
+    entries: ReviewLogEntry[];
+    cards: StatsCard[];
+    todayKey: string;
+    dayKeyOf: DayKeyFn;
+    weekStart: number;
+}
+
+/** Weeks of answers the home's activity grid shows. */
+const ACTIVITY_WEEKS = 26;
+
 // TODO: Refactor/integrate this code with the backend
 
 /**
@@ -107,6 +144,15 @@ export default class ContentManager {
     private returnAfterCustomStudy: FlashcardReviewMode | null = null;
     private readonly closeModal: (() => void) | undefined;
 
+    // The desktop interface (sidebar, dashboard home, study side panel) in place of the phone layout; null on the phone
+    private desktop: DesktopShell | null = null;
+    private studyClock: number | null = null;
+    // The review log by card, read once per session for the side panel; null until it is read
+    private panelLog: Map<string, ReviewLogEntry[]> | null = null;
+    private panelLogReading: Promise<void> | null = null;
+    // What the desktop home reads from the review log and the cards, read once each time the home is shown
+    private desktopData: Promise<DesktopData> | null = null;
+
     // Shared by every queue this screen loads, so the last answer of a deck can still be undone
     private undoHistory: UndoHistory<UndoRecord> = new UndoHistory<UndoRecord>();
     // When the current card was shown, to record how long the answer took
@@ -120,6 +166,7 @@ export default class ContentManager {
         settings: SRSettings,
         parentEl: HTMLElement,
         closeModal?: () => void,
+        useDesktop: boolean = false,
     ) {
         this.app = app;
         this.plugin = plugin;
@@ -131,8 +178,12 @@ export default class ContentManager {
         this.uiManager = this.plugin.uiManager;
         this.dataManager = this.plugin.dataManager;
 
+        // The desktop interface draws its own frame, and the decks and the cards go in its main area
+        if (useDesktop) this.desktop = new DesktopShell(parentEl, this._desktopActions());
+        const contentEl = this.desktop === null ? parentEl : this.desktop.mainEl;
+
         this.deckContainer = new DeckContainer(
-            parentEl,
+            contentEl,
             (reviewMode) => void this._changeReviewMode(reviewMode),
             (deck) => void this._startReviewOfDeck(deck),
             closeModal,
@@ -144,6 +195,7 @@ export default class ContentManager {
                     void this.uiManager.openStatisticsView();
                 },
                 openSettings: () => this._openPluginSettings(),
+                desktop: this.desktop === null ? undefined : this._desktopHomeServices(),
             },
         );
 
@@ -151,7 +203,7 @@ export default class ContentManager {
             this.app,
             this.plugin,
             this.settings,
-            parentEl,
+            contentEl,
             this._deleteCurrentCard.bind(this),
             this._showDecksList.bind(this),
             () => void this._doEditQuestionText(),
@@ -170,6 +222,8 @@ export default class ContentManager {
         this.uiManager.setSRViewInFocus(false);
         this.deckContainer.closeList();
         this.cardContainer.closeSession();
+        this._stopStudyClock();
+        this.desktop?.destroy();
         this.uiManager.setUIState(UIState.Closed);
     }
 
@@ -207,7 +261,14 @@ export default class ContentManager {
             }
         }
 
-        if (openImmediately && deckWithCards !== null) {
+        // The desktop opens on its dashboard, unless it was asked for one note or one custom session: then it is the
+        // cards that were asked for
+        const showDashboard =
+            this.desktop !== null &&
+            this.reviewQueueLoader.getSingleNote() === null &&
+            this.reviewQueueLoader.getCustomStudy() === null;
+
+        if (openImmediately && deckWithCards !== null && !showDashboard) {
             await this._reviewDeck(deckWithCards);
         } else {
             await this._showDecksList();
@@ -225,12 +286,14 @@ export default class ContentManager {
         if (this.reviewSequencer === null) return;
         this.cardContainer.closeSession();
         this.uiManager.setUIState(UIState.DeckList);
+        this.desktopData = null;
         this.deckContainer.showList(
             this.reviewSequencer,
             this.settings,
             this.reviewMode,
             this.reviewQueueLoader.getCustomStudy() !== null,
         );
+        this._showDesktopHome(this.reviewSequencer);
     }
 
     private async _reviewDeck(deck: Deck): Promise<void> {
@@ -241,8 +304,10 @@ export default class ContentManager {
         this.sessionData = this._getNewSessionData(deck);
         if (this.sessionData === null) return;
         this.uiManager.setUIState(UIState.CardFront);
+        this._startDesktopStudy();
         await this.cardContainer.openSession(this.sessionData, this.settings);
         this.cardShownAt = activeWindow.performance.now();
+        this._updateStudyPanel();
     }
 
     private async _showNextCard(): Promise<void> {
@@ -313,6 +378,7 @@ export default class ContentManager {
         ) {
             await this.cardContainer.drawCardFront(this.sessionData, this.settings);
             this.cardShownAt = activeWindow.performance.now();
+            this._updateStudyPanel();
         } else {
             await this._showDecksList(true);
         }
@@ -355,6 +421,8 @@ export default class ContentManager {
                     void this.uiManager.openStatisticsView();
                 },
             });
+            this._stopStudyClock();
+            this._updateStudyPanel();
             return true;
         } catch (error) {
             console.error("Flashcard Studio: could not build the session summary", error);
@@ -373,6 +441,7 @@ export default class ContentManager {
 
         this.uiManager.setUIState(UIState.CardFront);
         this.cardContainer.drawPendingState(nextPendingDueUnix);
+        this._updateStudyPanel();
 
         const delayMs = Math.max(0, nextPendingDueUnix - Date.now());
         this.pendingResumeTimeout = window.setTimeout(() => {
@@ -607,6 +676,7 @@ export default class ContentManager {
             this.cardContainer.setSessionAnswers(this.sessionAnswers);
         }
         const entry = this.reviewSequencer.lastLoggedEntry;
+        if (entry !== null) this._noteAnswerLogged(entry);
         await this._showNextCard();
         // The session summary has its own undo button; the toast would sit on top of its buttons
         if (
@@ -625,7 +695,11 @@ export default class ContentManager {
      */
     private async _loadHomeInsights(): Promise<HomeInsights> {
         try {
-            const entries = await this.dataManager.reviewLog.readAll();
+            // The desktop home has read the history already, for its own tables
+            const entries =
+                this.desktop === null
+                    ? await this.dataManager.reviewLog.readAll()
+                    : (await this._desktopStats()).entries;
             const dayKeyOf = currentDayKeyFn();
             const todayKey = dayKeyOf(Date.now());
             const last30 = trueRetention(entries, todayKey, dayKeyOf).find(
@@ -696,6 +770,8 @@ export default class ContentManager {
         if (this.reviewSequencer === null) return;
         this.cardContainer.hideAnswerToast();
         const result: UndoResult = await this.reviewSequencer.undoLastAnswer();
+        // The undone answer is no longer in the log, so the side panel reads it again
+        this.panelLog = null;
 
         switch (result) {
             case UndoResult.Nothing:
@@ -796,6 +872,216 @@ export default class ContentManager {
         }
         this.returnAfterCustomStudy = null;
         await this._showDecksList();
+    }
+
+    // MARK: Desktop
+
+    /**
+     * What the navigation of the desktop shell does. Exams and Create with AI are left out until those features
+     * exist, and the shell hides their items.
+     */
+    private _desktopActions(): DesktopShellActions {
+        return {
+            openHome: () => void this._showDecksList(),
+            startReviewOfDeck: (deck) => void this._startReviewOfDeck(deck),
+            // The card browser is still to come; until then this opens the custom study filter
+            openBrowse: () => this._openCustomStudy(),
+            openStatistics: () => void this.uiManager.openStatisticsView(),
+            openSettings: () => this._openPluginSettings(),
+        };
+    }
+
+    /**
+     * What the desktop home reads beyond the Studio home: the forecast, the activity, and the retention of each deck.
+     */
+    private _desktopHomeServices(): DesktopHomeServices {
+        return {
+            forecast: async () => {
+                const data = await this._desktopStats();
+                return forecastForHome(
+                    forecast(data.cards, {
+                        todayKey: data.todayKey,
+                        dayKeyOf: data.dayKeyOf,
+                        days: FORECAST_DAYS,
+                    }),
+                );
+            },
+            heatmap: async () => {
+                const data = await this._desktopStats();
+                return heatmap(data.entries, {
+                    todayKey: data.todayKey,
+                    dayKeyOf: data.dayKeyOf,
+                    weeks: ACTIVITY_WEEKS,
+                    weekStart: data.weekStart,
+                });
+            },
+            deckDetails: async (paths) => {
+                const data = await this._desktopStats();
+                const now = Date.now();
+                const details = new Map<string, DeckDetail>();
+                for (const path of paths) {
+                    const last30 = trueRetention(
+                        filterEntriesByDeck(data.entries, path),
+                        data.todayKey,
+                        data.dayKeyOf,
+                    ).find((row) => row.id === "last30");
+                    const judged =
+                        last30 !== undefined && last30.all.total >= WEAK_AREA_MIN_REVIEWS;
+                    details.set(path, {
+                        retention: judged ? last30.all.rate : null,
+                        learning: learningCount(data.cards, path, now),
+                    });
+                }
+                return details;
+            },
+            modeLabel: () => {
+                if (this.reviewQueueLoader.getCustomStudy() !== null) return t("CUSTOM_STUDY");
+                return this.reviewMode === FlashcardReviewMode.Cram ? t("CRAM_MODE") : null;
+            },
+            resetMode: () => void this._changeReviewMode(FlashcardReviewMode.Review),
+        };
+    }
+
+    private _desktopStats(): Promise<DesktopData> {
+        if (this.desktopData === null) this.desktopData = this._readDesktopStats();
+        return this.desktopData;
+    }
+
+    private async _readDesktopStats(): Promise<DesktopData> {
+        const dayKeyOf = currentDayKeyFn();
+        const todayKey = dayKeyOf(Date.now());
+        const weekStart = moment.localeData().firstDayOfWeek();
+        try {
+            const entries = await this.dataManager.reviewLog.readAll();
+            const cards =
+                this.reviewSequencer === null
+                    ? []
+                    : collectStatsCards(this.reviewSequencer.originalDeckTree, todayKey).cards;
+            return { entries, cards, todayKey, dayKeyOf, weekStart };
+        } catch (error) {
+            console.error(
+                "Flashcard Studio: could not read the history for the home screen",
+                error,
+            );
+            return { entries: [], cards: [], todayKey, dayKeyOf, weekStart };
+        }
+    }
+
+    /** The sidebar's deck tree and count follow the home; the frame shows the home section. */
+    private _showDesktopHome(sequencer: IFlashcardReviewSequencer): void {
+        if (this.desktop === null) return;
+        this._stopStudyClock();
+        this.desktop.setClock(null);
+        this.desktop.setSection("home");
+        const root = sequencer.originalDeckTree;
+        this.desktop.renderDeckTree(root, (path) => sequencer.getDeckStats(path));
+        const stats = sequencer.getDeckStats(root.getTopicPath());
+        this.desktop.setDueCount(stats.dueCount + stats.newCount);
+    }
+
+    /** Studying: the sidebar becomes a rail, the side panel shows, and the session clock starts. */
+    private _startDesktopStudy(): void {
+        if (this.desktop === null) return;
+        this.desktop.setSection("study");
+        this._stopStudyClock();
+        this.panelLog = null;
+        const tick = () => {
+            const elapsed = Date.now() - this.sessionStartMs;
+            this.desktop?.setClock(elapsed);
+            if (this.desktop !== null) updateStudyPanelTime(this.desktop.asideEl, elapsed);
+        };
+        tick();
+        this.studyClock = window.setInterval(tick, 1000);
+    }
+
+    private _stopStudyClock(): void {
+        if (this.studyClock === null) return;
+        window.clearInterval(this.studyClock);
+        this.studyClock = null;
+    }
+
+    /**
+     * Draws the side panel for the card on screen: what is known about the card, and how the session is going. The
+     * card's history follows a moment later, once the review log has been read.
+     */
+    private _updateStudyPanel(): void {
+        const desktop = this.desktop;
+        const sequencer = this.reviewSequencer;
+        if (desktop === null || sequencer === null || this.sessionData === null) return;
+
+        const card = sequencer.hasCurrentCard ? this.sessionData.cardData.currentCard : null;
+        const draw = () => {
+            if (this.sessionData === null) return;
+            const left = sequencer.hasCurrentCard
+                ? Math.max(0, this.sessionData.deckData.chosenDeckStats.cardsInQueueCount - 1)
+                : 0;
+            renderStudySidePanel(desktop.asideEl, {
+                card: card === null ? null : this._cardInfoData(card),
+                session: {
+                    ...summarizeSessionAnswers(this.sessionAnswers),
+                    elapsedMs: Date.now() - this.sessionStartMs,
+                    left,
+                },
+                keys: card === null ? [] : this._studyKeys(),
+            });
+        };
+        draw();
+
+        if (card !== null && this.panelLog === null) {
+            // Cards shown while the log is being read wait for that one read
+            this.panelLogReading ??= this._readPanelLog().finally(() => {
+                this.panelLogReading = null;
+            });
+            void this.panelLogReading.then(() => {
+                // Only if the same card is still on screen
+                if (this.sessionData?.cardData.currentCard === card) draw();
+            });
+        }
+    }
+
+    private _cardInfoData(card: Card): CardInfoData {
+        const now = Date.now();
+        const decks = card.question.topicPathList.list.map((path) => path.path.join("/"));
+        const stats = toStatsCard(card, decks, currentDayKeyFn()(now));
+        const entries = stats.id === null ? [] : (this.panelLog?.get(stats.id) ?? []);
+        return buildCardInfoData(stats, entries, now);
+    }
+
+    /** Reads the review log once, grouped by card, so showing each card does not read every log file again. */
+    private async _readPanelLog(): Promise<void> {
+        const log = new Map<string, ReviewLogEntry[]>();
+        try {
+            for (const entry of await this.dataManager.reviewLog.readAll()) {
+                const list = log.get(entry.c);
+                if (list === undefined) log.set(entry.c, [entry]);
+                else list.push(entry);
+            }
+        } catch (error) {
+            console.error("Flashcard Studio: could not read the review history", error);
+        }
+        this.panelLog = log;
+    }
+
+    /** Keeps the side panel's copy of the log in step with the answers of this session. */
+    private _noteAnswerLogged(entry: ReviewLogEntry): void {
+        if (this.panelLog === null || entry.c === "") return;
+        const list = this.panelLog.get(entry.c);
+        if (list === undefined) this.panelLog.set(entry.c, [entry]);
+        else list.push(entry);
+    }
+
+    /** The shortcuts the side panel lists. None with custom hotkeys, which replace them. */
+    private _studyKeys(): [string, string][] {
+        if (this.settings.useCustomHotkeys) return [];
+        return [
+            [this.settings.answerKeys === "anki" ? "1–4" : "1–3", t("DESKTOP_KEY_RATE")],
+            ["Space", t("DESKTOP_KEY_SPACE")],
+            ["U", t("UNDO_LAST_ANSWER")],
+            ["-", t("BURY_CARD")],
+            ["@", t("SUSPEND_CARD")],
+            ["S", t("SKIP")],
+            ["J", t("DESKTOP_KEY_JUMP")],
+        ];
     }
 
     // MARK: Utils

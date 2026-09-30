@@ -30,6 +30,8 @@ export class DeckContainer {
         // Build ui
         this.containerEl = parentEl.createDiv();
         this.containerEl.addClasses(["sr-container", "sr-deck-container", "sr-is-hidden"]);
+        // In the desktop shell the sidebar and the home replace the header with its mode and filter buttons
+        if (homeServices?.desktop !== undefined) this.containerEl.addClass("fs-desktop-decks");
 
         this.deckListHeader = new DeckListHeaderComponent(
             this.containerEl,

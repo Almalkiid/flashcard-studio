@@ -15,6 +15,9 @@ import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
 import EmulatedPlatform from "src/utils/platform-detector";
 
+/** Up to this many cards the desktop's progress bar draws a segment for each; above it, one continuous bar. */
+const MAX_PROGRESS_SEGMENTS = 60;
+
 export default class CardToolbarComponent {
     private toolbar: HTMLDivElement;
     private infoSection: DeckInfoComponent;
@@ -24,6 +27,10 @@ export default class CardToolbarComponent {
     private progressFill: HTMLDivElement;
     private counterEl: HTMLDivElement;
     private titleDeckEl: HTMLDivElement;
+    // One segment per card for the desktop's progress bar (the phone draws the fill above instead)
+    private segmentsEl: HTMLDivElement;
+    private answers: readonly ReviewResponse[] = [];
+    private totalCards: number = 0;
 
     public constructor(
         parentEl: HTMLElement,
@@ -121,6 +128,7 @@ export default class CardToolbarComponent {
         );
 
         // If we don't have a close modal, we don't need the close button
+        this.segmentsEl = parentEl.createDiv({ cls: "fs-session-segments is-off" });
         // A slim bar under the toolbar showing how much of this session is done
         const progress = parentEl.createDiv({ cls: "sr-session-progress" });
         this.progressFill = progress.createDiv({ cls: "sr-session-progress-fill" });
@@ -138,6 +146,8 @@ export default class CardToolbarComponent {
      * Colours the session's progress bar by the answers given so far, one segment per answer, oldest first.
      */
     public setSessionAnswers(responses: readonly ReviewResponse[]): void {
+        this.answers = responses;
+        this.drawSegments();
         this.progressFill.empty();
         this.progressFill.toggleClass("sr-has-answers", responses.length > 0);
         this.progressFill.toggleClass("sr-many-answers", responses.length > 60);
@@ -170,6 +180,8 @@ export default class CardToolbarComponent {
         flashcardCardOrder: string,
     ) {
         const done = totalCardsInSession - chosenDeckStats.cardsInQueueCount;
+        this.totalCards = totalCardsInSession;
+        this.drawSegments();
         const ratio =
             totalCardsInSession > 0 ? Math.min(1, Math.max(0, done / totalCardsInSession)) : 0;
         this.progressFill.setCssProps({ "--sr-progress": ratio.toFixed(4) });
@@ -183,7 +195,12 @@ export default class CardToolbarComponent {
         this.titleDeckEl.empty();
         if (deckPath.length > 0) {
             createDeckTile(this.titleDeckEl, currentDeck.deckName);
-            this.titleDeckEl.createSpan({ text: deckPath.map(readableDeckName).join(" – ") });
+            // One span per name, so the desktop layout can draw the path as a breadcrumb; the text is the same
+            const path = this.titleDeckEl.createSpan();
+            deckPath.forEach((name, index) => {
+                if (index > 0) path.createSpan({ cls: "fs-crumb-sep", text: " – " });
+                path.createSpan({ cls: "fs-crumb", text: readableDeckName(name) });
+            });
         }
 
         this.infoSection.updateInfo(
@@ -197,6 +214,27 @@ export default class CardToolbarComponent {
             currentDeckTotalCardsInQueue - currentDeckStats.cardsInQueueOfThisDeckCount,
             flashcardCardOrder === "EveryCardRandomDeckAndCard",
         );
+    }
+
+    /**
+     * Draws a segment for each card of the session: those answered in the colour of the answer, the card on screen
+     * marked. Left off for a long session, where the continuous bar is clearer.
+     */
+    private drawSegments(): void {
+        this.segmentsEl.empty();
+        const shown = this.totalCards > 0 && this.totalCards <= MAX_PROGRESS_SEGMENTS;
+        this.segmentsEl.toggleClass("is-off", !shown);
+        if (!shown) return;
+        for (let i = 0; i < this.totalCards; i++) {
+            const segment = this.segmentsEl.createEl("i");
+            if (i < this.answers.length) {
+                segment.addClass(
+                    `sr-session-answer-${ReviewResponse[this.answers[i]].toLowerCase()}`,
+                );
+            } else if (i === this.answers.length) {
+                segment.addClass("is-current");
+            }
+        }
     }
 
     /**
