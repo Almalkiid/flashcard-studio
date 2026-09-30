@@ -53,6 +53,7 @@ import {
     DesktopHomeServices,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-home";
 import {
+    desktopTabWanted,
     DesktopShell,
     DesktopShellActions,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
@@ -648,11 +649,12 @@ export default class ContentManager {
         const currentQuestion = this.reviewSequencer.currentQuestion;
         if (!currentQuestion) return;
 
+        const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
         if (
             (!this.settings.openViewInNewTab &&
-                !(Platform.isMobile || EmulatedPlatform().isMobile)) ||
-            (!this.settings.openViewInNewTabMobile &&
-                (Platform.isMobile || EmulatedPlatform().isMobile))
+                !desktopTabWanted(this.settings, isMobile) &&
+                !isMobile) ||
+            (!this.settings.openViewInNewTabMobile && isMobile)
         ) {
             new Notice("Note was opened in new tab in the background");
         }

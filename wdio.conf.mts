@@ -96,9 +96,9 @@ export const config: WebdriverIO.Config = {
         if (await welcome.isExisting()) await browser.keys("Escape");
         await welcome.waitForExist({ reverse: true, timeout: 5000 });
 
-        // A new install on desktop opens the Studio as a tab, at the full size of the pane, with the desktop interface.
-        // Every other spec was written for the modal (Escape closes it, and its size is the 60% by 60% it always had),
-        // so it gets the modal back; desktop.e2e.ts tests the new install as it is.
+        // On a desktop the Studio look opens as a tab with the desktop interface, whatever "Open in new tab" says (the
+        // Desktop layout setting, on by default). Every other spec was written for the modal (Escape closes it, and its
+        // size is the 60% by 60% it always had), so it gets the modal back; desktop.e2e.ts tests the default as it is.
         if (!specs.some((spec) => path.basename(spec) === "desktop.e2e.ts")) {
             await browser.executeObsidian(async ({ app }, id) => {
                 const plugin = (
@@ -116,9 +116,7 @@ export const config: WebdriverIO.Config = {
                         };
                     }
                 ).plugins.plugins[id];
-                plugin.dataManager.data.settings.openViewInNewTab = false;
-                plugin.dataManager.data.settings.flashcardWidthPercentage = 60;
-                plugin.dataManager.data.settings.flashcardHeightPercentage = 60;
+                plugin.dataManager.data.settings.desktopLayout = false;
                 await plugin.dataManager.settingsManager.save();
             }, pluginId);
         }

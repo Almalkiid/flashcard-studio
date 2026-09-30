@@ -17,6 +17,7 @@ import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/rep
 import { chosenCardsIn, CustomStudySpec } from "src/scheduling/custom-study";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
+import { desktopTabWanted } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirmation-modal";
 import { SRModalView } from "src/ui/obsidian-ui-components/modals/sr-modal-view";
@@ -180,7 +181,11 @@ export class UIManager {
 
     public handleExternalModalOpen(mutationList: MutationRecord[]) {
         if (
-            this.settingsManager.settings.openViewInNewTab && // Is a modal opening relevant for focus?
+            (this.settingsManager.settings.openViewInNewTab || // Is a modal opening relevant for focus?
+                desktopTabWanted(
+                    this.settingsManager.settings,
+                    Platform.isMobile || EmulatedPlatform().isMobile,
+                )) &&
             mutationList.length > 0 &&
             mutationList.filter(
                 (mutation) =>
@@ -425,8 +430,9 @@ export class UIManager {
         const settings = this.settingsManager.settings;
 
         const isMobile = Platform.isMobile || EmulatedPlatform().isMobile;
+        // On a computer the Studio look opens as a tab with the desktop interface, whatever "Open in new tab" says
         const openInNewTab =
-            (!isMobile && settings.openViewInNewTab) ||
+            (!isMobile && (settings.openViewInNewTab || desktopTabWanted(settings, isMobile))) ||
             (isMobile && settings.openViewInNewTabMobile);
 
         const reviewQueueLoader = new ReviewQueueLoader(

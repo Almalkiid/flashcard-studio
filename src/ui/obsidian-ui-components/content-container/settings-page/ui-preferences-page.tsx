@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
+import { desktopTabWanted } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
 import { speechAvailable, VoiceWatcher } from "src/ui/speech";
@@ -92,7 +93,9 @@ export class UIPreferencesPage extends SettingsPage {
                             .setDisabled(
                                 (isMobile &&
                                     !this.settingsManager.settings.openViewInNewTabMobile) ||
-                                    (!isMobile && !this.settingsManager.settings.openViewInNewTab),
+                                    (!isMobile &&
+                                        !this.settingsManager.settings.openViewInNewTab &&
+                                        !desktopTabWanted(this.settingsManager.settings, isMobile)),
                             )
                             .onChange(async (value) => {
                                 this.settingsManager.settings.useCustomHotkeys = value;
@@ -521,6 +524,21 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.settingsManager.save();
                             }),
                     );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("DESKTOP_LAYOUT"))
+                    .setDesc(t("DESKTOP_LAYOUT_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.desktopLayout)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.desktopLayout = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+                // Only a computer reads it: the phone has one layout
+                if (Platform.isMobile || EmulatedPlatform().isMobile) setting.settingEl.hide();
             })
             .addSetting((setting: Setting) => {
                 setting

@@ -9,7 +9,10 @@ import { SRSettings } from "src/data/settings";
 import { EXAM_VIEW_TYPE } from "src/exam/exam-view";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
-import { layoutToShow } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
+import {
+    desktopTabWanted,
+    layoutToShow,
+} from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -73,13 +76,19 @@ export class SRTabView extends ItemView {
 
         this.viewContentEl = this.viewContainerEl.createDiv("sr-tab-view-content");
         const isMobile: boolean = Platform.isMobile || EmulatedPlatform().isMobile;
-        const heightPercent: number = isMobile
-            ? this.settings.flashcardHeightPercentageMobile
-            : this.settings.flashcardHeightPercentage;
+        // The desktop tab takes the whole pane: it was asked for by its own setting, not by the sizes of the window
+        const fullPane = desktopTabWanted(this.settings, isMobile);
+        const heightPercent: number = fullPane
+            ? 100
+            : isMobile
+              ? this.settings.flashcardHeightPercentageMobile
+              : this.settings.flashcardHeightPercentage;
 
-        const widthPercent: number = isMobile
-            ? this.settings.flashcardWidthPercentageMobile
-            : this.settings.flashcardWidthPercentage;
+        const widthPercent: number = fullPane
+            ? 100
+            : isMobile
+              ? this.settings.flashcardWidthPercentageMobile
+              : this.settings.flashcardWidthPercentage;
 
         this.setSize(widthPercent, heightPercent);
 
@@ -165,6 +174,7 @@ export class SRTabView extends ItemView {
         if (this.viewContainerEl === null || this.settings === null) return false;
         return layoutToShow(this.desktopLayout, {
             isMobile: Platform.isMobile || EmulatedPlatform().isMobile,
+            desktopLayout: this.settings.desktopLayout,
             classic: this.settings.reviewLook === "classic",
             paneWidth: this.viewContainerEl.clientWidth,
             inSession: this.contentManager?.inSession ?? false,

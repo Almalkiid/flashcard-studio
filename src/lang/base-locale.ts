@@ -36,6 +36,8 @@ export interface IBaseLocale {
     REVIEW_LOOK_DESC: string;
     REVIEW_LOOK_STUDIO: string;
     REVIEW_LOOK_CLASSIC: string;
+    DESKTOP_LAYOUT: string;
+    DESKTOP_LAYOUT_DESC: string;
     HOME_TODAY: string;
     HOME_ONE_CARD: string;
     HOME_CARDS: string;

@@ -1,12 +1,9 @@
-import { Platform } from "obsidian";
-
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
 import { migrateExamDrafts } from "src/exam/exam-draft-store";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
-import EmulatedPlatform from "src/utils/platform-detector";
 
 /**
  * Custom error class for plugin data errors.
@@ -74,14 +71,6 @@ export class PluginDataManager {
             // M3a: scheduling. New installs start with Anki's keys and fuzz; existing settings keep what they had
             this._pluginData.settings.answerKeys = "anki";
             this._pluginData.settings.fsrsEnableFuzz = true;
-            // On desktop a new install opens the Studio in a tab, where it has the desktop interface, at the full size
-            // of the pane (as the toggle in the settings sets it). The phone keeps the modal. Existing settings, and
-            // the defaults that Reset settings restores, keep the modal.
-            if (!(Platform.isMobile || EmulatedPlatform().isMobile)) {
-                this._pluginData.settings.openViewInNewTab = true;
-                this._pluginData.settings.flashcardWidthPercentage = 100;
-                this._pluginData.settings.flashcardHeightPercentage = 100;
-            }
         }
         this._isFirstRun = !loadedData?.settings;
 

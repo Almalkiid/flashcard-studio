@@ -29,6 +29,7 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "examPassPercent",
     // The Studio look
     "reviewLook",
+    "desktopLayout",
     "learnerName",
     // AI-generated cards
     "aiProvider",

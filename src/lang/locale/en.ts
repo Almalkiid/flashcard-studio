@@ -46,6 +46,9 @@ const en: IBaseLocale = {
         "Studio shows each card as a sheet on a quiet background, with tinted answer buttons that show the next interval. Classic keeps the original look.",
     REVIEW_LOOK_STUDIO: "Studio",
     REVIEW_LOOK_CLASSIC: "Classic",
+    DESKTOP_LAYOUT: "Desktop layout",
+    DESKTOP_LAYOUT_DESC:
+        'On a computer, open Flashcard Studio as a full tab with a sidebar. Turn it off for the layout of the phone, in a window or a tab as "Open in new tab" says.',
     HOME_TODAY: "Today",
     HOME_ONE_CARD: "1 card",
     HOME_CARDS: "${count} cards",

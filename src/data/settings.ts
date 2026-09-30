@@ -112,6 +112,11 @@ export interface SRSettings {
     answerKeys: AnswerKeys;
     /** "studio" is the refined default review screen; "classic" keeps the original plugin's look. */
     reviewLook: "studio" | "classic";
+    /**
+     * On a computer, the Studio look opens as a full tab with the desktop interface (a sidebar and a dashboard), whatever
+     * `openViewInNewTab` says. Only read on a computer; the phone never has it.
+     */
+    desktopLayout: boolean;
     /** Shown in the home screen greeting; empty for none. */
     learnerName: string;
     // AI-generated cards
@@ -257,6 +262,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     fsrsWeights: "",
     answerKeys: "original",
     reviewLook: "studio",
+    desktopLayout: true,
     learnerName: "",
     // AI-generated cards
     aiProvider: "anthropic",

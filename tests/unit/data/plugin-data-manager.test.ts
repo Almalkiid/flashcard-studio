@@ -23,16 +23,29 @@ async function onPhone(body: () => Promise<void>): Promise<void> {
     }
 }
 
-describe("open in a tab, through the loader", () => {
-    test("a new install on desktop opens the Studio in a tab, at the full size of the pane", async () => {
+describe("the first run and how the Studio opens", () => {
+    test("a new install on desktop leaves the tab setting and the sizes alone: the Desktop layout setting opens the tab", async () => {
         const manager = managerWith(null);
         await manager.loadData();
         const settings = manager.pluginData.settings;
         expect(manager.isFirstRun).toBe(true);
-        expect(settings.openViewInNewTab).toBe(true);
-        // What the toggle in the settings does when it is switched on
-        expect(settings.flashcardWidthPercentage).toBe(100);
-        expect(settings.flashcardHeightPercentage).toBe(100);
+        // The settings are shared with the phone through the synced data, so the first run must not change them
+        expect(settings.openViewInNewTab).toBe(false);
+        expect(settings.openViewInNewTabMobile).toBe(false);
+        expect(settings.flashcardWidthPercentage).toBe(DEFAULT_SETTINGS.flashcardWidthPercentage);
+        expect(settings.flashcardHeightPercentage).toBe(DEFAULT_SETTINGS.flashcardHeightPercentage);
+        expect(settings.desktopLayout).toBe(true);
+    });
+
+    test("the first run sets the algorithm and the keys of a new install, and nothing about the window", async () => {
+        const manager = managerWith(null);
+        await manager.loadData();
+        const fresh = manager.pluginData.settings;
+        const untouched = cloneDefaultSettings();
+        const changed = (Object.keys(untouched) as (keyof typeof untouched)[]).filter(
+            (key) => JSON.stringify(fresh[key]) !== JSON.stringify(untouched[key]),
+        );
+        expect(changed.sort()).toEqual(["algorithm", "answerKeys", "fsrsEnableFuzz"]);
     });
 
     test("a new install on a phone keeps the modal, and the phone's own settings", async () => {

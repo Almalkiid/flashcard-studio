@@ -3,6 +3,7 @@ import { setIcon } from "obsidian";
 import type { Deck } from "src/data/data-structures/deck/deck";
 import type { TopicPath } from "src/data/data-structures/deck/topic-path";
 import { PRODUCT_NAME } from "src/data/product";
+import type { SRSettings } from "src/data/settings";
 import { IBaseLocale } from "src/lang/base-locale";
 import { t } from "src/lang/helpers";
 import type { DeckStats } from "src/scheduling/flashcard-review-sequencer";
@@ -20,9 +21,22 @@ export function useDesktopLayout(isMobile: boolean, paneWidth: number): boolean 
     return !isMobile && paneWidth >= DESKTOP_MIN_WIDTH;
 }
 
+/**
+ * Whether the Studio opens as a full tab with the desktop interface, whatever "Open in new tab" says: on a computer,
+ * with the Studio look, when the Desktop layout setting is on. The Classic look and the phone are not affected.
+ */
+export function desktopTabWanted(
+    settings: Pick<SRSettings, "desktopLayout" | "reviewLook">,
+    isMobile: boolean,
+): boolean {
+    return !isMobile && settings.desktopLayout && settings.reviewLook !== "classic";
+}
+
 /** What the pane is like, for `layoutToShow`. */
 export interface LayoutContext {
     isMobile: boolean;
+    /** The Desktop layout setting: off keeps the phone layout, in a tab too. */
+    desktopLayout: boolean;
     /** The Classic look keeps the layout it has always had. */
     classic: boolean;
     /** The width of the pane in pixels; 0 when the pane is not shown. */
@@ -40,7 +54,11 @@ export interface LayoutContext {
  */
 export function layoutToShow(current: boolean, context: LayoutContext): boolean {
     if (context.paneWidth <= 0 || context.inSession) return current;
-    return !context.classic && useDesktopLayout(context.isMobile, context.paneWidth);
+    return (
+        context.desktopLayout &&
+        !context.classic &&
+        useDesktopLayout(context.isMobile, context.paneWidth)
+    );
 }
 
 export type DesktopSection = "home" | "study" | "exams" | "browse" | "statistics" | "ai";

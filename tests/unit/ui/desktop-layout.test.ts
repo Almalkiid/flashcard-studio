@@ -1,5 +1,6 @@
 import {
     DESKTOP_MIN_WIDTH,
+    desktopTabWanted,
     layoutToShow,
     useDesktopLayout,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
@@ -17,7 +18,13 @@ describe("useDesktopLayout", () => {
 });
 
 describe("layoutToShow", () => {
-    const wide = { isMobile: false, classic: false, paneWidth: 1400, inSession: false };
+    const wide = {
+        isMobile: false,
+        desktopLayout: true,
+        classic: false,
+        paneWidth: 1400,
+        inSession: false,
+    };
     const narrow = { ...wide, paneWidth: 700 };
 
     test("follows the width of the pane", () => {
@@ -41,5 +48,27 @@ describe("layoutToShow", () => {
     test("the phone and the Classic look never get the desktop layout", () => {
         expect(layoutToShow(false, { ...wide, isMobile: true })).toBe(false);
         expect(layoutToShow(false, { ...wide, classic: true })).toBe(false);
+    });
+
+    test("with the Desktop layout setting off, a wide pane keeps the phone layout", () => {
+        expect(layoutToShow(false, { ...wide, desktopLayout: false })).toBe(false);
+        expect(layoutToShow(true, { ...wide, desktopLayout: false })).toBe(false);
+    });
+});
+
+describe("desktopTabWanted", () => {
+    const studio = { desktopLayout: true, reviewLook: "studio" as const };
+
+    test("a computer with the Studio look and the setting on opens the Studio as a desktop tab", () => {
+        expect(desktopTabWanted(studio, false)).toBe(true);
+    });
+
+    test("with the setting off the Studio is not a desktop tab", () => {
+        expect(desktopTabWanted({ ...studio, desktopLayout: false }, false)).toBe(false);
+    });
+
+    test("the Classic look and the phone are left as they were", () => {
+        expect(desktopTabWanted({ ...studio, reviewLook: "classic" }, false)).toBe(false);
+        expect(desktopTabWanted(studio, true)).toBe(false);
     });
 });
