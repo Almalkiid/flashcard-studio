@@ -6,6 +6,7 @@ import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 import { SR_TAB_VIEW } from "src/data/constants";
 import { PRODUCT_NAME } from "src/data/product";
 import { SRSettings } from "src/data/settings";
+import { EXAM_VIEW_TYPE } from "src/exam/exam-view";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
 import { layoutToShow } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
@@ -239,8 +240,9 @@ export class SRTabView extends ItemView {
      */
 
     async onClose() {
-        // Resets the changes made in onOpen
-        if (activeDocument.body.classList.contains("is-mobile")) {
+        // Resets the changes made in onOpen, unless an exam tab is still open: it needs the same room at the bottom
+        const examOpen = this.app.workspace.getLeavesOfType(EXAM_VIEW_TYPE).length > 0;
+        if (!examOpen && activeDocument.body.classList.contains("is-mobile")) {
             const mobileNavbar = activeDocument.getElementsByClassName("mobile-navbar")[0];
             if (mobileNavbar) {
                 (mobileNavbar as HTMLElement).setCssProps({ position: "unset" });
@@ -249,6 +251,7 @@ export class SRTabView extends ItemView {
 
         // Resets the changes made in onOpen
         if (
+            !examOpen &&
             activeDocument.body.classList.contains("is-phone") &&
             activeDocument.body.classList.contains("is-floating-nav")
         ) {

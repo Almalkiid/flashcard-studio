@@ -2,9 +2,14 @@ import {
     EXAM_PRESETS,
     ExamAnswer,
     ExamCardInput,
+    examEndMs,
+    examKeyAction,
     ExamQuestion,
     ExamSetup,
+    examSummary,
+    examTypedTarget,
     formatClock,
+    formatCountdown,
     isAnswered,
     isRight,
     joinDeckNames,
@@ -14,6 +19,7 @@ import {
     remainingMs,
     scoreExam,
 } from "src/exam/exam";
+import { occlusionCardMarkdown } from "src/occlusion/occlusion-view";
 
 // Two decks, five cards: a single answer question, a several answer one, a short typed one, a long one (self
 // marked) and a cloze card, which an exam never asks
@@ -248,7 +254,7 @@ describe("isRight", () => {
     });
 
     test("accents count unless the setting ignores them", () => {
-        const cafe: ExamQuestion = { ...typed, back: "café" };
+        const cafe: ExamQuestion = { ...typed, back: "café", typedTarget: "café" };
         expect(isRight(cafe, answer({ typed: "cafe" }), false)).toBe(false);
         expect(isRight(cafe, answer({ typed: "cafe" }), true)).toBe(true);
     });
@@ -409,5 +415,206 @@ describe("plainExcerpt", () => {
     test("is cut at the length asked for, on a word, with an ellipsis", () => {
         expect(plainExcerpt("one two three four five", 12)).toBe("one two…");
         expect(plainExcerpt("short", 12)).toBe("short");
+    });
+});
+
+describe("the typed answer is worked out once, when the question is picked", () => {
+    const picked = pickExamQuestions(
+        [
+            card({ id: "t1", back: "**Chief** Audit Executive" }),
+            card({ id: "s1", back: "Two lines\nof answer" }),
+        ],
+        { ...SETUP, shuffleOptions: false },
+        () => 0.999999,
+    );
+
+    test("a typed question keeps the plain text to type, a self-marked one has none", () => {
+        expect(picked.find((q) => q.cardId === "t1")).toMatchObject({
+            kind: "typed",
+            typedTarget: "Chief Audit Executive",
+        });
+        expect(picked.find((q) => q.cardId === "s1")).toMatchObject({
+            kind: "self",
+            typedTarget: null,
+        });
+    });
+
+    test("isRight compares with that text, not with the answer as written", () => {
+        const q = picked.find((candidate) => candidate.cardId === "t1");
+        const empty: ExamAnswer = { chosen: [], typed: "", selfRight: null, flagged: false, ms: 0 };
+        expect(isRight(q, { ...empty, typed: "chief audit executive" }, false)).toBe(true);
+        // "**Chief** Audit Executive" is not what anyone types
+        expect(isRight(q, { ...empty, typed: "**Chief** Audit Executive" }, false)).toBe(false);
+    });
+
+    test("a typed question without a target (an old file) is never right, and is unanswered when empty", () => {
+        const q = picked.find((candidate) => candidate.cardId === "t1");
+        const noTarget: ExamQuestion = { ...q, typedTarget: undefined };
+        const empty: ExamAnswer = { chosen: [], typed: "", selfRight: null, flagged: false, ms: 0 };
+        expect(isRight(noTarget, { ...empty, typed: "Chief Audit Executive" }, false)).toBe(false);
+        expect(isRight(noTarget, empty, false)).toBeNull();
+    });
+});
+
+describe("occlusion cards in an exam", () => {
+    const mask = { id: "a", shape: "rect" as const, x: 0, y: 0, w: 0.1, h: 0.1 };
+    const block = (label: string) => ({
+        image: "[[Heart.png]]",
+        mode: "hide-all" as const,
+        question: "Name the chamber",
+        masks: [{ ...mask, label }],
+    });
+    const occlusion = (id: string, label: string): ExamCardInput =>
+        card({
+            id,
+            front: occlusionCardMarkdown(block(label), 0, "front"),
+            back: occlusionCardMarkdown(block(label), 0, "back"),
+        });
+
+    test("examTypedTarget is the label of the mask for an occlusion card, the plain answer for another", () => {
+        expect(examTypedTarget(occlusionCardMarkdown(block("Left **ventricle**"), 0, "back"))).toBe(
+            "Left ventricle",
+        );
+        expect(examTypedTarget("**Chief** Audit Executive")).toBe("Chief Audit Executive");
+        expect(examTypedTarget(occlusionCardMarkdown(block(""), 0, "back"))).toBeNull();
+        expect(examTypedTarget("Two lines\nof answer")).toBeNull();
+    });
+
+    test("is typed when the label is short plain text, and self-marked when it is not", () => {
+        const picked = pickExamQuestions(
+            [
+                occlusion("o1", "Left ventricle"),
+                occlusion("o2", ""),
+                occlusion("o3", "x".repeat(130)),
+            ],
+            { ...SETUP, shuffleOptions: false },
+            () => 0.999999,
+        );
+        const byId = Object.fromEntries(picked.map((q) => [q.cardId, q]));
+        expect(byId.o1).toMatchObject({ kind: "typed", typedTarget: "Left ventricle" });
+        expect(byId.o2).toMatchObject({ kind: "self", typedTarget: null });
+        expect(byId.o3).toMatchObject({ kind: "self", typedTarget: null });
+    });
+
+    test("is marked by what was typed against the label, ignoring case and a full stop", () => {
+        const [q] = pickExamQuestions([occlusion("o1", "Left ventricle")], SETUP, () => 0);
+        const empty: ExamAnswer = { chosen: [], typed: "", selfRight: null, flagged: false, ms: 0 };
+        expect(isRight(q, { ...empty, typed: "left ventricle." }, false)).toBe(true);
+        expect(isRight(q, { ...empty, typed: "right atrium" }, false)).toBe(false);
+    });
+
+    test("a multiple choice only exam leaves occlusion cards out", () => {
+        expect(
+            pickExamQuestions(
+                [occlusion("o1", "Left ventricle")],
+                { ...SETUP, filter: "choice-only" },
+                () => 0,
+            ),
+        ).toEqual([]);
+    });
+
+    test("plainExcerpt never prints the fence of a code block or of an occlusion card", () => {
+        const front = occlusionCardMarkdown(block("Left ventricle"), 0, "front");
+        expect(plainExcerpt(front)).toBe("");
+        expect(plainExcerpt("Before\n```js\nconst a = 1;\n```\nAfter")).toBe("Before After");
+        expect(plainExcerpt("Unclosed ```fence text")).toBe("Unclosed fence text");
+    });
+});
+
+describe("examKeyAction", () => {
+    test("the arrows move, Enter goes on", () => {
+        expect(examKeyAction({ key: "ArrowRight", code: "ArrowRight" })).toEqual({ kind: "next" });
+        expect(examKeyAction({ key: "ArrowLeft", code: "ArrowLeft" })).toEqual({
+            kind: "previous",
+        });
+        expect(examKeyAction({ key: "Enter", code: "Enter" })).toEqual({ kind: "enter" });
+        expect(examKeyAction({ key: "Enter", code: "NumpadEnter" })).toEqual({ kind: "enter" });
+    });
+
+    test("F flags on a Latin layout", () => {
+        expect(examKeyAction({ key: "f", code: "KeyF" })).toEqual({ kind: "flag" });
+        expect(examKeyAction({ key: "F", code: "KeyF" })).toEqual({ kind: "flag" });
+    });
+
+    test("F flags on an Arabic layout, where the key gives another letter", () => {
+        expect(examKeyAction({ key: "ب", code: "KeyF" })).toEqual({ kind: "flag" });
+    });
+
+    test("the digits choose by the key, not by the character, so AZERTY and the numpad work", () => {
+        expect(examKeyAction({ key: "1", code: "Digit1" })).toEqual({
+            kind: "choose",
+            position: 0,
+        });
+        // AZERTY's unshifted number row gives symbols
+        expect(examKeyAction({ key: "&", code: "Digit1" })).toEqual({
+            kind: "choose",
+            position: 0,
+        });
+        expect(examKeyAction({ key: "é", code: "Digit2" })).toEqual({
+            kind: "choose",
+            position: 1,
+        });
+        expect(examKeyAction({ key: "9", code: "Numpad9" })).toEqual({
+            kind: "choose",
+            position: 8,
+        });
+        // Arabic-Indic digits
+        expect(examKeyAction({ key: "٣", code: "Digit3" })).toEqual({
+            kind: "choose",
+            position: 2,
+        });
+    });
+
+    test("zero, other keys, and a letter typed on the wrong key do nothing", () => {
+        expect(examKeyAction({ key: "0", code: "Digit0" })).toBeNull();
+        expect(examKeyAction({ key: "x", code: "KeyX" })).toBeNull();
+        expect(examKeyAction({ key: "f", code: "KeyG" })).toBeNull();
+        expect(examKeyAction({ key: "1", code: "" })).toBeNull();
+    });
+
+    test("a shortcut with Ctrl, Cmd or Alt is not the exam's", () => {
+        expect(examKeyAction({ key: "f", code: "KeyF", ctrlKey: true })).toBeNull();
+        expect(examKeyAction({ key: "f", code: "KeyF", metaKey: true })).toBeNull();
+        expect(examKeyAction({ key: "1", code: "Digit1", altKey: true })).toBeNull();
+        expect(examKeyAction({ key: "ArrowRight", code: "ArrowRight", ctrlKey: true })).toBeNull();
+    });
+});
+
+describe("the clock", () => {
+    test("the countdown rounds up, so 150 minutes read 2:30:00 and the last second 0:01", () => {
+        expect(formatCountdown(150 * 60_000)).toBe("2:30:00");
+        expect(formatCountdown(150 * 60_000 - 10)).toBe("2:30:00");
+        expect(formatCountdown(149 * 60_000 + 59_001)).toBe("2:30:00");
+        expect(formatCountdown(149 * 60_000 + 59_000)).toBe("2:29:59");
+        expect(formatCountdown(1)).toBe("0:01");
+        expect(formatCountdown(0)).toBe("0:00");
+        expect(formatCountdown(-5)).toBe("0:00");
+    });
+
+    test("an exam ends at the deadline at the latest, even when it is submitted after a sleep", () => {
+        const timed = { ...SETUP, minutes: 150 };
+        const started = 1_000_000;
+        expect(examEndMs(timed, started, started + 60_000)).toBe(started + 60_000);
+        expect(examEndMs(timed, started, started + 150 * 60_000)).toBe(started + 150 * 60_000);
+        expect(examEndMs(timed, started, started + 400 * 60_000)).toBe(started + 150 * 60_000);
+        // No limit, no deadline
+        expect(examEndMs(SETUP, started, started + 400 * 60_000)).toBe(started + 400 * 60_000);
+    });
+});
+
+describe("examSummary", () => {
+    test("is what the home's Last exam card shows", () => {
+        const questions = pickExamQuestions(CARDS, { ...SETUP, shuffleOptions: false }, ZERO);
+        const start = Date.parse("2026-09-30T14:00:00Z");
+        const result = scoreExam(SETUP, questions, [], start, start + 7.5 * 60_000, false);
+        expect(examSummary(result)).toEqual({
+            title: "Exam · CIA",
+            percent: 0,
+            right: 0,
+            total: 4,
+            minutes: 7.5,
+            endedMs: start + 7.5 * 60_000,
+            passed: false,
+        });
     });
 });

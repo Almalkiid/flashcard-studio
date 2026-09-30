@@ -61,6 +61,7 @@ export default {
 
         // Exams: the screens and the vault files need a running Obsidian, the end-to-end tests cover them
         "src/exam/exam-render.ts",
+        "src/exam/exam-resume.ts",
         "src/exam/exam-results-view.ts",
         "src/exam/exam-run.ts",
         "src/exam/exam-setup-modal.ts",

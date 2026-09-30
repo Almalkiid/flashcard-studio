@@ -1029,12 +1029,29 @@ export interface IBaseLocale {
     EXAM_RIGHT_ANSWER: string;
     EXAM_YOU_KNEW: string;
     EXAM_YOU_DIDNT: string;
-    EXAM_IMAGE_QUESTION: string;
     EXAM_SAVED: string;
     EXAM_SAVE_FAILED: string;
     EXAM_OPEN_FILE: string;
     EXAM_NO_CARDS: string;
     AI_PICK_NOTE: string;
     EXAM_HOME_SUB: string;
+    EXAM_SAVING: string;
+    EXAM_TRY_AGAIN: string;
+    EXAM_PICTURE_QUESTION: string;
+    EXAM_RESUME_TITLE: string;
+    EXAM_RESUME_INTRO: string;
+    EXAM_RESUME_BUTTON: string;
+    EXAM_RESUME_DETAIL: string;
+    EXAM_LEFT: string;
+    EXAM_TIME_RAN_OUT: string;
+    EXAM_DISCARD: string;
+    EXAM_DISCARD_CONFIRM: string;
+    EXAM_LATER: string;
+    EXAM_MISSED_NONE: string;
+    EXAM_CARDS_CHANGED: string;
+    EXAM_CARDS_CHANGED_ONE: string;
+    EXAM_AVAILABLE_ONE: string;
+    EXAM_AVAILABLE_FEWER_ONE: string;
+    EXAM_SEE_RESULTS: string;
     // End exams
 }

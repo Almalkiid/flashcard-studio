@@ -13,6 +13,9 @@ import {
     pickExamQuestions,
 } from "src/exam/exam";
 import { collectExamCards } from "src/exam/exam-cards";
+import { trapTab } from "src/exam/exam-dom";
+import { ExamDraft } from "src/exam/exam-draft";
+import { renderDraftRows } from "src/exam/exam-resume";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { deckMatches } from "src/stats/scope";
@@ -54,6 +57,8 @@ export class ExamSetupModal extends Modal {
     private readonly plugin: SRPlugin;
     private readonly onStart: (start: ExamStart) => void;
     private readonly recent: ExamResult[];
+    /** Exams that were started and not finished; they are offered before a new one is set up. */
+    private drafts: ExamDraft[];
     private readonly cards: ExamCardInput[];
     private readonly rows: DeckRow[];
 
@@ -79,15 +84,24 @@ export class ExamSetupModal extends Modal {
     /**
      * @param recent - The last exams, newest first. The newest one is what the form starts from, so a retake is one
      * press of Start.
+     * @param drafts - The exams that were not finished. Resuming one starts it through `onStart`, like a new exam.
      */
-    constructor(plugin: SRPlugin, recent: ExamResult[], onStart: (start: ExamStart) => void) {
+    constructor(
+        plugin: SRPlugin,
+        recent: ExamResult[],
+        drafts: ExamDraft[],
+        onStart: (start: ExamStart) => void,
+    ) {
         super(plugin.app);
         this.plugin = plugin;
         this.onStart = onStart;
         this.recent = recent;
+        this.drafts = drafts;
         this.modalEl.addClass("fs-exam-modal", "fs-studio");
         this.contentEl.addClass("fs-exam-setup");
         this.setTitle(t("EXAM_SETUP_TITLE"));
+        // Tab stays in the dialog, and does not reach the exam or the notes behind it
+        trapTab(this.modalEl);
 
         const tree = plugin.dataManager.osrCore.reviewableDeckTree;
         this.cards = collectExamCards(tree);
@@ -129,6 +143,7 @@ export class ExamSetupModal extends Modal {
             this.renderActions(contentEl);
             return;
         }
+        this.renderDrafts(contentEl);
         this.renderPresets(contentEl);
         this.renderDecks(contentEl);
         this.renderCountAndTime(contentEl);
@@ -184,12 +199,22 @@ export class ExamSetupModal extends Modal {
     }
 
     private deckRows(tree: Deck): DeckRow[] {
+        // The cards of each deck and of everything below it, in one pass over the cards: a card is in its own deck and
+        // in every deck above it
+        const idsByDeck = new Map<string, Set<string>>();
+        for (const card of this.cards) {
+            const parts = card.deck.split("/");
+            for (let length = 1; length <= parts.length; length++) {
+                const key = parts.slice(0, length).join("/");
+                const ids = idsByDeck.get(key) ?? new Set<string>();
+                ids.add(card.id);
+                idsByDeck.set(key, ids);
+            }
+        }
         const rows: DeckRow[] = [];
         const add = (deck: Deck, depth: number) => {
             const path = deck.getTopicPath().path.join("/");
-            const ids = new Set(
-                this.cards.filter((card) => deckMatches(path, card.deck)).map((card) => card.id),
-            );
+            const ids = idsByDeck.get(path) ?? new Set<string>();
             const below: string[] = [];
             const start = rows.length;
             rows.push({
@@ -234,6 +259,27 @@ export class ExamSetupModal extends Modal {
     // #endregion
 
     // #region -> Screen
+
+    /** An exam that was left comes first: the person most likely wants to go on with it. */
+    private renderDrafts(parent: HTMLElement): void {
+        if (this.drafts.length === 0) return;
+        const field = parent.createDiv({ cls: "fs-exam-field fs-exam-resume" });
+        field.createDiv({ cls: "fs-label", text: t("EXAM_RESUME_TITLE") });
+        renderDraftRows(
+            field,
+            this.plugin,
+            this.drafts,
+            (start) => {
+                this.close();
+                this.onStart(start);
+            },
+            (left) => {
+                this.drafts = left;
+                this.onOpen();
+                this.refresh();
+            },
+        );
+    }
 
     private renderPresets(parent: HTMLElement): void {
         const group = parent.createDiv({
@@ -541,9 +587,17 @@ export class ExamSetupModal extends Modal {
                     this.filter === "choice-only" ? t("EXAM_NONE_CHOICE") : t("EXAM_NONE_ALL"),
                 );
             } else if (available < this.count) {
-                this.statusEl.setText(t("EXAM_AVAILABLE_FEWER", { count: available }));
+                this.statusEl.setText(
+                    available === 1
+                        ? t("EXAM_AVAILABLE_FEWER_ONE")
+                        : t("EXAM_AVAILABLE_FEWER", { count: available }),
+                );
             } else {
-                this.statusEl.setText(t("EXAM_AVAILABLE", { count: available }));
+                this.statusEl.setText(
+                    available === 1
+                        ? t("EXAM_AVAILABLE_ONE")
+                        : t("EXAM_AVAILABLE", { count: available }),
+                );
             }
         }
         if (this.startButton) this.startButton.disabled = available === 0;

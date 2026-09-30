@@ -1,17 +1,24 @@
 import "src/exam/exam.css";
-import { Component, Notice, setIcon } from "obsidian";
+import { Component, ItemView, Notice, setIcon } from "obsidian";
 
 import {
     emptyAnswer,
     ExamAnswer,
+    examEndMs,
+    examKeyAction,
     ExamQuestion,
     ExamResult,
+    ExamResume,
     ExamSetup,
     formatClock,
+    formatCountdown,
     isAnswered,
     remainingMs,
     scoreExam,
 } from "src/exam/exam";
+import { isEditable, trapTab } from "src/exam/exam-dom";
+import { ExamDraft, makeDraft, newDraftId } from "src/exam/exam-draft";
+import { markExamGone, markExamLive } from "src/exam/exam-draft-store";
 import {
     choiceContext,
     deckLabel,
@@ -27,6 +34,10 @@ import { renderTypedInput } from "src/ui/obsidian-ui-components/content-containe
 
 /** The timer turns orange when this little time is left. */
 const LOW_TIME_MS = 5 * 60_000;
+/** Progress is also saved this often while the clock runs, whatever the person does. */
+const SAVE_EVERY_MS = 15_000;
+/** Typing is saved when the person pauses for this long, not at every letter. */
+const TYPING_SAVE_MS = 800;
 
 export interface ExamRunOptions {
     plugin: SRPlugin;
@@ -39,6 +50,12 @@ export interface ExamRunOptions {
     onStudyMissed: (ids: string[]) => void;
     /** The person is done with the exam screens: Close on the results, or leaving before the end. */
     onClose: () => void;
+    /** An exam that was left, taken up again: where it was. Its clock is the one it started with. */
+    resume?: ExamResume;
+    /** Saves the exam's progress so that it can be taken up again. Called after every answer, flag and move. */
+    persist?: (draft: ExamDraft) => void;
+    /** Forgets the saved progress: the exam was submitted or the person left it for good. */
+    discard?: (id: string) => void;
 }
 
 interface DialogAction {
@@ -58,20 +75,27 @@ export class ExamRunner {
     private readonly component = new Component();
     private readonly ctx: ExamRenderContext;
     private readonly root: HTMLElement;
+    /** The document the exam is in: a pop-out window has its own, and the key listener goes on and off that one. */
+    private readonly doc: Document;
     private readonly setup: ExamSetup;
     private readonly questions: ExamQuestion[];
     private readonly answers: ExamAnswer[];
     /** Self-marked questions whose answer the person has looked at. */
     private readonly revealed = new Set<number>();
 
-    private current = 0;
+    private current: number;
     private phase: "running" | "results" = "running";
-    private readonly startedMs = Date.now();
+    private readonly startedMs: number;
+    /** Names the exam among the saved ones. */
+    private readonly id: string;
     private shownAt = Date.now();
     private timerId: number | null = null;
+    private lastSavedMs = 0;
+    private typingSaveId: number | null = null;
     /** Bumped for each question drawn, so a slow one that is overtaken is dropped. */
     private drawn = 0;
     private dialog: HTMLElement | null = null;
+    private focusBeforeDialog: HTMLElement | null = null;
     private results: ExamResultsView | null = null;
 
     private counterNow: HTMLElement | null = null;
@@ -92,10 +116,19 @@ export class ExamRunner {
     ) {
         this.setup = opts.setup;
         this.questions = opts.questions;
-        this.answers = opts.questions.map(() => emptyAnswer());
+        // An exam taken up again goes on from its answers and its clock
+        const resume = opts.resume;
+        this.answers =
+            resume === undefined
+                ? opts.questions.map(() => emptyAnswer())
+                : resume.answers.map((answer) => ({ ...answer, chosen: [...answer.chosen] }));
+        this.current = resume === undefined ? 0 : resume.current;
+        this.startedMs = resume === undefined ? Date.now() : resume.startedMs;
+        this.id = resume?.id ?? newDraftId(this.startedMs);
         this.component.load();
         this.ctx = { app: opts.plugin.app, plugin: opts.plugin, component: this.component };
         this.root = parent.createDiv({ cls: "fs-exam fs-studio" });
+        this.doc = this.root.ownerDocument;
     }
 
     /** Whether the exam is still going: leaving now loses the answers. */
@@ -104,11 +137,15 @@ export class ExamRunner {
     }
 
     start(): void {
+        markExamLive(this.id);
         this.buildRunning();
-        activeDocument.addEventListener("keydown", this.onKeydown);
-        this.tick();
+        this.doc.addEventListener("keydown", this.onKeydown);
+        // The clock first: a resumed exam whose time ran out while it was closed is submitted by the first tick
         this.timerId = window.setInterval(() => this.tick(), 1000);
-        void this.showQuestion(0);
+        this.tick();
+        if (this.phase !== "running") return;
+        void this.showQuestion(this.current);
+        this.persist();
     }
 
     /**
@@ -124,14 +161,31 @@ export class ExamRunner {
             (body) => body.createDiv({ text: t("EXAM_LEAVE_BODY") }),
             [
                 { label: t("EXAM_KEEP_GOING"), run: () => undefined },
-                { label: t("EXAM_LEAVE"), primary: true, run: then },
+                {
+                    label: t("EXAM_LEAVE"),
+                    primary: true,
+                    run: () => {
+                        // Leaving is for good: what was saved is thrown away. Closing the tab is not leaving
+                        this.cancelTypingSave();
+                        this.opts.discard?.(this.id);
+                        then();
+                    },
+                },
             ],
         );
     }
 
+    /**
+     * Takes the exam off the screen. The saved progress stays: closing a tab, or the Studio, is not leaving the exam, and
+     * it can be taken up again. Leaving for good is `requestLeave`.
+     */
     destroy(): void {
         this.stopTimer();
-        activeDocument.removeEventListener("keydown", this.onKeydown);
+        // What was typed in the last moment is saved with it
+        if (this.typingSaveId !== null) this.persist();
+        this.cancelTypingSave();
+        this.doc.removeEventListener("keydown", this.onKeydown);
+        markExamGone(this.id);
         this.component.unload();
         this.root.remove();
     }
@@ -159,7 +213,10 @@ export class ExamRunner {
             attr: { type: "button", "aria-label": t("EXAM_MAP") },
         });
         counter.setCssProps({ "--fs-digits": String(String(this.questions.length).length) });
-        this.counterNow = counter.createSpan({ cls: "fs-exam-counter-now", text: "1" });
+        this.counterNow = counter.createSpan({
+            cls: "fs-exam-counter-now",
+            text: String(this.current + 1),
+        });
         counter.createSpan({
             cls: "fs-exam-counter-total",
             text: ` / ${this.questions.length}`,
@@ -176,8 +233,13 @@ export class ExamRunner {
         this.flagButton.createSpan({ cls: "fs-exam-flag-text", text: t("EXAM_FLAG") });
         this.flagButton.addEventListener("click", () => this.toggleFlag());
 
+        // A clock counts down; a stopwatch, when there is no limit, counts what has passed, so it is not a countdown
         this.timerEl = right.createDiv({ cls: "fs-exam-timer", attr: { role: "timer" } });
-        setIcon(this.timerEl.createSpan({ cls: "fs-exam-timer-icon" }), "clock");
+        this.timerEl.toggleClass("is-elapsed", this.setup.minutes === null);
+        setIcon(
+            this.timerEl.createSpan({ cls: "fs-exam-timer-icon" }),
+            this.setup.minutes === null ? "timer" : "clock",
+        );
         this.timerText = this.timerEl.createSpan({ cls: "fs-exam-timer-text" });
 
         const submit = right.createEl("button", {
@@ -324,14 +386,51 @@ export class ExamRunner {
         this.mapSummary?.setText(t("EXAM_MAP_PROGRESS", { answered, total }));
     }
 
-    /** Called when the answer to the question that is up changes. */
-    private answerChanged(): void {
+    /**
+     * Called when the answer to the question that is up changes. Typing is saved when the person pauses, anything else
+     * at once.
+     */
+    private answerChanged(typing = false): void {
         this.refreshCell(this.current);
         this.refreshProgress();
         this.clearButton?.toggleClass(
             "is-hidden",
             !isAnswered(this.questions[this.current], this.answers[this.current]),
         );
+        if (typing) this.persistSoon();
+        else this.persist();
+    }
+
+    /** Saves the exam's progress, if the exam is still going. */
+    private persist(): void {
+        this.cancelTypingSave();
+        if (this.phase !== "running" || this.opts.persist === undefined) return;
+        const now = Date.now();
+        this.lastSavedMs = now;
+        this.opts.persist(
+            makeDraft(
+                {
+                    setup: this.setup,
+                    questions: this.questions,
+                    answers: this.answers,
+                    current: this.current,
+                    startedMs: this.startedMs,
+                    id: this.id,
+                },
+                now,
+            ),
+        );
+    }
+
+    private persistSoon(): void {
+        this.cancelTypingSave();
+        this.typingSaveId = window.setTimeout(() => this.persist(), TYPING_SAVE_MS);
+    }
+
+    private cancelTypingSave(): void {
+        if (this.typingSaveId === null) return;
+        window.clearTimeout(this.typingSaveId);
+        this.typingSaveId = null;
     }
 
     private goTo(index: number): void {
@@ -349,6 +448,7 @@ export class ExamRunner {
         const answer = this.answers[this.current];
         answer.flagged = !answer.flagged;
         this.refreshChrome();
+        this.persist();
     }
 
     /** Adds the time since the question was shown to what has been spent on it. */
@@ -359,17 +459,24 @@ export class ExamRunner {
     }
 
     private tick(): void {
+        if (this.phase !== "running") return;
         const now = Date.now();
         const left = remainingMs(this.setup, this.startedMs, now);
+        // Time is up: submitted as it stands, not saved once more first
+        if (left === 0) {
+            this.finish(true);
+            return;
+        }
+        // Even with nothing being answered, the progress is saved now and then, so a crash loses little
+        if (now - this.lastSavedMs >= SAVE_EVERY_MS) this.persist();
         if (left === null) {
             this.timerText?.setText(formatClock(now - this.startedMs));
             this.timerEl?.setAttribute("aria-label", t("EXAM_TIME_ELAPSED"));
             return;
         }
-        this.timerText?.setText(formatClock(left));
+        this.timerText?.setText(formatCountdown(left));
         this.timerEl?.setAttribute("aria-label", t("EXAM_TIME_LEFT"));
         this.timerEl?.toggleClass("is-low", left < LOW_TIME_MS);
-        if (left === 0) this.finish(true);
     }
 
     private stopTimer(): void {
@@ -388,10 +495,11 @@ export class ExamRunner {
      */
     private async showQuestion(index: number): Promise<void> {
         const stage = this.stage;
-        if (stage === null) return;
+        if (stage === null || this.phase !== "running") return;
         if (index !== this.current) {
             this.noteTimeSpent();
             this.current = index;
+            this.persist();
         }
         this.refreshChrome();
 
@@ -471,7 +579,7 @@ export class ExamRunner {
             focus.value = answer.typed;
             focus.addEventListener("input", () => {
                 answer.typed = focus?.value ?? "";
-                this.answerChanged();
+                this.answerChanged(true);
             });
         } else if (q.kind === "self") {
             renders.push(this.renderSelf(body, index));
@@ -582,11 +690,13 @@ export class ExamRunner {
     }
 
     /**
-     * Marks the exam, saves it and shows the results. Time running out submits it as it is.
+     * Marks the exam, saves it and shows the results. Time running out submits it as it is, and the exam ends at its
+     * deadline, not at the moment a device that slept wakes up.
      */
     private finish(timeUp: boolean): void {
         if (this.phase !== "running") return;
         this.stopTimer();
+        this.cancelTypingSave();
         this.closeDialog();
         this.noteTimeSpent();
         const result = scoreExam(
@@ -594,7 +704,7 @@ export class ExamRunner {
             this.questions,
             this.answers,
             this.startedMs,
-            Date.now(),
+            examEndMs(this.setup, this.startedMs, Date.now()),
             this.opts.ignoreAccents,
         );
         this.phase = "results";
@@ -608,14 +718,33 @@ export class ExamRunner {
             ignoreAccents: this.opts.ignoreAccents,
             onStudyMissed: (ids) => this.opts.onStudyMissed(ids),
             onClose: () => this.opts.onClose(),
+            onRetrySave: () => void this.saveResult(result),
         });
-        this.opts
-            .save(result)
-            .then((path) => this.results?.showSaved(path))
-            .catch((error: unknown) => {
+        void this.saveResult(result);
+    }
+
+    /**
+     * Writes the results file, once more if the first try fails. The saved progress is dropped only when the file is
+     * written, so an exam whose results could not be saved is not lost. A failure is shown, with a button to try again,
+     * and the results stay on screen.
+     */
+    private async saveResult(result: ExamResult): Promise<void> {
+        this.results?.showSaving();
+        let reason = "";
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                const path = await this.opts.save(result);
+                this.opts.discard?.(this.id);
+                this.results?.showSaved(path);
+                return;
+            } catch (error) {
                 console.error("Flashcard Studio: could not save the exam", error);
-                this.results?.showSaveFailed(error instanceof Error ? error.message : "");
-            });
+                reason = error instanceof Error ? error.message : "";
+                if (attempt === 1) await new Promise((resolve) => window.setTimeout(resolve, 600));
+            }
+        }
+        new Notice(t("EXAM_SAVE_FAILED", { reason }));
+        this.results?.showSaveFailed(reason);
     }
 
     // #endregion
@@ -656,48 +785,74 @@ export class ExamRunner {
             event.stopPropagation();
             this.closeDialog();
         });
+        trapTab(dialog);
+        // Where the focus was goes back there when the dialog closes
+        this.focusBeforeDialog = this.doc.activeElement as HTMLElement | null;
         this.dialog = scrim;
         // The first button never does anything that cannot be undone
         buttons[0]?.focus();
     }
 
     private closeDialog(): void {
-        this.dialog?.remove();
+        if (this.dialog === null) return;
+        this.dialog.remove();
         this.dialog = null;
+        const before = this.focusBeforeDialog;
+        this.focusBeforeDialog = null;
+        if (before !== null && before.isConnected) before.focus();
     }
 
-    /** 1 to 9 choose an option, the arrows move, F flags, Enter goes on. */
+    /**
+     * Whether a key press is meant for the exam: the exam's own view is the one that is active, focus is in it (or on
+     * nothing at all, as after a dialog closes) and not in a field, and nothing of Obsidian's (the settings, the command
+     * palette) is in front. Anywhere else, Enter and the arrows and the letters are somebody else's.
+     */
+    private keysAreForTheExam(event: KeyboardEvent): boolean {
+        if (!this.root.isShown() || this.doc.querySelector(".modal-container, .prompt") !== null) {
+            return false;
+        }
+        const view = this.ctx.app.workspace.getActiveViewOfType(ItemView);
+        if (view === null || !view.containerEl.contains(this.root)) return false;
+        const focus = this.doc.activeElement;
+        if (focus !== null && focus !== this.doc.body && !view.containerEl.contains(focus)) {
+            return false;
+        }
+        return !isEditable(event.target) && !isEditable(focus);
+    }
+
+    /** 1 to 9 choose an option, the arrows move, F flags, Enter goes on. The keys are read by place, not character. */
     private readonly onKeydown = (event: KeyboardEvent): void => {
         if (this.phase !== "running" || this.dialog !== null || this.stage === null) return;
-        if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
-        // Another tab, or a dialog of Obsidian's (the settings, the command palette) is in front
-        if (!this.root.isShown() || activeDocument.querySelector(".modal-container, .prompt"))
-            return;
+        if (event.isComposing) return;
+        const action = examKeyAction(event);
+        if (action === null || !this.keysAreForTheExam(event)) return;
 
-        const target = event.target instanceof HTMLElement ? event.target : null;
-        const typing =
-            target !== null &&
-            (target.isContentEditable ||
-                target.tagName === "INPUT" ||
-                target.tagName === "TEXTAREA" ||
-                target.tagName === "SELECT");
-        if (typing) return;
-
-        let handled = true;
-        if (event.key === "ArrowRight") this.next();
-        else if (event.key === "ArrowLeft") this.goTo(this.current - 1);
-        else if (event.key === "f" || event.key === "F") this.toggleFlag();
-        else if (event.key === "Enter") {
-            // A button keeps its own Enter, except a tile: Enter there goes on
-            if (target?.tagName === "BUTTON" && !target.hasClass("fs-choice")) return;
-            if (this.current < this.questions.length - 1) this.goTo(this.current + 1);
-        } else if (/^[1-9]$/.test(event.key)) {
-            const tile =
-                this.stage.querySelectorAll<HTMLElement>(".fs-choice")[Number(event.key) - 1];
-            if (tile === undefined) return;
-            tile.click();
-        } else handled = false;
-        if (handled) event.preventDefault();
+        switch (action.kind) {
+            case "next":
+                this.next();
+                break;
+            case "previous":
+                this.goTo(this.current - 1);
+                break;
+            case "flag":
+                this.toggleFlag();
+                break;
+            case "enter": {
+                // A button keeps its own Enter, except a tile: Enter there goes on
+                const target = event.target as HTMLElement | null;
+                if (target?.tagName === "BUTTON" && !target.hasClass("fs-choice")) return;
+                if (this.current < this.questions.length - 1) this.goTo(this.current + 1);
+                break;
+            }
+            case "choose": {
+                const tile =
+                    this.stage.querySelectorAll<HTMLElement>(".fs-choice")[action.position];
+                if (tile === undefined) return;
+                tile.click();
+                break;
+            }
+        }
+        event.preventDefault();
     };
 
     // #endregion

@@ -14,6 +14,7 @@ import {
     allowanceFor,
     buildCustomStudyTree,
     cardKey,
+    chosenCardsIn,
     customStudyMode,
     customStudyPredicate,
     CustomStudySpec,
@@ -25,6 +26,7 @@ import {
     isInDeck,
     limitCards,
     monthsBetween,
+    placeKey,
 } from "src/scheduling/custom-study";
 import { DailyLimits } from "src/scheduling/daily-limits";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
@@ -449,5 +451,44 @@ describe("cards: the ones an exam missed", () => {
         const filtered = buildCustomStudyTree(tree, { type: "cards", ids: ["a", "c"] }, context());
         expect(filtered.getDistinctRepItemCount(RepItemState.AnyItem, true)).toBe(2);
         expect(filtered.getDeck(new TopicPath(["CIA", "Part2"]))).not.toBeNull();
+    });
+});
+
+describe("cards, after the cards have changed since the exam", () => {
+    test("placeKey is where the card is written, whether or not it has an id", () => {
+        expect(placeKey(makeCard({ path: "CIA/Charter.md", hash: "h9", cardIdx: 1 }))).toBe(
+            "CIA/Charter.md|h9|1",
+        );
+        expect(placeKey(makeCard({ id: "abc123", path: "CIA/Charter.md", hash: "h9" }))).toBe(
+            "CIA/Charter.md|h9|0",
+        );
+    });
+
+    test("a card that gained an id since the exam is still found by the place it was listed under", () => {
+        const before = makeCard({ path: "CIA/Charter.md", hash: "h9" });
+        const listed = cardKey(before);
+        // Answered on the phone since: the same card, now with an id
+        const after = makeCard({ id: "k3f9a2", path: "CIA/Charter.md", hash: "h9" });
+        expect(cardKey(after)).toBe("k3f9a2");
+        const predicate = customStudyPredicate({ type: "cards", ids: [listed] }, context());
+        expect(predicate(after)).toBe(true);
+        // and by its id, when the exam listed it after it had one
+        const byId = customStudyPredicate({ type: "cards", ids: ["k3f9a2"] }, context());
+        expect(byId(after)).toBe(true);
+    });
+
+    test("a card whose text changed is not found, and chosenCardsIn counts the ones that are", () => {
+        const tree = new Deck("root", null);
+        const cards = [
+            makeCard({ id: "a", deck: ["CIA/Part1"] }),
+            makeCard({ path: "CIA/N.md", hash: "old", deck: ["CIA/Part1"] }),
+            makeCard({ id: "c", deck: ["CIA/Part2", "CIA/Part1"] }),
+        ];
+        for (const card of cards) tree.appendRepItem(card.question.topicPathList, card);
+        const ids = ["a", "CIA/N.md|new|0", "c", "gone"];
+        const found = chosenCardsIn(tree, ids);
+        // "c" is in two decks and counts once; the edited card and the one that was deleted are lost
+        expect(found.map((card) => cardKey(card)).sort()).toEqual(["a", "c"]);
+        expect(chosenCardsIn(tree, [])).toEqual([]);
     });
 });

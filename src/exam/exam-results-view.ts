@@ -8,7 +8,8 @@ import {
     renderCardMarkdown,
 } from "src/exam/exam-render";
 import { t } from "src/lang/helpers";
-import { compareTypedAnswer, typedAnswerTarget } from "src/scheduling/typed-answer";
+import { occlusionQuestionOf } from "src/occlusion/occlusion-view";
+import { compareTypedAnswer } from "src/scheduling/typed-answer";
 import { renderChoiceBack } from "src/ui/obsidian-ui-components/content-container/card-container/choice-view";
 import { renderTypedResult } from "src/ui/obsidian-ui-components/content-container/card-container/typed-answer-view";
 import { formatDateTimeShort, formatDuration } from "src/ui/statistics-view/format";
@@ -19,10 +20,13 @@ export interface ExamResultsOptions {
     /** "Study the ones I missed": the ids of those cards. */
     onStudyMissed: (ids: string[]) => void;
     onClose: () => void;
+    /** Writes the results file again, after a failure. */
+    onRetrySave: () => void;
 }
 
-/** What the screen shows once the results file has been written, or has failed to be. */
+/** What the screen shows about the results file: being written, written, or failed to be written. */
 export interface ExamResultsView {
+    showSaving(): void;
     showSaved(path: string): void;
     showSaveFailed(reason: string): void;
 }
@@ -54,6 +58,11 @@ export function renderExamResults(
     renderReview(page, result, opts);
 
     return {
+        showSaving: () => {
+            saved.empty();
+            saved.removeClass("is-error");
+            saved.createSpan({ cls: "fs-exam-saved-text", text: t("EXAM_SAVING") });
+        },
         showSaved: (path) => {
             saved.empty();
             saved.removeClass("is-error");
@@ -76,6 +85,13 @@ export function renderExamResults(
                 cls: "fs-exam-saved-text",
                 text: t("EXAM_SAVE_FAILED", { reason }),
             });
+            saved
+                .createEl("button", {
+                    cls: "fs-exam-link",
+                    text: t("EXAM_TRY_AGAIN"),
+                    attr: { type: "button" },
+                })
+                .addEventListener("click", () => opts.onRetrySave());
         },
     };
 }
@@ -260,7 +276,10 @@ function renderItem(
     });
     head.createSpan({
         cls: "fs-exam-item-text",
-        text: plainExcerpt(item.q.front) || t("EXAM_IMAGE_QUESTION"),
+        // An occlusion card is listed by the question on its block, never by the data it is drawn from
+        text:
+            plainExcerpt(occlusionQuestionOf(item.q.front) ?? item.q.front) ||
+            t("EXAM_PICTURE_QUESTION"),
     }).setAttribute("dir", "auto");
     if (item.a.flagged) setIcon(head.createSpan({ cls: "fs-exam-item-flag" }), "flag");
     setIcon(head.createSpan({ cls: "fs-exam-item-chevron" }), "chevron-down");
@@ -287,8 +306,12 @@ async function fillItem(
     const { ctx } = opts;
     const q = item.q;
     const answer = item.a;
-    const question = body.createDiv({ cls: "fs-exam-question fs-exam-item-question" });
-    await renderCardMarkdown(ctx, q.front, question, q.sourcePath);
+    // An occlusion card's back is the picture with its question, so the front (the same picture, masked) is not drawn
+    // as well: the question is read once, and the answer is in the picture beside it
+    if (occlusionQuestionOf(q.front) === null) {
+        const question = body.createDiv({ cls: "fs-exam-question fs-exam-item-question" });
+        await renderCardMarkdown(ctx, q.front, question, q.sourcePath);
+    }
 
     if (item.right === null) {
         body.createDiv({ cls: "fs-exam-blank", text: t("EXAM_NOT_ANSWERED") });
@@ -303,9 +326,18 @@ async function fillItem(
         return;
     }
 
-    if (q.kind === "typed") {
-        const target = typedAnswerTarget(q.back) ?? q.back;
+    if (q.kind === "typed" && q.typedTarget !== undefined && q.typedTarget !== null) {
+        const target = q.typedTarget;
         const block = body.createDiv({ cls: "fs-exam-answer-block" });
+        // The picture of an occlusion card is its answer: the mask outlined, and the typed label checked under it
+        if (occlusionQuestionOf(q.back) !== null) {
+            await renderCardMarkdown(
+                ctx,
+                q.back,
+                block.createDiv({ cls: "fs-exam-self-answer" }),
+                q.sourcePath,
+            );
+        }
         if (item.right === null) {
             block.createDiv({ cls: "fs-label", text: t("EXAM_RIGHT_ANSWER") });
             block.createDiv({ cls: "fs-typed-line", text: target });

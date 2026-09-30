@@ -4,6 +4,8 @@ import {
     parseMultipleChoice,
     shuffledOrder,
 } from "src/data/data-structures/card/questions/multiple-choice";
+import { occlusionTypedTarget } from "src/occlusion/occlusion-view";
+import { digitFromKeyCode } from "src/scheduling/answer-keys";
 import { compareTypedAnswer, typedAnswerTarget } from "src/scheduling/typed-answer";
 import { deckMatches } from "src/stats/scope";
 
@@ -52,8 +54,13 @@ export interface ExamQuestion {
     choice: MultipleChoice | null;
     /** Display position to option index for a choice question; empty for the other kinds. */
     order: number[];
-    /** The note the card is in, for the links and images in its text. */
-    sourcePath: string;
+    /** The note the card is in, for the links and images in its text. Absent means none. */
+    sourcePath?: string;
+    /**
+     * For a typed question: the plain text to type, worked out once when the question is picked (the label of the mask
+     * for an occlusion card, the answer without its Markdown for another). Null for the other kinds.
+     */
+    typedTarget?: string | null;
 }
 
 export interface ExamAnswer {
@@ -78,20 +85,43 @@ export interface ExamCardInput {
     sourcePath?: string;
 }
 
+/** Where an exam that was left goes on: the answers so far, the question that was up, and when it started. */
+export interface ExamResume {
+    /** The id the saved progress is kept under. */
+    id: string;
+    answers: ExamAnswer[];
+    current: number;
+    startedMs: number;
+}
+
 /** An exam ready to be taken: how it was set up, and the questions picked for it. */
 export interface ExamStart {
     setup: ExamSetup;
     questions: ExamQuestion[];
+    /** Set when an exam that was left is taken up again; its clock is the one it started with. */
+    resume?: ExamResume;
 }
 
 export function emptyAnswer(): ExamAnswer {
     return { chosen: [], typed: "", selfRight: null, flagged: false, ms: 0 };
 }
 
-function kindOf(back: string, filter: ExamCardFilter): ExamQuestionKind | null {
-    if (parseMultipleChoice(back) !== null) return "choice";
+/**
+ * The plain text to type for a card's answer: the label of the mask for an occlusion card, the answer without its
+ * Markdown for a basic card. Null when there is nothing short and plain to type.
+ */
+export function examTypedTarget(back: string): string | null {
+    return occlusionTypedTarget(back) ?? typedAnswerTarget(back);
+}
+
+function kindOf(
+    back: string,
+    filter: ExamCardFilter,
+): { kind: ExamQuestionKind; target: string | null } | null {
+    if (parseMultipleChoice(back) !== null) return { kind: "choice", target: null };
     if (filter === "choice-only") return null;
-    return typedAnswerTarget(back) !== null ? "typed" : "self";
+    const target = examTypedTarget(back);
+    return target !== null ? { kind: "typed", target } : { kind: "self", target: null };
 }
 
 /**
@@ -107,22 +137,22 @@ export function pickExamQuestions(
 ): ExamQuestion[] {
     const scopes = setup.decks.length === 0 ? [""] : setup.decks;
     const seen = new Set<string>();
-    const eligible: { card: ExamCardInput; kind: ExamQuestionKind }[] = [];
+    const eligible: { card: ExamCardInput; kind: ExamQuestionKind; target: string | null }[] = [];
     for (const card of cards) {
         if (card.suspended || card.isCloze) continue;
         if (!scopes.some((scope) => deckMatches(scope, card.deck))) continue;
         if (seen.has(card.id)) continue;
-        const kind = kindOf(card.back, setup.filter);
-        if (kind === null) continue;
+        const found = kindOf(card.back, setup.filter);
+        if (found === null) continue;
         seen.add(card.id);
-        eligible.push({ card, kind });
+        eligible.push({ card, kind: found.kind, target: found.target });
     }
 
     const shuffleOptions = setup.shuffleOptions !== false;
     return shuffledOrder(eligible.length, random)
         .slice(0, Math.max(0, setup.count))
         .map((index) => {
-            const { card, kind } = eligible[index];
+            const { card, kind, target } = eligible[index];
             const choice = kind === "choice" ? parseMultipleChoice(card.back) : null;
             const optionCount = choice?.options.length ?? 0;
             return {
@@ -136,6 +166,7 @@ export function pickExamQuestions(
                     ? shuffledOrder(optionCount, random)
                     : Array.from({ length: optionCount }, (_, i) => i),
                 sourcePath: card.sourcePath ?? "",
+                typedTarget: target,
             };
         });
 }
@@ -163,8 +194,11 @@ export function isRight(q: ExamQuestion, a: ExamAnswer, ignoreAccents: boolean):
         case "choice":
             return q.choice !== null && isChoiceCorrect(q.choice, a.chosen);
         case "typed":
-            return compareTypedAnswer(a.typed, typedAnswerTarget(q.back) ?? q.back, ignoreAccents)
-                .exact;
+            return (
+                q.typedTarget !== undefined &&
+                q.typedTarget !== null &&
+                compareTypedAnswer(a.typed, q.typedTarget, ignoreAccents).exact
+            );
         case "self":
             return a.selfRight === true;
     }
@@ -284,6 +318,8 @@ export function joinDeckNames(names: string[]): string {
  */
 export function plainExcerpt(markdown: string, max = 140): string {
     const text = markdown
+        // A fenced block (code, or an occlusion card's data) is not words
+        .replace(/```[\s\S]*?```/g, " ")
         .replace(/!\[\[[^\]]*\]\]|!\[[^\]]*\]\([^)]*\)/g, " ")
         .replace(/\[\[([^\]|]*)\|([^\]]*)\]\]/g, "$2")
         .replace(/\[\[([^\]]*)\]\]/g, "$1")
@@ -296,4 +332,71 @@ export function plainExcerpt(markdown: string, max = 140): string {
     const cut = text.slice(0, max);
     const space = cut.lastIndexOf(" ");
     return `${(space > 0 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
+/** The text of a countdown: the time left, rounded up to whole seconds, so 150 minutes read 2:30:00. */
+export function formatCountdown(ms: number): string {
+    return formatClock(Math.ceil(Math.max(0, ms) / 1000) * 1000);
+}
+
+/** When an exam ended: now, but never later than its deadline (a laptop that slept past the limit). */
+export function examEndMs(setup: ExamSetup, startedMs: number, nowMs: number): number {
+    if (setup.minutes === null) return nowMs;
+    return Math.min(nowMs, startedMs + setup.minutes * 60_000);
+}
+
+/** What the home's Last exam card shows about an exam. */
+export function examSummary(result: ExamResult): {
+    title: string;
+    percent: number;
+    right: number;
+    total: number;
+    minutes: number;
+    endedMs: number;
+    passed: boolean;
+} {
+    return {
+        title: result.setup.title,
+        percent: result.percent,
+        right: result.right,
+        total: result.total,
+        minutes: Math.max(0, (result.endedMs - result.startedMs) / 60_000),
+        endedMs: result.endedMs,
+        passed: result.passed,
+    };
+}
+
+export type ExamKeyAction =
+    | { kind: "next" }
+    | { kind: "previous" }
+    | { kind: "enter" }
+    | { kind: "flag" }
+    | { kind: "choose"; position: number };
+
+/**
+ * What a key press does in an exam. The keys are read by their place on the keyboard (`code`), not by the character
+ * they give, so F works on an Arabic layout, and the number row works on AZERTY, where it gives symbols. A press with
+ * Ctrl, Cmd or Alt is a shortcut of the application's, not the exam's.
+ */
+export function examKeyAction(event: {
+    key: string;
+    code: string;
+    ctrlKey?: boolean;
+    metaKey?: boolean;
+    altKey?: boolean;
+}): ExamKeyAction | null {
+    if (event.ctrlKey === true || event.metaKey === true || event.altKey === true) return null;
+    switch (event.code) {
+        case "ArrowRight":
+            return { kind: "next" };
+        case "ArrowLeft":
+            return { kind: "previous" };
+        case "Enter":
+        case "NumpadEnter":
+            return { kind: "enter" };
+        case "KeyF":
+            return { kind: "flag" };
+    }
+    const digit = digitFromKeyCode(event.code);
+    return digit !== null && digit >= 1 ? { kind: "choose", position: digit - 1 } : null;
 }

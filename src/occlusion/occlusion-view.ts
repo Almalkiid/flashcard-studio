@@ -82,6 +82,14 @@ function occlusionSpecOf(markdown: string): OcclusionCardSpec | null {
 }
 
 /**
+ * The question written on an occlusion card's block ("" when the block has none), or null when the text is not the
+ * markdown of an occlusion card. For places that list a card without drawing its picture.
+ */
+export function occlusionQuestionOf(markdown: string): string | null {
+    return occlusionSpecOf(markdown)?.block.question ?? null;
+}
+
+/**
  * The text to type for an occlusion card: the label of the mask that the card asks about, when it is short plain text
  * (see `typedAnswerTarget`). Null for a card whose label is empty or is not plain text, and for anything that is not an
  * occlusion card. The front or the back of the card serves: both name the same mask.

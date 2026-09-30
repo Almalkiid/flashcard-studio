@@ -6,6 +6,7 @@ import {
     ExamQuestionKind,
     ExamResult,
     ExamSetup,
+    examTypedTarget,
     summarizeExam,
 } from "src/exam/exam";
 
@@ -118,6 +119,10 @@ function isFiniteNumber(value: unknown): value is number {
     return typeof value === "number" && Number.isFinite(value);
 }
 
+function isOptionalString(value: unknown): value is string | undefined {
+    return value === undefined || typeof value === "string";
+}
+
 function isNullableNumber(value: unknown): value is number | null {
     return value === null || isFiniteNumber(value);
 }
@@ -133,7 +138,7 @@ function isNumberArray(value: unknown): value is number[] {
 const FILTERS: ExamCardFilter[] = ["choice-only", "all"];
 const KINDS: ExamQuestionKind[] = ["choice", "typed", "self"];
 
-function readSetup(value: unknown): ExamSetup | null {
+export function readSetup(value: unknown): ExamSetup | null {
     if (!isObject(value)) return null;
     const { decks, count, minutes, filter, passPercent, title, shuffleOptions } = value;
     if (!Array.isArray(decks) || !decks.every((deck) => typeof deck === "string")) return null;
@@ -174,15 +179,21 @@ function readChoice(value: unknown): ExamQuestion["choice"] | undefined {
     return { lead, options: read, explanation, multiSelect };
 }
 
-function readQuestion(value: unknown): ExamQuestion | null {
+export function readQuestion(value: unknown): ExamQuestion | null {
     if (!isObject(value)) return null;
-    const { cardId, deck, kind, front, back, order, sourcePath } = value;
+    const { cardId, deck, kind, front, back, order, sourcePath, typedTarget } = value;
     if (typeof cardId !== "string" || typeof deck !== "string") return null;
     if (!KINDS.includes(kind as ExamQuestionKind)) return null;
     if (typeof front !== "string" || typeof back !== "string") return null;
-    if (!isNumberArray(order) || typeof sourcePath !== "string") return null;
+    if (!isNumberArray(order)) return null;
+    if (!isOptionalString(sourcePath)) return null;
+    if (typedTarget !== null && !isOptionalString(typedTarget)) return null;
+    const written = typedTarget as string | null | undefined;
     const choice = readChoice(value.choice);
     if (choice === undefined) return null;
+    // A question saved without its typed text (an older file) gets it from its answer
+    const target =
+        written !== undefined ? written : kind === "typed" ? examTypedTarget(back) : null;
     return {
         cardId,
         deck,
@@ -191,11 +202,12 @@ function readQuestion(value: unknown): ExamQuestion | null {
         back,
         choice,
         order,
-        sourcePath,
+        sourcePath: sourcePath ?? "",
+        typedTarget: target,
     };
 }
 
-function readAnswer(value: unknown): ExamAnswer | null {
+export function readAnswer(value: unknown): ExamAnswer | null {
     if (!isObject(value)) return null;
     const { chosen, typed, selfRight, flagged, ms } = value;
     if (!isNumberArray(chosen) || typeof typed !== "string") return null;
@@ -253,6 +265,8 @@ export function parseExamFile(text: string): ExamResult | null {
         if (item === null) return null;
         items.push(item);
     }
+    // An exam with no questions would be the last exam, and the setup the next one starts from
+    if (items.length === 0) return null;
     return summarizeExam(setup, items, startedMs, endedMs);
 }
 

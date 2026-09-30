@@ -36,7 +36,7 @@ export async function renderCardMarkdown(
     ctx: ExamRenderContext,
     text: string,
     el: HTMLElement,
-    sourcePath: string,
+    sourcePath = "",
 ): Promise<void> {
     el.addClass("markdown-rendered");
     el.setAttribute("dir", "auto");
@@ -45,7 +45,7 @@ export async function renderCardMarkdown(
 }
 
 /** What the multiple choice tiles need to render an option's Markdown. */
-export function choiceContext(ctx: ExamRenderContext, sourcePath: string): ChoiceContext {
+export function choiceContext(ctx: ExamRenderContext, sourcePath = ""): ChoiceContext {
     return {
         app: ctx.app,
         sourcePath,
@@ -55,4 +55,9 @@ export function choiceContext(ctx: ExamRenderContext, sourcePath: string): Choic
             wireInternalLinks(el, ctx.app, ctx.plugin, sourcePath);
         },
     };
+}
+
+/** "3 cards changed since the exam and were left out.": what "Study the ones I missed" says when it cannot find some. */
+export function cardsChangedText(count: number): string {
+    return count === 1 ? t("EXAM_CARDS_CHANGED_ONE") : t("EXAM_CARDS_CHANGED", { count });
 }

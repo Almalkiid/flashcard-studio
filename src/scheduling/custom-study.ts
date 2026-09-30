@@ -46,13 +46,20 @@ export interface CustomStudyContext {
 }
 
 /**
- * A card's id, or, for a card that has none yet (a card gets its id when its first schedule is written), where it is
- * written: its note, its text and which card of that text it is. Stable while the session it names lasts.
+ * Where a card is written: its note, its text and which card of that text it is. It does not change when the card gets
+ * an id, but it does when the card's text is edited or the note is moved.
  */
-export function cardKey(card: Card): string {
-    if (card.meta.id !== null) return card.meta.id;
+export function placeKey(card: Card): string {
     const question = card.question;
     return `${question.note?.filePath ?? ""}|${question.questionText?.textHash ?? ""}|${card.cardIdx ?? 0}`;
+}
+
+/**
+ * A card's id, or, for a card that has none yet (a card gets its id when its first schedule is written), where it is
+ * written. Stable while the session it names lasts; a list made earlier is also matched by {@link placeKey}.
+ */
+export function cardKey(card: Card): string {
+    return card.meta.id !== null ? card.meta.id : placeKey(card);
 }
 
 export function customStudyMode(spec: CustomStudySpec): FlashcardReviewMode {
@@ -109,8 +116,10 @@ export function customStudyPredicate(
             return (card) => available(card) && card.isNew;
         case "cards": {
             // Chosen by name, so a card buried until tomorrow is still studied; only a suspended card is not
+            // By its id or by its place: a card that was listed without an id has one by now if it was answered since
             const wanted = new Set(spec.ids);
-            return (card) => !card.meta.suspended && wanted.has(cardKey(card));
+            return (card) =>
+                !card.meta.suspended && (wanted.has(cardKey(card)) || wanted.has(placeKey(card)));
         }
         case "filter":
             return (card) => {
@@ -122,6 +131,25 @@ export function customStudyPredicate(
                 return spec.decks.length === 0 || spec.decks.some((deck) => isInDeck(card, deck));
             };
     }
+}
+
+/**
+ * The cards of a tree that a `cards` session would show for these ids, each once (a card in several decks counts once).
+ * Fewer than the ids means some cards were edited, moved or deleted since the list was made.
+ */
+export function chosenCardsIn(tree: Deck, ids: string[]): Card[] {
+    if (ids.length === 0) return [];
+    const predicate = customStudyPredicate(
+        { type: "cards", ids },
+        { nowMs: 0, todayYmd: "", forgottenIds: new Set<string>() },
+    );
+    const found = new Set<Card>();
+    for (const deck of tree.toDeckArray()) {
+        for (const item of [...deck.newRepItems, ...deck.dueRepItems]) {
+            if (item instanceof Card && predicate(item)) found.add(item);
+        }
+    }
+    return [...found];
 }
 
 /**

@@ -8,9 +8,11 @@ import { CardType, Question } from "src/data/data-structures/card/questions/ques
 import { Deck } from "src/data/data-structures/deck/deck";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
-import { ExamStart } from "src/exam/exam";
+import { ExamStart, examSummary } from "src/exam/exam";
+import { persistenceFor } from "src/exam/exam-draft-store";
+import { cardsChangedText } from "src/exam/exam-render";
 import { ExamRunner } from "src/exam/exam-run";
-import { examSummary, readExamResults, saveExamResult } from "src/exam/exam-store";
+import { readExamResults, saveExamResult } from "src/exam/exam-store";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
@@ -898,11 +900,15 @@ export default class ContentManager {
      *
      * @param startNow - Go straight to the cards, and back to the normal decks once they are done ("Review
      * mistakes"), instead of showing the decks of the session.
+     * @param beforeShow - Called once the session is known to have cards, just before it is drawn: whatever it replaces
+     * (the results of an exam) stays on screen until then.
+     * @returns Whether a session started.
      */
     private async _startCustomStudy(
         spec: CustomStudySpec,
         startNow: boolean = false,
-    ): Promise<void> {
+        beforeShow?: () => void,
+    ): Promise<boolean> {
         const previousSpec = this.reviewQueueLoader.getCustomStudy();
         const previousMode = this.reviewMode;
 
@@ -911,24 +917,34 @@ export default class ContentManager {
         this.reviewQueueLoader.setReviewMode(this.reviewMode);
         const sequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
 
-        if (sequencer.originalDeckTree.getDistinctRepItemCount(RepItemState.AnyItem, true) === 0) {
-            new Notice(t("CUSTOM_STUDY_NO_CARDS"));
+        const found = sequencer.originalDeckTree.getDistinctRepItemCount(
+            RepItemState.AnyItem,
+            true,
+        );
+        if (found === 0) {
+            new Notice(spec.type === "cards" ? t("EXAM_MISSED_NONE") : t("CUSTOM_STUDY_NO_CARDS"));
             this.reviewQueueLoader.setCustomStudy(previousSpec);
             this.reviewMode = previousMode;
             this.reviewQueueLoader.setReviewMode(previousMode);
-            return;
+            return false;
+        }
+        // Cards that were edited or deleted since the exam cannot be found: say so, rather than quietly study fewer
+        if (spec.type === "cards" && found < spec.ids.length) {
+            new Notice(cardsChangedText(spec.ids.length - found));
         }
 
+        beforeShow?.();
         this.reviewSequencer = sequencer;
         this.deckContainer.closeList();
         if (startNow) {
             this.returnAfterCustomStudy = previousMode;
             this.cardContainer.closeSession();
             await this._startReviewOfDeck(sequencer.originalDeckTree);
-            return;
+            return true;
         }
         this.returnAfterCustomStudy = null;
         await this._showDecksList();
+        return true;
     }
 
     // MARK: Desktop
@@ -972,7 +988,8 @@ export default class ContentManager {
      */
     public runExam(start: ExamStart): void {
         const desktop = this.desktop;
-        if (desktop === null) return;
+        // The Studio may have been closed while the setup was open: there is nowhere to draw the exam then
+        if (desktop === null || this.isClosed) return;
         this._closeExam();
         this._clearPendingResumeTimeout();
         this.sessionStartMs = 0;
@@ -991,9 +1008,11 @@ export default class ContentManager {
             questions: start.questions,
             ignoreAccents: this.settings.ignoreAccentsWhenTyping,
             save: (result) => saveExamResult(this.app, result),
+            resume: start.resume,
+            ...persistenceFor(this.plugin),
+            // The results stay on screen until the session has cards to show
             onStudyMissed: (ids) => {
-                this._closeExam();
-                void this._startCustomStudy({ type: "cards", ids }, true);
+                void this._startCustomStudy({ type: "cards", ids }, true, () => this._closeExam());
             },
             onClose: () => {
                 this._closeExam();

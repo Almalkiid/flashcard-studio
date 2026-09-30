@@ -39,6 +39,7 @@
   --fs-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 8px 24px -6px rgb(15 23 42 / 8%);
   --fs-shadow-lg:
     0 2px 4px rgb(15 23 42 / 4%), 0 24px 48px -16px rgb(15 23 42 / 18%);
+  --fs-scrim: rgb(15 23 42 / 42%);
   --fs-font: var(
     --font-interface,
     -apple-system,
@@ -85,6 +86,7 @@
     0 1px 0 rgb(255 255 255 / 3%) inset, 0 8px 24px -8px rgb(0 0 0 / 50%);
   --fs-shadow-lg:
     0 1px 0 rgb(255 255 255 / 4%) inset, 0 24px 48px -16px rgb(0 0 0 / 60%);
+  --fs-scrim: rgb(0 0 0 / 62%);
 }
 .fs-studio .fs-label {
   font-size: var(--fs-micro);
@@ -1230,6 +1232,12 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
 .fs-exam-timer.is-low .fs-exam-timer-icon {
   color: inherit;
 }
+.fs-exam-timer.is-elapsed {
+  color: var(--fs-text-2);
+  .fs-exam-timer-icon {
+    color: var(--fs-accent);
+  }
+}
 .fs-studio .fs-primary-button.fs-exam-submit {
   height: 36px;
   padding: 0 18px;
@@ -1374,6 +1382,17 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     height: auto;
     border-radius: 10px;
   }
+}
+.fs-exam-question-body .fs-occ {
+  --fs-occ-max-h: min(36vh, 340px);
+}
+.fs-exam-question-body .fs-occ.is-front .fs-occ-stage,
+.fs-exam-question-body .fs-occ.is-back .fs-occ-stage {
+  width: min(
+    100%,
+    calc(var(--fs-occ-max-h) * var(--fs-occ-ratio, 1.5)),
+    var(--fs-occ-natural, 100%)
+  );
 }
 .fs-exam .fs-exam-lead {
   margin-top: -6px;
@@ -1653,7 +1672,7 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
   display: grid;
   place-items: center;
   padding: 16px;
-  background-color: #0f172a73;
+  background-color: var(--fs-scrim);
 }
 .fs-exam-dialog.fs-card {
   box-sizing: border-box;
@@ -2235,6 +2254,9 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
   .fs-exam .fs-exam-question {
     font-size: 20px;
   }
+  .fs-exam-question-body .fs-occ {
+    --fs-occ-max-h: 34vh;
+  }
   .fs-exam.fs-exam .fs-choices {
     gap: 8px;
   }
@@ -2315,7 +2337,7 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     inset: 0;
     z-index: 20;
     display: block;
-    background-color: #0f172a66;
+    background-color: var(--fs-scrim);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -2781,6 +2803,75 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
   text-align: center;
   color: var(--fs-text-2);
 }
+.fs-exam-resume-intro {
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--fs-text-2);
+}
+.fs-exam-drafts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fs-exam-draft {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--fs-accent) 35%, transparent);
+  border-radius: var(--fs-radius-md);
+  background-color: var(--fs-accent-soft);
+}
+.fs-exam-draft-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--fs-surface);
+  color: var(--fs-accent);
+  & svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.9;
+  }
+}
+.fs-exam-draft-text {
+  min-width: 0;
+}
+.fs-exam-draft-title {
+  overflow: hidden;
+  font-size: var(--fs-headline);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fs-exam-draft-detail {
+  margin-top: 2px;
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--fs-text-2);
+}
+.fs-exam-draft-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fs-studio .fs-primary-button.fs-exam-draft-resume,
+.fs-studio .fs-exam-ghost.fs-exam-draft-discard {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+.fs-studio .fs-exam-ghost.fs-exam-draft-discard.is-armed {
+  border-color: var(--fs-red);
+  background-color: var(--fs-red-soft);
+  color: var(--fs-red);
+}
 .fs-exam-recent {
   gap: 6px;
 }
@@ -2848,6 +2939,15 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
   min-width: 156px;
 }
 @media (width<=560px) {
+  .fs-exam-draft {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .fs-exam-draft-buttons {
+    grid-column: 1 / -1;
+  }
+  .fs-exam-draft-buttons > * {
+    flex: 1 1 0;
+  }
   .fs-exam-presets,
   .fs-exam-two,
   .fs-exam-two.is-title,

@@ -8,7 +8,6 @@ import {
     lastExams,
     parseExamFile,
 } from "src/exam/exam-results-file";
-import { LastExamSummary } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-home";
 
 /**
  * Where exams are kept in the vault: one plain file each in `Flashcard Studio/Exams/`. Nothing else in the plugin
@@ -57,17 +56,4 @@ export async function readExamResults(app: App, n: number): Promise<ExamResult[]
         if (parseExamFile(text) !== null) found++;
     }
     return lastExams(texts, n);
-}
-
-/** What the home's Last exam card shows about an exam. */
-export function examSummary(result: ExamResult): LastExamSummary {
-    return {
-        title: result.setup.title,
-        percent: result.percent,
-        right: result.right,
-        total: result.total,
-        minutes: Math.max(0, (result.endedMs - result.startedMs) / 60_000),
-        endedMs: result.endedMs,
-        passed: result.passed,
-    };
 }

@@ -2,11 +2,11 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/data/constants";
 import { ExamStart } from "src/exam/exam";
+import { persistenceFor } from "src/exam/exam-draft-store";
 import { ExamRunner } from "src/exam/exam-run";
 import { saveExamResult } from "src/exam/exam-store";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
-import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
 
 export const EXAM_VIEW_TYPE = "flashcard-studio-exam";
 
@@ -64,12 +64,9 @@ export class ExamView extends ItemView {
             questions: exam.questions,
             ignoreAccents: this.plugin.dataManager.data.settings.ignoreAccentsWhenTyping,
             save: (result) => saveExamResult(this.app, result),
-            onStudyMissed: (ids) => {
-                void this.plugin.uiManager.openDeckContainer(FlashcardReviewMode.Cram, undefined, {
-                    type: "cards",
-                    ids,
-                });
-            },
+            onStudyMissed: (ids) => void this.plugin.uiManager.studyMissed(ids),
+            resume: exam.resume,
+            ...persistenceFor(this.plugin),
             onClose: () => this.leaf.detach(),
         });
         this.runner.start();

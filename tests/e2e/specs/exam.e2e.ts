@@ -348,6 +348,84 @@ async function waitForExamFile(previous = 0): Promise<{ name: string; text: stri
 
 // #endregion
 
+/** Sends a key press to the page, as a keyboard with any layout would: what the key gives, and where it is. */
+async function pressKey(init: { key: string; code: string }): Promise<boolean> {
+    return browser.execute((key: { key: string; code: string }) => {
+        const target = document.activeElement ?? document.body;
+        // True when the exam took the key: it is the one that stops the key from doing anything else
+        return !target.dispatchEvent(
+            new KeyboardEvent("keydown", { ...key, bubbles: true, cancelable: true }),
+        );
+    }, init);
+}
+
+/** The exams that were started and not finished, as the plugin keeps them. */
+async function draftIds(): Promise<string[]> {
+    return browser.executeObsidian(({ app }, id) => {
+        const plugin = (
+            app as unknown as {
+                plugins: {
+                    plugins: Record<
+                        string,
+                        { dataManager: { data: { examDrafts?: Record<string, unknown> } } }
+                    >;
+                };
+            }
+        ).plugins.plugins[id];
+        return Object.keys(plugin.dataManager.data.examDrafts ?? {});
+    }, pluginId);
+}
+
+async function clearDrafts(): Promise<void> {
+    await browser.executeObsidian(async ({ app }, id) => {
+        const plugin = (
+            app as unknown as {
+                plugins: {
+                    plugins: Record<
+                        string,
+                        {
+                            dataManager: {
+                                data: { examDrafts?: Record<string, unknown> };
+                                pluginDataManager: { savePluginData: () => Promise<void> };
+                            };
+                        }
+                    >;
+                };
+            }
+        ).plugins.plugins[id];
+        plugin.dataManager.data.examDrafts = {};
+        await plugin.dataManager.pluginDataManager.savePluginData();
+    }, pluginId);
+}
+
+/** Closes the exam's tab, as the person does with the tab's own close button: the exam is not left, only put away. */
+async function closeExamTab(): Promise<void> {
+    await browser.executeObsidian(({ app }, type) => {
+        app.workspace.detachLeavesOfType(type);
+    }, EXAM_VIEW);
+    await browser.$(".fs-exam").waitForExist({ reverse: true, timeoutMsg: "the exam tab stayed" });
+}
+
+async function noticeText(): Promise<string> {
+    return browser.execute(() =>
+        Array.from(document.querySelectorAll(".notice"))
+            .map((notice) => notice.textContent ?? "")
+            .join("\n"),
+    );
+}
+
+const HEART_BLOCK = [
+    "```image-occlusion",
+    "image: [[Heart.png]]",
+    "mode: hide-all",
+    "question: Name the labelled chamber",
+    "mask: ra rect 0.1440 0.2891 0.2520 0.0984 | Right atrium",
+    "mask: lv ellipse 0.5500 0.6600 0.3600 0.1600 | Left **ventricle**",
+    "mask: cc rect 0.7000 0.1000 0.1000 0.1000 | a `code` label",
+    "```",
+].join("\n");
+const OCCLUSION_NOTE = [TAG, "", HEART_BLOCK, ""].join("\n");
+
 describe("exams", function () {
     before(async function () {
         await waitForPlugin();
@@ -376,6 +454,8 @@ describe("exams", function () {
         for (const name of examFiles()) {
             fs.rmSync(path.join(obsidianPage.getVaultPath(), EXAMS_FOLDER, name));
         }
+        // Progress that earlier tests left behind would be offered for resuming
+        await clearDrafts();
     });
 
     afterEach(async function () {
@@ -432,6 +512,8 @@ describe("exams", function () {
 
         await pressStart();
         expect(await counter()).toBe("1 / 3");
+        // No time limit: a stopwatch, not a countdown
+        expect(await browser.$(".fs-exam-timer.is-elapsed").isExisting()).toBe(true);
     });
 
     it("asks the questions one at a time, and an answer is kept when coming back to it", async function () {
@@ -461,10 +543,11 @@ describe("exams", function () {
     });
 
     it("scores an exam of two, saves the file, and studies the question that was missed", async function () {
-        await startExam(2);
+        await startExam(2, { minutes: 90 });
         expect(await counter()).toBe("1 / 2");
-        // No time limit: the clock counts up
-        expect(await browser.$(".fs-exam-timer-text").getText()).toMatch(/^\d+:\d\d$/);
+        // A time limit: a countdown from 1:30:00, and not the stopwatch of an exam without one
+        expect(await browser.$(".fs-exam-timer-text").getText()).toMatch(/^1:(29:5\d|30:00)$/);
+        expect(await browser.$(".fs-exam-timer.is-elapsed").isExisting()).toBe(false);
 
         await answerCurrent(true);
         await goNext();
@@ -896,6 +979,422 @@ describe("exams", function () {
         }, pluginId);
         expect(decks.some((deck) => deck.startsWith("Flashcard Studio"))).toBe(false);
         await setSettings({ convertFoldersToDecks: false });
+    });
+
+    it("the keys are read by their place: F flags on an Arabic layout, the number row chooses on AZERTY", async function () {
+        if (await isMobile()) this.skip();
+        await startExam(3);
+        // AZERTY: the second key of the number row gives "é", and shifted "2"
+        expect(await pressKey({ key: "é", code: "Digit2" })).toBe(true);
+        await browser.waitUntil(
+            async () => (await browser.$$(`${TILE}.is-selected`).length) === 1,
+            {
+                timeoutMsg: "the number row did not choose an option on AZERTY",
+            },
+        );
+        const position = await browser.execute(
+            (css: string) =>
+                Array.from(document.querySelectorAll(css)).findIndex((tile) =>
+                    tile.classList.contains("is-selected"),
+                ),
+            TILE,
+        );
+        expect(position).toBe(1);
+
+        // The numpad, and Arabic-Indic digits, are the same keys
+        expect(await pressKey({ key: "1", code: "Numpad1" })).toBe(true);
+        await browser.waitUntil(
+            async () =>
+                (await browser.$(`${TILE}.is-selected`).getAttribute("data-option")) !== null,
+        );
+
+        // Arabic: the F key gives "ب"
+        expect(await pressKey({ key: "ب", code: "KeyF" })).toBe(true);
+        await browser.waitUntil(
+            async () => (await browser.$(".fs-exam-flag").getAttribute("aria-pressed")) === "true",
+            { timeoutMsg: "F did not flag the question on an Arabic layout" },
+        );
+        // A letter on the wrong key is not the exam's
+        expect(await pressKey({ key: "f", code: "KeyG" })).toBe(false);
+    });
+
+    it("the keys are the exam's only while its own view is the active one", async function () {
+        if (await isMobile()) this.skip();
+        await startExam(3);
+        // A note in a pane beside the exam, and the focus there
+        await browser.executeObsidian(async ({ app }, notePath) => {
+            const file = app.vault.getFileByPath(notePath);
+            if (file === null) throw new Error(`${notePath} is not in the vault`);
+            const leaf = app.workspace.getLeaf("split");
+            await leaf.openFile(file);
+            app.workspace.setActiveLeaf(leaf, { focus: true });
+        }, "Syntax deck.md");
+        await browser.pause(300);
+
+        // Enter, the arrows, F and the digits are the note's: the exam does not take them, or stop them
+        for (const key of [
+            { key: "Enter", code: "Enter" },
+            { key: "ArrowRight", code: "ArrowRight" },
+            { key: "f", code: "KeyF" },
+            { key: "1", code: "Digit1" },
+        ]) {
+            // (The note's editor may take the key itself; what matters is that the exam did not)
+            await pressKey(key);
+        }
+        expect(await counter()).toBe("1 / 3");
+        expect(await browser.$(".fs-exam-flag").getAttribute("aria-pressed")).toBe("false");
+        expect(await browser.$(`${TILE}.is-selected`).isExisting()).toBe(false);
+
+        // Back in the exam's pane they are the exam's
+        await browser.executeObsidian(({ app }, type) => {
+            const leaf = app.workspace.getLeavesOfType(type)[0];
+            app.workspace.setActiveLeaf(leaf, { focus: true });
+        }, EXAM_VIEW);
+        await browser.pause(300);
+        const front = await questionText();
+        expect(await pressKey({ key: "ArrowRight", code: "ArrowRight" })).toBe(true);
+        await waitForOtherQuestion(front);
+        expect(await counter()).toBe("2 / 3");
+    });
+
+    it("progress is saved as the exam goes: close the tab, resume, and the answers and the place are as they were", async function () {
+        await startExam(3, { minutes: 90 });
+        await answerCurrent(true);
+        await goNext();
+        const second = await answerCurrent(false);
+        await browser.$(".fs-exam-flag").click();
+        await browser.waitUntil(async () => (await draftIds()).length === 1, {
+            timeoutMsg: "the progress was never saved",
+        });
+
+        await closeExamTab();
+        // The progress is still there: closing a tab is not leaving the exam
+        expect(await draftIds()).toHaveLength(1);
+
+        // Exams offers it first
+        await openSetup();
+        const draft = browser.$(".fs-exam-draft");
+        await draft.waitForDisplayed({ timeoutMsg: "no unfinished exam was offered" });
+        expect(await draft.getText()).toMatch(/2 \/ 3 · 1 h (29|30) min left/);
+        expect(await browser.$(".fs-exam-draft-resume").getText()).toBe("Resume exam");
+        await screenshot("exam-resume", true);
+        await browser.$(".fs-exam-draft-resume").click();
+        await browser.$(BODY).waitForDisplayed({ timeoutMsg: "the exam did not come back" });
+        await waitForQuestion();
+
+        // The same question, the same answer, the flag, and the map
+        expect(await counter()).toBe("2 / 3");
+        expect(await questionText()).toBe(second.front);
+        expect(await browser.$(`${TILE}.is-selected`).getAttribute("data-option")).toBe(
+            String(second.wrong),
+        );
+        expect(await browser.$(".fs-exam-flag").getAttribute("aria-pressed")).toBe("true");
+        const cells = await browser.execute(() =>
+            Array.from(document.querySelectorAll(".fs-exam-cell")).map((cell) => cell.className),
+        );
+        expect(cells[0]).toContain("is-answered");
+        expect(cells[1]).toContain("is-flagged");
+        // The clock is the one it started with: about 90 minutes from when it began, less what has passed
+        expect(await browser.$(".fs-exam-timer-text").getText()).toMatch(/^1:(29|30):\d\d$/);
+
+        // The first answer is there too
+        const front = await questionText();
+        await browser.$(".fs-exam-prev").click();
+        await waitForOtherQuestion(front);
+        const first = known(await questionText());
+        expect(await browser.$(`${TILE}.is-selected`).getAttribute("data-option")).toBe(
+            String(first.right),
+        );
+
+        // Submitting drops the saved progress once the results file is written
+        await goNext();
+        await goNext();
+        await browser.$(".fs-exam-next").click();
+        await browser.$(".fs-exam-dialog").waitForDisplayed();
+        await settle(".fs-exam-dialog");
+        await browser.$(".fs-exam-dialog .fs-primary-button").click();
+        await browser.$(".fs-exam-ring-value").waitForDisplayed();
+        await waitForExamFile();
+        await browser.waitUntil(async () => (await draftIds()).length === 0, {
+            timeoutMsg: "the saved progress stayed after the exam was submitted",
+        });
+    });
+
+    it("leaving the exam for good throws the saved progress away", async function () {
+        await startExam(3);
+        await answerCurrent(true);
+        await browser.waitUntil(async () => (await draftIds()).length === 1);
+        await browser.$(".fs-exam .fs-exam-bar .fs-exam-icon-button").click();
+        await browser.$(".fs-exam-dialog").waitForDisplayed();
+        await settle(".fs-exam-dialog");
+        // The dialog says what leaving means, and how to put the exam away instead
+        expect(await browser.$(".fs-exam-dialog").getText()).toContain("close the tab instead");
+        await browser.$(".fs-exam-dialog .fs-primary-button").click();
+        await browser.$(".fs-exam").waitForExist({ reverse: true, timeoutMsg: "the exam stayed" });
+        expect(await draftIds()).toHaveLength(0);
+    });
+
+    it("an exam whose time ran out while it was closed is submitted with the answers it had, ending at its deadline", async function () {
+        await startExam(3, { minutes: 1 });
+        await answerCurrent(true);
+        await browser.waitUntil(async () => (await draftIds()).length === 1);
+        await closeExamTab();
+
+        // Five minutes go by: the deadline was one minute after the start
+        await browser.executeObsidian(async ({ app }, id) => {
+            const plugin = (
+                app as unknown as {
+                    plugins: {
+                        plugins: Record<
+                            string,
+                            {
+                                dataManager: {
+                                    data: { examDrafts: Record<string, { startedMs: number }> };
+                                    pluginDataManager: { savePluginData: () => Promise<void> };
+                                };
+                            }
+                        >;
+                    };
+                }
+            ).plugins.plugins[id];
+            for (const draft of Object.values(plugin.dataManager.data.examDrafts)) {
+                draft.startedMs -= 5 * 60_000;
+            }
+            await plugin.dataManager.pluginDataManager.savePluginData();
+        }, pluginId);
+
+        await openSetup();
+        expect(await browser.$(".fs-exam-draft").getText()).toContain("Time ran out");
+        expect(await browser.$(".fs-exam-draft-resume").getText()).toBe("See results");
+        await browser.$(".fs-exam-draft-resume").click();
+        await browser.$(".fs-exam-ring-value").waitForDisplayed({
+            timeoutMsg: "the exam that ran out was not submitted",
+        });
+        // The answer given counts; the exam took its minute, not the five that passed
+        expect(await browser.$(".fs-exam-hero-score").getText()).toMatch(/^[01] of 3 right$/);
+        const file = await waitForExamFile();
+        expect(file.text).toContain("| Time taken | 1 min |");
+        await browser.waitUntil(async () => (await draftIds()).length === 0);
+    });
+
+    it("an unfinished exam is offered when Obsidian starts, and Discard needs a second press", async function () {
+        await startExam(3);
+        await answerCurrent(true);
+        await browser.waitUntil(async () => (await draftIds()).length === 1);
+        await closeExamTab();
+
+        await browser.executeObsidian(({ app }, id) => {
+            (
+                app as unknown as {
+                    plugins: {
+                        plugins: Record<string, { uiManager: { offerExamResume: () => void } }>;
+                    };
+                }
+            ).plugins.plugins[id].uiManager.offerExamResume();
+        }, pluginId);
+        const row = browser.$(".fs-exam-resume-modal .fs-exam-draft");
+        await row.waitForDisplayed({ timeoutMsg: "the offer to resume was not shown" });
+        await settle(".fs-exam-resume-modal");
+        expect(await row.getText()).toMatch(/1 \/ 3 · No limit/);
+
+        // One press only arms it; the exam is still there
+        await browser.$(".fs-exam-draft-discard").click();
+        expect(await browser.$(".fs-exam-draft-discard").getText()).toBe("Discard for good");
+        expect(await draftIds()).toHaveLength(1);
+        // Later leaves it
+        await browser.$(".fs-exam-resume-modal .fs-exam-ghost:not(.fs-exam-draft-discard)").click();
+        await browser.$(".fs-exam-resume-modal").waitForExist({ reverse: true });
+        expect(await draftIds()).toHaveLength(1);
+
+        // Offered again, and this time discarded
+        await browser.executeObsidian(({ app }, id) => {
+            (
+                app as unknown as {
+                    plugins: {
+                        plugins: Record<string, { uiManager: { offerExamResume: () => void } }>;
+                    };
+                }
+            ).plugins.plugins[id].uiManager.offerExamResume();
+        }, pluginId);
+        await browser.$(".fs-exam-resume-modal .fs-exam-draft").waitForDisplayed();
+        await settle(".fs-exam-resume-modal");
+        await browser.$(".fs-exam-draft-discard").click();
+        await browser.$(".fs-exam-draft-discard").click();
+        await browser.$(".fs-exam-resume-modal").waitForExist({ reverse: true });
+        expect(await draftIds()).toHaveLength(0);
+    });
+
+    it("Study the ones I missed says when cards changed since the exam, and keeps the results when none can be found", async function () {
+        await startExam(3);
+        for (let index = 0; index < 3; index++) {
+            await answerCurrent(false);
+            if (index < 2) await goNext();
+        }
+        await submitFromLast();
+        await waitForExamFile();
+        expect(await browser.$(".fs-exam-study").getText()).toContain("· 3");
+
+        // One card is edited after the exam: it cannot be found, and the person is told
+        await obsidianPage.write(
+            "Syntax deck.md",
+            CHOICE_NOTE.replace(QUESTIONS[0].front, `${QUESTIONS[0].front} (edited)`),
+        );
+        await browser.pause(800);
+        await browser.$(".fs-exam-study").click();
+        await browser
+            .$(".sr-view .sr-card-container .fs-choice")
+            .waitForDisplayed({ timeoutMsg: "no session of the cards that were found opened" });
+        expect(await noticeText()).toContain("1 card changed since the exam and was left out.");
+        expect(await browser.$(".sr-view .fs-card-counter").getText()).toMatch(/^1 \/ 2$/);
+        await browser.keys("Escape");
+        await browser.$(".sr-view").waitForExist({ reverse: true });
+        await browser.execute(() => {
+            document.querySelectorAll(".notice").forEach((notice) => notice.remove());
+        });
+
+        // Every card is edited: nothing to study, so nothing opens and the results are still there to read
+        await obsidianPage.write(
+            "Syntax deck.md",
+            QUESTIONS.reduce(
+                (text, q) => text.replace(q.front, `${q.front} (edited again)`),
+                CHOICE_NOTE.replace(QUESTIONS[0].front, `${QUESTIONS[0].front} (edited)`),
+            ),
+        );
+        await browser.pause(800);
+        await browser.$(".fs-exam-study").click();
+        await browser.waitUntil(async () => (await noticeText()).includes("None of those cards"), {
+            timeoutMsg: "no notice said that the cards could not be found",
+        });
+        expect(await browser.$(".sr-view").isExisting()).toBe(false);
+        expect(await browser.$(".fs-exam-ring-value").isDisplayed()).toBe(true);
+    });
+
+    it("occlusion cards are asked in an exam: the label is typed, or marked by the person, and the list never shows the data", async function () {
+        await useNote(OCCLUSION_NOTE);
+        await openSetup();
+        await setNumber("fs-exam-count", 3);
+        await chooseCards("all");
+        expect(await browser.$(".fs-exam-status").getText()).toContain("3 questions available");
+        await pressStart();
+
+        // Each question is a picture with one mask asked about; which one it is shows in the mask's shape and place
+        for (let index = 0; index < 3; index++) {
+            await browser
+                .$(`${BODY} .fs-occ-image`)
+                .waitForDisplayed({ timeoutMsg: "the picture of the question was not shown" });
+            await browser.waitUntil(
+                () =>
+                    browser.execute((css: string) => {
+                        const img = document.querySelector<HTMLImageElement>(css);
+                        return img !== null && img.complete && img.naturalWidth > 0;
+                    }, `${BODY} .fs-occ-image`),
+                { timeoutMsg: "the picture did not load" },
+            );
+            const asked = await browser.execute((css: string) => {
+                const mask = document.querySelector(`${css} .fs-mask.is-active`);
+                if (mask === null) return "";
+                if (mask.tagName.toLowerCase() === "ellipse") return "ventricle";
+                return mask.getAttribute("x")?.startsWith("0.7") ? "code" : "atrium";
+            }, BODY);
+            expect(asked).not.toBe("");
+            if (index === 0) await screenshot("exam-occlusion-question", true);
+            if (asked === "code") {
+                // A label that is not plain text cannot be typed: the person says whether they knew it
+                await browser.$(`${BODY} .fs-exam-reveal`).click();
+                await browser.$(`${BODY} .fs-exam-self-answer`).waitForDisplayed();
+                await browser.$(`${BODY} .fs-exam-self-button.is-yes`).click();
+            } else {
+                const input = browser.$(`${BODY} .fs-typed-input`);
+                await input.waitForDisplayed({ timeoutMsg: "an occlusion question has no field" });
+                await input.setValue(asked === "atrium" ? "right atrium" : "Left Ventricle.");
+            }
+            if (index < 2) {
+                // The three questions read the same, so the counter is what shows that the next one is up
+                const before = await counter();
+                await browser.$(".fs-exam-next").click();
+                await browser.waitUntil(async () => (await counter()) !== before, {
+                    timeoutMsg: "Next did not move to the next question",
+                });
+            }
+        }
+        await submitFromLast();
+        expect(await resultPercent()).toBe("100%");
+
+        // The list names each card by the question on its block, not by the fence it is drawn from
+        const texts = await browser.execute(() =>
+            Array.from(document.querySelectorAll(".fs-exam-item-text")).map(
+                (el) => el.textContent ?? "",
+            ),
+        );
+        expect(texts).toHaveLength(3);
+        for (const text of texts) expect(text).toBe("Name the labelled chamber");
+        // The first is open: the picture, with the typed label under it
+        await browser
+            .$(".fs-exam-item.is-open .fs-occ")
+            .waitForDisplayed({ timeoutMsg: "the picture was not in the review" });
+        expect(await browser.$(".fs-exam-item.is-open").getText()).not.toContain("fs-occlusion");
+        await browser.execute(() => {
+            document.querySelector(".fs-exam-item.is-open")?.scrollIntoView({ block: "center" });
+        });
+        await screenshot("exam-occlusion", true);
+    });
+
+    it("an exam file is history: read as a note it has no cards, and it is never written to", async function () {
+        await openSetup();
+        await setNumber("fs-exam-count", 2);
+        await browser.execute(() => {
+            const input = document.querySelector<HTMLInputElement>("#fs-exam-title");
+            if (input === null) throw new Error("no title field");
+            input.value = "Exam A::B";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        await pressStart();
+        await answerCurrent(true);
+        await goNext();
+        await answerCurrent(false);
+        await submitFromLast();
+        const file = await waitForExamFile();
+        expect(file.text.split("\n")[0]).toBe("# Exam A::B");
+
+        // "Review the cards in this note", on the file itself, finds nothing: the title is not a card
+        const found = await browser.executeObsidian(
+            async ({ app }, id, name, notePath) => {
+                const plugin = (
+                    app as unknown as {
+                        plugins: {
+                            plugins: Record<
+                                string,
+                                {
+                                    dataManager: {
+                                        loadNote: (file: unknown) => Promise<unknown>;
+                                    };
+                                }
+                            >;
+                        };
+                    }
+                ).plugins.plugins[id];
+                const exam = app.vault.getFileByPath(`Flashcard Studio/Exams/${name}`);
+                const note = app.vault.getFileByPath(notePath);
+                return {
+                    exam: exam === null ? "missing" : await plugin.dataManager.loadNote(exam),
+                    note:
+                        note === null
+                            ? "missing"
+                            : (await plugin.dataManager.loadNote(note)) !== null,
+                };
+            },
+            pluginId,
+            file.name,
+            "Syntax deck.md",
+        );
+        expect(found.exam).toBeNull();
+        // A note that is a note still loads
+        expect(found.note).toBe(true);
+        const after = fs.readFileSync(
+            path.join(obsidianPage.getVaultPath(), EXAMS_FOLDER, file.name),
+            "utf8",
+        );
+        expect(after).toBe(file.text);
     });
 
     it("the desktop shell shows Exams, Take an exam, Create with AI, and takes the exam in its main area", async function () {

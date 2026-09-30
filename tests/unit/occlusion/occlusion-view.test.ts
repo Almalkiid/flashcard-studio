@@ -2,6 +2,7 @@ import {
     maskStates,
     occlusionCardMarkdown,
     occlusionCardText,
+    occlusionQuestionOf,
     occlusionTypedTarget,
     parseOcclusionCardSpec,
     plainLabel,
@@ -158,5 +159,25 @@ describe("occlusionTypedTarget", () => {
         expect(occlusionTypedTarget("```fs-occlusion-card\n{oops\n```")).toBeNull();
         expect(occlusionTypedTarget("```js\nconst a = 1;\n```")).toBeNull();
         expect(occlusionTypedTarget("")).toBeNull();
+    });
+});
+
+describe("occlusionQuestionOf", () => {
+    test("is the question written on the block, for a card front or back", () => {
+        expect(
+            occlusionQuestionOf(
+                occlusionCardMarkdown({ ...block, question: "Name it" }, 1, "front"),
+            ),
+        ).toBe("Name it");
+        expect(
+            occlusionQuestionOf(
+                occlusionCardMarkdown({ ...block, question: "Name it" }, 1, "back"),
+            ),
+        ).toBe("Name it");
+    });
+    test("is empty for a block without a question, and null for text that is not an occlusion card", () => {
+        expect(occlusionQuestionOf(occlusionCardMarkdown(block, 0, "front"))).toBe("");
+        expect(occlusionQuestionOf("Just a question")).toBeNull();
+        expect(occlusionQuestionOf("```fs-occlusion-card\n{oops\n```")).toBeNull();
     });
 });

@@ -14,6 +14,9 @@ import {
     isInExamsFolder,
     lastExams,
     parseExamFile,
+    readAnswer,
+    readQuestion,
+    readSetup,
 } from "src/exam/exam-results-file";
 
 const SETUP: ExamSetup = {
@@ -171,6 +174,14 @@ describe("parseExamFile", () => {
         expect(parseExamFile(text)).toBeNull();
     });
 
+    test("an exam with no questions is not an exam: it would be the last exam and the next setup", () => {
+        const text = formatExamFile(makeResult());
+        const lines = text.split("\n");
+        const start = lines.indexOf("```fs-exam");
+        const header = lines[start + 1];
+        expect(parseExamFile(`# T\n\`\`\`fs-exam\n${header}\n\`\`\`\n`)).toBeNull();
+    });
+
     test("an exam line without a setup or times is not an exam", () => {
         expect(parseExamFile('# T\n```fs-exam\n{"kind":"exam"}\n```\n')).toBeNull();
         expect(
@@ -238,5 +249,63 @@ describe("isInExamsFolder", () => {
         expect(isInExamsFolder("Flashcard Studio/Exams.md")).toBe(false);
         expect(isInExamsFolder("Flashcard Studio/Exams old/x.md")).toBe(false);
         expect(isInExamsFolder("CIA/Flashcard Studio/Exams/x.md")).toBe(false);
+    });
+});
+
+describe("the typed target of a question", () => {
+    test("is kept in the file and read back", () => {
+        const result = makeResult();
+        const typed = result.items.find((item) => item.q.kind === "typed");
+        expect(typed?.q.typedTarget).toBe("Chief Audit Executive");
+        const back = parseExamFile(formatExamFile(result));
+        expect(back?.items.find((item) => item.q.kind === "typed")?.q.typedTarget).toBe(
+            "Chief Audit Executive",
+        );
+    });
+
+    test("is worked out from the answer for a question written without one", () => {
+        const q: Record<string, unknown> = {
+            cardId: "c3",
+            deck: "CIA/Part2",
+            kind: "typed",
+            front: "What does CAE stand for?",
+            back: "**Chief** Audit Executive",
+            choice: null,
+            order: [],
+            sourcePath: "",
+        };
+        expect(readQuestion(q)?.typedTarget).toBe("Chief Audit Executive");
+        expect(readQuestion({ ...q, kind: "self" })?.typedTarget).toBeNull();
+        expect(readQuestion({ ...q, typedTarget: 5 })).toBeNull();
+    });
+
+    test("a question without a source path reads as one with none", () => {
+        const q: Record<string, unknown> = {
+            cardId: "c3",
+            deck: "d",
+            kind: "self",
+            front: "f",
+            back: "b",
+            choice: null,
+            order: [],
+        };
+        expect(readQuestion(q)?.sourcePath).toBe("");
+    });
+});
+
+describe("the readers that a saved exam draft shares with the results file", () => {
+    test("readSetup and readAnswer take a good value and refuse a bad one", () => {
+        expect(readSetup(SETUP)).toEqual(SETUP);
+        expect(readSetup({ ...SETUP, count: "many" })).toBeNull();
+        expect(readSetup(null)).toBeNull();
+        const answer: Record<string, unknown> = {
+            chosen: [1],
+            typed: "",
+            selfRight: null,
+            flagged: false,
+            ms: 5,
+        };
+        expect(readAnswer(answer)).toEqual(answer);
+        expect(readAnswer({ ...answer, chosen: "1" })).toBeNull();
     });
 });
