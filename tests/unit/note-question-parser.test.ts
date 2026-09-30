@@ -6,6 +6,8 @@ import { ISRNoteTFile } from "src/data/data-structures/file/note-file";
 import { frontmatterTagPseudoLineNum } from "src/data/data-structures/file/sr-file";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
 import { NoteQuestionParser } from "src/note/note-question-parser";
+import { parseOcclusionBlock } from "src/occlusion/occlusion-block";
+import { replaceOcclusionBlock } from "src/occlusion/occlusion-rewrite";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemScheduleInfoFsrs } from "src/scheduling/algorithms/fsrs/rep-item-schedule-info-fsrs";
 import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
@@ -253,6 +255,9 @@ A:::B
 });
 
 describe("Image occlusion cards", () => {
+    // One mask of a block, from its line
+    const parseMask = (line: string) => parseOcclusionBlock("image: x\n" + line).masks[0];
+
     const FSRS = "!fsrs,2023-09-06T00:10:00.000Z,0,0.4,5.5,1,1,0,1,2023-09-06T00:00:00.000Z";
     const block = (fence: string) =>
         `${fence}image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n${fence}`;
@@ -271,6 +276,42 @@ describe("Image occlusion cards", () => {
         expect(questionList[0].cards).toHaveLength(2);
         expect(questionList[0].cards[0].scheduleInfo).toBeNull();
         expect(questionList[0].cards[1].scheduleInfo).toBeInstanceOf(RepItemScheduleInfoFsrs);
+    });
+
+    test("Deleting the middle mask moves each schedule with its mask, and the parser reads it that way", async () => {
+        const three = (labels: string) =>
+            "```image-occlusion\nimage: [[h.png]]\n" +
+            labels +
+            "\n```\n<!--SR:!fsrs,2023-09-06T00:10:00.000Z,1,11,5,1,1,0,1,2023-09-06T00:00:00.000Z" +
+            "!fsrs,2023-09-06T00:10:00.000Z,1,22,5,1,1,0,1,2023-09-06T00:00:00.000Z" +
+            "!fsrs,2023-09-06T00:10:00.000Z,1,33,5,1,1,0,1,2023-09-06T00:00:00.000Z-->";
+        const masks = [
+            "mask: a rect 0 0 .2 .2 | A",
+            "mask: b rect .3 0 .2 .2 | B",
+            "mask: c rect .6 0 .2 .2 | C",
+        ];
+        const edited = replaceOcclusionBlock(
+            "#flashcards\n" + three(masks.join("\n")),
+            1,
+            {
+                image: "[[h.png]]",
+                mode: "hide-all",
+                question: "",
+                masks: [parseMask(masks[0]), parseMask(masks[2])],
+            },
+            [0, 2],
+            "fsrs,-,0,0,0,0,0,0,0,-",
+        );
+
+        const [question] = await parserWithDefaultSettings.createQuestionList(
+            new UnitTestSRFile(edited),
+            TextDirection.Ltr,
+            TopicPath.emptyPath,
+            true,
+        );
+        expect(question.cards).toHaveLength(2);
+        expect((question.cards[0].scheduleInfo as RepItemScheduleInfoFsrs).stability).toBe(11);
+        expect((question.cards[1].scheduleInfo as RepItemScheduleInfoFsrs).stability).toBe(33);
     });
 
     test.each(["```", "~~~"])(
