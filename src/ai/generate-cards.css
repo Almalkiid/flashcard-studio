@@ -394,7 +394,7 @@
     min-width: 148px;
 }
 
-.fs-studio .fs-primary-button:disabled {
+.fs-ai-modal.fs-studio .fs-primary-button:disabled {
     opacity: 0.45;
     cursor: default;
     filter: none;
@@ -485,6 +485,16 @@
     color: var(--fs-text-2);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+}
+
+/* Something to know about the reply, above the cards */
+.fs-ai-note {
+    padding: 10px 14px;
+    border-radius: var(--fs-radius-sm);
+    background-color: var(--fs-amber-soft);
+    color: var(--fs-text);
+    font-size: var(--fs-caption);
+    line-height: 1.45;
 }
 
 .fs-ai-list {

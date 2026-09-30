@@ -1,3 +1,5 @@
+import * as fs from "fs";
+
 import { DEFAULT_SETTINGS } from "src/data/settings";
 import { mergeImportedSettings } from "src/data/settings-import";
 
@@ -30,5 +32,39 @@ describe("AI settings", () => {
         expect(settings.aiBaseUrl).toBe("http://localhost:1/v1");
         expect(settings.aiKeySecret).toBe("my-key");
         expect(importedKeys).toEqual([]);
+    });
+});
+
+describe("the AI strings", () => {
+    test("use each ${placeholder} once: t() replaces only the first occurrence of a name", async () => {
+        const { default: en } = await import("src/lang/locale/en");
+        const repeated = Object.entries(en)
+            .filter(([key]) => key.startsWith("AI_"))
+            .filter(([, text]) => {
+                const names = String(text).match(/\$\{\w+\}/g) ?? [];
+                return new Set(names).size !== names.length;
+            })
+            .map(([key]) => key);
+        expect(repeated).toEqual([]);
+    });
+
+    test("fill in their placeholders when shown", async () => {
+        const { t } = await import("src/lang/helpers");
+        const shown = t("AI_PREVIEW_EXTRA", { total: 5, count: 2 });
+        expect(shown).toContain("5");
+        expect(shown).toContain("2");
+        expect(shown).not.toContain("${");
+    });
+});
+
+describe("the dialog's stylesheet", () => {
+    test("every rule about a primary button names one of the dialog's own classes", () => {
+        const css = fs.readFileSync("src/ai/generate-cards.css", "utf8");
+        const selectors = css
+            .split("{")
+            .map((part) => part.split("}").pop() ?? "")
+            .filter((selector) => selector.includes(".fs-primary-button"));
+        expect(selectors.length).toBeGreaterThan(0);
+        for (const selector of selectors) expect(selector).toMatch(/\.fs-ai-/);
     });
 });

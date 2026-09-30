@@ -52,9 +52,12 @@ const MAX_DETAIL_LENGTH = 200;
 export function aiSetupProblem(
     settings: AiSettings,
     apiKey: string,
-): "no-key" | "no-model" | "no-base-url" | null {
+): "no-key" | "no-model" | "no-base-url" | "bad-base-url" | null {
     if (settings.provider === "openai-compatible") {
-        if (settings.baseUrl.trim() === "") return "no-base-url";
+        const baseUrl = settings.baseUrl.trim();
+        if (baseUrl === "") return "no-base-url";
+        // "localhost:11434/v1" is read as the scheme "localhost:", with no host at all
+        if (!/^https?:\/\//i.test(baseUrl)) return "bad-base-url";
     } else if (apiKey.trim() === "") {
         return "no-key";
     }
@@ -69,12 +72,14 @@ export function buildAiRequest(
     prompt: AiPrompt,
 ): RequestUrlParam {
     const model = settings.model.trim();
+    // A key pasted with a newline or spaces would fail in a way that looks like a network problem
+    const key = apiKey.trim();
     if (settings.provider === "anthropic") {
         return {
             url: ANTHROPIC_URL,
             method: "POST",
             headers: {
-                "x-api-key": apiKey,
+                "x-api-key": key,
                 "anthropic-version": ANTHROPIC_VERSION,
                 "content-type": "application/json",
             },
@@ -89,7 +94,7 @@ export function buildAiRequest(
     }
 
     const headers: Record<string, string> = { "content-type": "application/json" };
-    if (apiKey !== "") headers.Authorization = `Bearer ${apiKey}`;
+    if (key !== "") headers.Authorization = `Bearer ${key}`;
     const messages = [
         { role: "system", content: prompt.system },
         { role: "user", content: prompt.user },
@@ -123,8 +128,14 @@ function unexpectedShape(): AiError {
     return new AiError("format", t("AI_ERR_SHAPE"));
 }
 
-/** The text of a reply. Throws an AiError of kind "format" when the reply has another shape. */
-export function readAiText(provider: AiProviderId, json: unknown): string {
+/** What a provider answered: the text, and whether it stopped because it hit the length limit. */
+export interface AiReply {
+    text: string;
+    truncated: boolean;
+}
+
+/** The reply. Throws an AiError of kind "format" when it has another shape. */
+export function readAiReply(provider: AiProviderId, json: unknown): AiReply {
     if (!isRecord(json)) throw unexpectedShape();
 
     if (provider === "anthropic") {
@@ -139,19 +150,25 @@ export function readAiText(provider: AiProviderId, json: unknown): string {
             )
             .map((block) => block.text);
         if (texts.length === 0) throw unexpectedShape();
-        return texts.join("");
+        return { text: texts.join(""), truncated: json.stop_reason === "max_tokens" };
     }
 
     const choices = json.choices;
     if (!Array.isArray(choices) || !isRecord(choices[0])) throw unexpectedShape();
     const message = choices[0].message;
     if (!isRecord(message) || typeof message.content !== "string") throw unexpectedShape();
-    return message.content;
+    return { text: message.content, truncated: choices[0].finish_reason === "length" };
+}
+
+/** The text of a reply. Throws an AiError of kind "format" when the reply has another shape. */
+export function readAiText(provider: AiProviderId, json: unknown): string {
+    return readAiReply(provider, json).text;
 }
 
 /** Masks anything that looks like an API key, in text that came from a provider. */
 function maskKeyLikeText(text: string): string {
-    return text.replace(/\b(?:sk|pk|rk|key|sess)[-_][A-Za-z0-9_-]{8,}/gi, "…");
+    // Providers echo a key partly hidden ("sk-abc12***xyz9"), so the stars, dots and dashes belong to it
+    return text.replace(/\b(?:sk|pk|rk|key|sess)[-_][A-Za-z0-9_*.\u2026-]{3,}/gi, "…");
 }
 
 /** The reason a provider gives in the body of an error reply, shortened, or "" when it gives none. */
@@ -192,9 +209,9 @@ export type AiRequestFn = (
 
 function hostOf(url: string): string {
     try {
-        return new URL(url).host;
+        return new URL(url).host || t("AI_HOST_FALLBACK");
     } catch {
-        return "the server";
+        return t("AI_HOST_FALLBACK");
     }
 }
 
@@ -218,24 +235,25 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 }
 
 /**
- * Sends the prompt and returns the reply text.
+ * Sends the prompt and returns the reply.
  *
  * @throws AiError for every failure. No message contains the key, even when the provider or the network layer
  * repeats it.
  */
-export async function requestAiText(
+export async function requestAiReply(
     settings: AiSettings,
     apiKey: string,
     prompt: AiPrompt,
     request: AiRequestFn,
     timeoutMs: number = DEFAULT_TIMEOUT_MS,
-): Promise<string> {
-    if (settings.provider !== "openai-compatible" && apiKey.trim() === "") {
+): Promise<AiReply> {
+    const key = apiKey.trim();
+    if (settings.provider !== "openai-compatible" && key === "") {
         throw new AiError("no-key", t("AI_ERR_NO_KEY"));
     }
 
     try {
-        const built = buildAiRequest(settings, apiKey, prompt);
+        const built = buildAiRequest(settings, key, prompt);
         let response: Pick<RequestUrlResponse, "status" | "text">;
         try {
             response = await withTimeout(request(built), timeoutMs);
@@ -257,11 +275,11 @@ export async function requestAiText(
         } catch {
             throw new AiError("format", t("AI_ERR_NOT_JSON"));
         }
-        return readAiText(settings.provider, json);
+        return readAiReply(settings.provider, json);
     } catch (error) {
         if (error instanceof AiError) {
             // A provider or a network layer may echo the key back in its own words
-            const message = apiKey === "" ? error.message : error.message.split(apiKey).join("…");
+            const message = key === "" ? error.message : error.message.split(key).join("…");
             throw new AiError(error.kind, message);
         }
         throw error;

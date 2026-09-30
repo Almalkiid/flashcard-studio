@@ -827,6 +827,21 @@ export interface IBaseLocale {
     AI_ERR_NO_CARDS: string;
     AI_ERR_WRITE: string;
     AI_ERR_EMPTY_SOURCE: string;
+    AI_FEWER: string;
+    AI_MORE: string;
+    AI_HOST_FALLBACK: string;
+    AI_ERR_BAD_BASE_URL: string;
+    AI_ERR_SYNC: string;
+    AI_ERR_BLOCK: string;
+    AI_WRITE_SEPARATOR: string;
+    AI_WRITE_LONE_SEPARATOR: string;
+    AI_WRITE_FENCE: string;
+    AI_WRITE_COMMENT: string;
+    AI_WRITE_REGION: string;
+    AI_WRITE_OTHER: string;
+    AI_WRITE_NO_CLOZE: string;
+    AI_PREVIEW_EXTRA: string;
+    AI_PREVIEW_CUT: string;
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: string;
     STATS_METRIC_STREAK: string;

@@ -56,6 +56,7 @@ interface WindowWithSaves {
     __saves?: string[];
     __settingsCalls?: string[];
     __settingsOriginals?: Pick<AppWithSetting["setting"], "open" | "openTabById">;
+    __originalSync?: () => Promise<void>;
 }
 
 interface SeenRequest {
@@ -78,9 +79,14 @@ let reply: { status: number; body: string; delayMs: number } = {
     delayMs: 0,
 };
 
-function completion(cards: unknown[]): string {
-    return JSON.stringify({ choices: [{ message: { content: JSON.stringify({ cards }) } }] });
+/* eslint-disable camelcase -- the provider's reply uses snake_case names */
+function completion(cards: unknown[], finishReason = "stop"): string {
+    return JSON.stringify({
+        choices: [{ message: { content: JSON.stringify({ cards }) }, finish_reason: finishReason }],
+    });
 }
+
+/* eslint-enable camelcase -- end of the reply builder */
 
 const TWO_BASIC = [
     { kind: "basic", front: "What does CAE stand for?", back: "Chief Audit Executive" },
@@ -376,6 +382,11 @@ describe("generate cards with AI", function () {
         const cardsBefore = await syncedDeckCount("flashcards");
         await openDialog(DECK_NOTE);
         await screenshot("ai-form");
+        // The stepper buttons have names (from the locale strings), not just icons
+        await expect(browser.$(".fs-ai-modal .fs-ai-step")).toHaveAttribute(
+            "aria-label",
+            "Fewer cards",
+        );
 
         await clickGenerate();
         await waitForPreview(2);
@@ -490,6 +501,146 @@ describe("generate cards with AI", function () {
         expect(await error.getText()).toContain("no API key");
         await expect(browser.$(".fs-ai-modal .fs-ai-error-button")).toExist();
         expect(seen).toHaveLength(0);
+    });
+
+    it("a card that would break the note is unticked with the reason, and fixing it makes it addable", async function () {
+        reply = {
+            status: 200,
+            body: completion([
+                {
+                    kind: "basic",
+                    front: "In C++ what is std::vector",
+                    back: "A dynamic array",
+                },
+                { kind: "basic", front: "Who approves the charter?", back: "The board" },
+            ]),
+            delayMs: 0,
+        };
+        const before = readVault(DECK_NOTE);
+        await openDialog(DECK_NOTE);
+        await clickGenerate();
+        await waitForPreview(2);
+
+        // The first card would be read back as a one-line card and lose its answer: refused, with the reason
+        const rows = await browser.$$(".fs-ai-modal .fs-ai-row");
+        await expect(rows[0]).toHaveElementClass("is-invalid");
+        const hint = rows[0].$(".fs-ai-row-hint");
+        await expect(hint).toHaveText(expect.stringContaining("::"));
+        await expect(hint).toHaveText(expect.stringContaining("split"));
+        await expect(rows[0].$(".fs-ai-check input")).toBeDisabled();
+        await expect(browser.$(".fs-ai-modal .fs-ai-add")).toHaveText("Add 1 card");
+        await screenshot("ai-blocked");
+
+        // Edited, it is checked again, ticked again, and counted
+        await rows[0].$(".fs-ai-edit-front").setValue("In C++ what is a vector");
+        await expect(rows[0]).not.toHaveElementClass("is-invalid");
+        await expect(browser.$(".fs-ai-modal .fs-ai-add")).toHaveText("Add 2 cards");
+        await addCards();
+
+        expect(readVault(DECK_NOTE)).toBe(
+            `${before.trimEnd()}\n\n## Flashcards\n\n` +
+                "In C++ what is a vector::A dynamic array\n\n" +
+                "Who approves the charter?::The board\n",
+        );
+    });
+
+    it("writes only the cards that read back, and never the one that would break the note", async function () {
+        reply = {
+            status: 200,
+            body: completion([
+                { kind: "basic", front: "Q1", back: "A1\n```\nunclosed" },
+                { kind: "basic", front: "Q2", back: "A2" },
+                { kind: "basic", front: "Q3", back: "A3" },
+            ]),
+            delayMs: 0,
+        };
+        const before = readVault(DECK_NOTE);
+        await openDialog(DECK_NOTE);
+        await clickGenerate();
+        await waitForPreview(3);
+        const rows = await browser.$$(".fs-ai-modal .fs-ai-row");
+        await expect(rows[0].$(".fs-ai-row-hint")).toHaveText(
+            expect.stringContaining("code block"),
+        );
+        await expect(browser.$(".fs-ai-modal .fs-ai-add")).toHaveText("Add 2 cards");
+        await addCards();
+        expect(readVault(DECK_NOTE)).toBe(
+            `${before.trimEnd()}\n\n## Flashcards\n\nQ2::A2\n\nQ3::A3\n`,
+        );
+    });
+
+    it("shows no more cards than were asked for, and says when the reply was cut off", async function () {
+        reply = {
+            status: 200,
+            body: completion(
+                [...TWO_BASIC, { kind: "basic", front: "Third?", back: "Yes" }],
+                "length",
+            ),
+            delayMs: 0,
+        };
+        await openDialog(DECK_NOTE);
+        // Down from 10 to 2 with the stepper's minus button
+        const minus = browser.$(".fs-ai-modal .fs-ai-step");
+        for (let click = 0; click < 8; click++) await minus.click();
+        await expect(browser.$(".fs-ai-modal #fs-ai-count")).toHaveValue("2");
+        await clickGenerate();
+        await waitForPreview(2);
+        const notes = await browser.$$(".fs-ai-modal .fs-ai-note");
+        expect(notes).toHaveLength(2);
+        await expect(notes[0]).toHaveText(expect.stringContaining("you asked for 2"));
+        await expect(notes[1]).toHaveText(expect.stringContaining("cut off"));
+        // Every placeholder was filled in
+        for (const note of notes) expect(await note.getText()).not.toContain("${");
+        await screenshot("ai-notes");
+    });
+
+    it("refuses a server address without http:// before anything is sent", async function () {
+        await setSetting("aiBaseUrl", "localhost:11434/v1");
+        await openDialog(DECK_NOTE);
+        await clickGenerate();
+        const error = browser.$(".fs-ai-modal .fs-ai-error");
+        await error.waitForExist();
+        expect(await error.getText()).toContain("http://");
+        await expect(browser.$(".fs-ai-modal .fs-ai-error-button")).toExist();
+        expect(seen).toHaveLength(0);
+    });
+
+    it("reports a re-sync that fails after the cards were added, instead of throwing", async function () {
+        await browser.executeObsidian(({ app }, id) => {
+            const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+            if (plugin === undefined) throw new Error("the plugin is not loaded");
+            const window_ = window as unknown as WindowWithSaves;
+            window_.__originalSync = plugin.dataManager.sync;
+            plugin.dataManager.sync = () => Promise.reject(new Error("no way"));
+        }, pluginId);
+        try {
+            const before = readVault(DECK_NOTE);
+            await openDialog(DECK_NOTE);
+            await clickGenerate();
+            await waitForPreview(2);
+            await addCards();
+            await browser.waitUntil(
+                async () =>
+                    (
+                        await browser.execute(() =>
+                            Array.from(document.querySelectorAll(".notice")).map(
+                                (notice) => notice.textContent ?? "",
+                            ),
+                        )
+                    ).some((text) => text.includes("could not read the note again")),
+                { timeoutMsg: "no notice about the failed re-sync" },
+            );
+            // The cards themselves were written
+            expect(readVault(DECK_NOTE).length).toBeGreaterThan(before.length);
+        } finally {
+            await browser.executeObsidian(({ app }, id) => {
+                const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+                const original = (window as unknown as WindowWithSaves).__originalSync;
+                if (plugin !== undefined && original !== undefined) {
+                    plugin.dataManager.sync = original;
+                }
+            }, pluginId);
+        }
     });
 
     it("a server problem is explained and the dialog stays open", async function () {

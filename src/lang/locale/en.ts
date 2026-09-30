@@ -953,6 +953,31 @@ const en: IBaseLocale = {
         "The reply did not contain any usable cards. Try again, or ask for fewer cards.",
     AI_ERR_WRITE: "The cards could not be added to the note.",
     AI_ERR_EMPTY_SOURCE: "There is no text to make cards from.",
+    AI_FEWER: "Fewer cards",
+    AI_MORE: "More cards",
+    AI_HOST_FALLBACK: "the server",
+    AI_ERR_BAD_BASE_URL:
+        "The server address has to start with http:// or https://, for example http://localhost:11434/v1.",
+    AI_ERR_SYNC:
+        "The cards were added, but the plugin could not read the note again. They will show up at the next sync.",
+    AI_ERR_BLOCK:
+        "Nothing was added, because card ${number} would not read back as itself once written. ${reason}",
+    AI_WRITE_SEPARATOR:
+        'Contains "${separator}", which would split the card. Edit it before adding.',
+    AI_WRITE_LONE_SEPARATOR:
+        'Has a line with only "${separator}", which would split the card. Edit it before adding.',
+    AI_WRITE_FENCE:
+        "Has a code block that is never closed, which would swallow the cards after it. Edit it before adding.",
+    AI_WRITE_COMMENT:
+        'Has a line that starts with "<!--", which would hide part of the note. Edit it before adding.',
+    AI_WRITE_REGION:
+        'Your settings use card regions ("${marker}"), and multi-line cards are not written inside one yet.',
+    AI_WRITE_OTHER: "Would not read back as this card once written. Edit it before adding.",
+    AI_WRITE_NO_CLOZE: "Cloze cards need a cloze form turned on in the settings, and none is.",
+    AI_PREVIEW_EXTRA:
+        "The model returned ${total} cards and you asked for ${count}. The extra ones are left out.",
+    AI_PREVIEW_CUT:
+        "The reply was cut off at the length limit, so some cards may be missing. Try asking for fewer cards.",
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: "Reviews today",
     STATS_METRIC_STREAK: "Day streak",

@@ -1,10 +1,14 @@
 import "src/ai/generate-cards.css";
 import { getAllTags, Modal, Notice, requestUrl, setIcon, TFile } from "obsidian";
 
-import { AiError, AiSettings, aiSetupProblem, requestAiText } from "src/ai/ai-provider";
+import { AiError, AiSettings, aiSetupProblem, requestAiReply } from "src/ai/ai-provider";
 import {
+    appendProblem,
     buildGenerationPrompt,
-    formatGeneratedCard,
+    capCards,
+    CardCheck,
+    checkCard,
+    formatGeneratedCards,
     freeFlashcardsNotePath,
     GeneratedCard,
     GeneratedKind,
@@ -13,7 +17,6 @@ import {
     newFlashcardsNoteText,
     optionsToLines,
     parseGeneratedCards,
-    readGeneratedCard,
 } from "src/ai/card-generation";
 import { SettingsUtil, SRSettings } from "src/data/settings";
 import { IBaseLocale } from "src/lang/base-locale";
@@ -40,21 +43,29 @@ type Destination = "append" | "new";
 interface PreviewRow {
     kind: GeneratedKind;
     selected: boolean;
+    /** Unticked by the check, not by the person: it is ticked again when an edit fixes the card. */
+    autoOff: boolean;
     front: string;
     back: string;
     options: string;
     explanation: string;
+    /** What checking the text as it is now says: the card, and why it cannot be added, if it cannot. */
+    check: CardCheck;
     hintEl: HTMLElement | null;
 }
 
-function rowCard(row: PreviewRow): GeneratedCard | null {
-    return readGeneratedCard({
-        kind: row.kind,
-        front: row.front,
-        back: row.back,
-        options: linesToOptions(row.options),
-        explanation: row.explanation,
-    });
+/** What the person has in the row's fields, as a card that is checked before it can be added. */
+function checkRow(row: PreviewRow, settings: SRSettings): CardCheck {
+    return checkCard(
+        {
+            kind: row.kind,
+            front: row.front,
+            back: row.back,
+            options: linesToOptions(row.options),
+            explanation: row.explanation,
+        },
+        settings,
+    );
 }
 
 function countWords(text: string): number {
@@ -80,6 +91,8 @@ export class GenerateCardsModal extends Modal {
     private destination: Destination = "append";
     private error: { message: string; settings: boolean } | null = null;
     private rows: PreviewRow[] = [];
+    /** Things to know about the reply: more cards than asked for, or cut off at the length limit. */
+    private previewNotes: string[] = [];
     /** Bumped when a request is abandoned (Cancel, close), so its late reply is ignored. */
     private run = 0;
     private writing = false;
@@ -202,7 +215,7 @@ export class GenerateCardsModal extends Modal {
         const stepper = field.createDiv({ cls: "fs-ai-stepper" });
         const minus = stepper.createEl("button", {
             cls: "fs-ai-step",
-            attr: { "aria-label": "−", type: "button" },
+            attr: { "aria-label": t("AI_FEWER"), type: "button" },
         });
         setIcon(minus, "minus");
         const input = stepper.createEl("input", {
@@ -218,7 +231,7 @@ export class GenerateCardsModal extends Modal {
         input.value = String(this.count);
         const plus = stepper.createEl("button", {
             cls: "fs-ai-step",
-            attr: { "aria-label": "+", type: "button" },
+            attr: { "aria-label": t("AI_MORE"), type: "button" },
         });
         setIcon(plus, "plus");
 
@@ -311,7 +324,8 @@ export class GenerateCardsModal extends Modal {
         const id = this.settings.aiKeySecret;
         if (id === "") return "";
         try {
-            return this.app.secretStorage.getSecret(id) ?? "";
+            // A secret pasted with a newline must not turn into a confusing network error
+            return (this.app.secretStorage.getSecret(id) ?? "").trim();
         } catch {
             return "";
         }
@@ -332,6 +346,7 @@ export class GenerateCardsModal extends Modal {
                 "no-key": "AI_ERR_NO_KEY",
                 "no-model": "AI_ERR_NO_MODEL",
                 "no-base-url": "AI_ERR_NO_BASE_URL",
+                "bad-base-url": "AI_ERR_BAD_BASE_URL",
             } as const;
             this.error = { message: t(message[problem]), settings: true };
             this.render();
@@ -357,18 +372,36 @@ export class GenerateCardsModal extends Modal {
         const run = ++this.run;
 
         try {
-            const text = await requestAiText(ai, key, prompt, (request) => requestUrl(request));
-            const cards = parseGeneratedCards(text);
+            const reply = await requestAiReply(ai, key, prompt, (request) => requestUrl(request));
+            const all = parseGeneratedCards(reply.text);
             if (run !== this.run) return;
-            this.rows = cards.map((card) => ({
-                kind: card.kind,
-                selected: true,
-                front: card.front,
-                back: card.back,
-                options: optionsToLines(card.options ?? []),
-                explanation: card.explanation ?? "",
-                hintEl: null as HTMLElement | null,
-            }));
+            // A model may write more cards than asked for, and a reply may stop at the length limit: say so
+            const { cards, extra } = capCards(all, this.count);
+            this.previewNotes = [
+                ...(extra > 0
+                    ? [t("AI_PREVIEW_EXTRA", { total: all.length, count: this.count })]
+                    : []),
+                ...(reply.truncated ? [t("AI_PREVIEW_CUT")] : []),
+            ];
+            const settings = this.settings;
+            this.rows = cards.map((card) => {
+                const row: PreviewRow = {
+                    kind: card.kind,
+                    selected: true,
+                    autoOff: false,
+                    front: card.front,
+                    back: card.back,
+                    options: optionsToLines(card.options ?? []),
+                    explanation: card.explanation ?? "",
+                    check: { card: null, problem: null },
+                    hintEl: null,
+                };
+                // A card that cannot be written as it is starts unticked, with the reason shown
+                row.check = checkRow(row, settings);
+                row.autoOff = row.check.problem !== null;
+                row.selected = !row.autoOff;
+                return row;
+            });
             this.step = "preview";
         } catch (error) {
             if (run !== this.run) return;
@@ -408,6 +441,10 @@ export class GenerateCardsModal extends Modal {
         titles.createDiv({ cls: "fs-ai-preview-title", text: t("AI_PREVIEW_TITLE") });
         titles.createDiv({ cls: "fs-ai-preview-hint", text: t("AI_PREVIEW_HINT") });
         this.selectedCountEl = head.createDiv({ cls: "fs-pill fs-ai-selected" });
+
+        for (const note of this.previewNotes) {
+            preview.createDiv({ cls: "fs-ai-note", text: note, attr: { role: "note" } });
+        }
 
         const list = preview.createDiv({ cls: "fs-ai-list" });
         for (const row of this.rows) this.renderRow(list, row);
@@ -464,34 +501,48 @@ export class GenerateCardsModal extends Modal {
             area.value = row[field];
             area.addEventListener("input", () => {
                 row[field] = area.value;
-                this.refreshRow(el, row);
+                // Checked again on every edit, so the row always says what would happen
+                row.check = checkRow(row, this.settings);
+                this.refreshRow(el, row, box);
                 this.refreshFooter();
             });
         }
 
-        row.hintEl = el.createDiv({ cls: "fs-ai-row-hint", text: t("AI_CARD_INVALID") });
+        row.hintEl = el.createDiv({ cls: "fs-ai-row-hint", attr: { role: "alert" } });
         box.addEventListener("change", () => {
             row.selected = box.checked;
-            this.refreshRow(el, row);
+            this.refreshRow(el, row, box);
             this.refreshFooter();
         });
-        this.refreshRow(el, row);
+        this.refreshRow(el, row, box);
     }
 
-    private refreshRow(el: HTMLElement, row: PreviewRow): void {
-        const invalid = rowCard(row) === null;
-        el.toggleClass("is-off", !row.selected);
-        el.toggleClass("is-invalid", invalid);
-        row.hintEl?.toggleClass("is-visible", invalid);
-    }
-
-    private readyCards(): GeneratedCard[] {
-        const cards: GeneratedCard[] = [];
-        for (const row of this.rows) {
-            const card = row.selected ? rowCard(row) : null;
-            if (card !== null) cards.push(card);
+    /** Shows what the last check of the row found: unticked and locked while it cannot be added. */
+    private refreshRow(el: HTMLElement, row: PreviewRow, box: HTMLInputElement): void {
+        const { problem } = row.check;
+        if (problem !== null && row.selected) {
+            row.selected = false;
+            row.autoOff = true;
+        } else if (problem === null && row.autoOff) {
+            row.selected = true;
+            row.autoOff = false;
         }
-        return cards;
+        box.checked = row.selected;
+        box.disabled = problem !== null;
+        el.toggleClass("is-off", !row.selected);
+        el.toggleClass("is-invalid", problem !== null);
+        row.hintEl?.setText(problem ?? "");
+        row.hintEl?.toggleClass("is-visible", problem !== null);
+    }
+
+    /** The cards that are ticked and can be written, with their place in the list. */
+    private readyCards(): { card: GeneratedCard; position: number }[] {
+        const ready: { card: GeneratedCard; position: number }[] = [];
+        this.rows.forEach((row, position) => {
+            const { card, problem } = row.check;
+            if (row.selected && card !== null && problem === null) ready.push({ card, position });
+        });
+        return ready;
     }
 
     private refreshFooter(): void {
@@ -536,13 +587,28 @@ export class GenerateCardsModal extends Modal {
     }
 
     private async addCards(): Promise<void> {
-        const cards = this.readyCards();
+        const ready = this.readyCards();
+        const cards = ready.map((entry) => entry.card);
         if (cards.length === 0 || this.writing) return;
+
+        // The last look before writing: the whole block must read back as exactly these cards, in order
+        const settings = this.settings;
+        const unsafe = appendProblem(cards, settings);
+        if (unsafe !== null) {
+            this.error = {
+                message: t("AI_ERR_BLOCK", {
+                    number: ready[unsafe.index].position + 1,
+                    reason: unsafe.message,
+                }),
+                settings: false,
+            };
+            this.render();
+            return;
+        }
+
         this.writing = true;
         this.refreshFooter();
-
-        const settings = this.settings;
-        const body = cards.map((card) => formatGeneratedCard(card, settings)).join("\n\n");
+        const body = formatGeneratedCards(cards, settings);
         const tag = this.tagToAdd();
         let watch: { indexed: Promise<void>; cancel: () => void } | null = null;
         try {
@@ -575,7 +641,13 @@ export class GenerateCardsModal extends Modal {
         // The plugin finds cards through Obsidian's metadata cache: read the vault only once the cache has the note,
         // with its new tag, or the new cards would be missed until the next sync.
         await watch.indexed;
-        if (this.plugin.isInitialized) await this.plugin.dataManager.sync();
+        if (!this.plugin.isInitialized) return;
+        try {
+            await this.plugin.dataManager.sync();
+        } catch {
+            // The dialog is gone by now, so there is nobody to show an error in: a notice is what is left
+            new Notice(t("AI_ERR_SYNC"));
+        }
     }
 
     /**
@@ -590,7 +662,9 @@ export class GenerateCardsModal extends Modal {
         const indexed = new Promise<void>((resolve) => {
             const metadataCache = this.app.metadataCache;
             const ref = metadataCache.on("changed", (changed, data) => {
-                if (changed.path === path && data.includes(cardsText)) finish();
+                // The note may have Windows line endings, the cards were written with plain ones
+                if (changed.path === path && data.replace(/\r\n/g, "\n").includes(cardsText))
+                    finish();
             });
             const timer = window.setTimeout(() => finish(), INDEX_WAIT_MS);
             finish = () => {
