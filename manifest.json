@@ -1,7 +1,7 @@
 {
     "id": "flashcard-studio",
     "name": "Flashcard Studio",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "minAppVersion": "1.11.4",
     "description": "Flashcards and note review with spaced repetition. FSRS scheduling, full review history, Anki style daily limits, statistics and a polished review screen for desktop and mobile.",
     "author": "Almalkiid",
