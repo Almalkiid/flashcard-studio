@@ -6,6 +6,7 @@ import {
     shuffledOrder,
 } from "src/data/data-structures/card/questions/multiple-choice";
 import { t } from "src/lang/helpers";
+import { TextDirection } from "src/utils/strings";
 
 export interface ChoiceTileOptions {
     /** "choose": tappable tiles. "result": the answer is in, right and wrong are marked. */
@@ -21,42 +22,66 @@ export interface ChoiceTileOptions {
     component: Component;
     /** Needed by `MarkdownRenderer.render`; the older `renderMarkdown` that needs none is deprecated. */
     app: App;
+    /** Reading direction of the note; right to left puts the tiles' key badges and tags on the other side. */
+    textDirection?: TextDirection;
+    /** Called with each element once its Markdown is in, for the internal links (see `wireInternalLinks`). */
+    onRendered?: (el: HTMLElement) => void;
 }
 
 /**
- * Renders Markdown into an element. Not awaited by callers that build synchronously: the text fills in a moment later.
+ * Everything but the tiles' own options: what the parts of a multiple choice card need to render Markdown.
  */
-function renderMarkdown(
-    text: string,
-    el: HTMLElement,
-    options: Pick<ChoiceTileOptions, "app" | "sourcePath" | "component">,
-): Promise<void> {
+export type ChoiceContext = Pick<
+    ChoiceTileOptions,
+    "app" | "sourcePath" | "component" | "textDirection" | "onRendered"
+>;
+
+/**
+ * Renders Markdown into an element. Resolves once the text is in.
+ */
+async function renderMarkdown(text: string, el: HTMLElement, ctx: ChoiceContext): Promise<void> {
     el.addClass("markdown-rendered");
-    return MarkdownRenderer.render(options.app, text, el, options.sourcePath, options.component);
+    await MarkdownRenderer.render(ctx.app, text, el, ctx.sourcePath, ctx.component);
+    ctx.onRendered?.(el);
+}
+
+export interface ChoiceTiles {
+    /** The tiles in display order. */
+    tiles: HTMLElement[];
+    /** Resolves when the text of every option has been rendered. Await it before reading the tiles' text. */
+    rendered: Promise<void>;
 }
 
 /**
- * One tile per option, in `order` (display position to option index). Returns the tiles in display order.
+ * One tile per option, in `order` (display position to option index).
+ *
+ * In "choose" mode a single-select tile marks itself `is-selected` and clears the tiles it was chosen over, so a
+ * screen that lets the person change the answer needs no redrawing; several-answer tiles toggle. Either way
+ * `onChoose` gets the option index.
  */
 export function renderChoiceTiles(
     parent: HTMLElement,
     mc: MultipleChoice,
     order: number[],
     opts: ChoiceTileOptions,
-): HTMLElement[] {
+): ChoiceTiles {
     const chosen = new Set(opts.chosen);
     const isResult = opts.mode === "result";
-    parent.setAttribute("role", "group");
+    parent.setAttribute("role", isResult || opts.multiSelect ? "group" : "radiogroup");
+    if (opts.textDirection === TextDirection.Rtl) parent.setAttribute("dir", "rtl");
+    const tiles: HTMLElement[] = [];
+    const renders: Promise<void>[] = [];
 
-    return order.map((optionIndex, position) => {
+    order.forEach((optionIndex, position) => {
         const option = mc.options[optionIndex];
         const tile: HTMLElement = isResult
             ? parent.createDiv({ cls: "fs-choice is-result" })
             : parent.createEl("button", { cls: "fs-choice", attr: { type: "button" } });
+        tiles.push(tile);
         tile.dataset.option = String(optionIndex);
         tile.createSpan({ cls: "fs-choice-key", text: String(position + 1) });
         const textEl = tile.createDiv({ cls: "fs-choice-text" });
-        void renderMarkdown(option.text, textEl, opts);
+        renders.push(renderMarkdown(option.text, textEl, opts));
 
         if (isResult) {
             const picked = chosen.has(optionIndex);
@@ -79,23 +104,30 @@ export function renderChoiceTiles(
                         : t("CHOICE_RIGHT_ANSWER"),
                 });
             }
-            return tile;
+            return;
         }
 
-        if (opts.multiSelect) tile.setAttribute("aria-pressed", String(chosen.has(optionIndex)));
-        tile.toggleClass("is-selected", chosen.has(optionIndex));
-        tile.addEventListener("click", () => {
+        const select = (selected: boolean) => {
+            tile.toggleClass("is-selected", selected);
+            tile.setAttribute(opts.multiSelect ? "aria-pressed" : "aria-checked", String(selected));
+        };
+        if (!opts.multiSelect) tile.setAttribute("role", "radio");
+        select(chosen.has(optionIndex));
+        tile.addEventListener("click", (event) => {
             if (opts.multiSelect) {
-                const selected = !tile.hasClass("is-selected");
-                tile.toggleClass("is-selected", selected);
-                tile.setAttribute("aria-pressed", String(selected));
+                select(!tile.hasClass("is-selected"));
+                // A tap or click leaves no focus on the tile, so a later Space checks the answer, as it did before
+                if (event.detail > 0) tile.blur();
             } else {
-                tile.addClass("is-selected");
+                for (const other of tiles) other.toggleClass("is-selected", other === tile);
+                for (const other of tiles)
+                    other.setAttribute("aria-checked", String(other === tile));
             }
             opts.onChoose?.(optionIndex);
         });
-        return tile;
     });
+
+    return { tiles, rendered: Promise.all(renders).then((): void => undefined) };
 }
 
 /**
@@ -129,15 +161,11 @@ export function createChoiceState(
     };
 }
 
-export interface ChoiceContext {
-    app: App;
-    sourcePath: string;
-    component: Component;
-}
-
 export interface ChoiceFrontHandle {
     /** Chooses the option shown at this position (0 for the first), as a tap on its tile does. */
     chooseAt(position: number): void;
+    /** Resolves when the lead and every option have been rendered. */
+    rendered: Promise<void>;
 }
 
 /**
@@ -151,18 +179,16 @@ export function renderChoiceFront(
     onSubmit: () => void,
 ): ChoiceFrontHandle {
     const { mc } = state;
-    renderLead(parent, mc, ctx);
+    const leadRendered = renderLead(parent, mc, ctx);
     if (mc.multiSelect) parent.createDiv({ cls: "fs-choice-hint", text: t("CHOICE_SELECT_ALL") });
 
     const tilesEl = parent.createDiv({ cls: "fs-choices" });
     let checkButton: HTMLButtonElement | null = null;
-    const tiles = renderChoiceTiles(tilesEl, mc, state.order, {
+    const { tiles, rendered } = renderChoiceTiles(tilesEl, mc, state.order, {
         mode: "choose",
         chosen: [],
         multiSelect: mc.multiSelect,
-        sourcePath: ctx.sourcePath,
-        component: ctx.component,
-        app: ctx.app,
+        ...ctx,
         onChoose: (optionIndex) => {
             if (state.locked) return;
             if (!mc.multiSelect) {
@@ -190,12 +216,15 @@ export function renderChoiceFront(
         });
     }
 
-    return { chooseAt: (position) => tiles[position]?.click() };
+    return {
+        chooseAt: (position) => tiles[position]?.click(),
+        rendered: Promise.all([leadRendered, rendered]).then((): void => undefined),
+    };
 }
 
 /**
- * The answered card: the tiles with right and wrong marked, then the explanation. Resolves once the explanation has
- * been rendered, so its height is known.
+ * The answered card: the tiles with right and wrong marked, then the explanation. Resolves once the lead, the options
+ * and the explanation have been rendered, so the text is there to read and the heights are known.
  */
 export async function renderChoiceBack(
     parent: HTMLElement,
@@ -203,22 +232,51 @@ export async function renderChoiceBack(
     ctx: ChoiceContext,
 ): Promise<void> {
     const { mc } = state;
-    renderLead(parent, mc, ctx);
-    renderChoiceTiles(parent.createDiv({ cls: "fs-choices" }), mc, state.order, {
-        mode: "result",
-        chosen: state.chosen,
-        multiSelect: mc.multiSelect,
-        sourcePath: ctx.sourcePath,
-        component: ctx.component,
-        app: ctx.app,
-    });
-    if (mc.explanation === "") return;
-    const box = parent.createDiv({ cls: "fs-choice-explanation" });
-    setIcon(box.createSpan({ cls: "fs-choice-explanation-icon" }), "lightbulb");
-    await renderMarkdown(mc.explanation, box.createDiv({ cls: "fs-choice-explanation-text" }), ctx);
+    const renders: Promise<void>[] = [renderLead(parent, mc, ctx)];
+    renders.push(
+        renderChoiceTiles(parent.createDiv({ cls: "fs-choices" }), mc, state.order, {
+            mode: "result",
+            chosen: state.chosen,
+            multiSelect: mc.multiSelect,
+            ...ctx,
+        }).rendered,
+    );
+    if (mc.explanation !== "") {
+        const box = parent.createDiv({ cls: "fs-choice-explanation" });
+        setIcon(box.createSpan({ cls: "fs-choice-explanation-icon" }), "lightbulb");
+        renders.push(
+            renderMarkdown(
+                mc.explanation,
+                box.createDiv({ cls: "fs-choice-explanation-text" }),
+                ctx,
+            ),
+        );
+    }
+    await Promise.all(renders);
 }
 
-function renderLead(parent: HTMLElement, mc: MultipleChoice, ctx: ChoiceContext): void {
-    if (mc.lead === "") return;
-    void renderMarkdown(mc.lead, parent.createDiv({ cls: "fs-choice-lead" }), ctx);
+function renderLead(parent: HTMLElement, mc: MultipleChoice, ctx: ChoiceContext): Promise<void> {
+    if (mc.lead === "") return Promise.resolve();
+    return renderMarkdown(mc.lead, parent.createDiv({ cls: "fs-choice-lead" }), ctx);
+}
+
+/**
+ * Scrolls a card that does not fit its window to the answer: the explanation at the bottom, unless that would push
+ * the tiles that were chosen and the right ones out of view, which matter more, so they win.
+ */
+export function revealChoiceResult(content: HTMLElement): void {
+    const marked = content.querySelectorAll<HTMLElement>(
+        ".fs-choice.is-picked, .fs-choice.is-correct",
+    );
+    const explanation = content.querySelector<HTMLElement>(".fs-choice-explanation");
+    const last = explanation ?? marked[marked.length - 1];
+    if (last === undefined) return;
+    last.scrollIntoView({ block: "nearest" });
+    const first = marked[0];
+    if (
+        first !== undefined &&
+        first.getBoundingClientRect().top < content.getBoundingClientRect().top
+    ) {
+        first.scrollIntoView({ block: "start" });
+    }
 }

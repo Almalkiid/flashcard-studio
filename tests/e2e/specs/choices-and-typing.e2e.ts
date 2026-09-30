@@ -4,7 +4,17 @@ import { after, afterEach, before, beforeEach, describe, it } from "mocha";
 import * as path from "path";
 import { obsidianPage } from "wdio-obsidian-service";
 
-import { openReview, setSettings, TAG, useNote, waitForPlugin } from "../card-syntax-helpers";
+import {
+    NOTE,
+    openReview,
+    pluginId,
+    readNote,
+    SCHEDULE,
+    setSettings,
+    TAG,
+    useNote,
+    waitForPlugin,
+} from "../card-syntax-helpers";
 
 // Multiple choice cards and typed answers in the study screen.
 // Runs once per capability in wdio.conf.mts: desktop, and emulated mobile.
@@ -45,6 +55,37 @@ const TYPED_NOTE = [TAG, "", "What does CAE stand for?::Chief Audit Executive", 
 
 const CLOZE_NOTE = [TAG, "", "The CAE reports ==functionally== to the ==board==.", ""].join("\n");
 
+const PLAIN_CHOICE_NOTE = [
+    TAG,
+    "",
+    "Which body should approve the internal audit charter?",
+    "?",
+    "- [ ] The chief audit executive",
+    "- [x] The board",
+    "",
+].join("\n");
+
+// A multiple choice card, then an ordinary one
+const TWO_NOTE = [
+    CHOICE_NOTE.trimEnd(),
+    "",
+    "What does CAE stand for?::Chief Audit Executive",
+    "",
+].join("\n");
+
+const RTL = ["---", "direction: rtl", "---", ""].join("\n");
+
+// An option with an internal link: the note is in the fixture vault
+const LINK_NOTE = [
+    TAG,
+    "",
+    "Where are the cards?",
+    "?",
+    "- [ ] Nowhere",
+    "- [x] In the [[Deck]] note",
+    "",
+].join("\n");
+
 async function isMobile(): Promise<boolean> {
     return browser.executeObsidian(({ obsidian }) => obsidian.Platform.isMobile);
 }
@@ -75,10 +116,10 @@ async function screenshot(name: string, light: boolean, extra = false): Promise<
 }
 
 /**
- * Waits until the review screen has stopped moving. On the phone the review slides up for a quarter of a second, and
- * a click made meanwhile lands where the element used to be.
+ * Waits until an element (the review screen, or a menu) has stopped moving. On the phone both slide up for a
+ * quarter of a second, and a click made meanwhile lands where the element used to be.
  */
-async function settle(): Promise<void> {
+async function settle(selector = CARD): Promise<void> {
     let last = "";
     let unchanged = 0;
     await browser.waitUntil(
@@ -86,7 +127,7 @@ async function settle(): Promise<void> {
             const now = await browser.execute(
                 (selector: string) =>
                     JSON.stringify(document.querySelector(selector)?.getBoundingClientRect()),
-                CARD,
+                selector,
             );
             unchanged = now === last ? unchanged + 1 : 0;
             last = now;
@@ -106,8 +147,8 @@ async function openTypedCard(): Promise<void> {
 }
 
 /** Opens a review of the note and waits until a multiple choice card is up with all its tiles filled in. */
-async function openChoiceCard(tiles: number): Promise<void> {
-    await openReview();
+async function openChoiceCard(tiles: number, command = "srs-review-flashcards"): Promise<void> {
+    await browser.executeObsidianCommand(`${pluginId}:${command}`);
     await browser.$(`${CARD} .fs-choice`).waitForDisplayed({ timeoutMsg: "no tiles were shown" });
     await browser.waitUntil(async () => (await browser.$$(`${CARD} .fs-choice`).length) === tiles, {
         timeoutMsg: `expected ${tiles} tiles`,
@@ -163,13 +204,136 @@ async function spoken(): Promise<string[]> {
     return browser.execute(() => (window as unknown as { __spoken: string[] }).__spoken);
 }
 
+/**
+ * Types the answer and presses Enter. On the desktop the field must already have focus, as it has on the first card of
+ * a review: nothing here clicks it. A phone shows no keyboard on its own, so there the field is tapped first.
+ */
 async function typeAnswer(text: string): Promise<void> {
     const input = browser.$(`${CARD} .fs-typed-input`);
     await input.waitForDisplayed({ timeoutMsg: "no field to type the answer in" });
-    await input.click();
-    await input.setValue(text);
+    if (await isMobile()) {
+        await input.click();
+        await input.setValue(text);
+    } else {
+        await browser.keys(text);
+        expect(await input.getValue()).toBe(text);
+    }
     await browser.keys("Enter");
     await waitForBack();
+}
+
+/** Answered cards are buried for the day in the plugin's data, which resetting the vault leaves alone. */
+async function clearBuryList(): Promise<void> {
+    await browser.executeObsidian(async ({ app }, id) => {
+        const plugin = (
+            app as unknown as {
+                plugins: {
+                    plugins: Record<
+                        string,
+                        {
+                            dataManager: {
+                                data: { buryList: string[] };
+                                settingsManager: { save: () => Promise<void> };
+                            };
+                        }
+                    >;
+                };
+            }
+        ).plugins.plugins[id];
+        plugin.dataManager.data.buryList.length = 0;
+        await plugin.dataManager.settingsManager.save();
+    }, pluginId);
+}
+
+/** Answering rewrites the note, and Obsidian indexes its tag again a moment later. */
+async function waitForNoteTag(): Promise<void> {
+    await browser.waitUntil(
+        () =>
+            browser.executeObsidian(
+                ({ app }, notePath, tag) => {
+                    const file = app.vault.getFileByPath(notePath);
+                    const tags = file ? app.metadataCache.getFileCache(file)?.tags : undefined;
+                    return (tags ?? []).some((cached) => cached.tag === tag);
+                },
+                NOTE,
+                TAG,
+            ),
+        { timeoutMsg: "Obsidian never indexed the tag again" },
+    );
+}
+
+/**
+ * Picks an item from the card menu. Obsidian's menus are native on a Mac, which the driver cannot click, so the test
+ * asks for its own menus while it does.
+ */
+async function pickFromCardMenu(title: string): Promise<void> {
+    type VaultConfig = {
+        getConfig(key: string): unknown;
+        setConfig(key: string, value: unknown): void;
+    };
+    const nativeMenus = await browser.executeObsidian(({ app }) => {
+        const vault = app.vault as unknown as VaultConfig;
+        const before = vault.getConfig("nativeMenus");
+        vault.setConfig("nativeMenus", false);
+        return before;
+    });
+    try {
+        await browser.$(`${CARD} .sr-extended-menu-button`).click();
+        await browser.$(".menu").waitForDisplayed({ timeoutMsg: "the menu did not open" });
+        await settle(".menu");
+        await browser.$(".menu").$(`div*=${title}`).click();
+    } finally {
+        await browser.executeObsidian(({ app }, value) => {
+            (app.vault as unknown as VaultConfig).setConfig("nativeMenus", value);
+        }, nativeMenus);
+    }
+}
+
+/** Whether the star in the card's corner covers any part of an option tile. */
+async function starCoversATile(): Promise<boolean> {
+    return browser.execute((selector: string) => {
+        const star = document.querySelector(`${selector} .fs-card-star`);
+        if (!star) return false;
+        const s = star.getBoundingClientRect();
+        return Array.from(document.querySelectorAll(`${selector} .fs-choice`)).some((tile) => {
+            const r = tile.getBoundingClientRect();
+            return !(
+                r.right <= s.left ||
+                r.left >= s.right ||
+                r.bottom <= s.top ||
+                r.top >= s.bottom
+            );
+        });
+    }, CARD);
+}
+
+/**
+ * Whether these elements are all inside the card's visible part, and whether the ones in `begun` at least start
+ * there (a long explanation may run on below).
+ */
+async function areInView(selectors: string[], begun: string[] = []): Promise<boolean> {
+    return browser.execute(
+        (card: string, whole: string[], started: string[]) => {
+            const content = document.querySelector(`${card} .sr-content`);
+            if (!content) return false;
+            const c = content.getBoundingClientRect();
+            const rect = (selector: string) =>
+                document.querySelector(`${card} ${selector}`)?.getBoundingClientRect();
+            return (
+                whole.every((selector) => {
+                    const r = rect(selector);
+                    return r !== undefined && r.top >= c.top - 1 && r.bottom <= c.bottom + 1;
+                }) &&
+                started.every((selector) => {
+                    const r = rect(selector);
+                    return r !== undefined && r.top >= c.top - 1 && r.top < c.bottom;
+                })
+            );
+        },
+        CARD,
+        selectors,
+        begun,
+    );
 }
 
 describe("multiple choice cards and typed answers", function () {
@@ -177,6 +341,7 @@ describe("multiple choice cards and typed answers", function () {
 
     beforeEach(async function () {
         await setTheme(false);
+        await clearBuryList();
         await setSettings({
             dailyLimitsEnabled: false,
             flashcardCardOrder: "NewFirstSequential",
@@ -191,6 +356,8 @@ describe("multiple choice cards and typed answers", function () {
     });
 
     afterEach(async function () {
+        // Twice: the first may only close a menu that a failed test left open
+        await browser.keys("Escape");
         await browser.keys("Escape");
         await setTheme(false);
     });
@@ -235,24 +402,28 @@ describe("multiple choice cards and typed answers", function () {
         expect(await browser.$$(`${CARD} .task-list-item-checkbox`).length).toBe(0);
         expect(await browser.$$(`${CARD} button.fs-choice`).length).toBe(0);
         expect(await suggestedRating()).toBe("good");
-        // A small window scrolls to the explanation, which would otherwise be below the card's visible part
+        // A small window scrolls to the answer: the chosen tile is in view, and the explanation starts there
         await browser.waitUntil(
-            () =>
-                browser.execute((selector: string) => {
-                    const content = document.querySelector(`${selector} .sr-content`);
-                    const box = document.querySelector(`${selector} .fs-choice-explanation`);
-                    if (!content || !box) return false;
-                    return (
-                        box.getBoundingClientRect().bottom <=
-                        content.getBoundingClientRect().bottom + 1
-                    );
-                }, CARD),
-            { timeoutMsg: "the explanation is not in view" },
+            () => areInView([".fs-choice.is-correct"], [".fs-choice-explanation"]),
+            { timeoutMsg: "the chosen tile and the start of the explanation are not in view" },
         );
 
         await screenshot("choice-back", false);
         await setTheme(true);
         await screenshot("choice-back", true);
+
+        // The star in the card's corner covers no tile, wherever the card is scrolled to
+        for (const fraction of [0, 0.5, 1]) {
+            await browser.execute(
+                (card: string, at: number) => {
+                    const content = document.querySelector(`${card} .sr-content`) as HTMLElement;
+                    content.scrollTop = (content.scrollHeight - content.clientHeight) * at;
+                },
+                CARD,
+                fraction,
+            );
+            expect(await starCoversATile()).toBe(false);
+        }
     });
 
     it("the Classic look shows the tiles and the suggestion too", async function () {
@@ -285,6 +456,10 @@ describe("multiple choice cards and typed answers", function () {
             await browser.$(`${CARD} .fs-choice.is-correct`).getProperty("textContent"),
         ).toContain("The board");
         expect(await suggestedRating()).toBe("again");
+        // Your wrong tile and the right one stay in view, even where the whole card does not fit
+        await browser.waitUntil(() => areInView([".fs-choice.is-wrong", ".fs-choice.is-correct"]), {
+            timeoutMsg: "the wrong tile and the right one are not both in view",
+        });
 
         await screenshot("choice-wrong", false);
         await setTheme(true);
@@ -449,8 +624,13 @@ describe("multiple choice cards and typed answers", function () {
         // The card has two blanks; with the answers in order, both right suggests Good
         const inputs = await browser.$$(`${CARD} .cloze-input`);
         expect(inputs.length).toBe(1);
-        await inputs[0].click();
-        await inputs[0].setValue("Functionally");
+        if (await isMobile()) {
+            await inputs[0].click();
+            await inputs[0].setValue("Functionally");
+        } else {
+            // The first blank has focus already, on the first card of the review too
+            await browser.keys("Functionally");
+        }
         await browser.keys("Enter");
         await waitForBack();
 
@@ -466,32 +646,13 @@ describe("multiple choice cards and typed answers", function () {
             .waitForClickable({ timeoutMsg: "no card was shown" });
         expect(await browser.$$(`${CARD} .fs-typed-input`).length).toBe(0);
 
-        // Obsidian's menus are native on a Mac, which the driver cannot click: ask for its own menus for this test
-        const nativeMenus = await browser.executeObsidian(({ app }) => {
-            const vault = app.vault as unknown as {
-                getConfig(key: string): unknown;
-                setConfig(key: string, value: unknown): void;
-            };
-            const before = vault.getConfig("nativeMenus");
-            vault.setConfig("nativeMenus", false);
-            return before;
-        });
-        try {
-            // Open the card menu and pick "Type answers"
-            await browser.$(`${CARD} .sr-extended-menu-button`).click();
-            await browser.$(".menu").$("div*=Type answers").click();
+        await pickFromCardMenu("Type answers");
 
-            await browser.$(`${CARD} .fs-typed-input`).waitForDisplayed({
-                timeoutMsg: "the field did not appear",
-            });
-        } finally {
-            await browser.executeObsidian(({ app }, value) => {
-                (
-                    app.vault as unknown as { setConfig(key: string, value: unknown): void }
-                ).setConfig("nativeMenus", value);
-            }, nativeMenus);
-        }
+        await browser.$(`${CARD} .fs-typed-input`).waitForDisplayed({
+            timeoutMsg: "the field did not appear",
+        });
     });
+
     it("the speaker button reads the side that is showing", async function () {
         await useNote(TYPED_NOTE);
         await recordSpeech();
@@ -557,5 +718,258 @@ describe("multiple choice cards and typed answers", function () {
         await browser.waitUntil(async () => (await spoken()).length === 1, {
             timeoutMsg: "the R key did not read the card",
         });
+    });
+    // MARK: Fix round 1
+
+    it("the typed field has focus on the first card of a review, so shortcut keys are typed", async function () {
+        if (await isMobile()) this.skip();
+        await setSettings({ typeAnswers: true });
+        await useNote(TYPED_NOTE);
+        await openTypedCard();
+
+        // Space, s, u, - , @ and the digits are review shortcuts: here they are letters of the answer
+        await browser.keys("s u-@ 1");
+        const input = browser.$(`${CARD} .fs-typed-input`);
+        expect(await input.getValue()).toBe("s u-@ 1");
+        expect(await input.isFocused()).toBe(true);
+        // Nothing was revealed, skipped, undone or buried
+        expect(await browser.$(`${CARD} .sr-show-answer-button`).isDisplayed()).toBe(true);
+        expect(await browser.$(`${CARD} .sr-again-button`).isDisplayed()).toBe(false);
+    });
+
+    it("a letter typed while the field has no focus goes into the field, not to the shortcuts", async function () {
+        if (await isMobile()) this.skip();
+        await setSettings({ typeAnswers: true });
+        await useNote(TYPED_NOTE);
+        await openTypedCard();
+        await browser.execute(() => (document.activeElement as HTMLElement | null)?.blur());
+
+        await browser.keys("s");
+        const input = browser.$(`${CARD} .fs-typed-input`);
+        expect(await input.getValue()).toBe("s");
+        expect(await input.isFocused()).toBe(true);
+        expect(await browser.$(`${CARD} .sr-show-answer-button`).isDisplayed()).toBe(true);
+    });
+
+    it("reads a choice card's question with its options by itself, then the right answer and why", async function () {
+        await setSettings({ readQuestionAloud: true, readAnswerAloud: true });
+        await useNote(CHOICE_NOTE);
+        await recordSpeech();
+        await openChoiceCard(4);
+
+        await browser.waitUntil(async () => (await spoken()).length === 1, {
+            timeoutMsg: "the question was not read",
+        });
+        // With the options in it: they were rendered before the reading started
+        expect(await spoken()).toEqual([
+            "Which body should approve the internal audit charter? The chief audit executive. The board. The external auditor. Senior management.",
+        ]);
+
+        await chooseOption(1);
+        await waitForBack();
+        await browser.waitUntil(async () => (await spoken()).length === 2, {
+            timeoutMsg: "the answer was not read",
+        });
+        expect((await spoken())[1]).toBe(
+            "The board. Why. The board approves the charter; the CAE drafts it and senior management reviews it.",
+        );
+    });
+
+    it("reads just the right answer when a choice card has no explanation", async function () {
+        await setSettings({ readAnswerAloud: true });
+        await useNote(PLAIN_CHOICE_NOTE);
+        await recordSpeech();
+        await openChoiceCard(2);
+
+        await chooseOption(0);
+        await waitForBack();
+        await browser.waitUntil(async () => (await spoken()).length === 1, {
+            timeoutMsg: "the answer was not read",
+        });
+        expect(await spoken()).toEqual(["The board."]);
+    });
+
+    it("Enter on a focused option chooses that option", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(CHOICE_NOTE);
+        await openChoiceCard(4);
+
+        await browser.execute(
+            (selector: string) => (document.querySelector(selector) as HTMLElement).focus(),
+            `${CARD} .fs-choice[data-option="1"]`,
+        );
+        await browser.keys("Enter");
+        await waitForBack();
+
+        expect(await browser.$(`${CARD} .fs-choice.is-correct`).getAttribute("class")).toContain(
+            "is-picked",
+        );
+        expect(await suggestedRating()).toBe("good");
+    });
+
+    it("Space on a focused option toggles it once in a several-answer question, and after a click Space checks", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(MULTI_NOTE);
+        await openChoiceCard(3);
+        const selected = () => browser.$$(`${CARD} .fs-choice.is-selected`).length;
+
+        await browser.execute(
+            (selector: string) => (document.querySelector(selector) as HTMLElement).focus(),
+            `${CARD} .fs-choice[data-option="0"]`,
+        );
+        await browser.keys("Space");
+        expect(await selected()).toBe(1);
+        expect(await browser.$(`${CARD} .fs-choice-check`).isEnabled()).toBe(true);
+        await browser.keys("Space");
+        expect(await selected()).toBe(0);
+
+        // A click leaves no focus on the tile, so Space then shows the answer with what was chosen
+        await chooseOption(1);
+        expect(await selected()).toBe(1);
+        await browser.keys("Space");
+        await waitForBack();
+        expect(await browser.$$(`${CARD} .fs-choice.is-picked`).length).toBe(1);
+    });
+
+    it("a number key rates after a number key chose", async function () {
+        if (await isMobile()) this.skip();
+        await setSettings({ answerKeys: "anki" });
+        try {
+            await useNote(CHOICE_NOTE);
+            await openChoiceCard(4);
+            await browser.keys("2");
+            await waitForBack();
+            // 4 is Easy: a new card answered Good comes back within the learn ahead limit
+            await browser.keys("4");
+            // The only card is answered: the session is over
+            await browser.waitUntil(
+                async () =>
+                    ((await browser.$(CARD).getAttribute("class")) ?? "").includes(
+                        "sr-summary-open",
+                    ),
+                { timeoutMsg: "the number key did not rate the card" },
+            );
+            expect(readNote()).toMatch(new RegExp(SCHEDULE));
+        } finally {
+            await setSettings({ answerKeys: "original" });
+        }
+    });
+
+    it("a right-to-left note reads right to left in the options and the typed result", async function () {
+        await useNote(RTL + CHOICE_NOTE);
+        await openChoiceCard(4);
+        expect(await browser.$(`${CARD} .fs-choice-root`).getAttribute("dir")).toBe("rtl");
+        expect(await browser.$(`${CARD} .fs-choices`).getAttribute("dir")).toBe("rtl");
+        await chooseOption(1);
+        await waitForBack();
+        expect(await browser.$(`${CARD} .fs-choices`).getAttribute("dir")).toBe("rtl");
+        await browser.keys("Escape");
+
+        await setSettings({ typeAnswers: true });
+        await useNote(RTL + TYPED_NOTE);
+        await openTypedCard();
+        expect(await browser.$(`${CARD} .fs-typed`).getAttribute("dir")).toBe("rtl");
+        await typeAnswer("chief");
+        expect(await browser.$(`${CARD} .fs-typed-result`).getAttribute("dir")).toBe("rtl");
+    });
+
+    it("an internal link in an option opens its note and does not choose the option", async function () {
+        await useNote(LINK_NOTE);
+        await openChoiceCard(2);
+
+        await browser.$(`${CARD} .fs-choice-text a.internal-link`).click();
+        await browser.pause(400);
+
+        // Still asking: the tiles are buttons, and none was chosen
+        expect(await browser.$$(`${CARD} button.fs-choice`).length).toBe(2);
+        expect(await browser.$$(`${CARD} .fs-choice.is-selected`).length).toBe(0);
+    });
+
+    it("undo after answering a choice card brings back its front with nothing chosen or suggested", async function () {
+        await useNote(TWO_NOTE);
+        await openChoiceCard(4);
+        await chooseOption(1);
+        await waitForBack();
+        await browser.$(`${CARD} .sr-easy-button`).click();
+        // The next card is the ordinary one
+        await browser
+            .$(`${CARD} .sr-show-answer-button`)
+            .waitForClickable({ timeoutMsg: "the next card did not show" });
+        await browser.$(`${CARD} .sr-answer-toast-undo`).click();
+
+        await browser.waitUntil(
+            async () => (await browser.$$(`${CARD} button.fs-choice`).length) === 4,
+            {
+                timeoutMsg: "the choice card did not come back",
+            },
+        );
+        await browser.waitUntil(async () => (await tileTexts()).every((text) => text.length > 0));
+        expect(await browser.$$(`${CARD} .fs-choice.is-selected`).length).toBe(0);
+        expect(await browser.$$(`${CARD} .fs-choice.is-result`).length).toBe(0);
+        expect(await browser.$$(`${CARD} .fs-suggested`).length).toBe(0);
+        expect(await browser.$(`${CARD} .sr-again-button`).isDisplayed()).toBe(false);
+        expect(await browser.$(`${CARD} .sr-show-answer-button`).isDisplayed()).toBe(false);
+
+        // and it can be answered again, differently
+        await settle();
+        await chooseOption(0);
+        await waitForBack();
+        expect(await suggestedRating()).toBe("again");
+    });
+
+    it("skipping a choice card that has been answered gives the next card no choice and no suggestion", async function () {
+        await useNote(TWO_NOTE);
+        await openChoiceCard(4);
+        await chooseOption(0);
+        await waitForBack();
+        expect(await suggestedRating()).toBe("again");
+
+        await pickFromCardMenu("Skip");
+
+        await browser
+            .$(`${CARD} .sr-show-answer-button`)
+            .waitForClickable({ timeoutMsg: "the next card did not show" });
+        expect(await browser.$$(`${CARD} .fs-choice`).length).toBe(0);
+        expect(await browser.$$(`${CARD} .fs-suggested`).length).toBe(0);
+        expect(await browser.$(`${CARD} .sr-again-button`).isDisplayed()).toBe(false);
+    });
+
+    it("a choice card with a schedule keeps its options, and in cram only Again and Easy are suggested", async function () {
+        await useNote(CHOICE_NOTE);
+        await openChoiceCard(4);
+        await chooseOption(1);
+        await waitForBack();
+        await browser.$(`${CARD} .sr-easy-button`).click();
+        // The schedule is written after the checklist and its explanation
+        await browser.waitUntil(() => new RegExp(SCHEDULE).test(readNote()), {
+            timeoutMsg: "the schedule was never written",
+        });
+        expect(readNote()).toContain("- [x] The board");
+        await browser.keys("Escape");
+        await waitForNoteTag();
+
+        await openChoiceCard(4, "srs-cram-flashcards");
+        // The schedule comment is in no option
+        expect(await tileTexts()).toEqual([
+            "The chief audit executive",
+            "The board",
+            "The external auditor",
+            "Senior management",
+        ]);
+        await chooseOption(1);
+        await waitForBack();
+        expect(await suggestedRating()).toBe("easy");
+        expect(await browser.$(`${CARD} .sr-good-button`).isDisplayed()).toBe(false);
+        expect(
+            await browser.$(`${CARD} .fs-choice-explanation-text`).getProperty("textContent"),
+        ).toBe(
+            "Why. The board approves the charter; the CAE drafts it and senior management reviews it.",
+        );
+        await browser.keys("Escape");
+
+        await openChoiceCard(4, "srs-cram-flashcards");
+        await chooseOption(0);
+        await waitForBack();
+        expect(await suggestedRating()).toBe("again");
     });
 });

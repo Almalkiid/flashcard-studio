@@ -7,9 +7,12 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
-import { speechAvailable } from "src/ui/speech";
+import { speechAvailable, VoiceWatcher } from "src/ui/speech";
 import { UIManager } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
+
+/** Refills the voice selects still on screen; one for every time the settings are drawn (see `VoiceWatcher`). */
+let voiceWatcher: VoiceWatcher | null = null;
 
 export class UIPreferencesPage extends SettingsPage {
     private uiManager: UIManager;
@@ -583,6 +586,18 @@ export class UIPreferencesPage extends SettingsPage {
             });
     }
 
+    private refillWhenVoicesChange(select: HTMLSelectElement, fill: () => void): void {
+        if (voiceWatcher === null) {
+            const watcher = new VoiceWatcher(activeWindow.speechSynthesis);
+            voiceWatcher = watcher;
+            this.plugin.register(() => {
+                watcher.dispose();
+                if (voiceWatcher === watcher) voiceWatcher = null;
+            });
+        }
+        voiceWatcher.watch(select, fill);
+    }
+
     private addReadAloudSettings(): void {
         const settings = this.settingsManager.settings;
         new SettingGroup(this.containerEl)
@@ -614,7 +629,6 @@ export class UIPreferencesPage extends SettingsPage {
                     .setName(t("SPEECH_VOICE"))
                     .setDesc(t("SPEECH_VOICE_DESC"))
                     .addDropdown((dropdown) => {
-                        // Devices load their voices a moment after start, and may add more later
                         const fill = () => {
                             dropdown.selectEl.empty();
                             dropdown.addOption("", t("SPEECH_VOICE_AUTOMATIC"));
@@ -624,7 +638,8 @@ export class UIPreferencesPage extends SettingsPage {
                             dropdown.setValue(settings.speechVoice);
                         };
                         fill();
-                        activeWindow.speechSynthesis.addEventListener("voiceschanged", fill);
+                        // Devices load their voices a moment after start, and may add more later
+                        this.refillWhenVoicesChange(dropdown.selectEl, fill);
                         dropdown.onChange(async (value) => {
                             settings.speechVoice = value;
                             await this.settingsManager.save();

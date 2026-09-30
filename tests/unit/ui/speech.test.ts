@@ -1,4 +1,11 @@
-import { joinSpeech, pickVoice, speakableText, Speaker, speechAvailable } from "src/ui/speech";
+import {
+    joinSpeech,
+    pickVoice,
+    speakableText,
+    Speaker,
+    speechAvailable,
+    VoiceWatcher,
+} from "src/ui/speech";
 
 function voice(voiceURI: string, lang: string): SpeechSynthesisVoice {
     return { voiceURI, lang, name: voiceURI, default: false, localService: true };
@@ -16,11 +23,18 @@ describe("speechAvailable", () => {
     test("is false when the voices cannot be listed", () => {
         expect(speechAvailable({ speechSynthesis: {} } as unknown as Window)).toBe(false);
     });
-    test("is true when the window can list voices", () => {
+    test("is true when the window can list voices and make an utterance", () => {
+        const win = {
+            speechSynthesis: { getVoices: (): SpeechSynthesisVoice[] => [] },
+            SpeechSynthesisUtterance: function () {},
+        } as unknown as Window;
+        expect(speechAvailable(win)).toBe(true);
+    });
+    test("is false when there is a synthesizer but no way to make an utterance", () => {
         const win = {
             speechSynthesis: { getVoices: (): SpeechSynthesisVoice[] => [] },
         } as unknown as Window;
-        expect(speechAvailable(win)).toBe(true);
+        expect(speechAvailable(win)).toBe(false);
     });
 });
 
@@ -32,6 +46,13 @@ describe("speakableText", () => {
                 "<svg><text>drawn</text></svg>",
         );
         expect(speakableText(el)).toBe("The board sets the blank charter.");
+    });
+    test("skips math, inline and display, however Obsidian wraps it", () => {
+        const el = element(
+            '<p>Take <span class="math math-inline is-loaded"><mjx-container>x squared</mjx-container></span> ' +
+                'and <mjx-container>y</mjx-container> then <div class="math math-block">z</div>done.</p>',
+        );
+        expect(speakableText(el)).toBe("Take and then done.");
     });
     test("a typed cloze field is a blank too", () => {
         const el = element('<p>The <input class="cloze-input" type="text"> approves it.</p>');
@@ -144,5 +165,92 @@ describe("Speaker", () => {
         const none = new Speaker({} as unknown as Window);
         expect(() => none.speak("x", null, 1)).not.toThrow();
         expect(() => none.stop()).not.toThrow();
+    });
+});
+
+describe("VoiceWatcher", () => {
+    // A synthesizer that counts its listeners
+    function synth() {
+        const target = new EventTarget();
+        const add = jest.spyOn(target, "addEventListener");
+        const remove = jest.spyOn(target, "removeEventListener");
+        return {
+            target,
+            add,
+            remove,
+            change: () => target.dispatchEvent(new Event("voiceschanged")),
+        };
+    }
+    const onScreen = () => ({ isConnected: true });
+
+    test("refills a list on screen when the voices change", () => {
+        const { target, change } = synth();
+        const watcher = new VoiceWatcher(target);
+        const fill = jest.fn();
+        watcher.watch(onScreen(), fill);
+        change();
+        change();
+        expect(fill).toHaveBeenCalledTimes(2);
+    });
+
+    test("every list shares one listener, however often the settings are drawn", () => {
+        const { target, add } = synth();
+        const watcher = new VoiceWatcher(target);
+        for (let i = 0; i < 5; i++) watcher.watch({ isConnected: false }, jest.fn());
+        expect(add).toHaveBeenCalledTimes(1);
+    });
+
+    test("a list that has left the page is not refilled, and is dropped", () => {
+        const { target, change } = synth();
+        const watcher = new VoiceWatcher(target);
+        const gone = { isConnected: true };
+        const goneFill = jest.fn();
+        const stayFill = jest.fn();
+        watcher.watch(gone, goneFill);
+        watcher.watch(onScreen(), stayFill);
+        gone.isConnected = false;
+        change();
+        change();
+        expect(goneFill).not.toHaveBeenCalled();
+        expect(stayFill).toHaveBeenCalledTimes(2);
+    });
+
+    test("a list added later drops the ones that left the page before it", () => {
+        const { target, change } = synth();
+        const watcher = new VoiceWatcher(target);
+        const old = { isConnected: true };
+        const oldFill = jest.fn();
+        watcher.watch(old, oldFill);
+        old.isConnected = false;
+        // The page is drawn again; the old select is not on it, and must not come back if it is reattached
+        watcher.watch(onScreen(), jest.fn());
+        old.isConnected = true;
+        change();
+        expect(oldFill).not.toHaveBeenCalled();
+    });
+
+    test("dispose takes the listener off and forgets the lists", () => {
+        const { target, remove, change } = synth();
+        const watcher = new VoiceWatcher(target);
+        const fill = jest.fn();
+        watcher.watch(onScreen(), fill);
+        watcher.dispose();
+        expect(remove).toHaveBeenCalledTimes(1);
+        change();
+        expect(fill).not.toHaveBeenCalled();
+        watcher.dispose();
+        expect(remove).toHaveBeenCalledTimes(1);
+    });
+
+    test("after dispose a new list starts listening again", () => {
+        const { target, add, change } = synth();
+        const watcher = new VoiceWatcher(target);
+        watcher.watch(onScreen(), jest.fn());
+        watcher.dispose();
+        const fill = jest.fn();
+        watcher.watch(onScreen(), fill);
+        change();
+        expect(add).toHaveBeenCalledTimes(2);
+        expect(fill).toHaveBeenCalledTimes(1);
     });
 });

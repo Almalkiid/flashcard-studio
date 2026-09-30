@@ -31,6 +31,7 @@ import {
     createChoiceState,
     renderChoiceBack,
     renderChoiceFront,
+    revealChoiceResult,
 } from "src/ui/obsidian-ui-components/content-container/card-container/choice-view";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
@@ -53,7 +54,8 @@ import { moment } from "src/utils/dates";
 import { escapeHtml } from "src/utils/escape-html";
 import { formatIntervalCompact } from "src/utils/format-interval";
 import EmulatedPlatform from "src/utils/platform-detector";
-import { RenderMarkdownWrapper } from "src/utils/renderers";
+import { RenderMarkdownWrapper, wireInternalLinks } from "src/utils/renderers";
+import { TextDirection } from "src/utils/strings";
 
 const ANSWER_LABELS = ["Reset", "Again", "Hard", "Good", "Easy"];
 
@@ -211,6 +213,20 @@ export class CardContainer {
 
         this.view.removeClass("sr-is-hidden");
         activeDocument.addEventListener("keydown", this._keydownHandler);
+        this.focusFrontField();
+    }
+
+    /**
+     * The first card of a session is drawn while the view is still hidden, and a field cannot take focus until it is
+     * shown. Focuses the field to type in (the answer, or the first cloze blank) once the view is visible.
+     */
+    private focusFrontField(): void {
+        if (this.cardState !== CardState.Front) return;
+        if (this.typedInput !== null) {
+            if (!(Platform.isMobile || EmulatedPlatform().isMobile)) this.typedInput.focus();
+            return;
+        }
+        this.content.querySelector<HTMLInputElement>(".cloze-input")?.focus();
     }
 
     /**
@@ -360,6 +376,7 @@ export class CardContainer {
         // Update card content
         const choiceRoot = await this.drawCardFrontContent(sessionData, settings, choice);
         const mobile = Platform.isMobile || EmulatedPlatform().isMobile;
+        let optionsRendered: Promise<void> = Promise.resolve();
         if (choice !== null && choiceRoot !== null) {
             this.choice = choice;
             this.choiceHandle = renderChoiceFront(
@@ -368,10 +385,12 @@ export class CardContainer {
                 this.choiceContext(sessionData),
                 () => this.showAnswerHandler(),
             );
+            optionsRendered = this.choiceHandle.rendered;
         } else if (typedTarget !== null) {
             this.typedInput = renderTypedInput(this.content, {
                 autofocus: !mobile,
                 onSubmit: () => this.showAnswerHandler(),
+                textDirection: sessionData.currentQuestion.questionText.textDirection,
             });
         }
         if (this.view.hasClass("sr-look-studio")) {
@@ -404,7 +423,13 @@ export class CardContainer {
             }
         }
 
-        if (settings.readQuestionAloud) this.readAloud();
+        if (settings.readQuestionAloud) {
+            // The options of a choice card fill in a moment after their tiles are made
+            await optionsRendered;
+            if (this.cardState === CardState.Front && sessionData.cardData.currentCard === card) {
+                this.readAloud();
+            }
+        }
     }
 
     private drawCardContext(sessionData: SessionData, settings: SRSettings) {
@@ -437,6 +462,9 @@ export class CardContainer {
         let choiceRoot: HTMLElement | null = null;
         if (choice !== null) {
             choiceRoot = this.content.createDiv({ cls: "fs-choice-root" });
+            if (sessionData.currentQuestion.questionText.textDirection === TextDirection.Rtl) {
+                choiceRoot.setAttribute("dir", "rtl");
+            }
             const kind = choiceRoot.createDiv({ cls: "fs-choice-kind" });
             setIcon(kind.createSpan({ cls: "fs-choice-kind-icon" }), "list-checks");
             kind.createSpan({ text: t("MULTIPLE_CHOICE") });
@@ -496,10 +524,14 @@ export class CardContainer {
         this.choiceComponent?.unload();
         this.choiceComponent = new Component();
         this.choiceComponent.load();
+        const sourcePath = sessionData.currentNote.filePath;
         return {
             app: this.app,
-            sourcePath: sessionData.currentNote.filePath,
+            sourcePath,
             component: this.choiceComponent,
+            textDirection: sessionData.currentQuestion.questionText.textDirection,
+            // Internal links in an option open their note, and do not choose the option
+            onRendered: (el) => wireInternalLinks(el, this.app, this.plugin, sourcePath),
         };
     }
 
@@ -813,7 +845,11 @@ export class CardContainer {
                     typedTarget,
                     settings.ignoreAccentsWhenTyping,
                 );
-                renderTypedResult(this.content, comparison);
+                renderTypedResult(
+                    this.content,
+                    comparison,
+                    sessionData.currentQuestion.questionText.textDirection,
+                );
                 suggestion = comparison.exact ? ReviewResponse.Good : ReviewResponse.Again;
             } else {
                 const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
@@ -849,8 +885,8 @@ export class CardContainer {
             determineButtonSchedule,
         );
         this.response.setSuggested(suggestion);
-        // With the answer tiles showing there may be too little room for the whole card: bring the explanation in view
-        this.content.querySelector(".fs-choice-explanation")?.scrollIntoView({ block: "nearest" });
+        // With the answer tiles showing there may be too little room for the whole card
+        if (choice !== null) revealChoiceResult(this.content);
         // NEW: restore keyboard focus after cloze confirmation
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setSRViewInFocus(true);
@@ -894,6 +930,12 @@ export class CardContainer {
             return;
         }
         if (e.altKey) return;
+        // While an answer is being typed, the keys that are shortcuts (Space, s, u, -, @, digits) are letters. The field
+        // is normally focused; if it is not, focus it, and the key then types into it.
+        if (this.typedInput !== null && this.cardState === CardState.Front && e.key.length === 1) {
+            this.typedInput.focus();
+            return;
+        }
         if (e.key === "@") {
             void this.actions.suspend();
             consumeKeyEvent();
@@ -923,6 +965,19 @@ export class CardContainer {
                 consumeKeyEvent();
             }
             return;
+        }
+
+        // Enter or Space on a focused option tile chooses that tile
+        if (
+            this.cardState === CardState.Front &&
+            (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Space")
+        ) {
+            const focused = activeDocument.activeElement as HTMLElement | null;
+            if (focused?.matches(".fs-choices .fs-choice")) {
+                focused.click();
+                consumeKeyEvent();
+                return;
+            }
         }
 
         switch (e.code) {

@@ -1,16 +1,26 @@
 // Read aloud with the device's own voices (the browser's speech synthesis): offline, free, and not there on
 // every device, so everything here checks before it speaks.
 
-/** What is not read: pictures, code, math and drawings, and image occlusion masks. */
-const NOT_SPOKEN = "img, svg, code, pre, .fs-mask";
+/**
+ * What is not read: pictures, code, math (Obsidian's `.math` and MathJax's `mjx-container`), drawings, and image
+ * occlusion masks.
+ */
+const NOT_SPOKEN = "img, svg, code, pre, .math, mjx-container, .fs-mask";
 /** Where the text is cut, so the last word of one block does not run into the first of the next. */
 const BLOCKS = "p, div, li, br, h1, h2, h3, h4, h5, h6, tr, blockquote";
 
+type SpeechWindow = Window & { SpeechSynthesisUtterance: typeof SpeechSynthesisUtterance };
+
 /**
- * Whether this device can speak: the window has speech synthesis and can list voices. Some Android builds cannot.
+ * Whether this device can speak: the window has speech synthesis, can list voices and can make an utterance to say.
+ * Some Android builds cannot.
  */
 export function speechAvailable(win: Window = activeWindow): boolean {
-    return "speechSynthesis" in win && typeof win.speechSynthesis?.getVoices === "function";
+    return (
+        "speechSynthesis" in win &&
+        typeof win.speechSynthesis?.getVoices === "function" &&
+        typeof (win as SpeechWindow).SpeechSynthesisUtterance === "function"
+    );
 }
 
 /**
@@ -62,8 +72,6 @@ export function pickVoice(
     return voices.find((voice) => normalizeLanguage(voice.lang).startsWith(wanted)) ?? null;
 }
 
-type SpeechWindow = Window & { SpeechSynthesisUtterance: typeof SpeechSynthesisUtterance };
-
 export class Speaker {
     /** What this speaker is reading now. It only ever cancels its own speech, never another plugin's. */
     private current: SpeechSynthesisUtterance | null = null;
@@ -99,5 +107,38 @@ export class Speaker {
         this.current = null;
         const synth: SpeechSynthesis | undefined = this.win.speechSynthesis;
         synth?.cancel();
+    }
+}
+
+/**
+ * Refills the voice lists of the settings when the device's voices change (devices load them a moment after start, and
+ * may add more later). The settings page is drawn again on every change, so there is one `voiceschanged` listener for
+ * all of its lists, added with the first and taken off by `dispose`, and a list that has left the page is dropped at
+ * the next event or the next `watch`.
+ */
+export class VoiceWatcher {
+    private readonly lists = new Set<{ el: { isConnected: boolean }; fill: () => void }>();
+    private listening = false;
+    private readonly onChange = () => {
+        for (const list of this.lists) {
+            if (list.el.isConnected) list.fill();
+            else this.lists.delete(list);
+        }
+    };
+
+    constructor(private readonly synth: EventTarget) {}
+
+    watch(el: { isConnected: boolean }, fill: () => void): void {
+        for (const list of this.lists) if (!list.el.isConnected) this.lists.delete(list);
+        this.lists.add({ el, fill });
+        if (this.listening) return;
+        this.synth.addEventListener("voiceschanged", this.onChange);
+        this.listening = true;
+    }
+
+    dispose(): void {
+        if (this.listening) this.synth.removeEventListener("voiceschanged", this.onChange);
+        this.listening = false;
+        this.lists.clear();
     }
 }

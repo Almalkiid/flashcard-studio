@@ -32,6 +32,15 @@
 }
 
 /*
+ * The star sits in the card frame's top right corner, over the content, which scrolls under it. Full-width tiles
+ * would end up under the star, so the card keeps that column free. Physical padding: the star is placed with `right`.
+ * The Studio look only (Classic has no star), and raised above the padding the Studio rules set on the content.
+ */
+.sr-card-container.sr-look-studio .sr-scroll-wrapper .sr-content.fs-choice-card.fs-choice-card {
+    padding-right: 52px;
+}
+
+/*
  * The card's block sits among the content's direct children, which the Studio look styles as a centred question
  * (front) or a quiet line (back). Repeating the class raises this rule above those, whatever the CSS order.
  */

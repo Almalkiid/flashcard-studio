@@ -1162,6 +1162,11 @@ body:not(.is-mobile) .sr-card-container.sr-keys-anki:not(.sr-custom-hotkeys) {
 .sr-card-container .sr-content.fs-choice-card > * {
   flex-shrink: 0;
 }
+.sr-card-container.sr-look-studio
+  .sr-scroll-wrapper
+  .sr-content.fs-choice-card.fs-choice-card {
+  padding-right: 52px;
+}
 .sr-card-container
   .sr-content.fs-choice-card
   > .fs-choice-root.fs-choice-root.fs-choice-root.fs-choice-root {
