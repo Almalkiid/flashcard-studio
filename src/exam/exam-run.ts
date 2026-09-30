@@ -820,7 +820,8 @@ export class ExamRunner {
     /** 1 to 9 choose an option, the arrows move, F flags, Enter goes on. The keys are read by place, not character. */
     private readonly onKeydown = (event: KeyboardEvent): void => {
         if (this.phase !== "running" || this.dialog !== null || this.stage === null) return;
-        if (event.isComposing) return;
+        // A key that something else took (a sidebar item pressed with Enter) is not the exam's as well
+        if (event.defaultPrevented || event.isComposing) return;
         const action = examKeyAction(event);
         if (action === null || !this.keysAreForTheExam(event)) return;
 

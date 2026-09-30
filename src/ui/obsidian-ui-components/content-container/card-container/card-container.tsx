@@ -673,6 +673,11 @@ export class CardContainer {
     public drawPendingState(nextPendingDueUnix: number): void {
         this.hideSessionSummary();
         this.toolbar.setResetButtonDisabled(true);
+        // The card that was up is gone: its speech, its options and its field must not outlive it, or the keys (and a
+        // digit on a card that is not there) would act on it
+        this.speaker.stop();
+        this.resetStudyAids();
+        this.content.removeClass("fs-choice-card", "sr-answer-shown");
         this.cardState = CardState.Front;
         this.content.empty();
         this.response.hideAllButtons();
@@ -917,6 +922,8 @@ export class CardContainer {
     }
 
     private _keydownHandler = (e: KeyboardEvent) => {
+        // A key that something else took (a button pressed with Space, a sidebar item) is not the card's as well
+        if (e.defaultPrevented) return;
         if (!this.plugin.isInitialized) throw new Error("SR plugin or data not initialized!!!");
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         // Prevents any input, if the edit modal is open or if the view is not in focus

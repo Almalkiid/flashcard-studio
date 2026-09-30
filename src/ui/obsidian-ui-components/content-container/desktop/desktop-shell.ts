@@ -84,11 +84,18 @@ interface NavItemSpec {
     run: (() => void) | undefined;
 }
 
-/** Makes a div behave as a button: focusable, and Enter or Space press it. */
+/**
+ * Makes a div behave as a button: focusable, and Enter or Space press it. A click lets go of the focus it gives: the
+ * screen that opens has keys of its own (Space shows the answer, Enter goes on), and they would press the item again.
+ */
 export function makePressable(el: HTMLElement, onPress: () => void): void {
     el.setAttribute("role", "button");
     el.setAttribute("tabindex", "0");
-    el.addEventListener("click", onPress);
+    el.addEventListener("click", (event: MouseEvent) => {
+        // A pointer click has a detail; the click that a script makes has none, and keeps the focus where it was
+        if (event.detail > 0) el.blur();
+        onPress();
+    });
     el.addEventListener("keydown", (event: KeyboardEvent) => {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -109,6 +116,7 @@ export class DesktopShell {
     readonly asideEl: HTMLElement;
 
     private readonly rootEl: HTMLElement;
+    private readonly sideEl: HTMLElement;
     private readonly navEl: HTMLElement;
     private readonly treeEl: HTMLElement;
     private readonly actions: DesktopShellActions;
@@ -125,6 +133,7 @@ export class DesktopShell {
         this.rootEl.setAttribute("data-section", "home");
 
         const side = this.rootEl.createDiv({ cls: "fs-desktop-side" });
+        this.sideEl = side;
         const brand = side.createDiv({ cls: "fs-desktop-brand" });
         setIcon(brand.createDiv({ cls: "fs-desktop-logo" }), "layers");
         brand.createSpan({ cls: "fs-desktop-brand-name", text: PRODUCT_NAME });
@@ -153,6 +162,7 @@ export class DesktopShell {
      * right panel.
      */
     setSection(section: DesktopSection): void {
+        this.blurSidebar();
         this.rootEl.setAttribute("data-section", section);
         this.rootEl.toggleClass("is-study", section === "study");
         for (const [key, el] of this.navItems) {
@@ -163,7 +173,17 @@ export class DesktopShell {
 
     /** Shrinks the sidebar to its icon rail, without the study side panel: an exam takes the room. */
     setRail(on: boolean): void {
+        this.blurSidebar();
         this.rootEl.toggleClass("is-rail", on);
+    }
+
+    /**
+     * Lets go of the focus when it is on a sidebar item. Opening a screen with the keyboard leaves the focus on the item
+     * that opened it, which stays on screen in the rail, and the keys of the new screen would press it again.
+     */
+    private blurSidebar(): void {
+        const focused = activeDocument.activeElement;
+        if (focused?.instanceOf(HTMLElement) && this.sideEl.contains(focused)) focused.blur();
     }
 
     /** The count beside Study in the navigation: the cards to study now. */
