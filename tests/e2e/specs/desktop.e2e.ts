@@ -629,6 +629,92 @@ describe("desktop interface", function () {
         });
     });
 
+    it("the decks table fits its card, and every button of the home is inside its card, at every pane width from 900 px", async function () {
+        if (await isMobile()) this.skip();
+        // Real vaults have long deck names, which the table shows in full unless it is made to give way
+        const long = {
+            path: "Long deck names.md",
+            content: [
+                "#flashcards/certified-internal-auditor-exam-preparation-programme-2026-part-one",
+                "",
+                "What does CAE stand for?::Chief Audit Executive",
+                "",
+            ].join("\n"),
+        };
+        const notes = buildDemoNotes(Date.now());
+        await createFiles([...notes, long]);
+        await waitForTags([...notes.map((note) => note.path), long.path]);
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        await browser.$(`${SHELL} .fs-dh-deck-row .fs-dh-study`).waitForDisplayed();
+
+        // A window with the sidebars closed is a pane about 44 px narrower than it (the ribbon); the last width is the
+        // one of a 1600 px window with the file explorer open, which gives a pane of about 1256 px
+        const widths: [number, boolean][] = [
+            [950, false],
+            [1100, false],
+            [1200, false],
+            [1350, false],
+            [1440, false],
+            [1600, true],
+        ];
+        const problems: string[] = [];
+        for (const [width, explorer] of widths) {
+            await resizeWindow(width, 900);
+            await browser.executeObsidian(({ app }, open) => {
+                if (open) app.workspace.leftSplit.expand();
+                else app.workspace.leftSplit.collapse();
+                app.workspace.rightSplit.collapse();
+            }, explorer);
+            await browser.pause(500);
+
+            const fit = await browser.execute(() => {
+                const inside = (inner: DOMRect, outer: DOMRect) =>
+                    inner.left >= outer.left - 1 &&
+                    inner.right <= outer.right + 1 &&
+                    inner.top >= outer.top - 1 &&
+                    inner.bottom <= outer.bottom + 1;
+                const home = document.querySelector(".fs-desktop-home");
+                const decks = document.querySelector<HTMLElement>(".fs-desktop-home .fs-dh-decks");
+                const table = decks?.querySelector<HTMLElement>(".fs-dh-table");
+                const pane =
+                    document.querySelector(".sr-tab-view")?.getBoundingClientRect().width ?? 0;
+                if (home === null || decks === null || table === null) return null;
+                const outside: string[] = [];
+                for (const button of Array.from(home.querySelectorAll("button"))) {
+                    if (button.getBoundingClientRect().width === 0) continue;
+                    const card = button.closest(".fs-card") ?? home;
+                    if (!inside(button.getBoundingClientRect(), card.getBoundingClientRect())) {
+                        outside.push(button.textContent ?? "");
+                    }
+                }
+                return {
+                    pane: Math.round(pane),
+                    card: Math.round(decks.getBoundingClientRect().width),
+                    hidden: Math.round(decks.scrollWidth - decks.clientWidth),
+                    table: Math.round(table.getBoundingClientRect().width),
+                    outside,
+                    studyButtons: home.querySelectorAll(".fs-dh-study").length,
+                };
+            });
+            const label = `window ${width}${explorer ? " with the file explorer" : ""}`;
+            if (fit === null) {
+                problems.push(`${label}: the home was not drawn`);
+                continue;
+            }
+            const where = `${label} (pane ${fit.pane}, card ${fit.card}, table ${fit.table})`;
+            if (fit.pane < 900) problems.push(`${where}: too narrow for the desktop layout`);
+            if (fit.studyButtons === 0) problems.push(`${where}: no Study buttons`);
+            if (fit.outside.length > 0) {
+                problems.push(`${where}: buttons outside their card: ${fit.outside.join(", ")}`);
+            }
+            // A card that scrolls sideways hides its right edge, where the Study buttons are
+            if (fit.hidden > 1)
+                problems.push(`${where}: the card scrolls sideways by ${fit.hidden}`);
+        }
+        expect(problems).toEqual([]);
+    });
+
     it("the deck tree studies a deck, and opens and closes its subdecks", async function () {
         if (await isMobile()) this.skip();
         const now = Date.now();

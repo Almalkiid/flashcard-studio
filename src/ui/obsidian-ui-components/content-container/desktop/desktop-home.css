@@ -349,6 +349,9 @@
 }
 
 .fs-dh-decks {
+    /* The table answers to the width of its own card, which is not the width of the window: the card is 8 parts of 12
+       beside the activity, and the whole row when the main area is narrow */
+    container: fs-decks / inline-size;
     padding: 6px 0 4px;
     overflow-x: auto;
 }
@@ -380,8 +383,17 @@
         background: transparent;
     }
 
+    /* The deck takes the room that the other columns leave, and gives way with an ellipsis; a long deck name never
+       pushes the Study button out of the card */
+    & th:first-child,
+    & td:first-child {
+        width: 100%;
+        min-width: 160px;
+        max-width: 0;
+    }
+
     & .is-num {
-        width: 64px;
+        width: 48px;
         text-align: right;
     }
 
@@ -433,19 +445,24 @@
 }
 
 .fs-dh-deck-name {
+    overflow: hidden;
     font-weight: 600;
+    text-overflow: ellipsis;
     color: var(--fs-text);
 }
 
 .fs-dh-deck-sub {
+    overflow: hidden;
     font-size: 12px;
+    text-overflow: ellipsis;
     color: var(--fs-text-3);
 }
 
 .fs-dh-bar {
     position: relative;
     display: inline-block;
-    width: 110px;
+    /* Shrinks with the card, from 110px in a wide one to 56px */
+    width: clamp(56px, 15cqi, 110px);
     height: 6px;
     vertical-align: middle;
     border-radius: 99px;
@@ -613,6 +630,49 @@
 
 .fs-dh-bar-col.is-today .fs-dh-bar-fill {
     background-color: var(--fs-accent);
+}
+
+/* A card that is not wide (the decks beside the activity in a window that is not; the whole row in a narrow one) takes
+   less room for the columns, so that every Study button is inside it. Below that the retention goes to its number and the
+   learning column goes, which the card can do without. */
+@container fs-decks (max-width: 720px) {
+    .fs-dh-table {
+        & th,
+        & td {
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+
+        & th:first-child,
+        & td:first-child {
+            padding-left: 16px;
+        }
+
+        & th:last-child,
+        & td:last-child {
+            padding-right: 16px;
+        }
+
+        & .is-retention {
+            padding-left: 14px;
+        }
+    }
+
+    .fs-dh-rate {
+        margin-left: 6px;
+    }
+}
+
+@container fs-decks (max-width: 560px) {
+    .fs-dh-table .is-learn,
+    .fs-dh-table th:nth-child(3),
+    .fs-dh-bar {
+        display: none;
+    }
+
+    .fs-dh-rate {
+        margin-left: 0;
+    }
 }
 
 /* A narrow main area (a small window, or a split pane): the rows stack, so nothing is squeezed */

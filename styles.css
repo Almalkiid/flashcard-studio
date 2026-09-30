@@ -3845,6 +3845,7 @@ body.sr-reduced-bottom-fade-mask {
   align-items: start;
 }
 .fs-dh-decks {
+  container: fs-decks / inline-size;
   padding: 6px 0 4px;
   overflow-x: auto;
 }
@@ -3872,8 +3873,14 @@ body.sr-reduced-bottom-fade-mask {
     color: var(--fs-text);
     background: transparent;
   }
+  & th:first-child,
+  td:first-child {
+    width: 100%;
+    min-width: 160px;
+    max-width: 0;
+  }
   .is-num {
-    width: 64px;
+    width: 48px;
     text-align: right;
   }
   .is-retention {
@@ -3914,17 +3921,21 @@ body.sr-reduced-bottom-fade-mask {
   min-width: 0;
 }
 .fs-dh-deck-name {
+  overflow: hidden;
   font-weight: 600;
+  text-overflow: ellipsis;
   color: var(--fs-text);
 }
 .fs-dh-deck-sub {
+  overflow: hidden;
   font-size: 12px;
+  text-overflow: ellipsis;
   color: var(--fs-text-3);
 }
 .fs-dh-bar {
   position: relative;
   display: inline-block;
-  width: 110px;
+  width: clamp(56px, 15cqi, 110px);
   height: 6px;
   vertical-align: middle;
   border-radius: 99px;
@@ -4077,6 +4088,39 @@ body.sr-reduced-bottom-fade-mask {
 }
 .fs-dh-bar-col.is-today .fs-dh-bar-fill {
   background-color: var(--fs-accent);
+}
+@container fs-decks (max-width: 720px) {
+  .fs-dh-table {
+    & th,
+    td {
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+    & th:first-child,
+    td:first-child {
+      padding-left: 16px;
+    }
+    & th:last-child,
+    td:last-child {
+      padding-right: 16px;
+    }
+    .is-retention {
+      padding-left: 14px;
+    }
+  }
+  .fs-dh-rate {
+    margin-left: 6px;
+  }
+}
+@container fs-decks (max-width: 560px) {
+  .fs-dh-table .is-learn,
+  .fs-dh-table th:nth-child(3),
+  .fs-dh-bar {
+    display: none;
+  }
+  .fs-dh-rate {
+    margin-left: 0;
+  }
 }
 @container fs-main (max-width: 1000px) {
   .fs-dh-top,
