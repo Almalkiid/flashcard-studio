@@ -37,6 +37,7 @@ import {
     FORECAST_DAYS,
     forecastForHome,
     learningCount,
+    retentionBelowTarget,
     summarizeSessionAnswers,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
 import {
@@ -144,6 +145,9 @@ export default class ContentManager {
     private returnAfterCustomStudy: FlashcardReviewMode | null = null;
     private readonly closeModal: (() => void) | undefined;
 
+    /** Called each time the screen is back on the deck list, when a layout switch that waited for the session can happen. */
+    public onDeckList: (() => void) | null = null;
+
     // The desktop interface (sidebar, dashboard home, study side panel) in place of the phone layout; null on the phone
     private desktop: DesktopShell | null = null;
     private studyClock: number | null = null;
@@ -217,6 +221,11 @@ export default class ContentManager {
         );
     }
 
+    /** Whether a study session is in progress: from its first card until the screen is back on the deck list. */
+    public get inSession(): boolean {
+        return this.sessionStartMs !== 0;
+    }
+
     public close() {
         this._clearPendingResumeTimeout();
         this.uiManager.setSRViewInFocus(false);
@@ -227,7 +236,11 @@ export default class ContentManager {
         this.uiManager.setUIState(UIState.Closed);
     }
 
-    public async open() {
+    /**
+     * @param stayOnDeckList - Do not go straight into the cards of a lone deck. Used when the screen is rebuilt for
+     * another layout, which only happens from the deck list.
+     */
+    public async open(stayOnDeckList: boolean = false) {
         // Prepare a review queue to display
         this.reviewSequencer = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
 
@@ -268,7 +281,7 @@ export default class ContentManager {
             this.reviewQueueLoader.getSingleNote() === null &&
             this.reviewQueueLoader.getCustomStudy() === null;
 
-        if (openImmediately && deckWithCards !== null && !showDashboard) {
+        if (openImmediately && deckWithCards !== null && !showDashboard && !stayOnDeckList) {
             await this._reviewDeck(deckWithCards);
         } else {
             await this._showDecksList();
@@ -294,6 +307,7 @@ export default class ContentManager {
             this.reviewQueueLoader.getCustomStudy() !== null,
         );
         this._showDesktopHome(this.reviewSequencer);
+        this.onDeckList?.();
     }
 
     private async _reviewDeck(deck: Deck): Promise<void> {
@@ -713,7 +727,7 @@ export default class ContentManager {
                 streak: streaks(entries, todayKey, dayKeyOf).current,
                 retention: last30?.all.rate ?? null,
                 focus:
-                    weakest !== undefined && weakest.retention < target
+                    weakest !== undefined && retentionBelowTarget(weakest.retention, target)
                         ? { deck: weakest.deck, retention: weakest.retention, target }
                         : null,
             };

@@ -6,6 +6,7 @@ import {
     deckPathLabel,
     forecastForHome,
     learningCount,
+    retentionBelowTarget,
     summarizeSessionAnswers,
     tableDecks,
     topLevelDecks,
@@ -236,5 +237,23 @@ describe("clockText", () => {
 
     test("never shows a negative time", () => {
         expect(clockText(-5000)).toBe("00:00");
+    });
+});
+
+describe("retentionBelowTarget", () => {
+    test("compares at the precision shown: a rate that reads 90% is not under a 90% target", () => {
+        expect(retentionBelowTarget(0.8996, 0.9)).toBe(false);
+        expect(retentionBelowTarget(0.9, 0.9)).toBe(false);
+        expect(retentionBelowTarget(0.96, 0.9)).toBe(false);
+    });
+
+    test("a rate that reads under the target is below it", () => {
+        expect(retentionBelowTarget(0.894, 0.9)).toBe(true);
+        expect(retentionBelowTarget(0.78, 0.9)).toBe(true);
+    });
+
+    test("a target that is not a whole percent is compared as it reads too", () => {
+        expect(retentionBelowTarget(0.8496, 0.85)).toBe(false);
+        expect(retentionBelowTarget(0.844, 0.85)).toBe(true);
     });
 });

@@ -18,6 +18,7 @@ import {
 } from "src/ui/obsidian-ui-components/content-container/deck-container/studio-home";
 import {
     deckPathLabel,
+    retentionBelowTarget,
     tableDecks,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
 import { makePressable } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
@@ -352,7 +353,10 @@ function renderDeckTable(
             if (detail.retention === null) continue;
             const percent = Math.round(detail.retention * 100);
             row.bar.querySelector("i")?.setCssProps({ "--fs-fill": `${percent}%` });
-            row.bar.toggleClass("is-below", detail.retention < actions.retentionTarget);
+            row.bar.toggleClass(
+                "is-below",
+                retentionBelowTarget(detail.retention, actions.retentionTarget),
+            );
             row.rate.setText(formatPercent(detail.retention));
         }
     });

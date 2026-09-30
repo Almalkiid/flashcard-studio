@@ -8,7 +8,7 @@ import { PRODUCT_NAME } from "src/data/product";
 import { SRSettings } from "src/data/settings";
 import SRPlugin from "src/main";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/content-manager";
-import { useDesktopLayout } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
+import { layoutToShow } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
 import EmulatedPlatform from "src/utils/platform-detector";
 
@@ -152,23 +152,27 @@ export class SRTabView extends ItemView {
         await this.buildContent();
 
         // The desktop layout needs a wide pane: a narrow split, or a window made narrower, gets the phone layout
-        this.resizeObserver = new ResizeObserver(() => {
-            if (this.wantsDesktopLayout() !== this.desktopLayout) void this.buildContent();
-        });
+        this.resizeObserver = new ResizeObserver(() => this.switchLayoutIfNeeded());
         this.resizeObserver.observe(this.viewContainerEl);
     }
 
     /**
-     * Whether the pane is wide enough for the desktop layout, on a desktop. The Classic look keeps the layout it has
-     * always had.
+     * The layout the pane calls for: the desktop layout in a wide pane, on a desktop. A pane that is not shown (a tab
+     * in the background) or a session in progress keeps the layout on screen, since rebuilding drops the session.
      */
     private wantsDesktopLayout(): boolean {
         if (this.viewContainerEl === null || this.settings === null) return false;
-        const isMobile: boolean = Platform.isMobile || EmulatedPlatform().isMobile;
-        return (
-            this.settings.reviewLook !== "classic" &&
-            useDesktopLayout(isMobile, this.viewContainerEl.clientWidth)
-        );
+        return layoutToShow(this.desktopLayout, {
+            isMobile: Platform.isMobile || EmulatedPlatform().isMobile,
+            classic: this.settings.reviewLook === "classic",
+            paneWidth: this.viewContainerEl.clientWidth,
+            inSession: this.contentManager?.inSession ?? false,
+        });
+    }
+
+    /** Rebuilds the content when the pane calls for the other layout. */
+    private switchLayoutIfNeeded(): void {
+        if (this.wantsDesktopLayout() !== this.desktopLayout) void this.buildContent();
     }
 
     /**
@@ -193,6 +197,8 @@ export class SRTabView extends ItemView {
         try {
             do {
                 this.rebuildAgain = false;
+                // Rebuilding for the other layout happens from the deck list, so it goes back to the deck list
+                const rebuilding = this.contentManager !== null;
                 this.desktopLayout = this.wantsDesktopLayout();
                 // Closing the old content lets go of the keyboard, which the new content takes back
                 const inFocus = this.plugin.uiManager?.isSRInFocus ?? false;
@@ -215,9 +221,13 @@ export class SRTabView extends ItemView {
                 }
                 this.plugin.uiManager.setContentManager(this.contentManager);
                 this.plugin.uiManager.setSRViewInFocus(inFocus);
+                // A switch that waited for a session to end happens once the screen is back on the deck list, after
+                // the deck list has finished drawing
+                this.contentManager.onDeckList = () =>
+                    window.setTimeout(() => this.switchLayoutIfNeeded(), 0);
 
-                await this.contentManager.open();
-            } while (this.rebuildAgain);
+                await this.contentManager.open(rebuilding);
+            } while (this.rebuildAgain && this.wantsDesktopLayout() !== this.desktopLayout);
         } finally {
             this.rebuilding = false;
         }

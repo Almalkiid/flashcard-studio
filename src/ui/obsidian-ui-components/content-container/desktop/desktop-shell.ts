@@ -20,6 +20,29 @@ export function useDesktopLayout(isMobile: boolean, paneWidth: number): boolean 
     return !isMobile && paneWidth >= DESKTOP_MIN_WIDTH;
 }
 
+/** What the pane is like, for `layoutToShow`. */
+export interface LayoutContext {
+    isMobile: boolean;
+    /** The Classic look keeps the layout it has always had. */
+    classic: boolean;
+    /** The width of the pane in pixels; 0 when the pane is not shown. */
+    paneWidth: number;
+    /** A study session is in progress. */
+    inSession: boolean;
+}
+
+/**
+ * The layout that should be on screen, given the one that is. The width decides, except that:
+ * - a pane that is not shown (a tab in the background is `display: none` and measures 0) says nothing about its
+ *   width, so what is on screen stays;
+ * - a session in progress keeps its layout, because switching rebuilds the screen and would drop the session. The
+ *   switch happens when it is back on the deck list.
+ */
+export function layoutToShow(current: boolean, context: LayoutContext): boolean {
+    if (context.paneWidth <= 0 || context.inSession) return current;
+    return !context.classic && useDesktopLayout(context.isMobile, context.paneWidth);
+}
+
 export type DesktopSection = "home" | "study" | "exams" | "browse" | "statistics" | "ai";
 
 /**

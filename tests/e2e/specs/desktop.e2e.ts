@@ -235,6 +235,9 @@ describe("desktop interface", function () {
         if (await isMobile()) this.skip();
         // The default, not something a test set: new installs on desktop start with "Open in new tab" on
         expect(await getSetting("openViewInNewTab")).toEqual(true);
+        // at the full size of the pane, as the toggle in the settings sets it
+        expect(await getSetting("flashcardWidthPercentage")).toEqual(100);
+        expect(await getSetting("flashcardHeightPercentage")).toEqual(100);
         await openStudio();
         await browser.$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] ${SHELL}`).waitForExist({
             timeoutMsg: "the Studio did not open as a tab with the desktop shell",
@@ -408,6 +411,86 @@ describe("desktop interface", function () {
         );
     });
 
+    /** Opens the demo decks, studies the first deck of the table and answers one card Good. */
+    async function studyAndAnswerOne(): Promise<void> {
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await openStudio();
+        const study = browser.$(`${SHELL} .fs-dh-deck-row .fs-dh-study`);
+        await study.waitForClickable({ timeoutMsg: "no deck offered a Study button" });
+        await study.click();
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        await showAnswer();
+        await answer("sr-good-button");
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        await browser.waitUntil(
+            async () =>
+                (await textOf(`${SHELL} .fs-card-counter`)).startsWith("2 / ") &&
+                (await textOf(`${SHELL} .fs-panel-tile.is-good b`)) === "1",
+            { timeoutMsg: "the first answer was not counted" },
+        );
+    }
+
+    it("switching to another tab and back keeps the session", async function () {
+        if (await isMobile()) this.skip();
+        await studyAndAnswerOne();
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+
+        // A note in a tab of its own hides the Studio tab, which then measures 0 wide
+        await browser.executeObsidian(async ({ app }, notePath) => {
+            const file = app.vault.getFileByPath(notePath);
+            if (file === null) throw new Error("the note is missing");
+            await app.workspace.getLeaf("tab").openFile(file);
+        }, DECK_NOTE);
+        await browser.waitUntil(async () => !(await browser.$(SHELL).isDisplayed()), {
+            timeoutMsg: "the Studio tab was not hidden",
+        });
+        // Long enough for the resize of the hidden pane to have been seen and acted on
+        await browser.pause(800);
+
+        await browser.executeObsidian(({ app }, type) => {
+            const leaf = app.workspace.getLeavesOfType(type)[0];
+            app.workspace.setActiveLeaf(leaf, { focus: true });
+        }, TAB_VIEW);
+        await browser.$(SHELL).waitForDisplayed({ timeoutMsg: "the Studio tab did not come back" });
+        await browser.pause(500);
+
+        // Still the desktop shell, still studying, the same position and the same answers
+        expect(await browser.$(`${SHELL}.is-study`).isExisting()).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("1");
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        await browser.executeObsidian(({ app }) => {
+            app.workspace.detachLeavesOfType("markdown");
+        });
+    });
+
+    it("a resize across the limit waits until the session is over", async function () {
+        if (await isMobile()) this.skip();
+        await studyAndAnswerOne();
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+
+        // Narrower than 900px mid-session: the layout stays, and so does the session
+        await resizeWindow(800, 900);
+        await browser.pause(800);
+        expect(await browser.$(`${SHELL}.is-study`).isExisting()).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("1");
+
+        // Back on the home, the pane calls for the phone layout, and gets it
+        await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Home"]`).click();
+        await browser.waitUntil(async () => !(await browser.$(SHELL).isExisting()), {
+            timeoutMsg: "the narrow pane did not switch to the phone layout after the session",
+        });
+        await browser.$(".sr-view .fs-home").waitForExist();
+
+        await resizeWindow(1440, 900);
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed({
+            timeoutMsg: "a wide pane did not bring the desktop shell back",
+        });
+    });
+
     it("the deck tree studies a deck, and opens and closes its subdecks", async function () {
         if (await isMobile()) this.skip();
         const now = Date.now();
@@ -494,7 +577,10 @@ describe("desktop interface", function () {
         await browser.waitUntil(async () => !(await browser.$(SHELL).isExisting()), {
             timeoutMsg: "a narrow pane kept the desktop shell",
         });
-        await browser.$(".sr-view .fs-home, .sr-view .sr-card-container").waitForExist();
+        // The deck list, not cards: the switch does not start a session
+        await browser
+            .$(".sr-view .sr-deck-container:not(.sr-is-hidden) .fs-home")
+            .waitForDisplayed();
 
         await resizeWindow(1440, 900);
         await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed({

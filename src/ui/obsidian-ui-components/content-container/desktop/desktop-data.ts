@@ -127,6 +127,14 @@ export function buildCardInfoData(
     };
 }
 
+/**
+ * Whether a retention is under the target, compared at the precision it is shown at (a whole percent). Compared raw, a
+ * deck that reads "90%" against a 90% target could still be drawn as under it.
+ */
+export function retentionBelowTarget(rate: number, target: number): boolean {
+    return Math.round(rate * 100) < Math.round(target * 100);
+}
+
 /** Cards due on each of the next seven days; the cards overdue count for today. */
 export function forecastForHome(forecast: Forecast): number[] {
     const days = forecast.days.slice(0, FORECAST_DAYS);
