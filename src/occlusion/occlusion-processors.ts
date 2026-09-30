@@ -96,6 +96,8 @@ export function registerOcclusion(plugin: SRPlugin): void {
     });
     plugin.registerEvent(
         plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
+            // Only on an image: a menu that gains an item for everyone would change every right-click there is
+            if (imageOnCursorLine(editor, plugin, view.file?.path ?? "") === null) return;
             menu.addItem((item) =>
                 item
                     .setTitle(t("OCCLUSION_ADD_COMMAND"))

@@ -11,6 +11,7 @@ import { SRSettings } from "src/data/settings";
 import { ExamStart, examSummary } from "src/exam/exam";
 import { persistenceFor } from "src/exam/exam-draft-store";
 import { cardsChangedText } from "src/exam/exam-render";
+import { isInExamsFolder } from "src/exam/exam-results-file";
 import { ExamRunner } from "src/exam/exam-run";
 import { readExamResults, saveExamResult } from "src/exam/exam-store";
 import { t } from "src/lang/helpers";
@@ -1047,11 +1048,15 @@ export default class ContentManager {
 
     /** "Create with AI": choose a note, then the same dialog as the command in a note. */
     private _openAiGenerator(): void {
-        new NotePickerModal(this.app, (file) => {
-            void this.app.vault
-                .cachedRead(file)
-                .then((text) => openGenerateCards(this.plugin, file, text, false));
-        }).open();
+        new NotePickerModal(
+            this.app,
+            (file) => {
+                void this.app.vault
+                    .cachedRead(file)
+                    .then((text) => openGenerateCards(this.plugin, file, text, false));
+            },
+            (path) => isInExamsFolder(path) || this.dataManager.isInReviewLogFolder(path),
+        ).open();
     }
 
     /**
