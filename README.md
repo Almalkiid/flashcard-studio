@@ -186,7 +186,7 @@ On a computer, Flashcard Studio opens as a full tab with a sidebar, in place of 
 </picture>
 
 - The **sidebar** has Home, Study (with the number of cards due), Exams, Browse cards, Statistics and Create with AI, then your decks with the cards due and the total of each, and Settings. Click a deck to study it; decks with subdecks open and close.
-- The **home** is a dashboard: a greeting with the number of cards due and about how long they take, **Take an exam** and **Study all**, your daily goal, the streak, the cards learned and the retention, the deck that needs focus, your last exam with **Retake**, your decks with their retention against your target, the activity of the year and the next seven days.
+- The **home** is a dashboard: a greeting with the number of cards due and about how long they take, **Take an exam** and **Study all**, your daily goal, the streak, the cards learned and the retention, the deck that needs focus, your last exam with **Retake**, your decks with their retention against your target, your activity over the last six months and the next seven days.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/desktop-study-dark.png">
