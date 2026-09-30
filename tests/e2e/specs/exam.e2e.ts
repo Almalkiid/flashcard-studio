@@ -183,13 +183,10 @@ function examFiles(): string[] {
     return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.endsWith(".md")) : [];
 }
 
-/** Opens the Studio as a tab with the desktop shell, as a new install on the desktop has it. */
+/** Opens the Studio as a tab with the desktop shell, as an install on the desktop has it by default. */
 async function useShell(): Promise<void> {
-    await setSettings({
-        openViewInNewTab: true,
-        flashcardWidthPercentage: 100,
-        flashcardHeightPercentage: 100,
-    });
+    // The tab setting is left off, as it is by default: the Desktop layout setting is what opens the tab
+    await setSettings({ desktopLayout: true, openViewInNewTab: false });
     await browser.executeObsidianCommand(`${pluginId}:srs-review-flashcards`);
 }
 
@@ -359,24 +356,39 @@ async function pressKey(init: { key: string; code: string }): Promise<boolean> {
     }, init);
 }
 
-/** The exams that were started and not finished, as the plugin keeps them. */
-async function draftIds(): Promise<string[]> {
-    return browser.executeObsidian(({ app }, id) => {
-        const plugin = (
-            app as unknown as {
-                plugins: {
-                    plugins: Record<
-                        string,
-                        { dataManager: { data: { examDrafts?: Record<string, unknown> } } }
-                    >;
-                };
-            }
-        ).plugins.plugins[id];
-        return Object.keys(plugin.dataManager.data.examDrafts ?? {});
-    }, pluginId);
+/**
+ * Where the plugin keeps the exams that were started and not finished: a file of its own for each, in the plugin's
+ * folder of the vault (`exam-drafts/<exam>-<device>.json`), not in `data.json`.
+ */
+function draftsDir(): string {
+    return path.join(obsidianPage.getVaultPath(), ".obsidian", "plugins", pluginId, "exam-drafts");
 }
 
-async function clearDrafts(): Promise<void> {
+function draftFiles(): string[] {
+    const dir = draftsDir();
+    return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.endsWith(".json")) : [];
+}
+
+interface DraftOnDisk {
+    id: string;
+    startedMs: number;
+    savedMs: number;
+    current: number;
+    questions: Record<string, unknown>[];
+    answers: { chosen: number[]; flagged: boolean; typed: string }[];
+}
+
+function readDraftFile(name: string): DraftOnDisk {
+    return JSON.parse(fs.readFileSync(path.join(draftsDir(), name), "utf8")) as DraftOnDisk;
+}
+
+/** The exams that were started and not finished, by the files that hold them. */
+async function draftIds(): Promise<string[]> {
+    return draftFiles().map((name) => readDraftFile(name).id);
+}
+
+/** What `data.json` holds of the plugin's data, read from the disk after the plugin has written it. */
+async function pluginDataOnDisk(): Promise<Record<string, unknown>> {
     await browser.executeObsidian(async ({ app }, id) => {
         const plugin = (
             app as unknown as {
@@ -385,7 +397,6 @@ async function clearDrafts(): Promise<void> {
                         string,
                         {
                             dataManager: {
-                                data: { examDrafts?: Record<string, unknown> };
                                 pluginDataManager: { savePluginData: () => Promise<void> };
                             };
                         }
@@ -393,9 +404,20 @@ async function clearDrafts(): Promise<void> {
                 };
             }
         ).plugins.plugins[id];
-        plugin.dataManager.data.examDrafts = {};
         await plugin.dataManager.pluginDataManager.savePluginData();
     }, pluginId);
+    const file = path.join(
+        obsidianPage.getVaultPath(),
+        ".obsidian",
+        "plugins",
+        pluginId,
+        "data.json",
+    );
+    return JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
+}
+
+async function clearDrafts(): Promise<void> {
+    fs.rmSync(draftsDir(), { recursive: true, force: true });
 }
 
 /** Closes the exam's tab, as the person does with the tab's own close button: the exam is not left, only put away. */
@@ -442,9 +464,8 @@ describe("exams", function () {
             shuffleChoices: true,
             ignoreAccentsWhenTyping: false,
             // As the other specs have them: the Studio in a modal
+            desktopLayout: false,
             openViewInNewTab: false,
-            flashcardWidthPercentage: 60,
-            flashcardHeightPercentage: 60,
         });
         if (!(await isMobile())) {
             await useFullWindow();
@@ -1070,6 +1091,25 @@ describe("exams", function () {
         await browser.waitUntil(async () => (await draftIds()).length === 1, {
             timeoutMsg: "the progress was never saved",
         });
+        // The file has what has been done: the place, the first answer, the second and the flag
+        await browser.waitUntil(
+            () => {
+                const draft = readDraftFile(draftFiles()[0]);
+                return draft.current === 1 && draft.answers[1].flagged;
+            },
+            { timeoutMsg: "the file of the exam never had the flag and the place" },
+        );
+        expect(draftFiles()).toHaveLength(1);
+        // Named for the exam and for this device, as the review log's files are
+        expect(draftFiles()[0]).toMatch(/^\d+-[a-z]+-[0-9a-z]{4}\.json$/);
+        const onDisk = readDraftFile(draftFiles()[0]);
+        expect(onDisk.answers[0].chosen).toHaveLength(1);
+        expect(onDisk.answers[1].chosen).toEqual([second.wrong]);
+        // The options of a multiple choice question are in its answer text once, not again as a parsed copy
+        expect(onDisk.questions).toHaveLength(3);
+        expect(onDisk.questions.some((question) => "choice" in question)).toBe(false);
+        // and none of it is in data.json, which the settings and the schedules share with the other devices
+        expect(Object.keys(await pluginDataOnDisk())).not.toContain("examDrafts");
 
         await closeExamTab();
         // The progress is still there: closing a tab is not leaving the exam
@@ -1124,6 +1164,32 @@ describe("exams", function () {
         });
     });
 
+    it("an exam that is only being looked at is not written again: the file changes when the exam does", async function () {
+        await startExam(3);
+        await answerCurrent(true);
+        const answered = () => {
+            const [name] = draftFiles();
+            return name !== undefined && readDraftFile(name).answers[0].chosen.length === 1;
+        };
+        await browser.waitUntil(answered, { timeoutMsg: "the answer was never saved" });
+        // Let the write that followed the answer finish
+        await browser.pause(500);
+        const file = path.join(draftsDir(), draftFiles()[0]);
+        const before = { modified: fs.statSync(file).mtimeMs, text: fs.readFileSync(file, "utf8") };
+
+        // The clock runs for longer than the fifteen seconds it used to save at, whatever was being done
+        await browser.pause(17_000);
+        expect(fs.statSync(file).mtimeMs).toBe(before.modified);
+        expect(fs.readFileSync(file, "utf8")).toBe(before.text);
+
+        // Moving on is a change, and is written
+        await goNext();
+        await browser.waitUntil(() => fs.statSync(file).mtimeMs > before.modified, {
+            timeoutMsg: "moving to the next question was not saved",
+        });
+        expect(readDraftFile(draftFiles()[0]).current).toBe(1);
+    });
+
     it("leaving the exam for good throws the saved progress away", async function () {
         await startExam(3);
         await answerCurrent(true);
@@ -1145,27 +1211,12 @@ describe("exams", function () {
         await closeExamTab();
 
         // Five minutes go by: the deadline was one minute after the start
-        await browser.executeObsidian(async ({ app }, id) => {
-            const plugin = (
-                app as unknown as {
-                    plugins: {
-                        plugins: Record<
-                            string,
-                            {
-                                dataManager: {
-                                    data: { examDrafts: Record<string, { startedMs: number }> };
-                                    pluginDataManager: { savePluginData: () => Promise<void> };
-                                };
-                            }
-                        >;
-                    };
-                }
-            ).plugins.plugins[id];
-            for (const draft of Object.values(plugin.dataManager.data.examDrafts)) {
-                draft.startedMs -= 5 * 60_000;
-            }
-            await plugin.dataManager.pluginDataManager.savePluginData();
-        }, pluginId);
+        for (const name of draftFiles()) {
+            const file = path.join(draftsDir(), name);
+            const draft = readDraftFile(name);
+            draft.startedMs -= 5 * 60_000;
+            fs.writeFileSync(file, JSON.stringify(draft));
+        }
 
         await openSetup();
         expect(await browser.$(".fs-exam-draft").getText()).toContain("Time ran out");
@@ -1459,8 +1510,15 @@ describe("exams", function () {
         await browser.$(".fs-exam-dialog .fs-exam-ghost").click();
         expect(await browser.$(`${SHELL} .fs-exam-host .fs-exam`).isExisting()).toBe(true);
 
+        // Keep going: Enter is the exam's again, and goes on to the next question. The Home item that was clicked does
+        // not keep the focus, or Enter would press it once more and ask about leaving again
+        const question = await questionText();
+        await browser.keys("Enter");
+        await waitForOtherQuestion(question);
+        expect(await counter()).toBe("2 / 2");
+        expect(await browser.$(".fs-exam-dialog").isExisting()).toBe(false);
+
         // Finish: one right, one wrong
-        await goNext();
         await answerCurrent(false);
         await submitFromLast();
         expect(await resultPercent()).toBe("50%");
@@ -1500,6 +1558,16 @@ describe("exams", function () {
         if (await isMobile()) this.skip();
         await useShell();
         await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        // The newest files in the vault are the plugin's own: an exam, and a month of the review log. They are not notes
+        // to make cards from, so the list must not have them
+        const logFolder = "Flashcard Studio/Review log";
+        await browser.executeObsidian(async ({ app }, folder) => {
+            for (const dir of ["Flashcard Studio", "Flashcard Studio/Exams", folder]) {
+                if (!app.vault.getFolderByPath(dir)) await app.vault.createFolder(dir);
+            }
+            await app.vault.create("Flashcard Studio/Exams/2099-01-01 0000 exam.md", "# Exam");
+            await app.vault.create(`${folder}/2099-01 mac-1a2b.md`, "log");
+        }, logFolder);
         await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Create with AI"]`).click();
         const picker = browser.$(".prompt");
         await picker.waitForDisplayed({ timeoutMsg: "the note picker was not shown" });
@@ -1512,6 +1580,13 @@ describe("exams", function () {
             .waitForDisplayed({ timeoutMsg: "the picker listed no notes" });
         const first = await browser.$(".prompt-results .suggestion-item").getText();
         expect(first).toContain("Syntax deck.md");
+        const listed = await browser.execute(() =>
+            Array.from(document.querySelectorAll(".prompt-results .suggestion-item")).map(
+                (item) => item.textContent ?? "",
+            ),
+        );
+        expect(listed.some((name) => name.includes("Flashcard Studio/Exams"))).toBe(false);
+        expect(listed.some((name) => name.includes("Review log"))).toBe(false);
         await browser.$(".prompt-results .suggestion-item").click();
         await browser.$(".fs-ai-modal").waitForDisplayed({
             timeoutMsg: "the generate cards dialog did not open",

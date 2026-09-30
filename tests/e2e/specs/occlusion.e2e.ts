@@ -576,7 +576,8 @@ describe("image occlusion", function () {
     it("reviews in a tab on a desktop: the picture is as wide as the card and the mask is in view", async function () {
         if (await isMobile()) this.skip();
         await useNote(NOTE_TEXT);
-        await setSettings({ openViewInNewTab: true });
+        // The desktop layout is what makes the Studio a tab; the other specs have it off, for the modal
+        await setSettings({ desktopLayout: true });
         try {
             await openReview();
             await browser
@@ -601,7 +602,7 @@ describe("image occlusion", function () {
             }
             await setTheme(false);
         } finally {
-            await setSettings({ openViewInNewTab: false });
+            await setSettings({ desktopLayout: false });
             // The review is in a tab of its own: close it, so that the next test opens its own
             await browser.executeObsidian(({ app }) =>
                 app.workspace.detachLeavesOfType("spaced-repetition-tab-view"),
@@ -919,6 +920,32 @@ describe("image occlusion", function () {
         // The schedules of the first and the third mask are what is left, in that order
         expect(text).toContain(`\`\`\`\n<!--SR:${fsrs(11)}${fsrs(33)}-->`);
         expect(text).not.toContain(fsrs(22));
+    });
+
+    it("the editor menu offers Add image occlusion on a line with an image, and only there", async function () {
+        await useNote([TAG, "", "Some notes about the heart.", "![[Heart.png]]", ""].join("\n"));
+        await openNote("source");
+
+        /** The titles of the items the plugin puts in the editor menu with the cursor on `line`. */
+        const menuTitles = (line: number) =>
+            browser.executeObsidian(({ app, obsidian }, cursorLine) => {
+                const view = app.workspace.getActiveViewOfType(obsidian.MarkdownView);
+                if (view === null) throw new Error("no editor is open");
+                view.editor.setCursor({ line: cursorLine, ch: 0 });
+                const menu = new obsidian.Menu();
+                app.workspace.trigger("editor-menu", menu, view.editor, view);
+                const items = (menu as unknown as { items: { titleEl?: HTMLElement }[] }).items;
+                return items.map((item) => item.titleEl?.textContent ?? "");
+            }, line);
+
+        // On a line of text: the item for cards made with AI, which the spec asks for, and no occlusion item
+        const onText = await menuTitles(2);
+        expect(onText).toContain("Generate cards with AI");
+        expect(onText).not.toContain("Add image occlusion");
+        // On the image: both
+        const onImage = await menuTitles(3);
+        expect(onImage).toContain("Add image occlusion");
+        expect(onImage).toContain("Generate cards with AI");
     });
 
     it("adds a block with the command: choose an image, draw and name masks with the pointer, save", async function () {

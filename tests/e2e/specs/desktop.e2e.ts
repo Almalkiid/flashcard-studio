@@ -231,17 +231,42 @@ describe("desktop interface", function () {
         if (!(await isMobile())) await resizeWindow(1280, 800);
     });
 
-    it("a fresh install opens the Studio in a tab", async function () {
+    it("a fresh install opens the Studio as a tab with the desktop shell, whatever Open in new tab says", async function () {
         if (await isMobile()) this.skip();
-        // The default, not something a test set: new installs on desktop start with "Open in new tab" on
-        expect(await getSetting("openViewInNewTab")).toEqual(true);
-        // at the full size of the pane, as the toggle in the settings sets it
-        expect(await getSetting("flashcardWidthPercentage")).toEqual(100);
-        expect(await getSetting("flashcardHeightPercentage")).toEqual(100);
+        // The defaults, not something a test set. The Desktop layout setting asks for the tab; the settings that the
+        // phone shares through the synced data (the tab and the sizes of the window) are left as they were
+        expect(await getSetting("desktopLayout")).toEqual(true);
+        expect(await getSetting("openViewInNewTab")).toEqual(false);
+        expect(await getSetting("flashcardWidthPercentage")).toEqual(60);
+        expect(await getSetting("flashcardHeightPercentage")).toEqual(60);
         await openStudio();
         await browser.$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] ${SHELL}`).waitForExist({
             timeoutMsg: "the Studio did not open as a tab with the desktop shell",
         });
+        expect(await browser.$(".modal-container .sr-view").isExisting()).toEqual(false);
+        // at the full size of the pane, whatever the sizes of the window say
+        const [pane, content] = await browser.execute(() => {
+            const view = document.querySelector(".sr-tab-view");
+            const shell = document.querySelector(".sr-tab-view-content");
+            const width = (el: Element | null) =>
+                el === null ? 0 : el.getBoundingClientRect().width;
+            return [width(view), width(shell)];
+        });
+        expect(pane).toBeGreaterThan(900);
+        expect(Math.abs(pane - content)).toBeLessThan(2);
+    });
+
+    it("the tab setting does not matter: with it on the Studio is still that one tab", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("openViewInNewTab", true);
+        try {
+            await openStudio();
+            await browser
+                .$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] ${SHELL}`)
+                .waitForExist({ timeoutMsg: "the Studio did not open as a tab with the shell" });
+        } finally {
+            await setSetting("openViewInNewTab", false);
+        }
     });
 
     it("the phone does not get the desktop interface", async function () {
@@ -414,6 +439,114 @@ describe("desktop interface", function () {
             async () => (await textOf(`${SHELL} .fs-panel-tile.is-good b`)) === "1",
             { timeoutMsg: "the 3 key did not answer Good" },
         );
+    });
+
+    /** The session's clock, as `mm:ss`. It counts from the start of the session, so a session that starts again shows 00:00. */
+    async function clockNow(): Promise<string> {
+        return textOf(`${SHELL} .fs-desktop-clock-text`);
+    }
+
+    /** Whether the keyboard focus is on something in the sidebar. */
+    async function focusIsInSidebar(): Promise<boolean> {
+        return browser.execute(
+            () =>
+                document.activeElement?.closest(".fs-desktop-side") !== null &&
+                document.activeElement?.closest(".fs-desktop-side") !== undefined,
+        );
+    }
+
+    /** Waits until the clock has moved on from 00:00, so that a session that started again could be told from it. */
+    async function waitForClockToRun(): Promise<string> {
+        await browser.waitUntil(async () => (await clockNow()) >= "00:02", {
+            timeoutMsg: "the session clock did not run",
+        });
+        return clockNow();
+    }
+
+    it("after a click on Study in the sidebar, Space shows the answer of the card on screen", async function () {
+        if (await isMobile()) this.skip();
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        // A random order, as the default has it: a session that started again would show another card
+        await setSetting("flashcardCardOrder", "DueFirstRandom");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+
+        // The sidebar's Study item, in the rail once the session has started: a click, as a person makes it
+        await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Study"]`).click();
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        expect(await focusIsInSidebar()).toEqual(false);
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+        const front = await textOf(`${CARD} .sr-content`);
+        const clock = await waitForClockToRun();
+
+        await browser.keys(" ");
+        await browser.$(`${CARD} .sr-good-button`).waitForDisplayed({
+            timeoutMsg: "Space did not show the answer",
+        });
+        // The same card, in the same session: the position, the front of the card and the clock have not started again
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${CARD} .sr-content`)).toContain(front.split("\n")[0]);
+        expect((await clockNow()) >= clock).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("0");
+    });
+
+    it("after the sidebar's Study item is pressed with the keyboard, Space and Enter are the card's", async function () {
+        if (await isMobile()) this.skip();
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await setSetting("flashcardCardOrder", "DueFirstRandom");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+
+        await browser.execute(() => {
+            document
+                .querySelector<HTMLElement>('.fs-desktop-nav-item[aria-label="Study"]')
+                ?.focus();
+        });
+        await browser.keys("Enter");
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        expect(await focusIsInSidebar()).toEqual(false);
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+        const clock = await waitForClockToRun();
+
+        await browser.keys("Enter");
+        await browser.$(`${CARD} .sr-good-button`).waitForDisplayed({
+            timeoutMsg: "Enter did not show the answer",
+        });
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect((await clockNow()) >= clock).toEqual(true);
+    });
+
+    it("the side panel lists the keys the card screen has", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("answerKeys", "original");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        await browser.$(`${SHELL} .fs-dh-button.is-primary`).click();
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        await browser.$(`${SHELL} .fs-panel-keys`).waitForDisplayed();
+        const keys = await listOf(`${SHELL} .fs-panel-key-list .fs-kbd`);
+        // Not a multiple choice card: no option keys. The original keys: 1 to 3 rate, and 0 resets the card
+        expect(keys).toEqual(
+            expect.arrayContaining(["1–3", "0", "Space / Enter", "U", "-", "@", "S", "J"]),
+        );
+        expect(keys).not.toContain("1–9");
+        expect(keys.some((key) => /1–7$/.test(key))).toEqual(true);
+        // Read aloud is listed only where the device can speak
+        const speaks = await browser.execute(() => "speechSynthesis" in window);
+        expect(keys.includes("R")).toEqual(speaks);
+
+        await setSetting("answerKeys", "anki");
+        await browser.$(`${CARD} .sr-show-answer-button`).click();
+        await browser.$(`${CARD} .sr-good-button`).waitForDisplayed();
+        await answer("sr-good-button");
+        await browser.$(`${CARD} .sr-show-answer-button`).waitForClickable();
+        const anki = await listOf(`${SHELL} .fs-panel-key-list .fs-kbd`);
+        expect(anki).toContain("1–4");
+        expect(anki).not.toContain("0");
     });
 
     /** Opens the demo decks, studies the first deck of the table and answers one card Good. */
@@ -593,7 +726,7 @@ describe("desktop interface", function () {
         });
     });
 
-    it("the Classic look keeps its own layout", async function () {
+    it("the Classic look keeps its own layout, in the window it always had", async function () {
         if (await isMobile()) this.skip();
         await setSetting("reviewLook", "classic");
         await openStudio();
@@ -604,16 +737,32 @@ describe("desktop interface", function () {
             )
             .waitForDisplayed({ timeoutMsg: "the review was not shown" });
         expect(await browser.$(SHELL).isExisting()).toEqual(false);
+        // Desktop layout is on, and Open in new tab is off: the Classic look is the modal
+        expect(await getSetting("desktopLayout")).toEqual(true);
+        expect(await browser.$(".modal-container .sr-view").isExisting()).toEqual(true);
     });
 
-    it("a saved choice of the modal is kept", async function () {
+    it("with the Desktop layout off the Studio is the modal it was, or the tab of the phone's layout", async function () {
         if (await isMobile()) this.skip();
-        await setSetting("openViewInNewTab", false);
-        await openStudio();
-        await browser.$(".modal-container .sr-view").waitForExist({
-            timeoutMsg: "the modal did not open",
-        });
-        expect(await browser.$(SHELL).isExisting()).toEqual(false);
-        await setSetting("openViewInNewTab", true);
+        await setSetting("desktopLayout", false);
+        try {
+            await openStudio();
+            await browser.$(".modal-container .sr-view").waitForExist({
+                timeoutMsg: "the modal did not open",
+            });
+            expect(await browser.$(SHELL).isExisting()).toEqual(false);
+            await closeStudio();
+
+            // Open in new tab on: the tab, in the layout of the phone
+            await setSetting("openViewInNewTab", true);
+            await openStudio();
+            await browser
+                .$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] .sr-view`)
+                .waitForExist({ timeoutMsg: "the Studio did not open as a tab" });
+            expect(await browser.$(SHELL).isExisting()).toEqual(false);
+        } finally {
+            await setSetting("openViewInNewTab", false);
+            await setSetting("desktopLayout", true);
+        }
     });
 });

@@ -73,6 +73,45 @@ const TWO_NOTE = [
     "",
 ].join("\n");
 
+// A card that is answered Again and comes back in a minute, then a typed one
+const TYPED_AFTER_LEARNING_NOTE = [
+    TAG,
+    "",
+    "What does CIA stand for?::Certified Internal Auditor",
+    "",
+    "What does CAE stand for?::Chief Audit Executive",
+    "",
+].join("\n");
+
+// The same, with a multiple choice card second
+const CHOICE_AFTER_LEARNING_NOTE = [
+    TAG,
+    "",
+    "What does CIA stand for?::Certified Internal Auditor",
+    "",
+    "Which body should approve the internal audit charter?",
+    "?",
+    "- [ ] The chief audit executive",
+    "- [x] The board",
+    "- [ ] The external auditor",
+    "",
+].join("\n");
+
+// Six options, for the key that AZERTY gives another character
+const SIX_NOTE = [
+    TAG,
+    "",
+    "Which of these is a line of defence?",
+    "?",
+    "- [ ] One",
+    "- [ ] Two",
+    "- [ ] Three",
+    "- [ ] Four",
+    "- [ ] Five",
+    "- [x] Six",
+    "",
+].join("\n");
+
 const RTL = ["---", "direction: rtl", "---", ""].join("\n");
 
 // An option with an internal link: the note is in the fixture vault
@@ -973,5 +1012,115 @@ describe("multiple choice cards and typed answers", function () {
         await chooseOption(0);
         await waitForBack();
         expect(await suggestedRating()).toBe("again");
+    });
+    // MARK: Final review
+
+    /** Sends a key press to the page as a keyboard with any layout would: what the key gives, and where it is. */
+    async function pressKey(init: { key: string; code: string }): Promise<void> {
+        await browser.execute((key: { key: string; code: string }) => {
+            const target = document.activeElement ?? document.body;
+            target.dispatchEvent(
+                new KeyboardEvent("keydown", { ...key, bubbles: true, cancelable: true }),
+            );
+        }, init);
+    }
+
+    async function waitForWaitingScreen(): Promise<void> {
+        await browser
+            .$(`${CARD} .sr-centered`)
+            .waitForDisplayed({ timeoutMsg: "the waiting screen was not shown" });
+        expect(await browser.$(`${CARD} .sr-centered`).getText()).toContain("Waiting");
+    }
+
+    it("skipping a typed card into the waiting screen leaves no field behind: U undoes the answer that was given", async function () {
+        if (await isMobile()) this.skip();
+        // Nothing may come back within the minute, so that skipping the second card leaves only the waiting screen
+        await setSettings({ typeAnswers: true, learnAheadMinutes: 0 });
+        await useNote(TYPED_AFTER_LEARNING_NOTE);
+        await openTypedCard();
+        await typeAnswer("nothing like it");
+        // Again: the card is learning, due in a minute
+        await browser.$(`${CARD} .sr-again-button`).click();
+
+        // The second card is typed: it has its field
+        await browser
+            .$(`${CARD} .fs-typed-input`)
+            .waitForDisplayed({ timeoutMsg: "the second card has no field" });
+        await settle();
+        await pickFromCardMenu("Skip");
+        await waitForWaitingScreen();
+        expect(await browser.$(`${CARD} .fs-typed-input`).isExisting()).toBe(false);
+
+        // A digit is nobody's, and the screen stays as it is
+        await browser.keys("1");
+        await browser.pause(300);
+        expect(await browser.$(`${CARD} .sr-centered`).isDisplayed()).toBe(true);
+        expect(await browser.$(`${CARD} .sr-again-button`).isDisplayed()).toBe(false);
+
+        // U is undo again: the answer to the first card is taken back, and it comes up with its field
+        await browser.keys("u");
+        await browser
+            .$(`${CARD} .fs-typed-input`)
+            .waitForDisplayed({ timeoutMsg: "U did not undo the answer on the waiting screen" });
+        expect(await browser.$(`${CARD} .sr-centered`).isExisting()).toBe(false);
+    });
+
+    it("skipping a multiple choice card into the waiting screen leaves no tiles for a digit to press", async function () {
+        if (await isMobile()) this.skip();
+        await setSettings({ learnAheadMinutes: 0 });
+        await useNote(CHOICE_AFTER_LEARNING_NOTE);
+        await openReview();
+        await browser
+            .$(`${CARD} .sr-show-answer-button`)
+            .waitForClickable({ timeoutMsg: "no card was shown" });
+        await settle();
+        await browser.$(`${CARD} .sr-show-answer-button`).click();
+        await waitForBack();
+        await browser.$(`${CARD} .sr-again-button`).click();
+
+        await browser
+            .$(`${CARD} .fs-choice`)
+            .waitForDisplayed({ timeoutMsg: "the choice card did not show" });
+        await settle();
+        await pickFromCardMenu("Skip");
+        await waitForWaitingScreen();
+        expect(await browser.$$(`${CARD} .fs-choice`).length).toBe(0);
+
+        // A digit chose an option of the card that had gone, and showed its answer; now it does nothing
+        await browser.keys("2");
+        await browser.pause(300);
+        expect(await browser.$(`${CARD} .sr-centered`).isDisplayed()).toBe(true);
+        expect(await browser.$(`${CARD} .sr-again-button`).isDisplayed()).toBe(false);
+        expect(await browser.$(`${CARD} .sr-content`).getAttribute("class")).not.toContain(
+            "fs-choice-card",
+        );
+    });
+
+    it("on AZERTY the 6 key chooses option 6, and does not bury the card", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(SIX_NOTE);
+        await openChoiceCard(6);
+
+        // The key that is 6 on AZERTY gives "-", which buries when it comes from a key that is not a number
+        await pressKey({ key: "-", code: "Digit6" });
+        await waitForBack();
+        expect(await browser.$(`${CARD} .fs-choice.is-picked`).getAttribute("data-option")).toBe(
+            "5",
+        );
+        expect(await suggestedRating()).toBe("good");
+        // Burying writes the card's schedule, with the day it is buried until, into the note: nothing was written
+        expect(readNote()).not.toMatch(new RegExp(SCHEDULE));
+    });
+
+    it("the minus key still buries", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(SIX_NOTE);
+        await openChoiceCard(6);
+
+        await pressKey({ key: "-", code: "Minus" });
+        await browser.waitUntil(() => new RegExp(SCHEDULE).test(readNote()), {
+            timeoutMsg: "the minus key did not bury the card",
+        });
+        expect(await browser.$$(`${CARD} .fs-choice.is-picked`).length).toBe(0);
     });
 });
