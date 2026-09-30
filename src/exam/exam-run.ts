@@ -34,8 +34,6 @@ import { renderTypedInput } from "src/ui/obsidian-ui-components/content-containe
 
 /** The timer turns orange when this little time is left. */
 const LOW_TIME_MS = 5 * 60_000;
-/** Progress is also saved this often while the clock runs, whatever the person does. */
-const SAVE_EVERY_MS = 15_000;
 /** Typing is saved when the person pauses for this long, not at every letter. */
 const TYPING_SAVE_MS = 800;
 
@@ -52,7 +50,10 @@ export interface ExamRunOptions {
     onClose: () => void;
     /** An exam that was left, taken up again: where it was. Its clock is the one it started with. */
     resume?: ExamResume;
-    /** Saves the exam's progress so that it can be taken up again. Called after every answer, flag and move. */
+    /**
+     * Saves the exam's progress so that it can be taken up again. Called after every answer, flag and move, and when
+     * typing pauses; the time spent on a question is added at each move, so the clock alone saves nothing.
+     */
     persist?: (draft: ExamDraft) => void;
     /** Forgets the saved progress: the exam was submitted or the person left it for good. */
     discard?: (id: string) => void;
@@ -90,7 +91,6 @@ export class ExamRunner {
     private readonly id: string;
     private shownAt = Date.now();
     private timerId: number | null = null;
-    private lastSavedMs = 0;
     private typingSaveId: number | null = null;
     /** Bumped for each question drawn, so a slow one that is overtaken is dropped. */
     private drawn = 0;
@@ -145,7 +145,8 @@ export class ExamRunner {
         this.tick();
         if (this.phase !== "running") return;
         void this.showQuestion(this.current);
-        this.persist();
+        // An exam taken up again is saved already; the first one is saved from its first question
+        if (this.opts.resume === undefined) this.persist();
     }
 
     /**
@@ -405,8 +406,6 @@ export class ExamRunner {
     private persist(): void {
         this.cancelTypingSave();
         if (this.phase !== "running" || this.opts.persist === undefined) return;
-        const now = Date.now();
-        this.lastSavedMs = now;
         this.opts.persist(
             makeDraft(
                 {
@@ -417,7 +416,7 @@ export class ExamRunner {
                     startedMs: this.startedMs,
                     id: this.id,
                 },
-                now,
+                Date.now(),
             ),
         );
     }
@@ -467,8 +466,6 @@ export class ExamRunner {
             this.finish(true);
             return;
         }
-        // Even with nothing being answered, the progress is saved now and then, so a crash loses little
-        if (now - this.lastSavedMs >= SAVE_EVERY_MS) this.persist();
         if (left === null) {
             this.timerText?.setText(formatClock(now - this.startedMs));
             this.timerEl?.setAttribute("aria-label", t("EXAM_TIME_ELAPSED"));

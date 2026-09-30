@@ -1,3 +1,4 @@
+import { parseMultipleChoice } from "src/data/data-structures/card/questions/multiple-choice";
 import {
     ExamAnswer,
     ExamQuestion,
@@ -10,8 +11,8 @@ import {
 import { readAnswer, readQuestion, readSetup } from "src/exam/exam-results-file";
 
 /**
- * An exam that has been started and not finished, as it is kept in the plugin's data so that it can be taken up again
- * after the tab is closed, the app is quit, or the device restarts. It holds everything the screen needs (the questions
+ * An exam that has been started and not finished, as it is kept in a file of its own in the plugin's folder so that it
+ * can be taken up again after the tab is closed, the app is quit, or the device restarts. It holds everything the screen needs (the questions
  * with the order of their options, the answers, the question that was up) and does not depend on the cards being
  * unchanged. A timed exam keeps its deadline: time passes while the exam is closed, as in a real one.
  */
@@ -74,6 +75,33 @@ function isFiniteNumber(value: unknown): value is number {
 }
 
 /**
+ * A draft as it is kept in its file. A multiple choice question's options are in its `back` already, so `choice` (a
+ * second copy of them) is not written; reading works it out again.
+ */
+export function draftText(draft: ExamDraft): string {
+    return JSON.stringify(draft, (key, value: unknown) => (key === "choice" ? undefined : value));
+}
+
+/**
+ * What a draft says apart from when it was written. Two drafts with the same key have nothing new to save, so an
+ * exam that was only looked at is not written again.
+ */
+export function draftKey(draft: ExamDraft): string {
+    return JSON.stringify(draft, (key, value: unknown) =>
+        key === "choice" || key === "savedMs" ? undefined : value,
+    );
+}
+
+/** A question as a draft keeps it: `choice` is worked out from the answer, whatever was stored under that name. */
+function readStoredQuestion(item: unknown): ExamQuestion | null {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) return null;
+    const value = item as Record<string, unknown>;
+    if (value.kind !== "choice") return readQuestion({ ...value, choice: null });
+    const choice = typeof value.back === "string" ? parseMultipleChoice(value.back) : null;
+    return choice === null ? null : readQuestion({ ...value, choice });
+}
+
+/**
  * Reads a saved draft back. Anything that is not a whole draft (another version, no questions, answers that do not
  * match the questions, a position outside them) is null, so a damaged entry is skipped rather than shown. The deadline
  * is worked out again from the setup and the start.
@@ -90,7 +118,7 @@ export function readDraft(raw: unknown): ExamDraft | null {
     }
     const questions: ExamQuestion[] = [];
     for (const item of value.questions as unknown[]) {
-        const question = readQuestion(item);
+        const question = readStoredQuestion(item);
         if (question === null) return null;
         questions.push(question);
     }
@@ -160,11 +188,11 @@ export function startFromDraft(draft: ExamDraft): ExamStart {
  * exam that is on screen in this session (`live`), which is not unfinished, only open.
  */
 export function unfinishedDrafts(
-    stored: Record<string, unknown> | undefined,
+    stored: Iterable<unknown>,
     live: ReadonlySet<string>,
 ): ExamDraft[] {
     const drafts: ExamDraft[] = [];
-    for (const raw of Object.values(stored ?? {})) {
+    for (const raw of stored) {
         const draft = readDraft(raw);
         if (draft !== null && !live.has(draft.id)) drafts.push(draft);
     }

@@ -465,7 +465,7 @@ export class UIManager {
         new ExamSetupModal(
             this.plugin,
             recent,
-            unfinishedExams(this.plugin),
+            await unfinishedExams(this.plugin),
             onStart ?? ((start) => void this.startExam(start)),
         ).open();
     }
@@ -474,8 +474,8 @@ export class UIManager {
      * When Obsidian starts with an exam that was not finished, offers to take it up again or drop it. Nothing happens
      * without one.
      */
-    public offerExamResume(): void {
-        const drafts = unfinishedExams(this.plugin);
+    public async offerExamResume(): Promise<void> {
+        const drafts = await unfinishedExams(this.plugin);
         if (drafts.length === 0) return;
         new ExamResumeModal(this.plugin, drafts, (start) => void this.startExam(start)).open();
     }

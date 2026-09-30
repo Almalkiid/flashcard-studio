@@ -2,6 +2,7 @@ import { Platform } from "obsidian";
 
 import { DEFAULT_DATA, PluginData } from "src/data/plugin-data";
 import { cloneDefaultSettings, SRSettings, upgradeSettings } from "src/data/settings";
+import { migrateExamDrafts } from "src/exam/exam-draft-store";
 import SRPlugin from "src/main";
 import { setDebugParser } from "src/parser";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
@@ -85,6 +86,19 @@ export class PluginDataManager {
         this._isFirstRun = !loadedData?.settings;
 
         setDebugParser(this._pluginData.settings.showParserDebugMessages);
+        await this.moveExamDrafts(loadedData);
+    }
+
+    /**
+     * Older builds kept the drafts of unfinished exams in the plugin data. They are files now, so they are written
+     * out and the data is saved once without them. When they cannot all be written they stay where they are, and the
+     * next start tries again.
+     */
+    private async moveExamDrafts(loaded: unknown): Promise<void> {
+        if (typeof loaded !== "object" || loaded === null || !("examDrafts" in loaded)) return;
+        if (!(await migrateExamDrafts(this.plugin, loaded.examDrafts))) return;
+        delete (this.pluginData as unknown as Record<string, unknown>).examDrafts;
+        await this.savePluginData();
     }
 
     /**

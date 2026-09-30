@@ -85,7 +85,7 @@ export default class SRPlugin extends Plugin {
                 this._reminderManager.restartReviewReminders();
                 await showWelcomeOnFirstRun(this);
                 // An exam that was started and not finished is offered for resuming, as the clock is still running
-                this.uiManager.offerExamResume();
+                await this.uiManager.offerExamResume();
             });
         } catch (error) {
             if (error instanceof PluginDataError || error instanceof Error) {

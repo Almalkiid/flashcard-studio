@@ -1,6 +1,8 @@
 import { ExamAnswer, ExamCardInput, ExamSetup, pickExamQuestions } from "src/exam/exam";
 import {
+    draftKey,
     draftStatus,
+    draftText,
     ExamDraft,
     makeDraft,
     newDraftId,
@@ -112,10 +114,76 @@ describe("makeDraft", () => {
     });
 });
 
+describe("draftText", () => {
+    test("keeps a multiple choice question's options once: in its answer text, not again as `choice`", () => {
+        const text = draftText(draft());
+        const stored = JSON.parse(text) as { questions: Record<string, unknown>[] };
+        for (const question of stored.questions) expect(question).not.toHaveProperty("choice");
+        // "External auditors" is an option of the first question, and is written where the answer text has it
+        expect(text.match(/External auditors/g)).toHaveLength(1);
+        expect(text.length).toBeLessThan(JSON.stringify(draft()).length);
+    });
+
+    test("reads back as the draft it was written from, the options worked out again", () => {
+        const d = draft();
+        const read = readDraft(JSON.parse(draftText(d)));
+        expect(read).toEqual(d);
+        const charter = read?.questions.find((q) => q.cardId === "c1");
+        expect(charter?.choice?.options.map((option) => option.text)).toEqual([
+            "The CAE",
+            "The board",
+            "External auditors",
+        ]);
+    });
+});
+
+describe("draftKey", () => {
+    test("is the same for a draft that only differs in when it was written", () => {
+        const first = draft();
+        const later = makeDraft(
+            {
+                setup: SETUP,
+                questions: QUESTIONS,
+                answers: answers(),
+                current: 1,
+                startedMs: START,
+            },
+            START + 20 * MINUTE,
+        );
+        expect(later.savedMs).not.toBe(first.savedMs);
+        expect(draftKey(later)).toBe(draftKey(first));
+    });
+
+    test.each([
+        ["an answer", { answers: [{ ...EMPTY }, { ...EMPTY }, { ...EMPTY }] }],
+        ["the question that is up", { current: 2 }],
+        [
+            "a flag",
+            { answers: [{ ...EMPTY, chosen: [0, 1], ms: 4000, flagged: true }, EMPTY, EMPTY] },
+        ],
+    ])("differs with %s", (_name, change) => {
+        expect(draftKey(draft(change))).not.toBe(draftKey(draft()));
+    });
+});
+
 describe("readDraft", () => {
     test("reads back what makeDraft made, through JSON as the plugin's data does", () => {
         const d = draft();
         expect(readDraft(JSON.parse(JSON.stringify(d)))).toEqual(d);
+    });
+
+    test("works the options out from the answer text, whatever was stored as `choice`", () => {
+        const raw = JSON.parse(JSON.stringify(draft())) as {
+            questions: { choice: unknown }[];
+        };
+        raw.questions[0].choice = { lead: "", options: [], explanation: "", multiSelect: false };
+        expect(readDraft(raw)?.questions[0].choice?.options).toHaveLength(3);
+    });
+
+    test("a multiple choice question whose answer text has no options makes the draft damaged", () => {
+        const raw = JSON.parse(draftText(draft())) as { questions: { back: string }[] };
+        raw.questions[0].back = "just text";
+        expect(readDraft(raw)).toBeNull();
     });
 
     test("works the deadline out from the setup and the start, not from what was written", () => {
@@ -220,17 +288,17 @@ describe("unfinishedDrafts", () => {
     const newer = { ...draft(), id: "newer", savedMs: 200 };
 
     test("lists the good drafts, newest first, and skips what is not one", () => {
-        const stored = { older, junk: { id: "junk" }, newer, text: "x" };
+        const stored = [older, { id: "junk" }, newer, "x"];
         expect(unfinishedDrafts(stored, new Set()).map((d) => d.id)).toEqual(["newer", "older"]);
     });
 
     test("leaves out an exam that is on screen in this session", () => {
-        const stored = { older, newer };
-        expect(unfinishedDrafts(stored, new Set(["newer"])).map((d) => d.id)).toEqual(["older"]);
+        expect(unfinishedDrafts([older, newer], new Set(["newer"])).map((d) => d.id)).toEqual([
+            "older",
+        ]);
     });
 
     test("nothing stored is no drafts", () => {
-        expect(unfinishedDrafts(undefined, new Set())).toEqual([]);
-        expect(unfinishedDrafts({}, new Set())).toEqual([]);
+        expect(unfinishedDrafts([], new Set())).toEqual([]);
     });
 });

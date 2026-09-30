@@ -32,9 +32,6 @@ export interface PluginData {
     welcomeShown?: boolean;
     // M3a: scheduling
     limitOverride: LimitOverride;
-    // Exams that were started and not finished, by id, so they can be taken up again. Read back with `readDraft`, which
-    // skips anything that is not a whole draft
-    examDrafts?: Record<string, unknown>;
 }
 
 /**
@@ -59,5 +56,4 @@ export const DEFAULT_DATA: PluginData = {
     },
     // M3a: scheduling
     limitOverride: { date: "", extraNew: 0, extraReviews: 0 },
-    examDrafts: {},
 };
