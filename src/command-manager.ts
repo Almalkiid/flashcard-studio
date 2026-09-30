@@ -1,4 +1,4 @@
-import { Notice, Platform, TFile } from "obsidian";
+import { Editor, MarkdownFileInfo, Notice, Platform, TFile } from "obsidian";
 
 import { unburyAllInText, unsuspendAllInText } from "src/data/card-meta";
 import { SettingsManager } from "src/data/settings-manager";
@@ -31,6 +31,7 @@ export class CommandManager {
         }
 
         this.addPluginCommands();
+        this.addAiCommands();
     }
 
     /**
@@ -582,6 +583,46 @@ export class CommandManager {
                 new AnkiExportModal(this.plugin).open();
             },
         });
+    }
+
+    /**
+     * "Generate cards with AI", in the command palette and in the editor's context menu. The dialog is loaded when it
+     * is used, so none of its code runs while the plugin starts, and nothing is sent anywhere until it is used.
+     */
+    private addAiCommands(): void {
+        const open = async (editor: Editor, info: MarkdownFileInfo): Promise<void> => {
+            const file = info.file;
+            if (file === null) return;
+            const [{ GenerateCardsModal }, { stripFrontmatter }] = await Promise.all([
+                import("src/ai/generate-cards-modal"),
+                import("src/ai/card-generation"),
+            ]);
+            const fromSelection = editor.somethingSelected();
+            const source = fromSelection
+                ? editor.getSelection()
+                : stripFrontmatter(editor.getValue());
+            new GenerateCardsModal(this.plugin, file, source, fromSelection).open();
+        };
+
+        this.plugin.addCommand({
+            id: "fs-generate-cards-ai",
+            name: t("AI_GENERATE_CMD"),
+            icon: "sparkles",
+            editorCallback: (editor: Editor, info: MarkdownFileInfo) => {
+                void open(editor, info);
+            },
+        });
+
+        this.plugin.registerEvent(
+            this.plugin.app.workspace.on("editor-menu", (menu, editor, info) => {
+                menu.addItem((item) =>
+                    item
+                        .setTitle(t("AI_GENERATE_CMD"))
+                        .setIcon("sparkles")
+                        .onClick(() => void open(editor, info)),
+                );
+            }),
+        );
     }
 
     /**

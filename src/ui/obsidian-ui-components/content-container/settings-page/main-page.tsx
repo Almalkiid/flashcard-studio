@@ -1,5 +1,6 @@
-import { ButtonComponent, setIcon, Setting, SettingGroup } from "obsidian";
+import { ButtonComponent, SecretComponent, setIcon, Setting, SettingGroup } from "obsidian";
 
+import type { AiProviderId } from "src/ai/ai-provider";
 import { DataManager } from "src/data/data-manager";
 import { DebugLoggerInstance } from "src/data/debug-logger";
 import {
@@ -10,6 +11,7 @@ import {
     REPOSITORY_URL,
     ROADMAP_URL,
 } from "src/data/product";
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import { SettingsManager } from "src/data/settings-manager";
 import { t, tHTML } from "src/lang/helpers";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
@@ -22,6 +24,9 @@ import {
     SettingsPageType,
     SettingsPageTypesArray,
 } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+
+/** Where Ollama listens by default; the example in the empty base URL field. */
+const OLLAMA_BASE_URL = "http://localhost:11434/v1";
 
 /**
  * Represents the main settings page, from which all other settings pages are accessed.
@@ -110,6 +115,8 @@ export class MainPage extends SettingsPage {
                     });
                 });
         });
+
+        this.addAiSettings();
 
         new SettingGroup(this.containerEl)
             .setHeading(t("INFO"))
@@ -270,6 +277,91 @@ export class MainPage extends SettingsPage {
                             });
                     });
             });
+    }
+
+    /**
+     * The settings of "Generate cards with AI". The key is kept in Obsidian's secret storage: the setting only holds
+     * the id of the secret.
+     */
+    private addAiSettings(): void {
+        const settings = this.settingsManager.settings;
+        const group = new SettingGroup(this.containerEl).setHeading(t("AI_SETTINGS_HEADING"));
+
+        group.addSetting((setting: Setting) => {
+            setting
+                .setName(t("AI_PROVIDER"))
+                .setDesc(t("AI_PROVIDER_DESC"))
+                .addDropdown((dropdown) => {
+                    dropdown
+                        .addOption("anthropic", t("AI_PROVIDER_ANTHROPIC"))
+                        .addOption("openai", t("AI_PROVIDER_OPENAI"))
+                        .addOption("openai-compatible", t("AI_PROVIDER_COMPATIBLE"))
+                        .setValue(settings.aiProvider)
+                        .onChange(async (value) => {
+                            settings.aiProvider = value as AiProviderId;
+                            // A model name belongs to one provider: Anthropic has a default, the others none
+                            settings.aiModel =
+                                value === "anthropic" ? DEFAULT_SETTINGS.aiModel : "";
+                            await this.settingsManager.save();
+                            this.display();
+                        });
+                });
+        });
+
+        group.addSetting((setting: Setting) => {
+            const placeholders: Record<AiProviderId, string> = {
+                anthropic: DEFAULT_SETTINGS.aiModel,
+                openai: "gpt-5.5",
+                "openai-compatible": "llama3.1",
+            };
+            setting
+                .setName(t("AI_MODEL"))
+                .setDesc(t("AI_MODEL_DESC"))
+                .addText((text) =>
+                    text
+                        .setPlaceholder(placeholders[settings.aiProvider])
+                        .setValue(settings.aiModel)
+                        .onChange(async (value) => {
+                            settings.aiModel = value.trim();
+                            await this.settingsManager.save();
+                        }),
+                );
+        });
+
+        if (settings.aiProvider === "openai-compatible") {
+            group.addSetting((setting: Setting) => {
+                setting
+                    .setName(t("AI_BASE_URL"))
+                    .setDesc(t("AI_BASE_URL_DESC"))
+                    .addText((text) =>
+                        text
+                            .setPlaceholder(OLLAMA_BASE_URL)
+                            .setValue(settings.aiBaseUrl)
+                            .onChange(async (value) => {
+                                settings.aiBaseUrl = value.trim();
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
+        }
+
+        group.addSetting((setting: Setting) => {
+            setting
+                .setName(t("AI_API_KEY"))
+                .setDesc(t("AI_API_KEY_DESC"))
+                .addComponent((el) =>
+                    new SecretComponent(this.plugin.app, el)
+                        .setValue(settings.aiKeySecret)
+                        .onChange(async (secretId) => {
+                            settings.aiKeySecret = secretId;
+                            await this.settingsManager.save();
+                        }),
+                );
+        });
+
+        group.addSetting((setting: Setting) => {
+            setting.setName(t("AI_PRIVACY_NAME")).setDesc(t("AI_PRIVACY_NOTE"));
+        });
     }
 
     /**

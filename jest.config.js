@@ -54,6 +54,9 @@ export default {
         "src/import-export/ui/",
         "src/import-export/obsidian-vault-host.ts",
 
+        // AI-generated cards: the dialog needs a running Obsidian, the end-to-end tests cover it
+        "src/ai/generate-cards-modal.ts",
+
         // debugging utils
         "src/utils/debug.ts",
 

@@ -20,6 +20,11 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     // The Studio look
     "reviewLook",
     "learnerName",
+    // AI-generated cards
+    "aiProvider",
+    "aiModel",
+    "aiBaseUrl",
+    "aiKeySecret",
 ]);
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
