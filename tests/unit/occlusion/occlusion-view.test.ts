@@ -2,6 +2,7 @@ import {
     maskStates,
     occlusionCardMarkdown,
     occlusionCardText,
+    occlusionTypedTarget,
     parseOcclusionCardSpec,
     plainLabel,
 } from "src/occlusion/occlusion-view";
@@ -120,5 +121,42 @@ describe("occlusionCardText", () => {
         expect(occlusionCardText("Just a question")).toBeNull();
         expect(occlusionCardText("```fs-occlusion-card\n{oops\n```")).toBeNull();
         expect(occlusionCardText("```js\nconst a = 1;\n```")).toBeNull();
+    });
+});
+
+describe("occlusionTypedTarget", () => {
+    const mask = block.masks[0];
+    const labelled = (label: string) => ({ ...block, masks: [{ ...mask, label }] });
+    const back = (label: string) => occlusionCardMarkdown(labelled(label), 0, "back");
+
+    test("is the label of the mask the card asks about, as the plain text to type", () => {
+        expect(occlusionTypedTarget(back("Left ventricle"))).toBe("Left ventricle");
+        expect(occlusionTypedTarget(back("Left **ventricle**"))).toBe("Left ventricle");
+        expect(occlusionTypedTarget(back("[[Heart|the heart]]"))).toBe("the heart");
+    });
+
+    test("is the label of the active mask, not of the first one", () => {
+        expect(occlusionTypedTarget(occlusionCardMarkdown(block, 1, "back"))).toBe("B");
+        expect(occlusionTypedTarget(occlusionCardMarkdown(block, 0, "front"))).toBe("A");
+    });
+
+    test("an empty label is not typed", () => {
+        expect(occlusionTypedTarget(back(""))).toBeNull();
+        expect(occlusionTypedTarget(back("   "))).toBeNull();
+        expect(occlusionTypedTarget(occlusionCardMarkdown(block, 2, "back"))).toBeNull();
+    });
+
+    test("a label that is not short plain text is not typed", () => {
+        expect(occlusionTypedTarget(back("x".repeat(121)))).toBeNull();
+        expect(occlusionTypedTarget(back("use `code` here"))).toBeNull();
+        expect(occlusionTypedTarget(back("- a list item"))).toBeNull();
+        expect(occlusionTypedTarget(back("![[heart.png]]"))).toBeNull();
+    });
+
+    test("text that is not an occlusion card has no target", () => {
+        expect(occlusionTypedTarget("Chief Audit Executive")).toBeNull();
+        expect(occlusionTypedTarget("```fs-occlusion-card\n{oops\n```")).toBeNull();
+        expect(occlusionTypedTarget("```js\nconst a = 1;\n```")).toBeNull();
+        expect(occlusionTypedTarget("")).toBeNull();
     });
 });

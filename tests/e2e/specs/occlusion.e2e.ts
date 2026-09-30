@@ -331,6 +331,87 @@ describe("image occlusion", function () {
         await obsidianPage.resetVault();
     });
 
+    it("types the label of the mask when Type the answer is on: the picture is the answer, the typed label is checked under it", async function () {
+        await setSettings({ typeAnswers: true });
+        await useNote(NOTE_TEXT);
+        await openReview();
+        await browser
+            .$(".sr-view .sr-card-container .fs-typed-input")
+            .waitForDisplayed({ timeoutMsg: "the occlusion card has no field to type in" });
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+        expect((await shownCard()).classes).toContain("is-front");
+
+        const type = async (text: string) => {
+            const input = browser.$(".sr-view .sr-card-container .fs-typed-input");
+            if (await isMobile()) await input.click();
+            await input.setValue(text);
+            await browser.keys("Enter");
+            await browser.$(".sr-view .sr-card-container .sr-easy-button").waitForClickable({
+                timeoutMsg: "typing the label did not show the answer",
+            });
+        };
+
+        // Right, apart from case and a full stop: the picture with the outlined mask, and the typed label marked right
+        await type("right atrium.");
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+        const card = await shownCard();
+        expect(card.classes).toContain("is-back");
+        expect(card.pictures).toBe(1);
+        expect(card.answer).toBe("Right atrium");
+        expect(
+            await browser.$(".sr-view .sr-card-container .fs-typed-result.is-exact").isExisting(),
+        ).toBe(true);
+        expect(
+            await browser
+                .$(".sr-view .sr-card-container .fs-suggested .fs-suggested-tag")
+                .isExisting(),
+        ).toBe(true);
+        await browser.$(".sr-view .sr-card-container .sr-easy-button").click();
+
+        // The next label is bold in the note: what is typed is the plain text, and a wrong letter is marked
+        await browser
+            .$(".sr-view .sr-card-container .fs-typed-input")
+            .waitForDisplayed({ timeoutMsg: "the second card has no field" });
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+        await type("left ventrical");
+        const wrong = await browser.execute(() => {
+            const result = document.querySelector(".sr-view .sr-card-container .fs-typed-result");
+            return {
+                exact: result?.classList.contains("is-exact") ?? null,
+                expected: result?.querySelector(".fs-typed-expected")?.textContent ?? "",
+            };
+        });
+        expect(wrong.exact).toBe(false);
+        expect(wrong.expected).toBe("Left ventricle");
+        await setSettings({ typeAnswers: false });
+        // The review is closed before the next test opens its own
+        await browser.keys("Escape");
+        await browser.$(".sr-view").waitForExist({
+            reverse: true,
+            timeoutMsg: "the review did not close",
+        });
+        // Answering buries the block for the day, in the plugin's data, which resetting the vault leaves alone
+        await browser.executeObsidian(async ({ app }, id) => {
+            const plugin = (
+                app as unknown as {
+                    plugins: {
+                        plugins: Record<
+                            string,
+                            {
+                                dataManager: {
+                                    data: { buryList: string[] };
+                                    settingsManager: { save: () => Promise<void> };
+                                };
+                            }
+                        >;
+                    };
+                }
+            ).plugins.plugins[id];
+            plugin.dataManager.data.buryList.length = 0;
+            await plugin.dataManager.settingsManager.save();
+        }, pluginId);
+    });
+
     it("reviews the cards of a block: the mask asked about is filled on the front and outlined, with its label, on the back", async function () {
         await useNote(NOTE_TEXT);
         expect(readNote()).not.toContain("<!--SR:");

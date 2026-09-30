@@ -13,6 +13,7 @@ import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
+import { occlusionTypedTarget } from "src/occlusion/occlusion-view";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { digitFromKeyCode, responseForDigit } from "src/scheduling/answer-keys";
@@ -369,7 +370,7 @@ export class CardContainer {
             choice === null &&
             this.typeAnswersOn() &&
             sessionData.currentQuestion.questionType !== CardType.Cloze
-                ? typedAnswerTarget(card.back)
+                ? this.typedTargetOf(sessionData.currentQuestion.questionType, card.back)
                 : null;
         this.content.toggleClass("fs-choice-card", choice !== null);
 
@@ -545,6 +546,16 @@ export class CardContainer {
         this.typedValue = null;
         this.choiceComponent?.unload();
         this.choiceComponent = null;
+    }
+
+    /**
+     * The text to type for a card: its short plain answer, or for an occlusion card the label of the mask it asks
+     * about. Null when the card has nothing to type.
+     */
+    private typedTargetOf(questionType: CardType, back: string): string | null {
+        return questionType === CardType.ImageOcclusion
+            ? occlusionTypedTarget(back)
+            : typedAnswerTarget(back);
     }
 
     private typeAnswersOn(): boolean {
@@ -840,8 +851,25 @@ export class CardContainer {
             }
 
             const backText = sessionData.cardData.currentCard.back;
-            const typedTarget = this.typedValue !== null ? typedAnswerTarget(backText) : null;
+            const questionType = sessionData.currentQuestion.questionType;
+            const typedTarget =
+                this.typedValue !== null ? this.typedTargetOf(questionType, backText) : null;
+            const renderBack = async () => {
+                const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+                    this.app,
+                    this.plugin,
+                    sessionData.currentNote.filePath,
+                );
+                await wrapper.renderMarkdownWrapper(
+                    backText,
+                    this.content,
+                    sessionData.currentQuestion.questionText.textDirection,
+                    // sessionData.cardData.currentCardState,
+                );
+            };
             if (this.typedValue !== null && typedTarget !== null) {
+                // The picture of an occlusion card is its answer, and the typed label is checked under it
+                if (questionType === CardType.ImageOcclusion) await renderBack();
                 // The answer was typed: show it letter by letter against the expected one
                 const comparison = compareTypedAnswer(
                     this.typedValue,
@@ -855,17 +883,7 @@ export class CardContainer {
                 );
                 suggestion = comparison.exact ? ReviewResponse.Good : ReviewResponse.Again;
             } else {
-                const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-                    this.app,
-                    this.plugin,
-                    sessionData.currentNote.filePath,
-                );
-                await wrapper.renderMarkdownWrapper(
-                    backText,
-                    this.content,
-                    sessionData.currentQuestion.questionText.textDirection,
-                    // sessionData.cardData.currentCardState,
-                );
+                await renderBack();
             }
 
             // Evaluate cloze answers

@@ -8,6 +8,7 @@ import {
     parseOcclusionBlock,
 } from "src/occlusion/occlusion-block";
 import { cardScrollTop } from "src/occlusion/occlusion-geometry";
+import { typedAnswerTarget } from "src/scheduling/typed-answer";
 
 export const OCCLUSION_CARD_LANG = "fs-occlusion-card";
 
@@ -72,15 +73,30 @@ export function maskStates(spec: OcclusionCardSpec): MaskState[] {
     });
 }
 
+/** The card that the markdown of an occlusion card (a front or a back) describes, or null when it is not one. */
+function occlusionSpecOf(markdown: string): OcclusionCardSpec | null {
+    if (!markdown.startsWith("```" + OCCLUSION_CARD_LANG + "\n")) return null;
+    return parseOcclusionCardSpec(
+        markdown.slice(markdown.indexOf("\n") + 1, markdown.lastIndexOf("\n```")),
+    );
+}
+
+/**
+ * The text to type for an occlusion card: the label of the mask that the card asks about, when it is short plain text
+ * (see `typedAnswerTarget`). Null for a card whose label is empty or is not plain text, and for anything that is not an
+ * occlusion card. The front or the back of the card serves: both name the same mask.
+ */
+export function occlusionTypedTarget(markdown: string): string | null {
+    const spec = occlusionSpecOf(markdown);
+    return spec === null ? null : typedAnswerTarget(spec.block.masks[spec.active].label);
+}
+
 /**
  * A card as one line of text, for the places that show a card's front outside the study screen (card info): its
  * question and the label of its mask. Null when the text is not the markdown of an occlusion card.
  */
 export function occlusionCardText(markdown: string): string | null {
-    if (!markdown.startsWith("```" + OCCLUSION_CARD_LANG + "\n")) return null;
-    const spec = parseOcclusionCardSpec(
-        markdown.slice(markdown.indexOf("\n") + 1, markdown.lastIndexOf("\n```")),
-    );
+    const spec = occlusionSpecOf(markdown);
     if (spec === null) return null;
     const mask = spec.block.masks[spec.active];
     const question = spec.block.question || t("OCCLUSION_DEFAULT_QUESTION");
