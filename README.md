@@ -14,9 +14,12 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 ## Highlights
 
 - **A study screen made for focus.** One card at a time, with the deck and "4 / 17" at the top and a progress bar that fills with the colour of each answer you give. Tap to reveal, then answer with soft tiles that show when you will see the card again.
+- **An interface for the desktop.** On a computer it opens as a full tab with a sidebar, a dashboard home and, while you study, a side panel with what is known about the card, how the session is going and the keys. The phone keeps its own screens.
+- **Learn diagrams.** Image occlusion hides parts of a picture, with an editor that works with a mouse and with a finger, one card for each mask.
+- **More ways to answer.** Multiple choice cards from a plain checklist, typed answers that show which letters were wrong, and cards read aloud with your device's voices.
 - **Know where you are weak.** The statistics rank your decks by how well you remembered them in the last 30 days, against your target, and the home screen puts the weakest one first with one tap to study it.
 - **Fix mistakes while they are fresh.** At the end of a session, **Review mistakes** goes over exactly the cards you missed.
-- **Practise like the real thing.** Timed exams from your multiple choice cards, with a question map, a score against your pass mark and the score of each deck, and one tap to study what you missed.
+- **Practise like the real thing.** Exams with a timer from your multiple choice cards, or all your cards, with a question map, a score against your pass mark and the score of each deck, progress that survives closing the tab, and one tap to study what you missed.
 - **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
 - **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI or a local model), look them over, and add only the ones you want.
@@ -44,7 +47,13 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 | Custom study (forgotten, ahead, preview, by deck)    |                   | ✓                |
 | Heatmap, true retention, study time and weak areas   |                   | ✓                |
 | Review mistakes after a session                      |                   | ✓                |
+| A desktop interface with a sidebar and a dashboard   |                   | ✓                |
+| Image occlusion cards                                |                   | ✓                |
+| Multiple choice cards                                |                   | ✓                |
+| Typed answers                                        |                   | ✓                |
+| Read aloud                                           |                   | ✓                |
 | Exams with a timer, a score and results to study     |                   | ✓                |
+| Cards written by your own AI provider                |                   | ✓                |
 | Import from and export to Anki                       |                   | ✓                |
 | Sync without conflicts across devices                |                   | ✓                |
 
@@ -167,13 +176,35 @@ An image occlusion card asks for the label of the mask it is about, when that la
 
 The speaker button in the card, or the **R** key, reads the side you see with your device's own voices, offline. Images, code and math are skipped, and a cloze blank is read as "blank". A multiple choice card reads its options, and after you answer, the right one and the explanation. In the settings you can read the question or the answer aloud as soon as it shows, and choose the voice and the speed. Where a device cannot speak, the button and the settings are not shown.
 
+## The desktop interface
+
+On a computer, Flashcard Studio opens as a full tab with a sidebar, in place of a window over your notes.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/desktop-home-dark.png">
+  <img alt="The desktop home: the sidebar with Home, Study, Exams, Browse cards, Statistics and Create with AI above the deck tree, and a dashboard with the daily goal, the streak, the decks, the activity and the next seven days" src="docs/media/screenshots/desktop-home.png">
+</picture>
+
+- The **sidebar** has Home, Study (with the number of cards due), Exams, Browse cards, Statistics and Create with AI, then your decks with the cards due and the total of each, and Settings. Click a deck to study it; decks with subdecks open and close.
+- The **home** is a dashboard: a greeting with the number of cards due and about how long they take, **Take an exam** and **Study all**, your daily goal, the streak, the cards learned and the retention, the deck that needs focus, your last exam with **Retake**, your decks with their retention against your target, the activity of the year and the next seven days.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/desktop-study-dark.png">
+  <img alt="The desktop study screen: the sidebar shrunk to a strip of icons, the card with its answer tiles under it, and a panel on the right with the card, the session and the keys" src="docs/media/screenshots/desktop-study.png">
+</picture>
+
+- While you **study**, the sidebar shrinks to a strip of icons so that the card gets the room. The card is up to 780 px wide, with the rating tiles and their keys under it, and the rating that the answer suggests is outlined. The panel on the right shows **This card** (its state, when you last saw it, its stability, how well you would recall it now, its lapses and your last five answers), **This session** (your answers, the time and the cards left) and the **Keys**.
+- Clicking or pressing an item of the sidebar leaves the keyboard to the screen it opens, so Space shows the answer of the card in front of you.
+- A pane narrower than 900 px, for example a split, gets the layout of the phone, and the desktop layout returns when it widens. A study session is never dropped by a change of size or of tab: the switch waits until you are back on the deck list.
+- **Desktop layout** in **Settings, UI preferences** (on by default) turns it off. It is only read on a computer, applies to the Studio look (the Classic look keeps its window), and opens the tab whatever **Open in new tab** says. Turn it off if you prefer a window over your notes, or the layout of the phone in a tab. The phone always has its own screens.
+
 ## Exams
 
 Run **Flashcard Studio: Take an exam** from the command palette, press **Take an exam** on the home screen, or choose **Exams** in the desktop sidebar. Choose the decks, the number of questions, a time limit (or none) and which cards to ask: **Multiple choice only**, or **All cards**, where a card with a short plain answer is typed and any other card is one you mark yourself after looking at the answer. An image occlusion card is typed too when the label of its mask is short plain text. Two presets fill it in: **Quick check** (20 questions, no limit) and **CIA simulation** (125 questions, 150 minutes). Cloze cards and suspended cards are never asked, and an exam never changes the schedule of a card.
 
 The exam shows one question at a time, with "12 / 125" and the time left at the top. The time turns orange under five minutes, and the exam is submitted when it reaches zero. Flag a question to come back to it. The question map, beside the question on a desktop and a sheet from the bottom on a phone, shows what is answered and what is flagged, and jumps to any question. Press 1 to 9 to choose an option, the left and right arrows to move, F to flag and Enter to go on; the keys are read by where they are on the keyboard, so they work on an Arabic or an AZERTY layout, and they only work while the exam is the pane you are in. **Submit** asks first, and says how many questions are unanswered or flagged.
 
-Your progress is saved as you go: after every answer, flag and move, and every 15 seconds. If you close the tab, or quit Obsidian, the exam is still there. Obsidian offers to **Resume exam** when it starts, and **Exams** lists it first. A timed exam keeps its deadline: time passes while it is closed, as in a real exam, and one that ran out is submitted as you left it. **Discard** (two presses) or **Leave** in the exam throws it away.
+Your progress is saved as you go: after every answer, flag and move, and when you pause typing, and only when something changed. If you close the tab, or quit Obsidian, the exam is still there. Obsidian offers to **Resume exam** when it starts, and **Exams** lists it first. A timed exam keeps its deadline: time passes while it is closed, as in a real exam, and one that ran out is submitted as you left it. **Discard** (two presses) or **Leave** in the exam throws it away. An exam is resumed on the device that started it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/exam-question-desktop.png">
@@ -206,7 +237,7 @@ Many local servers cut a long note short without saying so (Ollama's default con
 
 - **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the original plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the original plugin ignores.
 - **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
-- **Your exams** are in `Flashcard Studio/Exams/`, one Markdown file each. Like the review log, they are never read as cards. An exam in progress is kept in the plugin's `data.json` until it is submitted or discarded.
+- **Your exams** are in `Flashcard Studio/Exams/`, one Markdown file each. Like the review log, they are never read as cards. An exam in progress is kept in a file of its own in the plugin's folder (`exam-drafts/`, one file for each exam and device, named like the review log's files) until it is submitted or discarded, so it never touches your settings.
 - **Settings** are in the plugin's `data.json`.
 
 These plain files make it easy for scripts or AI assistants to read your progress and add cards.
