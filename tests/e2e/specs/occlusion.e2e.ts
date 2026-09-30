@@ -654,6 +654,9 @@ describe("image occlusion", function () {
 
         // The card on the screen has the new answer
         await showAnswer();
+        await browser
+            .$(".sr-view .sr-card-container .fs-occ-answer")
+            .waitForDisplayed({ timeoutMsg: "the answer was not shown under the picture" });
         expect(await browser.$(".sr-view .sr-card-container .fs-occ-answer").getText()).toBe(
             "Right atrium, edited",
         );
@@ -844,9 +847,18 @@ describe("image occlusion", function () {
         await browser
             .$(".sr-view .sr-card-container .sr-show-answer-button")
             .waitForClickable({ timeoutMsg: "no card was shown" });
+        // The card is drawn a moment after it can be clicked, and the text of an element that is not shown is empty
+        await browser
+            .$(`${card} .fs-occ-missing`)
+            .waitForDisplayed({ timeoutMsg: "the note about the missing picture was not shown" });
         expect(await browser.$(`${card} .fs-occ-missing`).getText()).toContain("Nowhere.png");
         await showAnswer();
-        expect(await browser.$(`${card} .fs-occ-missing`).isExisting()).toBe(true);
+        await browser
+            .$(`${card} .fs-occ-missing`)
+            .waitForDisplayed({ timeoutMsg: "the missing picture was not shown on the back" });
+        await browser
+            .$(`${card} .fs-occ-answer`)
+            .waitForDisplayed({ timeoutMsg: "the answer was not shown under the picture" });
         expect(await browser.$(`${card} .fs-occ-answer`).getText()).toBe("Right atrium");
     });
 

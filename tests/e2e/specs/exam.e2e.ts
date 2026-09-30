@@ -591,8 +591,12 @@ describe("exams", function () {
             async () => (await browser.$(".fs-exam-item.is-open .fs-choice-text").getText()) !== "",
             { timeoutMsg: "the missed question was not drawn" },
         );
-        expect(await browser.$(".fs-exam-item.is-open .fs-exam-item-question").getText()).toBe(
-            missed.front,
+        // The text of the question is drawn by Obsidian a moment after the element is there
+        await browser.waitUntil(
+            async () =>
+                (await browser.$(".fs-exam-item.is-open .fs-exam-item-question").getText()) ===
+                missed.front,
+            { timeoutMsg: "the missed question was not drawn in the list" },
         );
         expect(await browser.$$(".fs-exam-item.is-open .fs-choice.is-correct")).toHaveLength(1);
         expect(await browser.$$(".fs-exam-item.is-open .fs-choice.is-wrong")).toHaveLength(1);
@@ -1503,6 +1507,9 @@ describe("exams", function () {
             "Choose a note to make cards from",
         );
         // The note of this spec is listed, the most recently changed first
+        await browser
+            .$(".prompt-results .suggestion-item")
+            .waitForDisplayed({ timeoutMsg: "the picker listed no notes" });
         const first = await browser.$(".prompt-results .suggestion-item").getText();
         expect(first).toContain("Syntax deck.md");
         await browser.$(".prompt-results .suggestion-item").click();
@@ -1519,6 +1526,8 @@ describe("exams", function () {
         await browser.executeObsidianCommand(`${pluginId}:srs-review-flashcards`);
         const row = browser.$(".sr-view .fs-home-exam");
         await row.waitForDisplayed({ timeoutMsg: "the home has no exam row" });
+        // The phone's Studio slides in: a click while it moves lands where the row was, on nothing
+        await settle(".sr-view .fs-home-exam");
         expect(await row.getText()).toContain("Take an exam");
         await screenshot("exam-home-row", true);
         await row.click();

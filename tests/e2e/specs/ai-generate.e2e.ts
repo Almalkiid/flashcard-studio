@@ -435,7 +435,7 @@ describe("generate cards with AI", function () {
         await clickGenerate();
 
         const error = browser.$(".fs-ai-modal .fs-ai-error");
-        await error.waitForExist({ timeoutMsg: "no error was shown" });
+        await error.waitForDisplayed({ timeoutMsg: "no error was shown" });
         const message = await error.getText();
         expect(message).toContain("did not accept the API key");
         expect(message).not.toContain(FAKE_KEY);
@@ -497,7 +497,7 @@ describe("generate cards with AI", function () {
         await clickGenerate();
 
         const error = browser.$(".fs-ai-modal .fs-ai-error");
-        await error.waitForExist();
+        await error.waitForDisplayed();
         expect(await error.getText()).toContain("no API key");
         await expect(browser.$(".fs-ai-modal .fs-ai-error-button")).toExist();
         expect(seen).toHaveLength(0);
@@ -599,7 +599,7 @@ describe("generate cards with AI", function () {
         await openDialog(DECK_NOTE);
         await clickGenerate();
         const error = browser.$(".fs-ai-modal .fs-ai-error");
-        await error.waitForExist();
+        await error.waitForDisplayed();
         expect(await error.getText()).toContain("http://");
         await expect(browser.$(".fs-ai-modal .fs-ai-error-button")).toExist();
         expect(seen).toHaveLength(0);
@@ -648,7 +648,7 @@ describe("generate cards with AI", function () {
         await openDialog(DECK_NOTE);
         await clickGenerate();
         const error = browser.$(".fs-ai-modal .fs-ai-error");
-        await error.waitForExist();
+        await error.waitForDisplayed();
         expect(await error.getText()).toContain("HTTP 503");
     });
 
@@ -664,7 +664,7 @@ describe("generate cards with AI", function () {
         await openDialog(DECK_NOTE);
         await clickGenerate();
         const error = browser.$(".fs-ai-modal .fs-ai-error");
-        await error.waitForExist();
+        await error.waitForDisplayed();
         expect(await error.getText()).toContain("usable cards");
         expect(readVault(DECK_NOTE)).toBe(before);
     });

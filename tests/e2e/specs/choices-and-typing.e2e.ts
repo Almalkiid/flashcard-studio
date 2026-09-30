@@ -212,6 +212,8 @@ async function typeAnswer(text: string): Promise<void> {
     const input = browser.$(`${CARD} .fs-typed-input`);
     await input.waitForDisplayed({ timeoutMsg: "no field to type the answer in" });
     if (await isMobile()) {
+        // The card slides into place: a tap while it moves lands beside the field
+        await settle(`${CARD} .fs-typed-input`);
         await input.click();
         await input.setValue(text);
     } else {
