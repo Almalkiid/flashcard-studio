@@ -54,9 +54,9 @@ import {
     DesktopHomeServices,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-home";
 import {
-    desktopTabWanted,
     DesktopShell,
     DesktopShellActions,
+    desktopTabWanted,
 } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import {
     renderStudySidePanel,
@@ -67,6 +67,7 @@ import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirma
 import { CustomStudyModal } from "src/ui/obsidian-ui-components/modals/custom-study-modal";
 import { FlashcardEditModal } from "src/ui/obsidian-ui-components/modals/edit-modal";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
+import { speechAvailable } from "src/ui/speech";
 import { collectStatsCards, currentDayKeyFn, toStatsCard } from "src/ui/statistics-view/stats-data";
 import { UIManager, UIState } from "src/ui/ui-manager";
 import { moment } from "src/utils/dates";
@@ -1195,7 +1196,7 @@ export default class ContentManager {
                     elapsedMs: Date.now() - this.sessionStartMs,
                     left,
                 },
-                keys: card === null ? [] : this._studyKeys(),
+                keys: card === null ? [] : this._studyKeys(this.cardContainer.choosesByNumber),
             });
         };
         draw();
@@ -1243,18 +1244,29 @@ export default class ContentManager {
         else list.push(entry);
     }
 
-    /** The shortcuts the side panel lists. None with custom hotkeys, which replace them. */
-    private _studyKeys(): [string, string][] {
+    /**
+     * The shortcuts the side panel lists, as the card screen has them. None with custom hotkeys, which replace them.
+     *
+     * @param choosing - The card is a multiple choice card that has not been answered: the number keys choose an option.
+     */
+    private _studyKeys(choosing: boolean): [string, string][] {
         if (this.settings.useCustomHotkeys) return [];
-        return [
-            [this.settings.answerKeys === "anki" ? "1–4" : "1–3", t("DESKTOP_KEY_RATE")],
-            ["Space", t("DESKTOP_KEY_SPACE")],
+        const anki = this.settings.answerKeys === "anki";
+        const keys: [string, string][] = [];
+        if (choosing) keys.push(["1–9", t("DESKTOP_KEY_CHOOSE")]);
+        keys.push([anki ? "1–4" : "1–3", t("DESKTOP_KEY_RATE")]);
+        if (!anki) keys.push(["0", t("RESET_CARD_PROGRESS")]);
+        keys.push(
+            ["Space / Enter", t("DESKTOP_KEY_SPACE")],
             ["U", t("UNDO_LAST_ANSWER")],
             ["-", t("BURY_CARD")],
             ["@", t("SUSPEND_CARD")],
             ["S", t("SKIP")],
             ["J", t("DESKTOP_KEY_JUMP")],
-        ];
+        );
+        if (speechAvailable()) keys.push(["R", t("READ_ALOUD")]);
+        keys.push([`${Platform.isMacOS ? "⌘" : "Ctrl"} 1–7`, t("FLAG_CARD")]);
+        return keys;
     }
 
     // MARK: Utils

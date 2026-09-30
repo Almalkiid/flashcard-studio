@@ -1092,6 +1092,7 @@ const en: IBaseLocale = {
     DESKTOP_LAST_SEEN_YESTERDAY: "Yesterday",
     DESKTOP_LAST_SEEN_DAYS: "${count} days ago",
     DESKTOP_KEY_RATE: "Rate the card",
+    DESKTOP_KEY_CHOOSE: "Choose an option",
     DESKTOP_KEY_SPACE: "Show answer · Good",
     DESKTOP_KEY_JUMP: "Open the note",
     // End design: desktop

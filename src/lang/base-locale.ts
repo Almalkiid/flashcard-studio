@@ -946,6 +946,7 @@ export interface IBaseLocale {
     DESKTOP_LAST_SEEN_YESTERDAY: string;
     DESKTOP_LAST_SEEN_DAYS: string;
     DESKTOP_KEY_RATE: string;
+    DESKTOP_KEY_CHOOSE: string;
     DESKTOP_KEY_SPACE: string;
     DESKTOP_KEY_JUMP: string;
     // End design: desktop

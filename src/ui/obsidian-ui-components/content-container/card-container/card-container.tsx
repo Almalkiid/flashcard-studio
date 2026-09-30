@@ -257,6 +257,11 @@ export class CardContainer {
         return this.summaryEl !== null;
     }
 
+    /** Whether the card on screen is a multiple choice card whose answer is still to be given: 1 to 9 choose an option. */
+    public get choosesByNumber(): boolean {
+        return this.cardState === CardState.Front && this.choiceHandle !== null;
+    }
+
     /**
      * Replaces the card with the summary of the session that just ended.
      */
@@ -964,19 +969,23 @@ export class CardContainer {
             this.typedInput.focus();
             return;
         }
-        if (e.key === "@") {
-            void this.actions.suspend();
-            consumeKeyEvent();
-            return;
-        }
-        if (e.key === "-") {
-            void this.actions.bury();
-            consumeKeyEvent();
-            return;
+        // The number row is read by place, not by the character it gives: on AZERTY the 6 key gives "-", and it is 6. With
+        // Shift a number key gives its character ("@" on a US keyboard is Shift 2), which is suspend
+        const digit = digitFromKeyCode(e.code);
+        if (digit === null || e.shiftKey) {
+            if (e.key === "@") {
+                void this.actions.suspend();
+                consumeKeyEvent();
+                return;
+            }
+            if (e.key === "-") {
+                void this.actions.bury();
+                consumeKeyEvent();
+                return;
+            }
         }
 
         // M3a: scheduling. The number keys answer as the "Answer keys" setting says
-        const digit = digitFromKeyCode(e.code);
         if (digit !== null) {
             // On a multiple choice card the number keys choose an option until the answer is shown
             if (this.cardState === CardState.Front && this.choiceHandle !== null && digit >= 1) {
