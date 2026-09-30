@@ -369,37 +369,17 @@ describe("image occlusion", function () {
         await browser.keys("Escape");
         await browser.$(".modal.sr-card-info-modal").waitForExist({ reverse: true });
 
-        // A click or a tap on the picture zooms it, and is not a click on the card: the answer stays hidden. Zoomed, the
-        // picture is larger but never more than twice its own width, and the mask is still in view
-        {
-            const stage = ".sr-view .sr-card-container .fs-occ-stage";
-            const widthOf = () =>
-                browser.execute(
-                    (sel: string) =>
-                        document.querySelector(sel)?.getBoundingClientRect().width ?? 0,
-                    stage,
-                );
-            const before = await widthOf();
-            await browser.$(`${stage} .fs-occ-image`).click();
-            await browser.waitUntil(async () =>
-                ((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
-            );
-            await browser.pause(200);
-            expect((await shownCard()).classes).toContain("is-front");
-            const zoomed = await widthOf();
-            expect(zoomed).toBeGreaterThan(before + 10);
-            expect(zoomed).toBeLessThanOrEqual(2000 + 1);
-            await expectMaskInView();
-            await browser.$(`${stage} .fs-occ-image`).click();
-            await browser.waitUntil(
-                async () =>
-                    !((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
-            );
-            await expectMaskInView();
-        }
+        // On the front there is no zoom: a click or a tap on the picture is a click on the card, which shows the answer,
+        // like a click on any other card (Space and the Show answer button do the same). The picture has no zoom button.
+        expect(await browser.$(".sr-view .sr-card-container .fs-occ-zoom").isExisting()).toBe(
+            false,
+        );
 
-        // Back: the same picture once, the mask outlined, its label in it and under the picture
-        await showAnswer();
+        // Back: the same picture once, the mask outlined, its label under the picture
+        await browser.$(".sr-view .sr-card-container .fs-occ-image").click();
+        await browser.$(".sr-view .sr-card-container .sr-easy-button").waitForClickable({
+            timeoutMsg: "a click on the picture did not show the answer",
+        });
         await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
         card = await shownCard();
         expect(card.classes).toContain("is-back");
@@ -428,6 +408,46 @@ describe("image occlusion", function () {
             await screenshot("occlusion-back", light);
         }
         await setTheme(false);
+
+        // On the back a click or a tap on the picture, or on the button in its corner, zooms it: it is discoverable, and
+        // the answer is already shown. Zoomed, the picture is larger but never more than twice its own width, and the
+        // mask is still in view
+        {
+            const card = ".sr-view .sr-card-container";
+            const stage = `${card} .fs-occ-stage`;
+            const button = browser.$(`${card} .fs-occ-zoom`);
+            expect(await button.getAttribute("aria-label")).toBe("Zoom in");
+            const widthOf = () =>
+                browser.execute(
+                    (sel: string) =>
+                        document.querySelector(sel)?.getBoundingClientRect().width ?? 0,
+                    stage,
+                );
+            const isZoomed = async () =>
+                ((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed");
+            const before = await widthOf();
+
+            await button.click();
+            await browser.waitUntil(isZoomed);
+            await browser.pause(200);
+            const zoomed = await widthOf();
+            expect(zoomed).toBeGreaterThan(before + 10);
+            expect(zoomed).toBeLessThanOrEqual(2000 + 1);
+            expect(await button.getAttribute("aria-label")).toBe("Zoom out");
+            expect((await shownCard()).classes).toContain("is-back");
+            await expectMaskInView();
+
+            // The picture zooms out again when it is clicked, and in again
+            await browser.$(`${stage} .fs-occ-image`).click();
+            await browser.waitUntil(async () => !(await isZoomed()));
+            expect(await button.getAttribute("aria-label")).toBe("Zoom in");
+            await expectMaskInView();
+            await browser.$(`${stage} .fs-occ-image`).click();
+            await browser.waitUntil(isZoomed);
+            await button.click();
+            await browser.waitUntil(async () => !(await isZoomed()));
+            await expectMaskInView();
+        }
         await answerEasy();
 
         // The second card is about the other mask, an ellipse, and its label is Markdown

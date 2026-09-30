@@ -1,4 +1,4 @@
-import { App, Component, MarkdownRenderer, Platform, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, Platform, setIcon, TFile } from "obsidian";
 
 import { t } from "src/lang/helpers";
 import {
@@ -212,7 +212,9 @@ export function renderOcclusion(
         return null;
     }
 
-    const scroller = el.createDiv({ cls: "fs-occ-scroll" });
+    // The frame holds the zoom button, which stays in the corner while the zoomed picture scrolls in the box inside it
+    const frame = el.createDiv({ cls: "fs-occ-frame" });
+    const scroller = frame.createDiv({ cls: "fs-occ-scroll" });
     const stage = scroller.createDiv({ cls: "fs-occ-stage" });
     const img = stage.createEl("img", {
         cls: "fs-occ-image",
@@ -279,14 +281,33 @@ export function renderOcclusion(
         if (img.complete) later();
     }
 
-    // A click or a tap on the picture of a card zooms it (on a phone also in a note, where the picture is small). It is
-    // not a click on the card, which would show the answer: the answer button and the key are still there.
-    if (card || Platform.isMobile) {
-        img.addEventListener("click", (event) => {
+    // On the back of a card, a click or a tap on the picture, or on the button in its corner, zooms it. It is not a click
+    // on the card, which has nothing more to show. On the front there is no zoom: a click or a tap on the picture is a
+    // click on the card, which shows the answer, as on every other card. In a note, on a phone, the picture zooms too.
+    const zoomable = revealed >= 0 || (!card && Platform.isMobile);
+    if (zoomable) {
+        const button =
+            revealed >= 0
+                ? frame.createEl("button", { cls: "fs-occ-zoom", attr: { type: "button" } })
+                : null;
+        const showZoom = () => {
+            if (button === null) return;
+            const zoomed = stage.hasClass("is-zoomed");
+            setIcon(button, zoomed ? "zoom-out" : "zoom-in");
+            button.setAttribute(
+                "aria-label",
+                t(zoomed ? "OCCLUSION_ZOOM_OUT" : "OCCLUSION_ZOOM_IN"),
+            );
+        };
+        const toggleZoom = (event: Event) => {
             event.stopPropagation();
             stage.toggleClass("is-zoomed", !stage.hasClass("is-zoomed"));
+            showZoom();
             if (card) el.win.requestAnimationFrame(scroll);
-        });
+        };
+        showZoom();
+        button?.addEventListener("click", toggleZoom);
+        img.addEventListener("click", toggleZoom);
     }
 
     addAnswer();

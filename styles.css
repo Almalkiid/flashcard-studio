@@ -488,13 +488,14 @@ body.sr-reduced-bottom-fade-mask {
 .fs-occ.is-back .fs-occ-stage.is-zoomed {
   width: min(180%, calc(2 * var(--fs-occ-natural, 100%)));
 }
-.fs-occ.is-front .fs-occ-image,
 .fs-occ.is-back .fs-occ-image {
   cursor: zoom-in;
 }
-.fs-occ.is-front .is-zoomed .fs-occ-image,
 .fs-occ.is-back .is-zoomed .fs-occ-image {
   cursor: zoom-out;
+}
+.fs-occ-frame {
+  position: relative;
 }
 .fs-occ-image {
   display: block;
@@ -595,7 +596,8 @@ body.sr-reduced-bottom-fade-mask {
   color: var(--fs-red);
   background-color: var(--fs-red-soft);
 }
-.fs-occ-edit {
+.fs-occ-edit,
+.fs-occ-zoom {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -612,12 +614,15 @@ body.sr-reduced-bottom-fade-mask {
   background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
   box-shadow: var(--fs-shadow);
   cursor: pointer;
-  opacity: 0;
   transition:
     opacity 0.15s ease,
     color 0.15s ease;
 }
-.fs-occ-edit svg {
+.fs-occ-edit {
+  opacity: 0;
+}
+.fs-occ-edit svg,
+.fs-occ-zoom svg {
   width: 16px;
   height: 16px;
 }
@@ -625,7 +630,8 @@ body.sr-reduced-bottom-fade-mask {
 .fs-occ-edit:focus-visible {
   opacity: 1;
 }
-.fs-occ-edit:hover {
+.fs-occ-edit:hover,
+.fs-occ-zoom:hover {
   color: var(--fs-accent);
 }
 @media (hover: none) {

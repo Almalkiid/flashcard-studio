@@ -782,6 +782,8 @@ export interface IBaseLocale {
     OCCLUSION_HINT_LOCKED: string;
     OCCLUSION_SAVE_FAILED: string;
     OCCLUSION_BLOCK_AMBIGUOUS: string;
+    OCCLUSION_ZOOM_IN: string;
+    OCCLUSION_ZOOM_OUT: string;
     OCCLUSION_NEEDS_MASK: string;
     OCCLUSION_BLOCK_NOT_FOUND: string;
     // Design: statistics

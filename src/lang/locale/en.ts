@@ -903,6 +903,8 @@ const en: IBaseLocale = {
     OCCLUSION_SAVE_FAILED: "The block could not be saved.",
     OCCLUSION_BLOCK_AMBIGUOUS:
         "The note has this block more than once, so it cannot tell which one to change. Nothing was changed.",
+    OCCLUSION_ZOOM_IN: "Zoom in",
+    OCCLUSION_ZOOM_OUT: "Zoom out",
     OCCLUSION_NEEDS_MASK: "Draw at least one mask first.",
     OCCLUSION_BLOCK_NOT_FOUND: "The block was not found in the note. Open the note and try again.",
     // Design: statistics
