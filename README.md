@@ -103,9 +103,12 @@ mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
 
 - Every mask is one card. Coordinates are fractions of the picture, so the masks fit it at any size.
 - **Hide all, guess one** (the default) draws every mask and asks about one at a time, as Anki does. **Hide one, guess one** draws only the mask that is asked about.
-- On the front the mask that is asked about is filled and the others are grey. On the back it turns into an outline with its answer in it and under the picture. On a phone, tap the picture to zoom.
+- On the front the mask that is asked about is filled and the others are grey. On the back it turns into an outline, and its answer is shown under the picture. The picture is sized to fit the card, and on a phone you can tap it to zoom.
 - The schedules of the masks share one `<!--SR:...-->` comment after the block, like the deck of a cloze card. Editing a block in the editor moves each schedule with its mask: delete a mask and the others keep theirs, and a new mask starts as a new card.
 - In a note, the block shows the picture with every answer on its mask and a pencil that reopens the editor. The original Spaced Repetition plugin sees a code block and no card.
+- **Edit masks in the editor, not by hand, once a block has been reviewed.** Schedules follow the masks by their position in the block. The editor moves each schedule with its mask. If you delete or break a `mask:` line in the text, the schedules that come after it move onto the wrong masks. A block that has no image, or no mask that reads, is not a card, and its schedule comment is left as it is.
+- The image is a link to a file, and Obsidian does not update links inside code blocks. If you rename or move the image, the card shows "Image not found" and keeps its schedule; change the `image:` line to the new name.
+- **Edit card** in the study screen opens the same editor with the masks locked: you can move and resize them, change their answers and the question, but not add or delete a mask, because the cards of the block are in the queue. Add or delete masks from the note.
 - Anki has no such card in its basic model, so an export writes one basic note per mask, with the question and the whole picture on the front and the answer on the back.
 
 ## Reviewing

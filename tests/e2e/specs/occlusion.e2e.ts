@@ -150,6 +150,56 @@ async function expectActiveMaskAt(
     expect(Math.abs(mask.height - fraction.h * stage.height)).toBeLessThan(2);
 }
 
+/**
+ * The mask that the card asks about is inside the card's box, and the card does not scroll: the whole picture, the
+ * question and the rest of the card are seen at once, also in the default (small) review window on a desktop.
+ */
+async function expectCardFitsWithMaskInView(): Promise<void> {
+    const measure = () =>
+        browser.execute(() => {
+            const card = ".sr-view .sr-card-container";
+            const host = document.querySelector<HTMLElement>(`${card} .sr-content`);
+            const mask = document.querySelector(
+                `${card} .fs-mask.is-active, ${card} .fs-mask.is-revealed`,
+            );
+            if (host === null || mask === null) return null;
+            const box = host.getBoundingClientRect();
+            const at = mask.getBoundingClientRect();
+            return {
+                maskTop: at.top - box.top,
+                maskBottom: box.bottom - at.bottom,
+                overflow: host.scrollHeight - host.clientHeight,
+                maxH: document
+                    .querySelector<HTMLElement>(`${card} .fs-occ-stage`)
+                    ?.style.getPropertyValue("--fs-occ-max-h"),
+                client: host.clientHeight,
+                rows: Array.from(host.children).map(
+                    (child) =>
+                        `${child.className.toString().slice(0, 24)}:${(child as HTMLElement).offsetHeight}`,
+                ),
+                stage: document.querySelector<HTMLElement>(`${card} .fs-occ-stage`)?.offsetHeight,
+            };
+        });
+    // The picture is sized to the card on the frames after it is drawn
+    let last: unknown = null;
+    await browser
+        .waitUntil(
+            async () => {
+                last = await measure();
+                return ((last as { overflow: number } | null)?.overflow ?? 99) <= 2;
+            },
+            { timeout: 4000 },
+        )
+        .catch(() => {
+            throw new Error(
+                `the card still scrolls, the picture was not sized to it: ${JSON.stringify(last)}`,
+            );
+        });
+    const fit = await measure();
+    expect(fit?.maskTop).toBeGreaterThanOrEqual(0);
+    expect(fit?.maskBottom).toBeGreaterThanOrEqual(0);
+}
+
 async function openNote(mode: "preview" | "source"): Promise<void> {
     await browser.executeObsidian(
         async ({ app }, notePath, viewMode) => {
@@ -187,21 +237,35 @@ async function drag(
         .perform();
 }
 
+/**
+ * Waits until a box has stopped moving. The editor slides in on a phone, and a click or a drag that is aimed at where
+ * something was while it moves misses it.
+ */
+async function waitUntilStill(selector: string): Promise<Box> {
+    let box = await boxOf(selector);
+    for (let tries = 0; tries < 30; tries++) {
+        await browser.pause(100);
+        const later = await boxOf(selector);
+        const moved = Math.abs(later.top - box.top) + Math.abs(later.left - box.left);
+        box = later;
+        if (moved < 0.5) break;
+        console.log(`${selector} was still moving by ${moved}px`);
+    }
+    return box;
+}
+
+/** The editor is open, its picture is loaded, and it is not sliding in any more. */
+async function editorReady(): Promise<void> {
+    await picturesLoaded(".fs-occ-editor .fs-occ-image");
+    await waitUntilStill(".fs-occ-editor .fs-occ-stage");
+}
+
 /** Draws a mask over a box of the picture in the editor. */
 async function drawMask(
     fraction: { x: number; y: number; w: number; h: number },
     pointerType: "mouse" | "touch",
 ): Promise<void> {
-    // The editor slides in on a phone: draw when the picture has stopped moving
-    let stage = await boxOf(".fs-occ-editor .fs-occ-stage");
-    for (let tries = 0; tries < 20; tries++) {
-        await browser.pause(100);
-        const later = await boxOf(".fs-occ-editor .fs-occ-stage");
-        const moved = Math.abs(later.top - stage.top) + Math.abs(later.left - stage.left);
-        stage = later;
-        if (moved < 0.5) break;
-        console.log(`the picture was still moving by ${moved}px`);
-    }
+    const stage = await waitUntilStill(".fs-occ-editor .fs-occ-stage");
     await drag(
         {
             x: stage.left + fraction.x * stage.width,
@@ -257,24 +321,37 @@ describe("image occlusion", function () {
         expect(card.tags).toEqual(["?"]);
         expect(card.answer).toBe("");
         await expectActiveMaskAt(RIGHT_ATRIUM, "is-front");
+        await expectCardFitsWithMaskInView();
         for (const light of [false, true]) {
             await setTheme(light);
             await screenshot("occlusion-front", light);
         }
         await setTheme(false);
 
+        // Card info shows the card as its question and the label of its mask, not the data it is made of
+        await browser.executeObsidianCommand(`${pluginId}:srs-card-info`);
+        await browser
+            .$(".modal.sr-card-info-modal")
+            .waitForDisplayed({ timeoutMsg: "card info did not open" });
+        expect(await browser.$(".sr-card-info-front").getText()).toBe(
+            "Name the labelled chamber · Right atrium",
+        );
+        await browser.keys("Escape");
+        await browser.$(".modal.sr-card-info-modal").waitForExist({ reverse: true });
+
         // On a phone a tap on the picture zooms it, and is not a tap on the card: the answer stays hidden
         if (await isMobile()) {
             const stage = ".sr-view .sr-card-container .fs-occ-stage";
             await browser.$(`${stage} .fs-occ-image`).click();
             await browser.waitUntil(async () =>
-                (await browser.$(stage).getAttribute("class")).includes("is-zoomed"),
+                ((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
             );
             await browser.pause(200);
             expect((await shownCard()).classes).toContain("is-front");
             await browser.$(`${stage} .fs-occ-image`).click();
             await browser.waitUntil(
-                async () => !(await browser.$(stage).getAttribute("class")).includes("is-zoomed"),
+                async () =>
+                    !((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
             );
         }
 
@@ -286,9 +363,22 @@ describe("image occlusion", function () {
         expect(card.pictures).toBe(1);
         expect(card.masks[0]).toContain("is-revealed");
         expect(card.masks[0]).not.toContain("is-active");
-        expect(card.tags).toEqual(["Right atrium"]);
+        // The label is under the picture only: the picture usually has it written on it already
+        expect(card.tags).toEqual([]);
         expect(card.answer).toBe("Right atrium");
+        // The revealed mask is an outline with nothing in it
+        expect(
+            await browser.execute(
+                () =>
+                    getComputedStyle(
+                        document.querySelector(
+                            ".sr-view .sr-card-container .fs-mask.is-revealed",
+                        ) as Element,
+                    ).fill,
+            ),
+        ).toBe("rgba(0, 0, 0, 0)");
         await expectActiveMaskAt(RIGHT_ATRIUM, "is-back");
+        await expectCardFitsWithMaskInView();
         for (const light of [false, true]) {
             await setTheme(light);
             await screenshot("occlusion-back", light);
@@ -305,11 +395,14 @@ describe("image occlusion", function () {
         expect(card.classes).toContain("is-front");
         expect(card.masks[1]).toContain("is-active");
         expect(card.masks[0]).not.toContain("is-active");
+        // This mask is in the lower half of the picture
+        await expectCardFitsWithMaskInView();
         await showAnswer();
         card = await shownCard();
         expect(card.masks[1]).toContain("is-revealed");
-        expect(card.tags).toEqual(["Left ventricle"]);
+        expect(card.tags).toEqual([]);
         expect(card.answer).toBe("Left ventricle");
+        await expectCardFitsWithMaskInView();
         expect(
             await browser.execute(
                 () =>
@@ -328,6 +421,123 @@ describe("image occlusion", function () {
         const comments = text.match(/<!--SR:(![^!>]+)+-->/g) ?? [];
         expect(comments).toHaveLength(1);
         expect(comments[0]?.split("!").filter((part) => part.startsWith("fsrs"))).toHaveLength(2);
+    });
+
+    it("edits an occlusion card from the study screen: the masks are locked, the answer is changed and written", async function () {
+        await useNote(NOTE_TEXT);
+        await openReview();
+        await browser
+            .$(".sr-view .sr-card-container .sr-show-answer-button")
+            .waitForClickable({ timeoutMsg: "no card was shown" });
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+
+        // The Edit card button of the study screen (on a phone it is in the card menu, which has the same handler)
+        await browser.execute(() => {
+            const button = document.querySelector<HTMLElement>(".sr-view .sr-edit-button");
+            if (button === null) throw new Error("no Edit card button");
+            button.click();
+        });
+        await browser
+            .$(".fs-occ-editor-modal")
+            .waitForDisplayed({ timeoutMsg: "the editor did not open" });
+        await editorReady();
+        expect(await browser.$$(".fs-occ-editor .fs-occ-emask")).toHaveLength(2);
+        // Nothing to delete or to draw with: the cards of the block are in the queue
+        expect(await browser.$(".fs-occ-editor .fs-occ-btn.is-danger").isExisting()).toBe(false);
+        expect(await browser.$$(".fs-occ-editor .fs-occ-seg")).toHaveLength(1);
+        const stage = await boxOf(".fs-occ-editor .fs-occ-stage");
+        await drag(
+            { x: stage.left + stage.width * 0.05, y: stage.top + stage.height * 0.9 },
+            { x: stage.left + stage.width * 0.4, y: stage.top + stage.height * 0.97 },
+            (await isMobile()) ? "touch" : "mouse",
+        );
+        expect(await browser.$$(".fs-occ-editor .fs-occ-emask")).toHaveLength(2);
+
+        await browser.$$(".fs-occ-editor .fs-occ-chip")[0].click();
+        await browser.$$(".fs-occ-editor .fs-occ-input")[0].setValue("Right atrium, edited");
+        await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
+        await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });
+
+        await browser.waitUntil(() => readNote().includes("| Right atrium, edited"), {
+            timeoutMsg: "the edit was never written to the note",
+        });
+        const text = readNote();
+        expect(text).toContain("mask: ra rect 0.1440 0.2891 0.2520 0.0984 | Right atrium, edited");
+        expect(text).toContain(MASK_LINES[1]);
+        expect(text.match(/^mask: /gm)).toHaveLength(2);
+
+        // The card on the screen has the new answer
+        await showAnswer();
+        expect(await browser.$(".sr-view .sr-card-container .fs-occ-answer").getText()).toBe(
+            "Right atrium, edited",
+        );
+    });
+
+    it("saves into the block that was opened when the note has changed, and refuses when it cannot tell which", async function () {
+        await useNote(NOTE_TEXT);
+        await openNote("preview");
+        await picturesLoaded(".markdown-reading-view .fs-occ-image");
+        await browser.$(".markdown-reading-view .fs-occ").moveTo();
+        await browser.$(".markdown-reading-view .fs-occ-edit").click();
+        await browser
+            .$(".fs-occ-editor-modal")
+            .waitForDisplayed({ timeoutMsg: "the editor did not open" });
+        await editorReady();
+
+        // A sync adds two lines above the block while the editor is open: the block is found by what it holds
+        await obsidianPage.write(NOTE, [TAG, "", "Added by a sync", "", BLOCK, ""].join("\n"));
+        await browser.pause(700);
+        await browser.$$(".fs-occ-editor .fs-occ-chip")[0].click();
+        await browser.$$(".fs-occ-editor .fs-occ-input")[0].setValue("Found by content");
+        await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
+        await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });
+        await browser.waitUntil(() => readNote().includes("| Found by content"), {
+            timeoutMsg: "the edit was never written to the note",
+        });
+        expect(readNote()).toContain("Added by a sync");
+        expect(readNote().match(/^mask: /gm)).toHaveLength(2);
+
+        // Someone else changed this very block while the editor is open: nothing is written, and the work is kept
+        await browser.$(".markdown-reading-view .fs-occ").moveTo();
+        await browser.$(".markdown-reading-view .fs-occ-edit").click();
+        await browser.$(".fs-occ-editor-modal").waitForDisplayed();
+        await editorReady();
+        const theirs = [TAG, "", BLOCK.replace("| Right atrium", "| Changed elsewhere"), ""].join(
+            "\n",
+        );
+        await obsidianPage.write(NOTE, theirs);
+        await browser.pause(700);
+        await browser.$$(".fs-occ-editor .fs-occ-chip")[1].click();
+        await browser.$$(".fs-occ-editor .fs-occ-input")[0].setValue("My unsaved work");
+        await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
+        await browser.waitUntil(
+            () =>
+                browser.execute(() =>
+                    Array.from(document.querySelectorAll(".notice")).some((notice) =>
+                        (notice.textContent ?? "").includes("was not found in the note"),
+                    ),
+                ),
+            { timeoutMsg: "the notice that the block was not found was never shown" },
+        );
+        expect(await browser.$(".fs-occ-editor-modal").isExisting()).toBe(true);
+        expect(await browser.$$(".fs-occ-editor .fs-occ-emask")).toHaveLength(2);
+        expect(readNote()).toBe(theirs);
+        // Close the editor that was kept open, so that the next test starts without it
+        await browser.$(".fs-occ-editor .fs-occ-footer .fs-occ-btn:not(.is-primary)").click();
+        await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });
+    });
+
+    it("shows the answer on the back when the picture is missing", async function () {
+        await useNote([TAG, "", BLOCK.replace("[[Heart.png]]", "[[Nowhere.png]]"), ""].join("\n"));
+        await openReview();
+        const card = ".sr-view .sr-card-container .fs-occ";
+        await browser
+            .$(".sr-view .sr-card-container .sr-show-answer-button")
+            .waitForClickable({ timeoutMsg: "no card was shown" });
+        expect(await browser.$(`${card} .fs-occ-missing`).getText()).toContain("Nowhere.png");
+        await showAnswer();
+        expect(await browser.$(`${card} .fs-occ-missing`).isExisting()).toBe(true);
+        expect(await browser.$(`${card} .fs-occ-answer`).getText()).toBe("Right atrium");
     });
 
     it("edits a block in the note: deleting a mask keeps the other masks' schedules with them", async function () {
@@ -368,7 +578,7 @@ describe("image occlusion", function () {
         await browser
             .$(".fs-occ-editor-modal")
             .waitForDisplayed({ timeoutMsg: "the editor did not open" });
-        await picturesLoaded(".fs-occ-editor .fs-occ-image");
+        await editorReady();
         expect(await browser.$$(".fs-occ-editor .fs-occ-emask")).toHaveLength(3);
 
         // Select the middle mask by its chip, and delete it
@@ -409,7 +619,7 @@ describe("image occlusion", function () {
         await browser
             .$(".fs-occ-editor-modal")
             .waitForDisplayed({ timeoutMsg: "the editor did not open" });
-        await picturesLoaded(".fs-occ-editor .fs-occ-image");
+        await editorReady();
         // A phone has touch and a desktop a mouse: the pointer events take both
         const pointerType = (await isMobile()) ? "touch" : "mouse";
 

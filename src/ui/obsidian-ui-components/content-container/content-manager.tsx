@@ -2,12 +2,13 @@ import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
-import { Question } from "src/data/data-structures/card/questions/question";
+import { CardType, Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
+import { editOcclusionQuestion } from "src/occlusion/occlusion-processors";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { customStudyMode, CustomStudySpec, forgottenCardIds } from "src/scheduling/custom-study";
@@ -484,13 +485,17 @@ export default class ContentManager {
         const textPrompt = currentQ.questionText.actualQuestion;
         const currentUIState = this.uiManager.uiState;
         this.uiManager.setUIState(UIState.EditModal);
-        const editModal = FlashcardEditModal.Prompt(
-            this.app,
-            this.settings,
-            currentCard,
-            textPrompt,
-            currentQ.questionText.textDirection,
-        );
+        // An image occlusion card is edited in the occlusion editor, not as text
+        const editModal =
+            currentQ.questionType === CardType.ImageOcclusion
+                ? editOcclusionQuestion(this.app, currentQ)
+                : FlashcardEditModal.Prompt(
+                      this.app,
+                      this.settings,
+                      currentCard,
+                      textPrompt,
+                      currentQ.questionText.textDirection,
+                  );
         await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;

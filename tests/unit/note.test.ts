@@ -81,3 +81,29 @@ Q3:::A3
         expect(stripCardIds(updatedText)).toEqual(expectedText);
     });
 });
+
+describe("image occlusion blocks that are not valid", () => {
+    // Hand-edited into something that is not a block (no image, or no mask that reads): not a card, so nothing about it
+    // may be rewritten when the note is loaded, and the schedules in the comment after it must survive
+    const comment = "<!--SR:!2023-09-02,4,270!2023-09-02,5,270-->";
+    test.each([
+        [
+            "no image",
+            "```image-occlusion\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```",
+        ],
+        [
+            "no valid mask",
+            "```image-occlusion\nimage: [[h.png]]\nmask: a rect zero 0 .5 .5 | A\n```",
+        ],
+    ])("a block with %s keeps its comment through a load and a write", async (_name, block) => {
+        const originalText = `#flashcards/test\nQ1::A1\n\n${block}\n${comment}\n`;
+        const file: UnitTestSRFile = new UnitTestSRFile(originalText);
+        const note: Note = await noteFileLoader.load(file, TextDirection.Ltr, TopicPath.emptyPath);
+
+        // What the data manager does after a load: a note with a changed question is written back
+        expect(note.hasChanged).toBe(false);
+        await note.writeNoteFile(DEFAULT_SETTINGS);
+        expect(file.content).toEqual(originalText);
+        expect(note.questionList.map((question) => question.lineNo)).toEqual([1]);
+    });
+});

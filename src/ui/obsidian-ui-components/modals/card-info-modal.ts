@@ -6,6 +6,7 @@ import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { IBaseLocale } from "src/lang/base-locale";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
+import { occlusionCardText } from "src/occlusion/occlusion-view";
 import { retrievability } from "src/stats/cards";
 import { StatsCard } from "src/stats/types";
 import {
@@ -84,11 +85,14 @@ export class CardInfoModal extends Modal {
     }
 
     private renderFront(): void {
-        // The card text is markdown; a preview reads better without its emphasis marks
-        const text = this.card.front
-            .replace(/(\*\*|__|==|~~|`)/g, "")
-            .replace(/\s+/g, " ")
-            .trim();
+        // The card text is markdown; a preview reads better without its emphasis marks. An image occlusion card's
+        // text is a block of data: it is shown as its question and the label of its mask
+        const text =
+            occlusionCardText(this.card.front) ??
+            this.card.front
+                .replace(/(\*\*|__|==|~~|`)/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
         if (text === "") return;
         const preview =
             text.length > FRONT_PREVIEW_LENGTH ? text.slice(0, FRONT_PREVIEW_LENGTH) + "…" : text;

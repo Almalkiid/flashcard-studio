@@ -784,8 +784,30 @@ describe("image occlusion blocks", () => {
         const tilde = "~~~image-occlusion\nimage: h.png\nmask: a rect 0 0 .5 .5 | A\n~~~";
         expect(parseT(tilde, base)).toEqual([[CardType.ImageOcclusion, tilde, 0, 3]]);
     });
-    test("a malformed block is still one card here, and expands to no cards later", () => {
-        const bad = "```image-occlusion\nnothing useful\n```";
-        expect(parseT(bad, base).map((c) => c[0])).toEqual([CardType.ImageOcclusion]);
+    test("a closed block that is not valid is not a card, and its schedule comment is left as text", () => {
+        for (const bad of [
+            "```image-occlusion\nnothing useful\n```",
+            "```image-occlusion\nmask: a rect 0 0 .5 .5 | A\n```", // no image
+            "```image-occlusion\nimage: [[h.png]]\nmask: a rect zero 0 .5 .5 | A\n```", // no valid mask
+        ]) {
+            expect(parseT(bad, base)).toEqual([]);
+            expect(parseT(bad + "\n<!--SR:!fsrs,x-->", base)).toEqual([]);
+            expect(
+                parseT("Q1::A1\n\n" + bad + "\n<!--SR:!fsrs,x-->\n\nQ2::A2", base).map((c) => c[0]),
+            ).toEqual([CardType.SingleLineBasic, CardType.SingleLineBasic]);
+        }
+    });
+    test("an open fence pairs with the next bare fence, as Obsidian shows it: it is all code", () => {
+        const text =
+            "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n\nQ::A\n\n```js\nx\n```";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.ImageOcclusion]);
+    });
+    test("a block directly under a question line is part of that card", () => {
+        const text =
+            "Q\n?\nA\n" + "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+        const cloze =
+            "A ==cloze== line\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+        expect(parseT(cloze, base).map((c) => c[0])).toEqual([CardType.Cloze]);
     });
 });

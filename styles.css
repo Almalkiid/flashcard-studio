@@ -438,6 +438,552 @@ body.sr-reduced-bottom-fade-mask {
     #000000 16px
   );
 }
+.fs-occ.fs-studio {
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin: 0 0 8px;
+}
+.sr-content .fs-occ.fs-studio {
+  gap: 10px;
+}
+.fs-occ-question {
+  font-size: var(--fs-headline);
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--fs-text);
+}
+.fs-occ-scroll {
+  container-type: inline-size;
+  overflow: auto;
+  border-radius: var(--fs-radius-md);
+  -webkit-overflow-scrolling: touch;
+}
+.fs-occ-stage {
+  position: relative;
+  width: min(
+    100%,
+    calc(var(--fs-occ-max-h, 62vh) * var(--fs-occ-ratio, 1.5)),
+    var(--fs-occ-natural, 100%)
+  );
+  margin-inline: auto;
+  line-height: 0;
+  border-radius: var(--fs-radius-md);
+  overflow: hidden;
+  background-color: var(--fs-surface);
+  box-shadow:
+    var(--fs-shadow),
+    0 0 0 1px var(--fs-border-strong);
+}
+.fs-occ-stage.is-zoomed {
+  width: 180%;
+  max-width: none;
+  margin-inline: 0;
+}
+.fs-occ-image {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  border-radius: 0;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.fs-occ-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.fs-occ .fs-mask {
+  fill: color-mix(in srgb, var(--fs-text-3) 85%, var(--fs-surface));
+  stroke: var(--fs-border-strong);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+.fs-occ .fs-mask.is-active {
+  fill: var(--fs-accent);
+  stroke: var(--fs-surface);
+  stroke-width: 1.5px;
+}
+.fs-occ .fs-mask.is-revealed {
+  fill: transparent;
+  stroke: var(--fs-accent);
+  stroke-width: 2.5px;
+}
+.fs-occ.is-note .fs-mask.is-revealed {
+  fill: color-mix(in srgb, var(--fs-accent) 14%, transparent);
+}
+.fs-occ-tag {
+  position: absolute;
+  left: var(--fs-occ-x);
+  top: var(--fs-occ-y);
+  width: var(--fs-occ-w);
+  height: var(--fs-occ-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 2px;
+  overflow: visible;
+  font-size: clamp(10px, 1.9cqw, 15px);
+  font-weight: 600;
+  line-height: 1.25;
+  pointer-events: none;
+}
+.fs-occ-tag-text {
+  flex: none;
+  max-width: 70cqw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  color: var(--fs-text);
+  background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
+  box-shadow:
+    var(--fs-shadow),
+    0 0 0 1px var(--fs-border);
+}
+.fs-occ-tag.is-question {
+  font-size: clamp(14px, 3.4cqw, 26px);
+  font-weight: 700;
+}
+.fs-occ-tag.is-question .fs-occ-tag-text {
+  padding: 0;
+  color: var(--fs-on-accent);
+  background: none;
+  box-shadow: none;
+}
+.fs-occ-answer {
+  align-self: center;
+  max-width: 100%;
+  padding: 10px 18px;
+  border-radius: var(--fs-radius-md);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  text-align: center;
+  color: var(--fs-text);
+  background-color: var(--fs-accent-soft);
+}
+.fs-occ-answer p {
+  margin: 0;
+}
+.fs-occ-missing {
+  padding: 14px 16px;
+  border-radius: var(--fs-radius-md);
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--fs-red);
+  background-color: var(--fs-red-soft);
+}
+.fs-occ-edit {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--fs-border-strong);
+  border-radius: 999px;
+  line-height: 1;
+  color: var(--fs-text-2);
+  background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
+  box-shadow: var(--fs-shadow);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
+}
+.fs-occ-edit svg {
+  width: 16px;
+  height: 16px;
+}
+.fs-occ:hover .fs-occ-edit,
+.fs-occ-edit:focus-visible {
+  opacity: 1;
+}
+.fs-occ-edit:hover {
+  color: var(--fs-accent);
+}
+@media (hover: none) {
+  .fs-occ-edit {
+    opacity: 1;
+  }
+}
+.modal.fs-occ-editor-modal.fs-studio {
+  width: min(1080px, 94vw);
+  max-width: 94vw;
+  border: 1px solid var(--fs-border-strong);
+  border-radius: var(--fs-radius-xl);
+  background-color: var(--fs-surface);
+  box-shadow: var(--fs-shadow-lg);
+}
+.fs-occ-editor-modal .modal-title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--fs-text);
+}
+.fs-occ-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fs-occ-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.fs-occ-toolbar-spacer {
+  flex: 1 1 auto;
+}
+.fs-occ-count {
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--fs-text-3);
+}
+.fs-occ-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--fs-border);
+  border-radius: 999px;
+  background-color: var(--fs-surface-2);
+}
+.fs-occ-editor .fs-occ-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--fs-font);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fs-text-2);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+.fs-occ-editor .fs-occ-seg-btn[aria-checked="true"] {
+  color: var(--fs-accent);
+  background-color: var(--fs-surface);
+  box-shadow:
+    var(--fs-shadow),
+    0 0 0 1px var(--fs-border);
+}
+.fs-occ-seg-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.fs-occ-editor .fs-occ-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 18px;
+  border: 1px solid var(--fs-border-strong);
+  border-radius: 999px;
+  font-family: var(--fs-font);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fs-text);
+  background-color: var(--fs-surface);
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+.fs-occ-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.fs-occ-editor .fs-occ-btn:hover {
+  background-color: var(--fs-surface-2);
+}
+.fs-occ-editor .fs-occ-btn.is-primary {
+  border-color: transparent;
+  color: var(--fs-on-accent);
+  background-color: var(--fs-accent);
+}
+.fs-occ-editor .fs-occ-btn.is-primary:hover {
+  background-color: color-mix(in srgb, var(--fs-accent) 88%, var(--fs-text));
+}
+.fs-occ-editor .fs-occ-btn.is-danger {
+  color: var(--fs-red);
+}
+.fs-occ-editor .fs-occ-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.fs-occ-editor-stagewrap {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius-lg);
+  background-color: var(--fs-surface-2);
+  background-image: radial-gradient(
+    var(--fs-border-strong) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+.fs-occ-stage.is-editing {
+  --fs-occ-max-h: clamp(200px, calc(85vh - 320px), 560px);
+  touch-action: none;
+  user-select: none;
+  outline: none;
+  cursor: crosshair;
+  overflow: visible;
+}
+.fs-occ-stage.is-editing .fs-occ-image {
+  border-radius: var(--fs-radius-sm);
+}
+.fs-occ-stage.is-editing[data-cursor="move"] {
+  cursor: move;
+}
+.fs-occ-stage.is-editing[data-cursor="nwse"] {
+  cursor: nwse-resize;
+}
+.fs-occ-stage.is-editing[data-cursor="nesw"] {
+  cursor: nesw-resize;
+}
+.fs-occ-stage.is-editing[data-cursor="ns"] {
+  cursor: ns-resize;
+}
+.fs-occ-stage.is-editing[data-cursor="ew"] {
+  cursor: ew-resize;
+}
+.fs-occ-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.fs-occ-emask {
+  position: absolute;
+  left: var(--fs-occ-x);
+  top: var(--fs-occ-y);
+  width: var(--fs-occ-w);
+  height: var(--fs-occ-h);
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--fs-accent);
+  border-radius: 4px;
+  line-height: 1.2;
+  background-color: color-mix(in srgb, var(--fs-accent) 24%, transparent);
+}
+.fs-occ-emask.is-ellipse {
+  border-radius: 50%;
+}
+.fs-occ-emask.is-selected {
+  background-color: color-mix(in srgb, var(--fs-accent) 34%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--fs-accent) 26%, transparent);
+}
+.fs-occ-emask.is-draft {
+  border-style: dashed;
+  background-color: color-mix(in srgb, var(--fs-accent) 16%, transparent);
+}
+.fs-occ-emask-num {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fs-on-accent);
+  background-color: var(--fs-accent);
+  box-shadow: 0 0 0 2px var(--fs-surface);
+}
+.fs-occ-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  box-sizing: border-box;
+  border: 2px solid var(--fs-accent);
+  border-radius: 50%;
+  background-color: var(--fs-surface);
+  box-shadow: var(--fs-shadow);
+}
+@media (pointer: coarse) {
+  .fs-occ-handle {
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+  }
+}
+.fs-occ-handle.is-nw {
+  left: 0;
+  top: 0;
+}
+.fs-occ-handle.is-n {
+  left: 50%;
+  top: 0;
+}
+.fs-occ-handle.is-ne {
+  left: 100%;
+  top: 0;
+}
+.fs-occ-handle.is-e {
+  left: 100%;
+  top: 50%;
+}
+.fs-occ-handle.is-se {
+  left: 100%;
+  top: 100%;
+}
+.fs-occ-handle.is-s {
+  left: 50%;
+  top: 100%;
+}
+.fs-occ-handle.is-sw {
+  left: 0;
+  top: 100%;
+}
+.fs-occ-handle.is-w {
+  left: 0;
+  top: 50%;
+}
+.fs-occ-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .fs-occ-fields {
+    grid-template-columns: 1fr;
+  }
+}
+.fs-occ-field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fs-text-3);
+}
+.fs-occ-editor .fs-occ-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--fs-border-strong);
+  border-radius: var(--fs-radius-sm);
+  font-family: var(--fs-font);
+  font-size: var(--fs-body);
+  color: var(--fs-text);
+  background-color: var(--fs-surface);
+  box-shadow: none;
+}
+.fs-occ-editor .fs-occ-input:focus {
+  border-color: var(--fs-accent);
+  box-shadow: 0 0 0 3px var(--fs-accent-soft);
+}
+.fs-occ-editor .fs-occ-input:disabled {
+  opacity: 0.5;
+}
+.fs-occ-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+}
+.fs-occ-editor .fs-occ-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  height: 28px;
+  padding: 0 12px 0 6px;
+  border: 1px solid var(--fs-border);
+  border-radius: 999px;
+  font-family: var(--fs-font);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--fs-text-2);
+  background-color: var(--fs-surface-2);
+  box-shadow: none;
+  cursor: pointer;
+}
+.fs-occ-editor .fs-occ-chip.is-selected {
+  border-color: var(--fs-accent);
+  color: var(--fs-accent);
+  background-color: var(--fs-accent-soft);
+}
+.fs-occ-chip-num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fs-on-accent);
+  background-color: var(--fs-accent);
+}
+.fs-occ-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fs-occ-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 2px;
+  background-color: var(--fs-surface);
+}
+.fs-occ-hint {
+  flex: 1 1 260px;
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--fs-text-3);
+}
+@media (max-width: 640px) {
+  .modal.fs-occ-editor-modal.fs-studio {
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: var(--fs-radius-lg);
+  }
+  .fs-occ-editor-stagewrap {
+    padding: 10px;
+  }
+  .fs-occ-stage.is-editing {
+    --fs-occ-max-h: 40vh;
+  }
+}
 .sr-card-container {
   --internal-side-padding: var(--size-4-2);
   .sr-scroll-wrapper {
@@ -4112,559 +4658,6 @@ th.gridjs-th:last-child {
   margin-top: var(--size-4-3);
   padding: var(--size-4-2) 0;
   background: var(--modal-background, var(--background-primary));
-}
-.fs-occ.fs-studio {
-  background-color: transparent;
-  --fs-occ-hidden: #8c96a8;
-  --fs-occ-hidden-edge: rgb(15 23 42 / 22%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  margin: 0 0 8px;
-}
-.theme-dark .fs-occ.fs-studio {
-  --fs-occ-hidden: #4a5468;
-  --fs-occ-hidden-edge: rgb(255 255 255 / 16%);
-}
-.fs-occ-question {
-  font-size: var(--fs-headline);
-  font-weight: 650;
-  line-height: 1.35;
-  text-align: center;
-  color: var(--fs-text);
-}
-.fs-occ-scroll {
-  container-type: inline-size;
-  overflow: auto;
-  border-radius: var(--fs-radius-md);
-  -webkit-overflow-scrolling: touch;
-}
-.fs-occ-stage {
-  position: relative;
-  width: min(
-    100%,
-    calc(var(--fs-occ-max-h, 62vh) * var(--fs-occ-ratio, 1.5)),
-    var(--fs-occ-natural, 100%)
-  );
-  margin-inline: auto;
-  line-height: 0;
-  border-radius: var(--fs-radius-md);
-  overflow: hidden;
-  background-color: var(--fs-surface);
-  box-shadow:
-    var(--fs-shadow),
-    0 0 0 1px var(--fs-border-strong);
-}
-.fs-occ-stage.is-zoomed {
-  width: 180%;
-  max-width: none;
-  margin-inline: 0;
-}
-.fs-occ-image {
-  display: block;
-  width: 100%;
-  max-width: none;
-  height: auto;
-  margin: 0;
-  border-radius: 0;
-  -webkit-user-drag: none;
-  user-select: none;
-}
-.fs-occ-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.fs-occ .fs-mask {
-  fill: var(--fs-occ-hidden);
-  stroke: var(--fs-occ-hidden-edge);
-  stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
-}
-.fs-occ .fs-mask.is-active {
-  fill: var(--fs-accent);
-  stroke: color-mix(in srgb, var(--fs-accent) 70%, white);
-  stroke-width: 2px;
-  filter: drop-shadow(
-    0 2px 8px color-mix(in srgb, var(--fs-accent) 50%, transparent)
-  );
-}
-.fs-occ .fs-mask.is-revealed {
-  fill: color-mix(in srgb, var(--fs-accent) 14%, transparent);
-  stroke: var(--fs-accent);
-  stroke-width: 2.5px;
-}
-.fs-occ-tag {
-  position: absolute;
-  left: var(--fs-occ-x);
-  top: var(--fs-occ-y);
-  width: var(--fs-occ-w);
-  height: var(--fs-occ-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: 2px;
-  overflow: visible;
-  font-size: clamp(10px, 1.9cqw, 15px);
-  font-weight: 600;
-  line-height: 1.25;
-  pointer-events: none;
-}
-.fs-occ-tag-text {
-  flex: none;
-  max-width: 70cqw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 0.2em 0.7em;
-  border-radius: 999px;
-  color: var(--fs-text);
-  background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
-  box-shadow:
-    0 1px 3px #0f172a2e,
-    0 0 0 1px var(--fs-border);
-}
-.fs-occ-tag.is-question {
-  font-size: clamp(14px, 3.4cqw, 26px);
-  font-weight: 700;
-}
-.fs-occ-tag.is-question .fs-occ-tag-text {
-  padding: 0;
-  color: var(--fs-on-accent);
-  background: none;
-  box-shadow: none;
-}
-.fs-occ-answer {
-  align-self: center;
-  max-width: 100%;
-  padding: 10px 18px;
-  border-radius: var(--fs-radius-md);
-  font-size: var(--fs-body);
-  font-weight: 600;
-  text-align: center;
-  color: var(--fs-text);
-  background-color: var(--fs-accent-soft);
-}
-.fs-occ-answer p {
-  margin: 0;
-}
-.fs-occ-missing {
-  padding: 14px 16px;
-  border-radius: var(--fs-radius-md);
-  font-size: var(--fs-caption);
-  line-height: 1.4;
-  color: var(--fs-red);
-  background-color: var(--fs-red-soft);
-}
-.markdown-rendered:has(.fs-occ.is-back) .fs-occ.is-front,
-.markdown-rendered:has(.fs-occ.is-back) > hr {
-  display: none;
-}
-.fs-occ-edit {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid var(--fs-border-strong);
-  border-radius: 999px;
-  line-height: 1;
-  color: var(--fs-text-2);
-  background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
-  box-shadow: var(--fs-shadow);
-  cursor: pointer;
-  opacity: 0;
-  transition:
-    opacity 0.15s ease,
-    color 0.15s ease;
-}
-.fs-occ-edit svg {
-  width: 16px;
-  height: 16px;
-}
-.fs-occ:hover .fs-occ-edit,
-.fs-occ-edit:focus-visible {
-  opacity: 1;
-}
-.fs-occ-edit:hover {
-  color: var(--fs-accent);
-}
-@media (hover: none) {
-  .fs-occ-edit {
-    opacity: 1;
-  }
-}
-.modal.fs-occ-editor-modal.fs-studio {
-  width: min(1080px, 94vw);
-  max-width: 94vw;
-  border: 1px solid var(--fs-border-strong);
-  border-radius: var(--fs-radius-xl);
-  background-color: var(--fs-surface);
-  box-shadow: var(--fs-shadow-lg);
-}
-.fs-occ-editor-modal .modal-title {
-  font-size: var(--fs-title);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--fs-text);
-}
-.fs-occ-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.fs-occ-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-.fs-occ-toolbar-spacer {
-  flex: 1 1 auto;
-}
-.fs-occ-count {
-  font-size: var(--fs-caption);
-  font-variant-numeric: tabular-nums;
-  color: var(--fs-text-3);
-}
-.fs-occ-seg {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid var(--fs-border);
-  border-radius: 999px;
-  background-color: var(--fs-surface-2);
-}
-.fs-occ-editor .fs-occ-seg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 999px;
-  font-family: var(--fs-font);
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--fs-text-2);
-  background: transparent;
-  box-shadow: none;
-  cursor: pointer;
-  transition:
-    color 0.15s ease,
-    background-color 0.15s ease;
-}
-.fs-occ-editor .fs-occ-seg-btn[aria-checked="true"] {
-  color: var(--fs-accent);
-  background-color: var(--fs-surface);
-  box-shadow:
-    0 1px 2px #0f172a1a,
-    0 0 0 1px var(--fs-border);
-}
-.fs-occ-seg-btn svg {
-  width: 15px;
-  height: 15px;
-}
-.fs-occ-editor .fs-occ-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 18px;
-  border: 1px solid var(--fs-border-strong);
-  border-radius: 999px;
-  font-family: var(--fs-font);
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--fs-text);
-  background-color: var(--fs-surface);
-  box-shadow: none;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    opacity 0.15s ease;
-}
-.fs-occ-btn svg {
-  width: 15px;
-  height: 15px;
-}
-.fs-occ-editor .fs-occ-btn:hover {
-  background-color: var(--fs-surface-2);
-}
-.fs-occ-editor .fs-occ-btn.is-primary {
-  border-color: transparent;
-  color: var(--fs-on-accent);
-  background-color: var(--fs-accent);
-}
-.fs-occ-editor .fs-occ-btn.is-primary:hover {
-  background-color: color-mix(in srgb, var(--fs-accent) 88%, black);
-}
-.fs-occ-editor .fs-occ-btn.is-danger {
-  color: var(--fs-red);
-}
-.fs-occ-editor .fs-occ-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-.fs-occ-editor-stagewrap {
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  border: 1px solid var(--fs-border);
-  border-radius: var(--fs-radius-lg);
-  background-color: var(--fs-surface-2);
-  background-image: radial-gradient(
-    var(--fs-border-strong) 1px,
-    transparent 1px
-  );
-  background-size: 16px 16px;
-}
-.fs-occ-stage.is-editing {
-  --fs-occ-max-h: clamp(200px, calc(85vh - 320px), 560px);
-  touch-action: none;
-  user-select: none;
-  outline: none;
-  cursor: crosshair;
-  overflow: visible;
-}
-.fs-occ-stage.is-editing .fs-occ-image {
-  border-radius: var(--fs-radius-sm);
-}
-.fs-occ-stage.is-editing[data-cursor="move"] {
-  cursor: move;
-}
-.fs-occ-stage.is-editing[data-cursor="nwse"] {
-  cursor: nwse-resize;
-}
-.fs-occ-stage.is-editing[data-cursor="nesw"] {
-  cursor: nesw-resize;
-}
-.fs-occ-stage.is-editing[data-cursor="ns"] {
-  cursor: ns-resize;
-}
-.fs-occ-stage.is-editing[data-cursor="ew"] {
-  cursor: ew-resize;
-}
-.fs-occ-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.fs-occ-emask {
-  position: absolute;
-  left: var(--fs-occ-x);
-  top: var(--fs-occ-y);
-  width: var(--fs-occ-w);
-  height: var(--fs-occ-h);
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  border: 2px solid var(--fs-accent);
-  border-radius: 4px;
-  line-height: 1.2;
-  background-color: color-mix(in srgb, var(--fs-accent) 24%, transparent);
-}
-.fs-occ-emask.is-ellipse {
-  border-radius: 50%;
-}
-.fs-occ-emask.is-selected {
-  background-color: color-mix(in srgb, var(--fs-accent) 34%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--fs-accent) 26%, transparent);
-}
-.fs-occ-emask.is-draft {
-  border-style: dashed;
-  background-color: color-mix(in srgb, var(--fs-accent) 16%, transparent);
-}
-.fs-occ-emask-num {
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  display: grid;
-  place-items: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--fs-on-accent);
-  background-color: var(--fs-accent);
-  box-shadow: 0 0 0 2px var(--fs-surface);
-}
-.fs-occ-handle {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  box-sizing: border-box;
-  border: 2px solid var(--fs-accent);
-  border-radius: 50%;
-  background-color: var(--fs-surface);
-  box-shadow: 0 1px 3px #0f172a4d;
-}
-@media (pointer: coarse) {
-  .fs-occ-handle {
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-  }
-}
-.fs-occ-handle.is-nw {
-  left: 0;
-  top: 0;
-}
-.fs-occ-handle.is-n {
-  left: 50%;
-  top: 0;
-}
-.fs-occ-handle.is-ne {
-  left: 100%;
-  top: 0;
-}
-.fs-occ-handle.is-e {
-  left: 100%;
-  top: 50%;
-}
-.fs-occ-handle.is-se {
-  left: 100%;
-  top: 100%;
-}
-.fs-occ-handle.is-s {
-  left: 50%;
-  top: 100%;
-}
-.fs-occ-handle.is-sw {
-  left: 0;
-  top: 100%;
-}
-.fs-occ-handle.is-w {
-  left: 0;
-  top: 50%;
-}
-.fs-occ-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 640px) {
-  .fs-occ-fields {
-    grid-template-columns: 1fr;
-  }
-}
-.fs-occ-field-label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: var(--fs-micro);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--fs-text-3);
-}
-.fs-occ-editor .fs-occ-input {
-  width: 100%;
-  height: 38px;
-  padding: 0 12px;
-  border: 1px solid var(--fs-border-strong);
-  border-radius: var(--fs-radius-sm);
-  font-family: var(--fs-font);
-  font-size: var(--fs-body);
-  color: var(--fs-text);
-  background-color: var(--fs-surface);
-  box-shadow: none;
-}
-.fs-occ-editor .fs-occ-input:focus {
-  border-color: var(--fs-accent);
-  box-shadow: 0 0 0 3px var(--fs-accent-soft);
-}
-.fs-occ-editor .fs-occ-input:disabled {
-  opacity: 0.5;
-}
-.fs-occ-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 28px;
-}
-.fs-occ-editor .fs-occ-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 220px;
-  height: 28px;
-  padding: 0 12px 0 6px;
-  border: 1px solid var(--fs-border);
-  border-radius: 999px;
-  font-family: var(--fs-font);
-  font-size: var(--fs-caption);
-  font-weight: 500;
-  color: var(--fs-text-2);
-  background-color: var(--fs-surface-2);
-  box-shadow: none;
-  cursor: pointer;
-}
-.fs-occ-editor .fs-occ-chip.is-selected {
-  border-color: var(--fs-accent);
-  color: var(--fs-accent);
-  background-color: var(--fs-accent-soft);
-}
-.fs-occ-chip-num {
-  display: grid;
-  place-items: center;
-  flex: none;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--fs-on-accent);
-  background-color: var(--fs-accent);
-}
-.fs-occ-chip-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.fs-occ-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0 2px;
-  background-color: var(--fs-surface);
-}
-.fs-occ-hint {
-  flex: 1 1 260px;
-  font-size: var(--fs-caption);
-  line-height: 1.4;
-  color: var(--fs-text-3);
-}
-@media (max-width: 640px) {
-  .modal.fs-occ-editor-modal.fs-studio {
-    width: 100vw;
-    max-width: 100vw;
-    border-radius: var(--fs-radius-lg);
-  }
-  .fs-occ-editor-stagewrap {
-    padding: 10px;
-  }
-  .fs-occ-stage.is-editing {
-    --fs-occ-max-h: 40vh;
-  }
 }
 .sr-review-log {
   font-size: var(--font-ui-small);

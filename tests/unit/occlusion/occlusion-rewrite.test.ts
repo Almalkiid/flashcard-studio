@@ -3,6 +3,7 @@ import type { OcclusionBlock } from "src/occlusion/occlusion-block";
 import {
     emptyScheduleSegment,
     insertOcclusionBlock,
+    locateOcclusionBlock,
     remapScheduleComment,
     replaceOcclusionBlock,
 } from "src/occlusion/occlusion-rewrite";
@@ -145,5 +146,48 @@ describe("emptyScheduleSegment", () => {
                 baseEase: 250,
             }),
         ).toBe("2000-01-01,1,250");
+    });
+});
+
+describe("locateOcclusionBlock", () => {
+    const block = (image: string, label: string) =>
+        `\`\`\`image-occlusion\nimage: ${image}\nmask: a rect 0 0 .5 .5 | ${label}\n\`\`\``;
+    const mine: OcclusionBlock = {
+        image: "x.png",
+        mode: "hide-all",
+        question: "",
+        masks: [{ id: "a", shape: "rect", x: 0, y: 0, w: 0.5, h: 0.5, label: "A" }],
+    };
+
+    test("is the line it was on, when the block there still has its content", () => {
+        expect(locateOcclusionBlock("Intro\n\n" + block("x.png", "A") + "\nend", 2, mine)).toBe(2);
+    });
+    test("finds the block by its content when the note changed above it", () => {
+        expect(locateOcclusionBlock("One\nTwo\nThree\n\n" + block("x.png", "A"), 2, mine)).toBe(4);
+    });
+    test("a different block on that line is not this block", () => {
+        const note = block("y.png", "Other") + "\n\n" + block("x.png", "A");
+        expect(locateOcclusionBlock(note, 0, mine)).toBe(5);
+    });
+    test("is not found when the block was changed, or is gone", () => {
+        expect(locateOcclusionBlock(block("x.png", "A changed"), 0, mine)).toBe("not-found");
+        expect(locateOcclusionBlock("Nothing here\n", 0, mine)).toBe("not-found");
+        expect(locateOcclusionBlock(block("y.png", "Other"), 0, mine)).toBe("not-found");
+    });
+    test("is ambiguous when the note has the same block twice and neither is on that line", () => {
+        const note = "Added\n\n" + block("x.png", "A") + "\n\n" + block("x.png", "A");
+        expect(locateOcclusionBlock(note, 0, mine)).toBe("ambiguous");
+        // but a copy on the very line it was on is the one that was opened
+        expect(locateOcclusionBlock(note, 2, mine)).toBe(2);
+        expect(locateOcclusionBlock(note, 7, mine)).toBe(7);
+    });
+    test("blocks that are not closed, and other code blocks, are not looked at", () => {
+        expect(
+            locateOcclusionBlock("```image-occlusion\nimage: x.png\n\n```js\nx\n```", 0, mine),
+        ).toBe("not-found");
+    });
+    test("compares the content, not how it was written", () => {
+        const spaced = "```image-occlusion\nIMAGE:  x.png\nmask: a  rect 0 0 .5 .5 |  A\n```";
+        expect(locateOcclusionBlock("\n" + spaced, 5, mine)).toBe(1);
     });
 });

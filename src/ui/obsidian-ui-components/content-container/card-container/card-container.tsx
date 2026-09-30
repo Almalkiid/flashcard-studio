@@ -526,8 +526,11 @@ export class CardContainer {
         this.toolbar.setResetButtonDisabled(false);
         this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
 
-        // Show answer text
-        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
+        // Show answer text. A cloze card, and an image occlusion card, show only their back: it is the whole card
+        if (
+            sessionData.currentQuestion.questionType !== CardType.Cloze &&
+            sessionData.currentQuestion.questionType !== CardType.ImageOcclusion
+        ) {
             await this.drawCardFrontContent(sessionData, settings);
             const hr: HTMLElement = createEl("hr");
             this.content.appendChild(hr);

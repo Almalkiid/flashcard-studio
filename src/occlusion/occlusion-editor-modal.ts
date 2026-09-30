@@ -28,6 +28,16 @@ import {
     resolveImagePath,
 } from "src/occlusion/occlusion-view";
 
+export interface OcclusionEditorOptions {
+    /**
+     * The masks stay as they are (none is drawn or deleted): they can be moved, resized and named, and the question and
+     * the mode changed. For the study screen, where the cards of a block are in the queue and their number must not change.
+     */
+    lockMasks?: boolean;
+    /** Called when the editor closes, whether it was saved or not. */
+    onClosed?: () => void;
+}
+
 export interface OcclusionEditorResult {
     block: OcclusionBlock;
     /** For each mask of the block, the index it had in the block that was opened, or null for a new mask. */
@@ -51,6 +61,9 @@ const HANDLE_CURSOR: Record<Handle, string> = {
     w: "ew",
 };
 
+/** Saves an edited block. False, or an error, says it was not saved: the editor stays open. */
+type SaveHandler = (result: OcclusionEditorResult) => boolean | void | Promise<boolean | void>;
+
 /**
  * The editor of an occlusion block: the picture, and masks to draw on it with the mouse or a finger (pointer events).
  * Drag on empty space to draw a mask, drag a mask to move it, drag its handles to resize it. The selected mask has
@@ -59,7 +72,10 @@ const HANDLE_CURSOR: Record<Handle, string> = {
 export class OcclusionEditorModal extends Modal {
     private model: OcclusionEditorModel;
     private sourcePath: string;
-    private onSave: (result: OcclusionEditorResult) => void | Promise<void>;
+    private onSave: SaveHandler;
+    private options: OcclusionEditorOptions;
+    private saveButton: HTMLButtonElement | null = null;
+    private saving = false;
 
     private stage: HTMLElement | null = null;
     private layer: HTMLElement | null = null;
@@ -72,18 +88,21 @@ export class OcclusionEditorModal extends Modal {
     /**
      * @param sourcePath - The note the block is in, which its image link is resolved from.
      * @param block - The block to edit; a new one has no masks.
-     * @param onSave - Called with the edited block when Save is pressed.
+     * @param onSave - Called with the edited block when Save is pressed. The editor stays open, with its work in it,
+     * until this is done: when it returns false or throws, the block was not saved.
      */
     constructor(
         app: App,
         sourcePath: string,
         block: OcclusionBlock,
-        onSave: (result: OcclusionEditorResult) => void | Promise<void>,
+        onSave: SaveHandler,
+        options: OcclusionEditorOptions = {},
     ) {
         super(app);
         this.sourcePath = sourcePath;
         this.model = new OcclusionEditorModel(block);
         this.onSave = onSave;
+        this.options = options;
     }
 
     onOpen(): void {
@@ -111,7 +130,9 @@ export class OcclusionEditorModal extends Modal {
         // Delete removes the selected mask, unless the key is for a text field
         contentEl.addEventListener("keydown", (event) => {
             if (event.key !== "Delete" && event.key !== "Backspace") return;
-            if (event.target instanceof HTMLInputElement) return;
+            // Not `instanceof`: an element of a pop-out window is not an instance of this window's classes
+            const target = event.target as Element | null;
+            if (target?.matches?.("input, textarea, [contenteditable]")) return;
             event.preventDefault();
             this.deleteSelected();
         });
@@ -121,21 +142,25 @@ export class OcclusionEditorModal extends Modal {
     onClose(): void {
         this.drag = null;
         this.contentEl.empty();
+        this.options.onClosed?.();
     }
 
     // #region -> Building
 
     private buildToolbar(root: HTMLElement): void {
         const bar = root.createDiv({ cls: "fs-occ-toolbar" });
-        this.segmented<MaskShape>(
-            bar,
-            [
-                { value: "rect", label: t("OCCLUSION_SHAPE_RECT"), icon: "square" },
-                { value: "ellipse", label: t("OCCLUSION_SHAPE_ELLIPSE"), icon: "circle" },
-            ],
-            () => this.model.shape,
-            (shape) => (this.model.shape = shape),
-        );
+        // Nothing is drawn or deleted when the masks are locked, so the shape of a new mask is of no use
+        if (!this.options.lockMasks) {
+            this.segmented<MaskShape>(
+                bar,
+                [
+                    { value: "rect", label: t("OCCLUSION_SHAPE_RECT"), icon: "square" },
+                    { value: "ellipse", label: t("OCCLUSION_SHAPE_ELLIPSE"), icon: "circle" },
+                ],
+                () => this.model.shape,
+                (shape) => (this.model.shape = shape),
+            );
+        }
         this.segmented<OcclusionMode>(
             bar,
             [
@@ -147,6 +172,7 @@ export class OcclusionEditorModal extends Modal {
         );
         bar.createDiv({ cls: "fs-occ-toolbar-spacer" });
         this.count = bar.createSpan({ cls: "fs-occ-count" });
+        if (this.options.lockMasks) return;
 
         this.deleteButton = bar.createEl("button", {
             cls: "fs-occ-btn is-danger",
@@ -198,7 +224,10 @@ export class OcclusionEditorModal extends Modal {
 
         stage.addEventListener("pointerdown", (event) => this.onPointerDown(event));
         stage.addEventListener("pointermove", (event) => this.onPointerMove(event));
-        stage.addEventListener("pointerup", (event) => this.endDrag(true, event.pointerType));
+        // Only the first finger draws: a second one would start a second drag over the first
+        stage.addEventListener("pointerup", (event) => {
+            if (event.isPrimary) this.endDrag(true, event.pointerType);
+        });
         stage.addEventListener("pointercancel", () => this.endDrag(false, "mouse"));
         // A long press on a phone would open a menu in the middle of a drag
         stage.addEventListener("contextmenu", (event) => event.preventDefault());
@@ -236,8 +265,8 @@ export class OcclusionEditorModal extends Modal {
 
     private buildFooter(root: HTMLElement, canSave: boolean): void {
         const footer = root.createDiv({ cls: "fs-occ-footer" });
-        if (canSave) footer.createDiv({ cls: "fs-occ-hint", text: t("OCCLUSION_HINT") });
-        else footer.createDiv({ cls: "fs-occ-hint" });
+        const hint = this.options.lockMasks ? t("OCCLUSION_HINT_LOCKED") : t("OCCLUSION_HINT");
+        footer.createDiv({ cls: "fs-occ-hint", text: canSave ? hint : "" });
 
         const cancel = footer.createEl("button", {
             cls: "fs-occ-btn",
@@ -252,7 +281,8 @@ export class OcclusionEditorModal extends Modal {
             attr: { type: "button" },
         });
         save.disabled = !canSave;
-        save.addEventListener("click", () => this.save());
+        save.addEventListener("click", () => void this.save());
+        this.saveButton = save;
     }
 
     // #endregion
@@ -338,6 +368,7 @@ export class OcclusionEditorModal extends Modal {
 
     private onPointerDown(event: PointerEvent): void {
         if (this.stage === null || this.layer === null) return;
+        if (!event.isPrimary || this.drag !== null) return;
         if (event.pointerType === "mouse" && event.button !== 0) return;
         event.preventDefault();
         this.stage.focus({ preventScroll: true });
@@ -373,6 +404,7 @@ export class OcclusionEditorModal extends Modal {
 
         this.model.select(-1);
         this.refresh();
+        if (this.options.lockMasks) return;
         const draft = this.layer.createDiv({ cls: "fs-occ-emask is-draft" });
         draft.toggleClass("is-ellipse", this.model.shape === "ellipse");
         this.drag = { kind: "draw", start: point, rect: rectFromPoints(point, point), draft };
@@ -380,6 +412,7 @@ export class OcclusionEditorModal extends Modal {
     }
 
     private onPointerMove(event: PointerEvent): void {
+        if (!event.isPrimary) return;
         const drag = this.drag;
         if (drag === null) {
             this.showCursor(event);
@@ -435,19 +468,28 @@ export class OcclusionEditorModal extends Modal {
     // #endregion
 
     private deleteSelected(): void {
+        if (this.options.lockMasks) return;
         if (this.model.removeSelected()) this.refresh();
     }
 
-    private save(): void {
+    private async save(): Promise<void> {
+        if (this.saving) return;
         if (this.model.masks.length === 0) {
             new Notice(t("OCCLUSION_NEEDS_MASK"));
             return;
         }
-        const result = this.model.result();
-        this.close();
-        void Promise.resolve(this.onSave(result)).catch((error: unknown) => {
+
+        // The editor stays open until the block is saved, so a refused save does not lose what was drawn
+        this.saving = true;
+        if (this.saveButton !== null) this.saveButton.disabled = true;
+        try {
+            if ((await this.onSave(this.model.result())) !== false) this.close();
+        } catch (error) {
             console.error("Image occlusion: could not save", error);
-            new Notice(t("OCCLUSION_BLOCK_NOT_FOUND"));
-        });
+            new Notice(t("OCCLUSION_SAVE_FAILED"));
+        } finally {
+            this.saving = false;
+            if (this.saveButton !== null) this.saveButton.disabled = false;
+        }
     }
 }

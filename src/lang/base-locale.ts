@@ -779,6 +779,9 @@ export interface IBaseLocale {
     OCCLUSION_MASK_NUMBER: string;
     OCCLUSION_NO_LABEL: string;
     OCCLUSION_MASK_COUNT: string;
+    OCCLUSION_HINT_LOCKED: string;
+    OCCLUSION_SAVE_FAILED: string;
+    OCCLUSION_BLOCK_AMBIGUOUS: string;
     OCCLUSION_NEEDS_MASK: string;
     OCCLUSION_BLOCK_NOT_FOUND: string;
     // Design: statistics

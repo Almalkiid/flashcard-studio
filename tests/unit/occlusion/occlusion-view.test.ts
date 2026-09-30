@@ -1,6 +1,7 @@
 import {
     maskStates,
     occlusionCardMarkdown,
+    occlusionCardText,
     parseOcclusionCardSpec,
     plainLabel,
 } from "src/occlusion/occlusion-view";
@@ -98,5 +99,26 @@ describe("plainLabel", () => {
             "the note and Other and text",
         );
         expect(plainLabel("plain")).toBe("plain");
+    });
+});
+
+describe("occlusionCardText", () => {
+    test("reads a card as its question and the label of its mask, for places that show a card as one line", () => {
+        expect(occlusionCardText(occlusionCardMarkdown(block, 1, "front"))).toBe(
+            "What is hidden? · B",
+        );
+        expect(
+            occlusionCardText(occlusionCardMarkdown({ ...block, question: "Name it" }, 0, "back")),
+        ).toBe("Name it · A");
+    });
+    test("a mask with no label is called by its number", () => {
+        expect(occlusionCardText(occlusionCardMarkdown(block, 2, "front"))).toBe(
+            "What is hidden? · Mask 3",
+        );
+    });
+    test("text that is not an occlusion card is not one", () => {
+        expect(occlusionCardText("Just a question")).toBeNull();
+        expect(occlusionCardText("```fs-occlusion-card\n{oops\n```")).toBeNull();
+        expect(occlusionCardText("```js\nconst a = 1;\n```")).toBeNull();
     });
 });

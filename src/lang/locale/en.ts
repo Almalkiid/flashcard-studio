@@ -898,6 +898,11 @@ const en: IBaseLocale = {
     OCCLUSION_MASK_NUMBER: "Mask ${n}",
     OCCLUSION_NO_LABEL: "No answer yet",
     OCCLUSION_MASK_COUNT: "Cards: ${n}",
+    OCCLUSION_HINT_LOCKED:
+        "Move and resize the masks, and change their answers. To add or delete masks, edit the block in its note.",
+    OCCLUSION_SAVE_FAILED: "The block could not be saved.",
+    OCCLUSION_BLOCK_AMBIGUOUS:
+        "The note has this block more than once, so it cannot tell which one to change. Nothing was changed.",
     OCCLUSION_NEEDS_MASK: "Draw at least one mask first.",
     OCCLUSION_BLOCK_NOT_FOUND: "The block was not found in the note. Open the note and try again.",
     // Design: statistics

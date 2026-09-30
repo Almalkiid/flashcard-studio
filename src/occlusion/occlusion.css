@@ -10,8 +10,6 @@
 .fs-occ.fs-studio {
     /* The card sits on whatever it is drawn on: the study screen, or the note */
     background-color: transparent;
-    --fs-occ-hidden: #8c96a8;
-    --fs-occ-hidden-edge: rgb(15 23 42 / 22%);
 
     display: flex;
     flex-direction: column;
@@ -20,9 +18,9 @@
     margin: 0 0 8px;
 }
 
-.theme-dark .fs-occ.fs-studio {
-    --fs-occ-hidden: #4a5468;
-    --fs-occ-hidden-edge: rgb(255 255 255 / 16%);
+/* In the study screen the card has little room: the rows of the card sit closer together */
+.sr-content .fs-occ.fs-studio {
+    gap: 10px;
 }
 
 .fs-occ-question {
@@ -89,9 +87,10 @@
     pointer-events: none;
 }
 
+/* A mask that hides: solid, so that what is under it cannot be read. The tokens switch with the theme. */
 .fs-occ .fs-mask {
-    fill: var(--fs-occ-hidden);
-    stroke: var(--fs-occ-hidden-edge);
+    fill: color-mix(in srgb, var(--fs-text-3) 85%, var(--fs-surface));
+    stroke: var(--fs-border-strong);
     stroke-width: 1px;
     vector-effect: non-scaling-stroke;
 }
@@ -99,16 +98,22 @@
 /* The mask the card asks about */
 .fs-occ .fs-mask.is-active {
     fill: var(--fs-accent);
-    stroke: color-mix(in srgb, var(--fs-accent) 70%, white);
-    stroke-width: 2px;
-    filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--fs-accent) 50%, transparent));
+    stroke: var(--fs-surface);
+    stroke-width: 1.5px;
 }
 
-/* A mask that shows its answer is only an outline, so that the picture under it can be seen */
+/*
+ * A mask that shows its answer is only an accent outline, with nothing in it: the picture usually has the label written
+ * on it already, and the answer is shown under the picture. In the note's own view the answers are on the masks.
+ */
 .fs-occ .fs-mask.is-revealed {
-    fill: color-mix(in srgb, var(--fs-accent) 14%, transparent);
+    fill: transparent;
     stroke: var(--fs-accent);
     stroke-width: 2.5px;
+}
+
+.fs-occ.is-note .fs-mask.is-revealed {
+    fill: color-mix(in srgb, var(--fs-accent) 14%, transparent);
 }
 
 /* The words in a mask: "?" on the one that is asked about, the answer on the ones that show it */
@@ -142,7 +147,7 @@
     color: var(--fs-text);
     background-color: color-mix(in srgb, var(--fs-surface) 92%, transparent);
     box-shadow:
-        0 1px 3px rgb(15 23 42 / 18%),
+        var(--fs-shadow),
         0 0 0 1px var(--fs-border);
 }
 
@@ -182,15 +187,6 @@
     line-height: 1.4;
     color: var(--fs-red);
     background-color: var(--fs-red-soft);
-}
-
-/*
- * The study screen draws the question again above its answer. An occlusion answer is the whole picture, so the
- * copy of the question would show the picture twice.
- */
-.markdown-rendered:has(.fs-occ.is-back) .fs-occ.is-front,
-.markdown-rendered:has(.fs-occ.is-back) > hr {
-    display: none;
 }
 
 /* The pencil that opens the editor, on the note's own view */
@@ -313,7 +309,7 @@
     color: var(--fs-accent);
     background-color: var(--fs-surface);
     box-shadow:
-        0 1px 2px rgb(15 23 42 / 10%),
+        var(--fs-shadow),
         0 0 0 1px var(--fs-border);
 }
 
@@ -360,7 +356,7 @@
 }
 
 .fs-occ-editor .fs-occ-btn.is-primary:hover {
-    background-color: color-mix(in srgb, var(--fs-accent) 88%, black);
+    background-color: color-mix(in srgb, var(--fs-accent) 88%, var(--fs-text));
 }
 
 .fs-occ-editor .fs-occ-btn.is-danger {
@@ -478,7 +474,7 @@
     border: 2px solid var(--fs-accent);
     border-radius: 50%;
     background-color: var(--fs-surface);
-    box-shadow: 0 1px 3px rgb(15 23 42 / 30%);
+    box-shadow: var(--fs-shadow);
 }
 
 @media (pointer: coarse) {

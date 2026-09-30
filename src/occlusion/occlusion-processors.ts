@@ -1,5 +1,6 @@
 import "src/occlusion/occlusion.css";
 import {
+    App,
     Editor,
     MarkdownFileInfo,
     MarkdownPostProcessorContext,
@@ -10,19 +11,21 @@ import {
     TFile,
 } from "obsidian";
 
+import { Question } from "src/data/data-structures/card/questions/question";
 import { t } from "src/lang/helpers";
 import type SRPlugin from "src/main";
 import { ImageSuggestModal, isImageFile, vaultImages } from "src/occlusion/image-suggest-modal";
 import {
-    isOcclusionFenceStart,
     OCCLUSION_LANG,
     OcclusionBlock,
+    occlusionSourceOf,
     parseOcclusionBlock,
 } from "src/occlusion/occlusion-block";
 import { OcclusionEditorModal } from "src/occlusion/occlusion-editor-modal";
 import {
     emptyScheduleSegment,
     insertOcclusionBlock,
+    locateOcclusionBlock,
     replaceOcclusionBlock,
 } from "src/occlusion/occlusion-rewrite";
 import {
@@ -130,26 +133,67 @@ function editBlock(
         block,
         async ({ block: edited, oldIndexOfNew }) => {
             const file = app.vault.getFileByPath(ctx.sourcePath);
-            if (file === null) throw new Error(`${ctx.sourcePath} is not in the vault`);
+            if (file === null) {
+                new Notice(t("OCCLUSION_BLOCK_NOT_FOUND"));
+                return false;
+            }
             const emptySegment = emptyScheduleSegment(plugin.dataManager.data.settings);
 
-            let found = true;
+            const outcome: { refused: "not-found" | "ambiguous" | null } = { refused: null };
             await app.vault.process(file, (text) => {
-                // The note may have changed since the block was drawn: only a block still on that line is rewritten
-                found = isOcclusionFenceStart(text.split("\n")[section.lineStart] ?? "");
-                return found
-                    ? replaceOcclusionBlock(
-                          text,
-                          section.lineStart,
-                          edited,
-                          oldIndexOfNew,
-                          emptySegment,
-                      )
-                    : text;
+                // The note may have changed since the block was drawn: only the block that was opened is rewritten
+                const line = locateOcclusionBlock(text, section.lineStart, block);
+                if (typeof line !== "number") {
+                    outcome.refused = line;
+                    return text;
+                }
+                return replaceOcclusionBlock(text, line, edited, oldIndexOfNew, emptySegment);
             });
-            if (!found) new Notice(t("OCCLUSION_BLOCK_NOT_FOUND"));
+            if (outcome.refused === null) return true;
+            new Notice(
+                t(
+                    outcome.refused === "ambiguous"
+                        ? "OCCLUSION_BLOCK_AMBIGUOUS"
+                        : "OCCLUSION_BLOCK_NOT_FOUND",
+                ),
+            );
+            return false;
         },
     ).open();
+}
+
+/**
+ * The "Edit card" of the study screen, for an occlusion card: the occlusion editor on the card's block. It resolves
+ * with the new text of the question, which the review sequencer writes to the note and puts on the cards. The masks
+ * are locked, because the cards of the block are in the queue and their number and order cannot change during a
+ * session. Rejects when the editor is closed without saving.
+ */
+export function editOcclusionQuestion(app: App, question: Question): Promise<string> {
+    const text = question.questionText.actualQuestion;
+    const source = occlusionSourceOf(text);
+    const block = source === null ? null : parseOcclusionBlock(source);
+
+    return new Promise<string>((resolve, reject) => {
+        if (block === null) {
+            reject(new Error("The card's block cannot be read"));
+            return;
+        }
+        let saved: string | null = null;
+        new OcclusionEditorModal(
+            app,
+            question.note.filePath,
+            block,
+            ({ block: edited, oldIndexOfNew }) => {
+                // The block is the question text: no comment after it, and the masks keep their places
+                saved = replaceOcclusionBlock(text, 0, edited, oldIndexOfNew, "");
+            },
+            {
+                lockMasks: true,
+                onClosed: () =>
+                    saved === null ? reject(new Error(t("NO_INPUT"))) : resolve(saved),
+            },
+        ).open();
+    });
 }
 
 /** The image the cursor's line embeds, when there is one in the vault. */
