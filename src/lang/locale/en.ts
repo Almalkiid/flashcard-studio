@@ -875,6 +875,8 @@ const en: IBaseLocale = {
     ANKI_EXPORT_ERR_FAILED: "Export failed: ${detail}",
     ANKI_EXPORT_NOT_READY: "The plugin is still loading. Try again in a moment.",
     ANKI_SHOW_IN_FOLDER: "Show in folder",
+    EDIT_CARD_MOVED_ON:
+        "The review moved on to another card while you were editing, so nothing was changed.",
     // Image occlusion
     OCCLUSION_ADD_COMMAND: "Add image occlusion",
     OCCLUSION_EDITOR_TITLE: "Image occlusion",

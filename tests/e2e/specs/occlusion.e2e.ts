@@ -578,6 +578,130 @@ describe("image occlusion", function () {
         );
     });
 
+    it("keeps the study shortcuts still while the occlusion editor is open, and saves into the question it was opened on", async function () {
+        // The shortcuts are keyboard only, and there is no keyboard on a phone
+        if (await isMobile()) this.skip();
+        await useNote(NOTE_TEXT);
+        await openReview();
+        await browser
+            .$(".sr-view .sr-card-container .sr-show-answer-button")
+            .waitForClickable({ timeoutMsg: "no card was shown" });
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+        // The back is where a key does the most: 3 is Good, Space is Good, s skips, u undoes
+        await showAnswer();
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+        expect((await shownCard()).answer).toBe("Right atrium");
+
+        await browser.execute(() => {
+            const button = document.querySelector<HTMLElement>(".sr-view .sr-edit-button");
+            if (button === null) throw new Error("no Edit card button");
+            button.click();
+        });
+        await browser
+            .$(".fs-occ-editor-modal")
+            .waitForDisplayed({ timeoutMsg: "the editor did not open" });
+        await editorReady();
+
+        // Focus is on the picture, as after a click on a mask, not in a text field: the keys are for the editor
+        await browser.$(".fs-occ-editor .fs-occ-stage").click();
+        for (const key of ["3", "Space", "s", "u", "j", "Enter"]) {
+            await browser.keys(key === "Space" ? " " : key === "Enter" ? "Enter" : key);
+        }
+        await browser.pause(800);
+        // Nothing was graded, skipped or undone: no schedule was written, and the card is the same card, on its back
+        expect(readNote()).not.toContain("<!--SR:");
+        expect(await browser.$(".fs-occ-editor-modal").isExisting()).toBe(true);
+        let card = await shownCard();
+        expect(card.classes).toContain("is-back");
+        expect(card.answer).toBe("Right atrium");
+
+        await browser.$$(".fs-occ-editor .fs-occ-chip")[0].click();
+        await browser.$$(".fs-occ-editor .fs-occ-input")[0].setValue("Edited with keys pressed");
+        await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
+        await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });
+        await browser.waitUntil(() => readNote().includes("| Edited with keys pressed"), {
+            timeoutMsg: "the edit was never written to the note",
+        });
+
+        // The same question was updated, and the card on the screen is the same card with the new answer
+        expect(readNote()).toContain(MASK_LINES[1]);
+        expect(readNote().match(/^mask: /gm)).toHaveLength(2);
+        expect(readNote()).not.toContain("<!--SR:");
+        await browser.waitUntil(
+            async () => (await shownCard()).answer === "Edited with keys pressed",
+            {
+                timeoutMsg: "the card on the screen did not get the new answer",
+            },
+        );
+        card = await shownCard();
+        expect(card.classes).toContain("is-back");
+
+        // And the shortcuts work again once the editor is closed: 3 grades the card (Good), which writes its schedule
+        await browser.keys("3");
+        await browser.waitUntil(() => readNote().includes("<!--SR:"), {
+            timeoutMsg: "the shortcuts did not come back after the editor was closed",
+        });
+    });
+
+    it("refuses to save when the review moved to another card while the occlusion editor was open", async function () {
+        const other = "Other question::Other answer";
+        const text = [TAG, "", BLOCK, "", other, ""].join("\n");
+        await useNote(text);
+        await openReview();
+        await browser
+            .$(".sr-view .sr-card-container .sr-show-answer-button")
+            .waitForClickable({ timeoutMsg: "no card was shown" });
+        await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+
+        await browser.execute(() => {
+            const button = document.querySelector<HTMLElement>(".sr-view .sr-edit-button");
+            if (button === null) throw new Error("no Edit card button");
+            button.click();
+        });
+        await browser
+            .$(".fs-occ-editor-modal")
+            .waitForDisplayed({ timeoutMsg: "the editor did not open" });
+        await editorReady();
+
+        // Something else moves the review on (the sibling card, then the other question) while the editor is open
+        const skip = () =>
+            browser.executeObsidian(async ({ app }, id) => {
+                const plugin = (
+                    app as unknown as {
+                        plugins: {
+                            plugins: Record<
+                                string,
+                                {
+                                    uiManager: {
+                                        contentManager: { _skipCurrentCard(): Promise<void> };
+                                    };
+                                }
+                            >;
+                        };
+                    }
+                ).plugins.plugins[id];
+                await plugin.uiManager.contentManager._skipCurrentCard();
+            }, pluginId);
+        await skip();
+        await skip();
+
+        await browser.$$(".fs-occ-editor .fs-occ-chip")[0].click();
+        await browser.$$(".fs-occ-editor .fs-occ-input")[0].setValue("Must not be written");
+        await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
+        await browser.waitUntil(
+            () =>
+                browser.execute(() =>
+                    Array.from(document.querySelectorAll(".notice")).some((notice) =>
+                        (notice.textContent ?? "").includes("moved on"),
+                    ),
+                ),
+            { timeoutMsg: "no notice said that the review had moved on" },
+        );
+        await browser.pause(500);
+        // Nothing was written: the other question was not overwritten with the block, and the block is as it was
+        expect(readNote()).toBe(text);
+    });
+
     it("saves into the block that was opened when the note has changed, and refuses when it cannot tell which", async function () {
         await useNote(NOTE_TEXT);
         await openNote("preview");

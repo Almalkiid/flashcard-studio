@@ -757,6 +757,7 @@ export interface IBaseLocale {
     ANKI_EXPORT_ERR_FAILED: string;
     ANKI_EXPORT_NOT_READY: string;
     ANKI_SHOW_IN_FOLDER: string;
+    EDIT_CARD_MOVED_ON: string;
     // Image occlusion
     OCCLUSION_ADD_COMMAND: string;
     OCCLUSION_EDITOR_TITLE: string;
