@@ -56,6 +56,16 @@ export default {
 
         // AI-generated cards: the dialog needs a running Obsidian, the end-to-end tests cover it
         "src/ai/generate-cards-modal.ts",
+        "src/ai/note-picker-modal.ts",
+        "src/ai/open-generate-cards.ts",
+
+        // Exams: the screens and the vault files need a running Obsidian, the end-to-end tests cover them
+        "src/exam/exam-render.ts",
+        "src/exam/exam-results-view.ts",
+        "src/exam/exam-run.ts",
+        "src/exam/exam-setup-modal.ts",
+        "src/exam/exam-store.ts",
+        "src/exam/exam-view.ts",
 
         // debugging utils
         "src/utils/debug.ts",

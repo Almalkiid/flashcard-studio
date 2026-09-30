@@ -5,7 +5,7 @@
  * none, so every token falls back to an Obsidian variable and the pieces stay plain there.
  */
 
-.sr-card-container {
+:is(.sr-card-container, .fs-exam) {
     --fsa-card: var(--fs-surface, var(--background-primary));
     --fsa-tile: var(--fs-surface-2, var(--background-secondary));
     --fsa-border: var(--fs-border-strong, var(--background-modifier-border));
@@ -122,14 +122,14 @@
     color: var(--fsa-muted);
 }
 
-.sr-card-container .fs-choices {
+:is(.sr-card-container, .fs-exam) .fs-choices {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
 /* One option: a key badge, the option as Markdown, and after answering a tag saying what it was */
-.sr-card-container .fs-choices > .fs-choice {
+:is(.sr-card-container, .fs-exam) .fs-choices > .fs-choice {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -239,7 +239,7 @@
     }
 }
 
-.sr-card-container .fs-choice-key {
+:is(.sr-card-container, .fs-exam) .fs-choice-key {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -256,7 +256,7 @@
     background-color: transparent;
 }
 
-.sr-card-container .fs-choice-text {
+:is(.sr-card-container, .fs-exam) .fs-choice-text {
     flex: 1 1 0;
     min-width: 0;
     word-break: break-word;
@@ -270,7 +270,7 @@
     }
 }
 
-.sr-card-container .fs-choice-tag {
+:is(.sr-card-container, .fs-exam) .fs-choice-tag {
     display: inline-flex;
     align-items: center;
     flex: none;
@@ -280,7 +280,7 @@
     white-space: nowrap;
 }
 
-.sr-card-container .fs-choice-tag-icon {
+:is(.sr-card-container, .fs-exam) .fs-choice-tag-icon {
     display: flex;
 
     & svg {
@@ -291,7 +291,7 @@
 }
 
 /* The explanation after answering */
-.sr-card-container .fs-choice-explanation {
+:is(.sr-card-container, .fs-exam) .fs-choice-explanation {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -307,7 +307,7 @@
     }
 }
 
-.sr-card-container .fs-choice-explanation-icon {
+:is(.sr-card-container, .fs-exam) .fs-choice-explanation-icon {
     display: flex;
     flex: none;
     margin-top: 1px;
@@ -320,7 +320,7 @@
     }
 }
 
-.sr-card-container .fs-choice-explanation-text {
+:is(.sr-card-container, .fs-exam) .fs-choice-explanation-text {
     flex: 1 1 0;
     min-width: 0;
 
@@ -338,21 +338,21 @@
     justify-content: flex-end;
 }
 
-.sr-card-container .fs-choice-check:disabled {
+:is(.sr-card-container, .fs-exam) .fs-choice-check:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
 
 /* MARK: Typed answer */
 
-.sr-card-container .fs-typed {
+:is(.sr-card-container, .fs-exam) .fs-typed {
     display: flex;
     justify-content: center;
     width: 100%;
     box-sizing: border-box;
 }
 
-.sr-card-container .fs-typed .fs-typed-input {
+:is(.sr-card-container, .fs-exam) .fs-typed .fs-typed-input {
     box-sizing: border-box;
     width: 100%;
     max-width: 460px;
@@ -383,14 +383,14 @@
 }
 
 /* What was typed with each letter marked, an arrow, and the expected answer */
-.sr-card-container .fs-typed-result {
+:is(.sr-card-container, .fs-exam) .fs-typed-result {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
 }
 
-.sr-card-container .fs-typed-line {
+:is(.sr-card-container, .fs-exam) .fs-typed-line {
     font-size: 22px;
     font-weight: 500;
     line-height: 1.45;
@@ -399,12 +399,12 @@
     color: var(--fsa-text);
 }
 
-.sr-card-container .fs-typed-typed:empty::before {
+:is(.sr-card-container, .fs-exam) .fs-typed-typed:empty::before {
     content: "—";
     color: var(--fsa-muted);
 }
 
-.sr-card-container .fs-typed-arrow {
+:is(.sr-card-container, .fs-exam) .fs-typed-arrow {
     display: flex;
     padding-inline-start: 2px;
     color: var(--fsa-muted);
@@ -415,27 +415,27 @@
     }
 }
 
-.sr-card-container .fs-typed-ok {
+:is(.sr-card-container, .fs-exam) .fs-typed-ok {
     color: var(--fsa-green);
 }
 
-.sr-card-container .fs-typed-wrong,
-.sr-card-container .fs-typed-missing {
+:is(.sr-card-container, .fs-exam) .fs-typed-wrong,
+:is(.sr-card-container, .fs-exam) .fs-typed-missing {
     border-radius: 4px;
     color: var(--fsa-red);
     background-color: var(--fsa-red-soft);
 }
 
-.sr-card-container .fs-typed-wrong {
+:is(.sr-card-container, .fs-exam) .fs-typed-wrong {
     text-decoration: line-through;
 }
 
-.sr-card-container .fs-typed-missing {
+:is(.sr-card-container, .fs-exam) .fs-typed-missing {
     text-decoration: underline;
     text-underline-offset: 4px;
 }
 
-.sr-card-container .fs-typed-check {
+:is(.sr-card-container, .fs-exam) .fs-typed-check {
     display: inline-flex;
     margin-inline-start: 10px;
     vertical-align: middle;

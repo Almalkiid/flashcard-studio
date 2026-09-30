@@ -136,6 +136,9 @@ export interface SRSettings {
     speechVoice: string;
     /** 1 is the voice's normal speed. */
     speechRate: number;
+    // Exams
+    /** The score, in percent, from which an exam counts as passed. A practice target, not an official pass mark. */
+    examPassPercent: number;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -268,6 +271,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     readAnswerAloud: false,
     speechVoice: "",
     speechRate: 1,
+    // Exams
+    examPassPercent: 75,
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

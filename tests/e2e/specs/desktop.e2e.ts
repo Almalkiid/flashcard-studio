@@ -270,9 +270,16 @@ describe("desktop interface", function () {
             timeoutMsg: "the dashboard home was not shown",
         });
 
-        // The sidebar: the navigation with what exists (no Exams or AI yet), the deck tree and Settings
+        // The sidebar: the navigation, the deck tree and Settings
         const labels = await listOf(`${SHELL} .fs-desktop-nav .fs-desktop-nav-item`, "aria-label");
-        expect(labels).toEqual(["Home", "Study", "Browse cards", "Statistics"]);
+        expect(labels).toEqual([
+            "Home",
+            "Study",
+            "Exams",
+            "Browse cards",
+            "Statistics",
+            "Create with AI",
+        ]);
         expect(
             await browser.$(`${SHELL} .fs-desktop-nav-item.is-active`).getAttribute("aria-label"),
         ).toEqual("Home");
@@ -289,9 +296,7 @@ describe("desktop interface", function () {
         expect(await browser.$(`${SHELL} .fs-dh-button.is-primary`).getText()).toMatch(
             /^Study all · \d+$/,
         );
-        expect(await browser.$(`${SHELL} .fs-dh-button:not(.is-primary)`).isExisting()).toEqual(
-            false,
-        );
+        expect(await textOf(`${SHELL} .fs-dh-button:not(.is-primary)`)).toEqual("Take an exam");
         await browser.waitUntil(async () => (await textOf(`${SHELL} .fs-home-goal-done`)) !== "0", {
             timeoutMsg: "the goal never showed today's answers",
         });
@@ -307,7 +312,7 @@ describe("desktop interface", function () {
         expect((await listOf(`${SHELL} .fs-dh-bar-col`)).length).toEqual(7);
         expect(await textOf(`${SHELL} .fs-dh-bar-col.is-today .fs-dh-bar-day`)).toEqual("Today");
 
-        // No exam feature yet: no "Last exam" card
+        // No exam taken yet: no "Last exam" card
         expect(await browser.$(`${SHELL} .fs-dh-exam`).isExisting()).toEqual(false);
 
         await browser.pause(500);

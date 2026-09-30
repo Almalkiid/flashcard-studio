@@ -228,7 +228,8 @@ export function renderChoiceFront(
  */
 export async function renderChoiceBack(
     parent: HTMLElement,
-    state: ChoiceState,
+    // Only what is drawn: an exam has no card to hold
+    state: Pick<ChoiceState, "mc" | "order" | "chosen"> & Partial<ChoiceState>,
     ctx: ChoiceContext,
 ): Promise<void> {
     const { mc } = state;

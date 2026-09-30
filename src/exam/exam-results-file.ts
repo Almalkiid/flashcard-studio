@@ -20,6 +20,11 @@ export const EXAMS_FOLDER = "Flashcard Studio/Exams";
 const BLOCK_START = "```fs-exam";
 const BLOCK_END = "```";
 
+/** Whether a path is a file in the exams folder, which holds history rather than cards. */
+export function isInExamsFolder(path: string): boolean {
+    return path.startsWith(`${EXAMS_FOLDER}/`);
+}
+
 function two(value: number): string {
     return String(value).padStart(2, "0");
 }

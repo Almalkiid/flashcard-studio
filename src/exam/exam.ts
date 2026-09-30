@@ -78,6 +78,12 @@ export interface ExamCardInput {
     sourcePath?: string;
 }
 
+/** An exam ready to be taken: how it was set up, and the questions picked for it. */
+export interface ExamStart {
+    setup: ExamSetup;
+    questions: ExamQuestion[];
+}
+
 export function emptyAnswer(): ExamAnswer {
     return { chosen: [], typed: "", selfRight: null, flagged: false, ms: 0 };
 }
@@ -270,4 +276,24 @@ const NAMES_SHOWN = 3;
 export function joinDeckNames(names: string[]): string {
     const shown = names.slice(0, NAMES_SHOWN).join(", ");
     return names.length > NAMES_SHOWN ? `${shown} +${names.length - NAMES_SHOWN}` : shown;
+}
+
+/**
+ * The words of a Markdown text on one line, for a list where the text is only a label: images are left out, links and
+ * emphasis keep their words, and a long text is cut on a word with an ellipsis. Empty when the text is only images.
+ */
+export function plainExcerpt(markdown: string, max = 140): string {
+    const text = markdown
+        .replace(/!\[\[[^\]]*\]\]|!\[[^\]]*\]\([^)]*\)/g, " ")
+        .replace(/\[\[([^\]|]*)\|([^\]]*)\]\]/g, "$2")
+        .replace(/\[\[([^\]]*)\]\]/g, "$1")
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+        .replace(/^\s{0,3}(#{1,6}\s+|>\s?|[-*+]\s+(\[[ xX]\]\s+)?|\d+[.)]\s+)/gm, "")
+        .replace(/\*\*|__|~~|==|`|\$/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    if (text.length <= max) return text;
+    const cut = text.slice(0, max);
+    const space = cut.lastIndexOf(" ");
+    return `${(space > 0 ? cut.slice(0, space) : cut).trimEnd()}…`;
 }

@@ -565,6 +565,8 @@ export class UIPreferencesPage extends SettingsPage {
         // Read aloud, on devices that can speak
         if (speechAvailable()) this.addReadAloudSettings();
 
+        this.addExamSettings();
+
         // M3a: scheduling
         new SettingGroup(this.containerEl)
             .setHeading(t("ANSWER_KEYS"))
@@ -660,5 +662,23 @@ export class UIPreferencesPage extends SettingsPage {
                             }),
                     );
             });
+    }
+
+    private addExamSettings(): void {
+        const settings = this.settingsManager.settings;
+        new SettingGroup(this.containerEl).setHeading(t("EXAMS")).addSetting((setting: Setting) => {
+            setting
+                .setName(t("EXAM_PASS_MARK"))
+                .setDesc(t("EXAM_PASS_MARK_DESC"))
+                .addSlider((slider) =>
+                    slider
+                        .setLimits(1, 100, 1)
+                        .setValue(settings.examPassPercent)
+                        .onChange(async (value) => {
+                            settings.examPassPercent = value;
+                            await this.settingsManager.save();
+                        }),
+                );
+        });
     }
 }

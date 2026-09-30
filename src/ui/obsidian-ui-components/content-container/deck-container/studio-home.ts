@@ -27,6 +27,8 @@ export interface HomeActions {
     loadInsights: () => Promise<HomeInsights>;
     openStatistics: () => void;
     openSettings: () => void;
+    /** Opens the exam setup. Absent: no "Take an exam" row. */
+    openExams?: () => void;
     learnerName: string;
 }
 
@@ -137,6 +139,26 @@ export function renderStudioHome(
             insights.retention === null ? "–" : `${Math.round(insights.retention * 100)}%`,
         );
     });
+
+    // Exams
+    const openExams = actions.openExams;
+    if (openExams !== undefined) {
+        const row = container.createDiv({ cls: "fs-card fs-home-deck is-clickable fs-home-exam" });
+        setIcon(row.createDiv({ cls: "fs-icon-tile fs-tone-purple" }), "clipboard-check");
+        const text = row.createDiv({ cls: "fs-home-deck-text" });
+        text.createDiv({ cls: "fs-home-deck-name", text: t("DESKTOP_TAKE_EXAM") });
+        text.createDiv({ cls: "fs-home-deck-sub", text: t("EXAM_HOME_SUB") });
+        setIcon(row.createDiv({ cls: "fs-home-chevron" }), "chevron-right");
+        row.setAttribute("role", "button");
+        row.setAttribute("tabindex", "0");
+        row.addEventListener("click", () => openExams());
+        row.addEventListener("keydown", (event: KeyboardEvent) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openExams();
+            }
+        });
+    }
 
     // Decks
     const section = container.createDiv({ cls: "fs-home-section" });

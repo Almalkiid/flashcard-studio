@@ -13,6 +13,8 @@ Changes made before the fork are in the [Spaced Repetition changelog](docs/docs/
 - Typed answers. With **Type the answer** on, or for one session from the card menu, a card with a short plain answer shows a field, compares your answer letter by letter and suggests Good or Again. Cloze blanks become fields too. Case, spacing and a final full stop do not count; accents can be ignored.
 - The rating that an answer suggests is outlined on the answer tiles.
 - Read aloud with the device's voices: a speaker button and the R key, optional reading of the question or the answer when it shows, a voice and a speed.
+- Exams. **Take an exam** (a command, a button on the home screen, **Exams** in the desktop sidebar) sets up an exam from the decks you choose: how many questions, a time limit, multiple choice cards only or all cards (short answers typed, others marked by you), with presets for a Quick check (20 questions) and a CIA simulation (125 questions, 150 minutes). The exam has a question map, flags, a countdown that submits at zero, and the keys 1 to 9, the arrows, F and Enter. The results show the score against a pass mark (75% by default, in **Settings, Exams**), the score of each deck and every question with the right answer and the explanation. **Study the ones I missed** reviews exactly those cards. Exams never change a schedule, and each one is saved as a plain file in `Flashcard Studio/Exams/`.
+- On the desktop, **Create with AI** in the sidebar asks for a note and opens the generate cards dialog on it.
 
 ## [0.9.0] - 2026-09-29
 

@@ -1,5 +1,6 @@
 import { Editor, MarkdownFileInfo, Notice, Platform, TFile } from "obsidian";
 
+import { openGenerateCards } from "src/ai/open-generate-cards";
 import { unburyAllInText, unsuspendAllInText } from "src/data/card-meta";
 import { SettingsManager } from "src/data/settings-manager";
 import { t } from "src/lang/helpers";
@@ -32,6 +33,7 @@ export class CommandManager {
 
         this.addPluginCommands();
         this.addAiCommands();
+        this.addExamCommands();
     }
 
     /**
@@ -586,6 +588,21 @@ export class CommandManager {
     }
 
     /**
+     * "Take an exam": the setup dialog, then the exam in a tab (or in the desktop Studio when it is open).
+     */
+    private addExamCommands(): void {
+        this.plugin.addCommand({
+            id: "fs-take-exam",
+            name: t("DESKTOP_TAKE_EXAM"),
+            icon: "clipboard-check",
+            callback: () => {
+                if (!this.plugin.isInitialized) return;
+                void this.uiManager.openExamSetup();
+            },
+        });
+    }
+
+    /**
      * "Generate cards with AI", in the command palette and in the editor's context menu. The dialog is loaded when it
      * is used, so none of its code runs while the plugin starts, and nothing is sent anywhere until it is used.
      */
@@ -593,15 +610,13 @@ export class CommandManager {
         const open = async (editor: Editor, info: MarkdownFileInfo): Promise<void> => {
             const file = info.file;
             if (file === null) return;
-            const [{ GenerateCardsModal }, { stripFrontmatter }] = await Promise.all([
-                import("src/ai/generate-cards-modal"),
-                import("src/ai/card-generation"),
-            ]);
             const fromSelection = editor.somethingSelected();
-            const source = fromSelection
-                ? editor.getSelection()
-                : stripFrontmatter(editor.getValue());
-            new GenerateCardsModal(this.plugin, file, source, fromSelection).open();
+            await openGenerateCards(
+                this.plugin,
+                file,
+                fromSelection ? editor.getSelection() : editor.getValue(),
+                fromSelection,
+            );
         };
 
         this.plugin.addCommand({

@@ -10,6 +10,7 @@ import {
     joinDeckNames,
     missedCardIds,
     pickExamQuestions,
+    plainExcerpt,
     remainingMs,
     scoreExam,
 } from "src/exam/exam";
@@ -385,5 +386,28 @@ describe("clock and deck names", () => {
         expect(joinDeckNames(["CIA", "Arabic"])).toBe("CIA, Arabic");
         expect(joinDeckNames(["A", "B", "C", "D", "E"])).toBe("A, B, C +2");
         expect(joinDeckNames([])).toBe("");
+    });
+});
+
+describe("plainExcerpt", () => {
+    test("drops the Markdown around words, keeping the words", () => {
+        expect(
+            plainExcerpt(
+                "**Who** approves the [[Charter|audit charter]] in `IIA` (see [Standard 6.2](https://x.y))?",
+            ),
+        ).toBe("Who approves the audit charter in IIA (see Standard 6.2)?");
+        expect(plainExcerpt("## Heading\n> quoted [[Note]] text")).toBe("Heading quoted Note text");
+    });
+
+    test("leaves out images and joins lines with single spaces", () => {
+        expect(plainExcerpt("Look at ![[heart.png]] and ![diagram](a.png)\n\nname the part")).toBe(
+            "Look at and name the part",
+        );
+        expect(plainExcerpt("![[heart.png]]")).toBe("");
+    });
+
+    test("is cut at the length asked for, on a word, with an ellipsis", () => {
+        expect(plainExcerpt("one two three four five", 12)).toBe("one two…");
+        expect(plainExcerpt("short", 12)).toBe("short");
     });
 });

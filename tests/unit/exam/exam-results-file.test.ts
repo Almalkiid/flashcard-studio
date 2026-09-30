@@ -11,6 +11,7 @@ import {
     examFilePath,
     EXAMS_FOLDER,
     formatExamFile,
+    isInExamsFolder,
     lastExams,
     parseExamFile,
 } from "src/exam/exam-results-file";
@@ -223,5 +224,19 @@ describe("lastExams", () => {
             { name: "broken.md", text: "# T\n```fs-exam\n{oops\n```" },
         ];
         expect(lastExams(files, 1).map((r) => r.setup.title)).toEqual(["Real"]);
+    });
+});
+
+describe("isInExamsFolder", () => {
+    test("a file in the exams folder holds history, not cards", () => {
+        expect(isInExamsFolder("Flashcard Studio/Exams/2026-09-30 1405 exam.md")).toBe(true);
+        expect(isInExamsFolder("Flashcard Studio/Exams/older/2026-09-30 1405 exam.md")).toBe(true);
+    });
+
+    test("a note next to the folder, or in one with a similar name, is a note", () => {
+        expect(isInExamsFolder("Flashcard Studio/Getting started.md")).toBe(false);
+        expect(isInExamsFolder("Flashcard Studio/Exams.md")).toBe(false);
+        expect(isInExamsFolder("Flashcard Studio/Exams old/x.md")).toBe(false);
+        expect(isInExamsFolder("CIA/Flashcard Studio/Exams/x.md")).toBe(false);
     });
 });

@@ -2,6 +2,7 @@ import { PaneType, WorkspaceLeaf } from "obsidian";
 
 import { SR_TAB_VIEW } from "src/data/constants";
 import { SettingsManager } from "src/data/settings-manager";
+import { EXAM_VIEW_TYPE, ExamView } from "src/exam/exam-view";
 import SRPlugin from "src/main";
 import { SRTabView } from "src/ui/obsidian-ui-components/item-views/sr-tab-view";
 import { ReviewQueueLoader } from "src/ui/review-queue-loader";
@@ -40,6 +41,10 @@ export default class TabViewManager {
         {
             type: STATISTICS_VIEW_TYPE,
             viewCreator: (leaf) => new StatisticsView(leaf, this.plugin),
+        },
+        {
+            type: EXAM_VIEW_TYPE,
+            viewCreator: (leaf) => new ExamView(leaf, this.plugin),
         },
     ];
 
@@ -90,6 +95,16 @@ export default class TabViewManager {
         this.forEachTabViewType((viewType) =>
             this.plugin.registerView(viewType.type, viewType.viewCreator),
         );
+    }
+
+    /**
+     * Opens an exam in a tab of its own. Every exam gets a new tab, so one that is still going is never replaced.
+     */
+    public async openExamTab(): Promise<void> {
+        const { workspace } = this.plugin.app;
+        const leaf = workspace.getLeaf("tab");
+        await leaf.setViewState({ type: EXAM_VIEW_TYPE, active: true });
+        await workspace.revealLeaf(leaf);
     }
 
     public async openTabView(type: string, newLeaf?: PaneType | boolean) {
