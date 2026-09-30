@@ -69,7 +69,7 @@ export function renderDraftRows(
                 return;
             }
             window.clearTimeout(armed);
-            discardExamDraft(plugin, draft.id);
+            void discardExamDraft(plugin, draft.id);
             onChange(drafts.filter((other) => other.id !== draft.id));
         });
     }
