@@ -3,6 +3,15 @@
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 Changes made before the fork are in the [Spaced Repetition changelog](docs/docs/changelog.md).
 
+## [Unreleased]
+
+### Added
+
+**Cards**
+
+- Image occlusion: hide parts of a picture and guess what is under them. **Add image occlusion** (command palette and editor menu) opens an editor where you draw rectangles and ellipses with a mouse or a finger, move and resize them, and give each one an answer. The result is a fenced `image-occlusion` block in the note, one card per mask, with one schedule comment after it. Editing the block keeps each mask's schedule with its mask. Hide all or hide one, tap to zoom on a phone, and the block in a note shows every answer with a button to edit it. The original Spaced Repetition plugin sees a code block and no card.
+- Anki export writes an image occlusion card as one basic note per mask, with the question and the whole picture on the front and the answer on the back. The masks are not drawn there.
+
 ## [0.9.0] - 2026-09-29
 
 First preview of Flashcard Studio, forked from Spaced Repetition 1.15.4.

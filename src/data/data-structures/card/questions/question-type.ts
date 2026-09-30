@@ -9,6 +9,7 @@ import {
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
 import { occlusionSourceOf, parseOcclusionBlock } from "src/occlusion/occlusion-block";
+import { occlusionCardMarkdown } from "src/occlusion/occlusion-view";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/strings";
 
 export class CardFrontBack {
@@ -107,10 +108,6 @@ class QuestionTypeCallout implements IQuestionTypeHandler {
     }
 }
 
-// Task B3 replaces this with occlusionCardMarkdown
-const occlusionCardText = (index: number, side: "front" | "back"): string =>
-    "image-occlusion:" + index + ":" + side;
-
 // One card per mask. A block that does not parse makes no cards, like a callout that is not complete
 class QuestionTypeImageOcclusion implements IQuestionTypeHandler {
     expand(questionText: string, _settings: SRSettings): CardFrontBack[] {
@@ -120,8 +117,8 @@ class QuestionTypeImageOcclusion implements IQuestionTypeHandler {
         return block.masks.map(
             (_mask, index) =>
                 new CardFrontBack(
-                    occlusionCardText(index, "front"),
-                    occlusionCardText(index, "back"),
+                    occlusionCardMarkdown(block, index, "front"),
+                    occlusionCardMarkdown(block, index, "back"),
                 ),
         );
     }

@@ -1,6 +1,7 @@
 import {
     closingFenceLine,
     formatOcclusionBlock,
+    imagePathOf,
     isOcclusionFenceStart,
     newMaskId,
     occlusionSourceOf,
@@ -169,5 +170,22 @@ describe("newMaskId", () => {
             expect(ids).not.toContain(id);
             ids.push(id);
         }
+    });
+});
+
+describe("imagePathOf", () => {
+    test.each([
+        ["[[Heart.png]]", "Heart.png"],
+        ["![[Heart.png]]", "Heart.png"],
+        ["![[Heart.png|300]]", "Heart.png"],
+        ["[[folder/Heart.png#page=2]]", "folder/Heart.png"],
+        ["![](my%20pic.png)", "my pic.png"],
+        ["![alt](<my pic.png>)", "my pic.png"],
+        ["[](x.png)", "x.png"],
+        ["folder/x.png", "folder/x.png"],
+        ["  spaced.png  ", "spaced.png"],
+        ["![](100%.png)", "100%.png"],
+    ])("%s is %s", (image, path) => {
+        expect(imagePathOf(image)).toBe(path);
     });
 });

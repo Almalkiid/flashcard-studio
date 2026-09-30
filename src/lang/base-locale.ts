@@ -757,6 +757,30 @@ export interface IBaseLocale {
     ANKI_EXPORT_ERR_FAILED: string;
     ANKI_EXPORT_NOT_READY: string;
     ANKI_SHOW_IN_FOLDER: string;
+    // Image occlusion
+    OCCLUSION_ADD_COMMAND: string;
+    OCCLUSION_EDITOR_TITLE: string;
+    OCCLUSION_EDIT: string;
+    OCCLUSION_PICK_IMAGE: string;
+    OCCLUSION_NO_IMAGES: string;
+    OCCLUSION_DEFAULT_QUESTION: string;
+    OCCLUSION_IMAGE_MISSING: string;
+    OCCLUSION_INVALID_BLOCK: string;
+    OCCLUSION_INVALID_CARD: string;
+    OCCLUSION_SHAPE_RECT: string;
+    OCCLUSION_SHAPE_ELLIPSE: string;
+    OCCLUSION_MODE_HIDE_ALL: string;
+    OCCLUSION_MODE_HIDE_ONE: string;
+    OCCLUSION_DELETE_MASK: string;
+    OCCLUSION_QUESTION_FIELD: string;
+    OCCLUSION_LABEL_FIELD: string;
+    OCCLUSION_LABEL_PLACEHOLDER: string;
+    OCCLUSION_HINT: string;
+    OCCLUSION_MASK_NUMBER: string;
+    OCCLUSION_NO_LABEL: string;
+    OCCLUSION_MASK_COUNT: string;
+    OCCLUSION_NEEDS_MASK: string;
+    OCCLUSION_BLOCK_NOT_FOUND: string;
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: string;
     STATS_METRIC_STREAK: string;

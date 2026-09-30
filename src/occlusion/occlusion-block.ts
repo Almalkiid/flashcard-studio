@@ -114,6 +114,27 @@ export function formatOcclusionBlock(block: OcclusionBlock): string {
     return lines.join("\n");
 }
 
+/**
+ * The path of the image an `image:` value points at: from `[[x]]`, `![[x]]` (a size, alias or heading after the path
+ * is left off), `![](x)` or a bare path.
+ */
+export function imagePathOf(image: string): string {
+    const text = image.trim();
+    const wiki = /^!?\[\[(.+?)\]\]$/.exec(text);
+    if (wiki !== null) return wiki[1].split("|")[0].split("#")[0].trim();
+
+    const markdown = /^!?\[[^\]]*\]\((.+)\)$/.exec(text);
+    if (markdown === null) return text;
+    let target = markdown[1].trim();
+    if (target.startsWith("<") && target.endsWith(">")) target = target.slice(1, -1);
+    try {
+        return decodeURI(target);
+    } catch {
+        // A "%" that is not an escape: the path is as it was written
+        return target;
+    }
+}
+
 /** Whether a line opens an occlusion block: ```image-occlusion or ~~~image-occlusion, trimmed. */
 export function isOcclusionFenceStart(line: string): boolean {
     return FENCE_START.test(line.trim());

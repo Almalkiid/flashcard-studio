@@ -1,10 +1,14 @@
 import { SR_METADATA_CALLOUT } from "src/data/constants";
+import { SRSettings } from "src/data/settings";
 import {
     closingFenceLine,
     formatOcclusionBlock,
     isOcclusionFenceStart,
     OcclusionBlock,
 } from "src/occlusion/occlusion-block";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { FSRS_EMPTY_SCHEDULE_COMMENT } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
+import { RepItemScheduleInfoOsr } from "src/scheduling/algorithms/osr/rep-item-schedule-info-osr";
 
 const COMMENT = /<!--SR:(.+?)-->/;
 
@@ -104,4 +108,14 @@ export function replaceOcclusionBlock(
 /** A new block, ready to put into a note: the fenced block and a line break. */
 export function insertOcclusionBlock(block: OcclusionBlock): string {
     return "```image-occlusion\n" + formatOcclusionBlock(block) + "\n```\n";
+}
+
+/**
+ * The segment of a schedule comment that stands for a card that was never reviewed, as formatCardSchedule writes it
+ * (without the leading "!"): in the FSRS format under FSRS, else the SM-2 one.
+ */
+export function emptyScheduleSegment(settings: SRSettings): string {
+    return settings.algorithm === SRAlgorithmType.FSRS
+        ? FSRS_EMPTY_SCHEDULE_COMMENT.slice(1)
+        : `${RepItemScheduleInfoOsr.dummyDueDateForNewCard},${RepItemScheduleInfoOsr.initialInterval},${settings.baseEase}`;
 }

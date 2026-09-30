@@ -8,6 +8,8 @@ import { ANKI_DECK_SEPARATOR } from "src/import-export/anki-types";
 import { BLANK_LINE_IN_CARD } from "src/import-export/card-builder";
 import { convertClozesToAnki } from "src/import-export/export-cloze";
 import { decodeGuid } from "src/import-export/guid-comment";
+import { t } from "src/lang/helpers";
+import { imagePathOf, occlusionSourceOf, parseOcclusionBlock } from "src/occlusion/occlusion-block";
 import { cyrb53 } from "src/utils/strings";
 
 export type ExportKind = "basic" | "reversed" | "cloze";
@@ -63,6 +65,23 @@ function splitClozeExtra(text: string): { text: string; extra: string } {
 }
 
 /**
+ * The notes of an image occlusion block: one basic note for each mask, with the question and the picture on the front
+ * and the mask's label on the back. Anki has no such card in its basic model, so the masks themselves are not drawn:
+ * the picture is shown whole. This is an honest fallback, not a copy of the card.
+ */
+function occlusionSides(text: string): { front: string; back: string }[] {
+    const source = occlusionSourceOf(text);
+    const block = source === null ? null : parseOcclusionBlock(source);
+    if (block === null) return [];
+
+    const front = `${block.question || t("OCCLUSION_DEFAULT_QUESTION")}\n\n![[${imagePathOf(block.image)}]]`;
+    return block.masks.map((mask, index) => ({
+        front,
+        back: mask.label || t("OCCLUSION_MASK_NUMBER", { n: index + 1 }),
+    }));
+}
+
+/**
  * The name of a deck in Anki. The plugin's deck path starts with the flashcard tag (`flashcards/Spanish`), which
  * says nothing about the deck, so it is left out when something follows it.
  */
@@ -109,54 +128,58 @@ export async function collectExportNotes(root: Deck, settings: SRSettings): Prom
         for (const question of questions) {
             const type = question.questionType;
             const text = question.questionText.actualQuestion;
-            let kind: ExportKind;
-            let front: string;
-            let back: string;
+            // One question is one note, except an occlusion block, which is one note for each mask
+            const sides: { kind: ExportKind; front: string; back: string }[] = [];
             if (type === CardType.Cloze) {
                 const converted = convertClozesToAnki(text, settings.clozePatterns);
                 if (converted === null) {
                     collected.skipped++;
                     continue;
                 }
-                kind = "cloze";
                 const parts = splitClozeExtra(converted.trim());
-                front = parts.text;
-                back = parts.extra;
+                sides.push({ kind: "cloze", front: parts.text, back: parts.extra });
+            } else if (type === CardType.ImageOcclusion) {
+                for (const side of occlusionSides(text)) sides.push({ kind: "basic", ...side });
             } else {
                 const side = CardFrontBackUtil.expand(type, text, settings)[0];
-                kind =
-                    type === CardType.SingleLineReversed || type === CardType.MultiLineReversed
-                        ? "reversed"
-                        : "basic";
-                front = side.front.trim();
-                back = side.back.trim();
+                sides.push({
+                    kind:
+                        type === CardType.SingleLineReversed || type === CardType.MultiLineReversed
+                            ? "reversed"
+                            : "basic",
+                    front: side.front.trim(),
+                    back: side.back.trim(),
+                });
             }
 
             const path = question.note.filePath;
             if (!fileLines.has(path)) {
                 fileLines.set(path, (await question.note.file.cachedRead()).split("\n"));
             }
-            let guid = importedGuid(
+            const imported = importedGuid(
                 fileLines.get(path),
                 question.parsedQuestionInfo.firstLineNum,
                 question.parsedQuestionInfo.lastLineNum,
             );
-            // Cards made in Obsidian get an id from their content, so that exporting them again gives the same note
-            guid ??= "cw-" + cyrb53([deckName, kind, front, back].join("\u001f"));
-            // Two notes of one guid would be one note in Anki: the same card twice in a deck gets a number
-            const baseGuid = guid;
-            for (let repeat = 2; seenGuids.has(guid); repeat++) guid = `${baseGuid}-${repeat}`;
-            seenGuids.add(guid);
 
-            collected.notes.push({
-                deck: deckName,
-                kind,
-                front,
-                back,
-                tags: ankiTagsOf(question.note.file.getAllTagsFromCache(), settings),
-                guid,
-                sourcePath: path,
-            });
+            for (const { kind, front, back } of sides) {
+                // Cards made in Obsidian get an id from their content, so that exporting them again gives the same note
+                let guid = imported ?? "cw-" + cyrb53([deckName, kind, front, back].join("\u001f"));
+                // Two notes of one guid would be one note in Anki: the same card twice in a deck gets a number
+                const baseGuid = guid;
+                for (let repeat = 2; seenGuids.has(guid); repeat++) guid = `${baseGuid}-${repeat}`;
+                seenGuids.add(guid);
+
+                collected.notes.push({
+                    deck: deckName,
+                    kind,
+                    front,
+                    back,
+                    tags: ankiTagsOf(question.note.file.getAllTagsFromCache(), settings),
+                    guid,
+                    sourcePath: path,
+                });
+            }
         }
     }
     return collected;

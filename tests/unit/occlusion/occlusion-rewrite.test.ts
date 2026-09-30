@@ -1,9 +1,13 @@
+import { DEFAULT_SETTINGS } from "src/data/settings";
 import type { OcclusionBlock } from "src/occlusion/occlusion-block";
 import {
+    emptyScheduleSegment,
     insertOcclusionBlock,
     remapScheduleComment,
     replaceOcclusionBlock,
 } from "src/occlusion/occlusion-rewrite";
+import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
+import { FSRS_EMPTY_SCHEDULE_COMMENT } from "src/scheduling/algorithms/fsrs/fsrs-helpers";
 
 const E = "fsrs,EMPTY";
 describe("remapScheduleComment", () => {
@@ -126,5 +130,20 @@ describe("insertOcclusionBlock", () => {
         ).toBe(
             "```image-occlusion\nimage: [[x.png]]\nmode: hide-one\nquestion: What?\nmask: a1 ellipse 0.1000 0.2000 0.3000 0.4000 |\n```\n",
         );
+    });
+});
+
+describe("emptyScheduleSegment", () => {
+    test("is the placeholder that formatCardSchedule writes for a card that was never reviewed", () => {
+        expect(emptyScheduleSegment({ ...DEFAULT_SETTINGS, algorithm: SRAlgorithmType.FSRS })).toBe(
+            FSRS_EMPTY_SCHEDULE_COMMENT.slice(1),
+        );
+        expect(
+            emptyScheduleSegment({
+                ...DEFAULT_SETTINGS,
+                algorithm: SRAlgorithmType.SM_2_OSR,
+                baseEase: 250,
+            }),
+        ).toBe("2000-01-01,1,250");
     });
 });

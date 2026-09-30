@@ -78,6 +78,36 @@ The CAE reports ==functionally== to the ==board==.
 
 Images, audio, LaTeX, code and footnotes work inside cards, because Obsidian renders them.
 
+### Image occlusion
+
+Hide parts of a picture and guess what is under them, which is how you learn a diagram, a map or an anatomy plate.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/screenshots/occlusion-editor-desktop.png">
+  <img alt="The image occlusion editor: a picture of the heart's four chambers with a mask drawn over two labels, and the answer for each mask under it" src="docs/media/screenshots/occlusion-editor-light-desktop.png">
+</picture>
+
+Run **Add image occlusion** from the command palette, or from the editor menu, and choose an image from your vault. Drag on the picture to draw a rectangle or an ellipse, drag a mask to move it, drag its handles to resize it, and type what is under it in the answer field. It works with a mouse and with a finger. A mask smaller than 1% of the picture is ignored, and Delete removes the selected mask.
+
+Saving writes a block into your note:
+
+````markdown
+```image-occlusion
+image: [[Heart.png]]
+mode: hide-all
+question: Name the labelled chamber
+mask: a1 rect 0.1250 0.3000 0.1800 0.0950 | Left ventricle
+mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
+```
+````
+
+- Every mask is one card. Coordinates are fractions of the picture, so the masks fit it at any size.
+- **Hide all, guess one** (the default) draws every mask and asks about one at a time, as Anki does. **Hide one, guess one** draws only the mask that is asked about.
+- On the front the mask that is asked about is filled and the others are grey. On the back it turns into an outline with its answer in it and under the picture. On a phone, tap the picture to zoom.
+- The schedules of the masks share one `<!--SR:...-->` comment after the block, like the deck of a cloze card. Editing a block in the editor moves each schedule with its mask: delete a mask and the others keep theirs, and a new mask starts as a new card.
+- In a note, the block shows the picture with every answer on its mask and a pencil that reopens the editor. The original Spaced Repetition plugin sees a code block and no card.
+- Anki has no such card in its basic model, so an export writes one basic note per mask, with the question and the whole picture on the front and the answer on the back.
+
 ## Reviewing
 
 Run **Flashcard Studio: Review flashcards from all notes** from the command palette, or click the ribbon icon. Rate each card **Again**, **Hard**, **Good** or **Easy**. After an answer, a toast shows when you will see the card again, with an **Undo** button.

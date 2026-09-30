@@ -5,6 +5,8 @@ import {
     QuestionTypeClozeFormatter,
 } from "src/data/data-structures/card/questions/question-type";
 import { DEFAULT_SETTINGS, SRSettings } from "src/data/settings";
+import { occlusionSourceOf, parseOcclusionBlock } from "src/occlusion/occlusion-block";
+import { occlusionCardMarkdown } from "src/occlusion/occlusion-view";
 
 test("CardType.SingleLineBasic", () => {
     expect(CardFrontBackUtil.expand(CardType.SingleLineBasic, "A::B", DEFAULT_SETTINGS)).toEqual([
@@ -107,10 +109,18 @@ describe("CardType.ImageOcclusion", () => {
     const block =
         "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```";
 
+    const parsed = parseOcclusionBlock(occlusionSourceOf(block));
+
     test("one card per mask, in mask order", () => {
         expect(CardFrontBackUtil.expand(CardType.ImageOcclusion, block, DEFAULT_SETTINGS)).toEqual([
-            new CardFrontBack("image-occlusion:0:front", "image-occlusion:0:back"),
-            new CardFrontBack("image-occlusion:1:front", "image-occlusion:1:back"),
+            new CardFrontBack(
+                occlusionCardMarkdown(parsed, 0, "front"),
+                occlusionCardMarkdown(parsed, 0, "back"),
+            ),
+            new CardFrontBack(
+                occlusionCardMarkdown(parsed, 1, "front"),
+                occlusionCardMarkdown(parsed, 1, "back"),
+            ),
         ]);
     });
 
