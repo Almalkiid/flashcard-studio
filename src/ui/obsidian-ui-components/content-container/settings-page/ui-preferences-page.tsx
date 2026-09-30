@@ -7,8 +7,12 @@ import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { SettingsPage } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page";
 import { SettingsPageType } from "src/ui/obsidian-ui-components/content-container/settings-page/settings-page-manager";
+import { speechAvailable, VoiceWatcher } from "src/ui/speech";
 import { UIManager } from "src/ui/ui-manager";
 import EmulatedPlatform from "src/utils/platform-detector";
+
+/** Refills the voice selects still on screen; one for every time the settings are drawn (see `VoiceWatcher`). */
+let voiceWatcher: VoiceWatcher | null = null;
 
 export class UIPreferencesPage extends SettingsPage {
     private uiManager: UIManager;
@@ -517,7 +521,49 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.settingsManager.save();
                             }),
                     );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHUFFLE_CHOICES"))
+                    .setDesc(t("SHUFFLE_CHOICES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.shuffleChoices)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.shuffleChoices = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("TYPE_ANSWERS_SETTING"))
+                    .setDesc(t("TYPE_ANSWERS_SETTING_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.typeAnswers)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.typeAnswers = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("IGNORE_ACCENTS_WHEN_TYPING"))
+                    .setDesc(t("IGNORE_ACCENTS_WHEN_TYPING_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.ignoreAccentsWhenTyping)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.ignoreAccentsWhenTyping = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
             });
+
+        // Read aloud, on devices that can speak
+        if (speechAvailable()) this.addReadAloudSettings();
 
         // M3a: scheduling
         new SettingGroup(this.containerEl)
@@ -534,6 +580,82 @@ export class UIPreferencesPage extends SettingsPage {
                             .onChange(async (value) => {
                                 this.settingsManager.settings.answerKeys =
                                     value === "anki" ? "anki" : "original";
+                                await this.settingsManager.save();
+                            }),
+                    );
+            });
+    }
+
+    private refillWhenVoicesChange(select: HTMLSelectElement, fill: () => void): void {
+        if (voiceWatcher === null) {
+            const watcher = new VoiceWatcher(activeWindow.speechSynthesis);
+            voiceWatcher = watcher;
+            this.plugin.register(() => {
+                watcher.dispose();
+                if (voiceWatcher === watcher) voiceWatcher = null;
+            });
+        }
+        voiceWatcher.watch(select, fill);
+    }
+
+    private addReadAloudSettings(): void {
+        const settings = this.settingsManager.settings;
+        new SettingGroup(this.containerEl)
+            .setHeading(t("READ_ALOUD"))
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("READ_QUESTION_ALOUD"))
+                    .setDesc(t("READ_QUESTION_ALOUD_DESC"))
+                    .addToggle((toggle) =>
+                        toggle.setValue(settings.readQuestionAloud).onChange(async (value) => {
+                            settings.readQuestionAloud = value;
+                            await this.settingsManager.save();
+                        }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("READ_ANSWER_ALOUD"))
+                    .setDesc(t("READ_ANSWER_ALOUD_DESC"))
+                    .addToggle((toggle) =>
+                        toggle.setValue(settings.readAnswerAloud).onChange(async (value) => {
+                            settings.readAnswerAloud = value;
+                            await this.settingsManager.save();
+                        }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SPEECH_VOICE"))
+                    .setDesc(t("SPEECH_VOICE_DESC"))
+                    .addDropdown((dropdown) => {
+                        const fill = () => {
+                            dropdown.selectEl.empty();
+                            dropdown.addOption("", t("SPEECH_VOICE_AUTOMATIC"));
+                            for (const voice of activeWindow.speechSynthesis.getVoices()) {
+                                dropdown.addOption(voice.voiceURI, `${voice.name} (${voice.lang})`);
+                            }
+                            dropdown.setValue(settings.speechVoice);
+                        };
+                        fill();
+                        // Devices load their voices a moment after start, and may add more later
+                        this.refillWhenVoicesChange(dropdown.selectEl, fill);
+                        dropdown.onChange(async (value) => {
+                            settings.speechVoice = value;
+                            await this.settingsManager.save();
+                        });
+                    });
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SPEECH_RATE"))
+                    .setDesc(t("SPEECH_RATE_DESC"))
+                    .addSlider((slider) =>
+                        slider
+                            .setLimits(0.5, 2, 0.1)
+                            .setValue(settings.speechRate)
+                            .onChange(async (value) => {
+                                settings.speechRate = value;
                                 await this.settingsManager.save();
                             }),
                     );

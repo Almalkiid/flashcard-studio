@@ -125,9 +125,11 @@ class QuestionTypeCloze implements IQuestionTypeHandler {
         );
 
         // Determine which question formatter to use based on settings (Cloze patterns as inputs or not).
-        const clozeFormatter = settings.convertClozePatternsToInputs
-            ? new QuestionTypeClozeInputFormatter()
-            : new QuestionTypeClozeFormatter();
+        // Typing answers fills in the blanks in the card as well.
+        const clozeFormatter =
+            settings.convertClozePatternsToInputs || settings.typeAnswers
+                ? new QuestionTypeClozeInputFormatter()
+                : new QuestionTypeClozeFormatter();
 
         let front: string, back: string;
         const result: CardFrontBack[] = [];

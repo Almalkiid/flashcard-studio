@@ -17,6 +17,14 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "fsrsWeights",
     "learnAheadMinutes",
     "answerKeys",
+    // Study modes
+    "typeAnswers",
+    "ignoreAccentsWhenTyping",
+    "shuffleChoices",
+    "readQuestionAloud",
+    "readAnswerAloud",
+    "speechVoice",
+    "speechRate",
     // The Studio look
     "reviewLook",
     "learnerName",

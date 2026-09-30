@@ -122,6 +122,20 @@ export interface SRSettings {
     aiBaseUrl: string;
     /** The id of the secret in Obsidian's secret storage that holds the API key. Never the key itself. */
     aiKeySecret: string;
+    // Study modes: multiple choice, typed answers
+    /** Type the answer to a card whose answer is short plain text, and fill in cloze blanks in the card. */
+    typeAnswers: boolean;
+    /** A typed answer ignores accents ("cafe" matches "café"). */
+    ignoreAccentsWhenTyping: boolean;
+    /** The options of a multiple choice card show in a new order each time. */
+    shuffleChoices: boolean;
+    // Read aloud with the device's voices
+    readQuestionAloud: boolean;
+    readAnswerAloud: boolean;
+    /** The voiceURI of the voice to read with; empty picks one by language. */
+    speechVoice: string;
+    /** 1 is the voice's normal speed. */
+    speechRate: number;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -246,6 +260,14 @@ export const DEFAULT_SETTINGS: SRSettings = {
     aiModel: "claude-sonnet-5-5",
     aiBaseUrl: "",
     aiKeySecret: "",
+    // Study modes: multiple choice, typed answers
+    typeAnswers: false,
+    ignoreAccentsWhenTyping: false,
+    shuffleChoices: true,
+    readQuestionAloud: false,
+    readAnswerAloud: false,
+    speechVoice: "",
+    speechRate: 1,
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

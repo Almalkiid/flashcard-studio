@@ -8,11 +8,15 @@ import { CardActions } from "src/ui/card-actions";
 import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
-import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
+import CardMenuButtonComponent, {
+    TypeAnswersToggle,
+} from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
+import SpeakButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/speak-button";
 import ModalCloseButtonComponent from "src/ui/obsidian-ui-components/content-container/modal-close-button";
+import { speechAvailable } from "src/ui/speech";
 import EmulatedPlatform from "src/utils/platform-detector";
 
 /** Up to this many cards the desktop's progress bar draws a segment for each; above it, one continuous bar. */
@@ -31,6 +35,7 @@ export default class CardToolbarComponent {
     private segmentsEl: HTMLDivElement;
     private answers: readonly ReviewResponse[] = [];
     private totalCards: number = 0;
+    private speakHandler: (() => void) | null = null;
 
     public constructor(
         parentEl: HTMLElement,
@@ -67,6 +72,17 @@ export default class CardToolbarComponent {
         this.counterEl = title.createDiv({ cls: "fs-card-counter" });
 
         this.toolbar.createDiv().addClass("sr-flex-spacer");
+
+        // Read aloud, on devices that can speak
+        if (speechAvailable()) {
+            new SpeakButtonComponent(
+                this.toolbar,
+                () => this.speakHandler?.(),
+                EmulatedPlatform().isPhone || Platform.isPhone
+                    ? ["mod-raised"]
+                    : ["clickable-icon"],
+            );
+        }
 
         new EditButtonComponent(
             this.toolbar,
@@ -140,6 +156,21 @@ export default class CardToolbarComponent {
         ];
 
         new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
+    }
+
+    /**
+     * What the speaker button does when it is pressed.
+     */
+    public setSpeakHandler(handler: () => void): void {
+        this.speakHandler = handler;
+    }
+
+    /**
+     * Adds the "Type answers" switch for this session to both card menus.
+     */
+    public setTypeAnswersToggle(toggle: TypeAnswersToggle): void {
+        this.extendedMenuButton.typeAnswersToggle = toggle;
+        this.shortMenuButton.typeAnswersToggle = toggle;
     }
 
     /**

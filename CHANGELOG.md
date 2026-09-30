@@ -3,6 +3,17 @@
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 Changes made before the fork are in the [Spaced Repetition changelog](docs/docs/changelog.md).
 
+## [Unreleased]
+
+### Added
+
+**Study**
+
+- Multiple choice cards. A card whose answer is a task list with at least two items and at least one checked shows its options as tiles. Choosing one shows the answer with the right and wrong options marked and the explanation, and suggests a rating. Several right answers take a selection and a Check button. The number keys 1 to 9 choose. No new syntax, and the original plugin reads such a card as an ordinary one.
+- Typed answers. With **Type the answer** on, or for one session from the card menu, a card with a short plain answer shows a field, compares your answer letter by letter and suggests Good or Again. Cloze blanks become fields too. Case, spacing and a final full stop do not count; accents can be ignored.
+- The rating that an answer suggests is outlined on the answer tiles.
+- Read aloud with the device's voices: a speaker button and the R key, optional reading of the question or the answer when it shows, a voice and a speed.
+
 ## [0.9.0] - 2026-09-29
 
 First preview of Flashcard Studio, forked from Spaced Repetition 1.15.4.
