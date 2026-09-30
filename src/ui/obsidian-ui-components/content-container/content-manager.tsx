@@ -2,13 +2,14 @@ import { App, MarkdownView, Notice, Platform } from "obsidian";
 
 import { DataManager } from "src/data/data-manager";
 import { Card } from "src/data/data-structures/card/card";
-import { Question } from "src/data/data-structures/card/questions/question";
+import { CardType, Question } from "src/data/data-structures/card/questions/question";
 import { Deck } from "src/data/data-structures/deck/deck";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { Note } from "src/note/note";
+import { editOcclusionQuestion } from "src/occlusion/occlusion-processors";
 import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-schedule-info";
 import { RepItemState, ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { customStudyMode, CustomStudySpec, forgottenCardIds } from "src/scheduling/custom-study";
@@ -567,16 +568,31 @@ export default class ContentManager {
         const textPrompt = currentQ.questionText.actualQuestion;
         const currentUIState = this.uiManager.uiState;
         this.uiManager.setUIState(UIState.EditModal);
-        const editModal = FlashcardEditModal.Prompt(
-            this.app,
-            this.settings,
-            currentCard,
-            textPrompt,
-            currentQ.questionText.textDirection,
-        );
+        // The occlusion editor keeps focus on its picture and its buttons, not in a text field, so the review shortcuts
+        // (skip, undo, grade) would act on the card behind it for the keys typed in it: they stand down while it is
+        // open, as they do for the card info window
+        const editingOcclusion = currentQ.questionType === CardType.ImageOcclusion;
+        const wasInFocus = this.uiManager.isSRInFocus;
+        if (editingOcclusion) this.uiManager.setSRViewInFocus(false);
+        // An image occlusion card is edited in the occlusion editor, not as text
+        const editModal = editingOcclusion
+            ? editOcclusionQuestion(this.app, currentQ)
+            : FlashcardEditModal.Prompt(
+                  this.app,
+                  this.settings,
+                  currentCard,
+                  textPrompt,
+                  currentQ.questionText.textDirection,
+              );
         await editModal
             .then(async (modifiedCardText) => {
                 if (this.reviewSequencer === null) return;
+                // The text is of the question that the editor was opened on. If the review has moved on since, the
+                // current question is another one, and writing it there would overwrite that question
+                if (this.reviewSequencer.currentQuestion !== currentQ) {
+                    new Notice(t("EDIT_CARD_MOVED_ON"));
+                    return;
+                }
                 await this.reviewSequencer.updateCurrentQuestionTextAndCards(modifiedCardText);
                 this.uiManager.setUIState(currentUIState);
 
@@ -595,7 +611,14 @@ export default class ContentManager {
                     }
                 }
             })
-            .catch((reason) => console.error(reason));
+            .catch((reason) => console.error(reason))
+            .finally(() => {
+                // Closed, whether saved, cancelled or refused
+                if (editingOcclusion) this.uiManager.setSRViewInFocus(wasInFocus);
+                if (this.uiManager.uiState === UIState.EditModal) {
+                    this.uiManager.setUIState(currentUIState);
+                }
+            });
     }
 
     public async _jumpToCurrentCard(): Promise<void> {
