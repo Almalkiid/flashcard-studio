@@ -126,6 +126,47 @@ describe("collectExportNotes", () => {
         expect(skipped).toBe(1);
     });
 
+    test("exports each mask of an image occlusion block as a basic note: the question and the picture, and the label", async () => {
+        const text = [
+            "#flashcards/Anatomy",
+            "",
+            "```image-occlusion",
+            "image: [[Heart.png]]",
+            "question: Name the chamber",
+            "mask: a rect 0 0 .5 .5 | Left **ventricle**",
+            "mask: b rect .5 .5 .5 .5 |",
+            "```",
+            "",
+            "```image-occlusion",
+            "image: ![](folder/my%20heart.png)",
+            "mask: c ellipse 0 0 .5 .5 | Aorta",
+            "```",
+            "",
+        ].join("\n");
+        const { notes, skipped } = await collectExportNotes(
+            await deckFromText(text, settings),
+            settings,
+        );
+
+        expect(skipped).toBe(0);
+        expect(notes.map((note) => [note.kind, note.front, note.back])).toEqual([
+            ["basic", "Name the chamber\n\n![[Heart.png]]", "Left **ventricle**"],
+            ["basic", "Name the chamber\n\n![[Heart.png]]", "Mask 2"],
+            ["basic", "What is hidden?\n\n![[folder/my heart.png]]", "Aorta"],
+        ]);
+        expect(new Set(notes.map((note) => note.guid)).size).toBe(3);
+        expect(notes.every((note) => note.deck === "Anatomy")).toBe(true);
+    });
+
+    test("an image occlusion block that is not valid is skipped without harm to the other cards", async () => {
+        const deck = await deckFromText(
+            "#flashcards\n\n```image-occlusion\nnothing useful\n```\n\nQ::A\n",
+            settings,
+        );
+        const { notes } = await collectExportNotes(deck, settings);
+        expect(notes.map((note) => note.front)).toEqual(["Q"]);
+    });
+
     test("collects a single deck of the tree", async () => {
         const deck = await deckFromText(
             "#flashcards/A\n\nQ1::A1\n\n#flashcards/B\nQ2::A2\n",

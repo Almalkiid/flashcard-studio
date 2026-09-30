@@ -262,6 +262,7 @@ export class FlashcardEditModal extends Modal {
                 return settings.multilineReversedCardSeparator;
             case CardType.Cloze:
             case CardType.Callout:
+            case CardType.ImageOcclusion:
                 return null;
         }
     }

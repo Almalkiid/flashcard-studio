@@ -1013,6 +1013,40 @@ const en: IBaseLocale = {
         "The model returned ${total} cards and you asked for ${count}. The extra ones are left out.",
     AI_PREVIEW_CUT:
         "The reply was cut off at the length limit, so some cards may be missing. Try asking for fewer cards.",
+    EDIT_CARD_MOVED_ON:
+        "The review moved on to another card while you were editing, so nothing was changed.",
+    // Image occlusion
+    OCCLUSION_ADD_COMMAND: "Add image occlusion",
+    OCCLUSION_EDITOR_TITLE: "Image occlusion",
+    OCCLUSION_EDIT: "Edit image occlusion",
+    OCCLUSION_PICK_IMAGE: "Choose an image",
+    OCCLUSION_NO_IMAGES: "There are no images in this vault.",
+    OCCLUSION_DEFAULT_QUESTION: "What is hidden?",
+    OCCLUSION_IMAGE_MISSING: "Image not found: ${path}",
+    OCCLUSION_INVALID_BLOCK: "This image occlusion block needs an image and at least one mask.",
+    OCCLUSION_INVALID_CARD: "This image occlusion card could not be read.",
+    OCCLUSION_SHAPE_RECT: "Rectangle",
+    OCCLUSION_SHAPE_ELLIPSE: "Ellipse",
+    OCCLUSION_MODE_HIDE_ALL: "Hide all, guess one",
+    OCCLUSION_MODE_HIDE_ONE: "Hide one, guess one",
+    OCCLUSION_DELETE_MASK: "Delete mask",
+    OCCLUSION_QUESTION_FIELD: "Question",
+    OCCLUSION_LABEL_FIELD: "Answer for this mask",
+    OCCLUSION_LABEL_PLACEHOLDER: "Shown when the card is answered",
+    OCCLUSION_HINT:
+        "Drag on the image to draw a mask. Drag a mask to move it, or its handles to resize it.",
+    OCCLUSION_MASK_NUMBER: "Mask ${n}",
+    OCCLUSION_NO_LABEL: "No answer yet",
+    OCCLUSION_MASK_COUNT: "Cards: ${n}",
+    OCCLUSION_HINT_LOCKED:
+        "Move and resize the masks, and change their answers. To add or delete masks, edit the block in its note.",
+    OCCLUSION_SAVE_FAILED: "The block could not be saved.",
+    OCCLUSION_BLOCK_AMBIGUOUS:
+        "The note has this block more than once, so it cannot tell which one to change. Nothing was changed.",
+    OCCLUSION_ZOOM_IN: "Zoom in",
+    OCCLUSION_ZOOM_OUT: "Zoom out",
+    OCCLUSION_NEEDS_MASK: "Draw at least one mask first.",
+    OCCLUSION_BLOCK_NOT_FOUND: "The block was not found in the note. Open the note and try again.",
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: "Reviews today",
     STATS_METRIC_STREAK: "Day streak",

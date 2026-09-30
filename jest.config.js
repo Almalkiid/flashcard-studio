@@ -67,6 +67,12 @@ export default {
         "src/exam/exam-store.ts",
         "src/exam/exam-view.ts",
 
+        // Image occlusion: the editor, the picker and the wiring need a running Obsidian, the end-to-end tests cover
+        // them. The geometry, the model and the block format are unit tested.
+        "src/occlusion/occlusion-editor-modal.ts",
+        "src/occlusion/image-suggest-modal.ts",
+        "src/occlusion/occlusion-processors.ts",
+
         // debugging utils
         "src/utils/debug.ts",
 

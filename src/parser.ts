@@ -14,6 +14,11 @@ import {
 } from "src/data/data-structures/card/questions/math-cloze";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { SRSettings } from "src/data/settings";
+import {
+    closingFenceLine,
+    isOcclusionFenceStart,
+    parseOcclusionBlock,
+} from "src/occlusion/occlusion-block";
 
 export let debugParser = false;
 
@@ -449,6 +454,33 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
             }
         }
 
+        // Image occlusion: a fenced `image-occlusion` block is a card on its own, with the schedule after it. Only a
+        // block that is closed counts; an open fence is ordinary text, so it can't swallow the rest of the note.
+        // A closed block that is not valid (no image, no mask that reads) is not a card either: it is an ordinary
+        // code block, so nothing is made of it and the schedule comment after it is left alone.
+        const fenceClose = isOcclusionFenceStart(currentLine) ? closingFenceLine(lines, i) : -1;
+        const occlusionClose =
+            fenceClose !== -1 &&
+            parseOcclusionBlock(lines.slice(i + 1, fenceClose).join("\n")) !== null
+                ? fenceClose
+                : -1;
+        if (occlusionClose !== -1 && cardType === null && !inRegion) {
+            const [occlusionText, occlusionLast] = pickUpSchedule(
+                occlusionClose,
+                lines
+                    .slice(i, occlusionClose + 1)
+                    .map((line) => line.trimEnd())
+                    .join("\n"),
+            );
+            cards.push(
+                new ParsedQuestionInfo(CardType.ImageOcclusion, occlusionText, i, occlusionLast),
+            );
+            i = occlusionLast;
+            cardText = "";
+            firstLineNo = i + 1;
+            continue;
+        }
+
         // Update card text
         if (cardText.length > 0) {
             cardText += "\n";
@@ -491,7 +523,11 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
                 // Pick up multiline basic cards
                 cardType = CardType.MultiLineReversed;
             }
-        } else if (currentLine.startsWith("```") || currentLine.startsWith("~~~")) {
+        } else if (
+            (currentLine.startsWith("```") || currentLine.startsWith("~~~")) &&
+            // An occlusion fence that is never closed is text, see above
+            !(isOcclusionFenceStart(currentLine) && fenceClose === -1)
+        ) {
             // Pick up codeblocks
             const codeBlockClose = currentLine.match(/`+|~+/)[0];
             while (i + 1 < lines.length && !lines[i + 1].startsWith(codeBlockClose)) {

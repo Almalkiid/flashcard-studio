@@ -16,6 +16,11 @@ Changes made before the fork are in the [Spaced Repetition changelog](docs/docs/
 - Exams. **Take an exam** (a command, a button on the home screen, **Exams** in the desktop sidebar) sets up an exam from the decks you choose: how many questions, a time limit, multiple choice cards only or all cards (short answers typed, others marked by you), with presets for a Quick check (20 questions) and a CIA simulation (125 questions, 150 minutes). The exam has a question map, flags, a countdown that submits at zero, and the keys 1 to 9, the arrows, F and Enter. The results show the score against a pass mark (75% by default, in **Settings, Exams**), the score of each deck and every question with the right answer and the explanation. **Study the ones I missed** reviews exactly those cards. Exams never change a schedule, and each one is saved as a plain file in `Flashcard Studio/Exams/`.
 - On the desktop, **Create with AI** in the sidebar asks for a note and opens the generate cards dialog on it.
 
+**Cards**
+
+- Image occlusion: hide parts of a picture and guess what is under them. **Add image occlusion** (command palette and editor menu) opens an editor where you draw rectangles and ellipses with a mouse or a finger, move and resize them, and give each one an answer. The result is a fenced `image-occlusion` block in the note, one card per mask, with one schedule comment after it. Editing the block keeps each mask's schedule with its mask. Hide all or hide one, a picture as wide as the card that scrolls to the mask being asked about, zoom on the back (click, tap or the corner button), and the block in a note shows every answer on its mask with a button to edit it. **Edit card** in the study screen opens the editor with the masks locked. The original Spaced Repetition plugin sees a code block and no card.
+- Anki export writes an image occlusion card as one basic note per mask, with the question and the whole picture on the front and the answer on the back. The masks are not drawn there.
+
 ## [0.9.0] - 2026-09-29
 
 First preview of Flashcard Studio, forked from Spaced Repetition 1.15.4.

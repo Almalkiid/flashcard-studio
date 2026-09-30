@@ -10,6 +10,7 @@ import { SettingsManager } from "src/data/settings-manager";
 import { LocaleManagerInstance } from "src/lang/locale-manager";
 import { NextNoteReviewHandler } from "src/note/next-note-review-handler";
 import { NoteReviewQueue } from "src/note/note-review-queue";
+import { registerOcclusion } from "src/occlusion/occlusion-processors";
 import { showWelcomeOnFirstRun } from "src/onboarding/onboarding";
 import { ReminderManager } from "src/scheduling/reminder-manager";
 import { setClozeMathMacro } from "src/ui/cloze-math-macro";
@@ -49,6 +50,9 @@ export default class SRPlugin extends Plugin {
             this.registerMarkdownCodeBlockProcessor("srlog", (source, el) =>
                 renderReviewLog(source, el),
             );
+
+            // Image occlusion: its cards, the block in a note, and the command that adds one
+            registerOcclusion(this);
 
             this.app.workspace.onLayoutReady(async () => {
                 // M3b: teach MathJax the \cloze macro, if clozes in LaTeX math are on
