@@ -1,5 +1,6 @@
 import { AiError, AiPrompt } from "src/ai/ai-provider";
 import type { SRSettings } from "src/data/settings";
+import { t } from "src/lang/helpers";
 
 /*
  * The parts of "Generate cards with AI" that are plain text handling: the prompt, reading the model's reply, and
@@ -263,10 +264,23 @@ export function parseGeneratedCards(text: string): GeneratedCard[] {
     const salvaged = validCards(found);
     if (salvaged.length > 0) return salvaged;
 
-    throw new AiError(
-        "format",
-        "The reply did not contain any usable cards. Try again, or ask for fewer cards.",
-    );
+    throw new AiError("format", t("AI_ERR_NO_CARDS"));
+}
+
+/** A choice card's options as the lines the person edits in the preview: `[x] text` for a right one. */
+export function optionsToLines(options: { text: string; correct: boolean }[]): string {
+    return options.map((option) => `[${option.correct ? "x" : " "}] ${option.text}`).join("\n");
+}
+
+/** The options from those lines. A line without a marker is a wrong option; a line without text is skipped. */
+export function linesToOptions(text: string): { text: string; correct: boolean }[] {
+    const options: { text: string; correct: boolean }[] = [];
+    for (const line of text.split("\n")) {
+        const match = /^\s*(?:[-*]\s+)?(?:\[([ xX])\])?\s*(.*)$/.exec(line);
+        const label = oneLine(match?.[2] ?? "");
+        if (label !== "") options.push({ text: label, correct: match?.[1]?.toLowerCase() === "x" });
+    }
+    return options;
 }
 
 // MARK: writing cards

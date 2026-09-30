@@ -3,7 +3,9 @@ import {
     formatGeneratedCard,
     freeFlashcardsNotePath,
     insertFlashcardsSection,
+    linesToOptions,
     newFlashcardsNoteText,
+    optionsToLines,
     parseGeneratedCards,
     stripFrontmatter,
     stripScheduleComments,
@@ -383,5 +385,33 @@ describe("freeFlashcardsNotePath", () => {
         expect(freeFlashcardsNotePath("CIA", "Governance", (p) => taken.has(p))).toBe(
             "CIA/Governance - flashcards 3.md",
         );
+    });
+});
+
+describe("editing choice options as text", () => {
+    test("shows one [x] or [ ] line per option", () => {
+        expect(
+            optionsToLines([
+                { text: "The board", correct: true },
+                { text: "The CAE", correct: false },
+            ]),
+        ).toBe("[x] The board\n[ ] The CAE");
+    });
+
+    test("reads the lines back, accepting list dashes, capital X and lines without a marker", () => {
+        expect(linesToOptions("[x] A\n- [ ] B\n* [X] C\nD\n\n   \n[ ]   \n")).toEqual([
+            { text: "A", correct: true },
+            { text: "B", correct: false },
+            { text: "C", correct: true },
+            { text: "D", correct: false },
+        ]);
+    });
+
+    test("round-trips", () => {
+        const options = [
+            { text: "One", correct: false },
+            { text: "Two", correct: true },
+        ];
+        expect(linesToOptions(optionsToLines(options))).toEqual(options);
     });
 });

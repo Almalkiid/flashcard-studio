@@ -1,3 +1,4 @@
+import type { AiProviderId } from "src/ai/ai-provider";
 import { StorageType } from "src/data/data-store/base/data-store";
 import { t } from "src/lang/helpers";
 import { SRAlgorithmType } from "src/scheduling/algorithms/base/isr-algorithm";
@@ -113,6 +114,14 @@ export interface SRSettings {
     reviewLook: "studio" | "classic";
     /** Shown in the home screen greeting; empty for none. */
     learnerName: string;
+    // AI-generated cards
+    aiProvider: AiProviderId;
+    /** The model to ask. The Anthropic default is filled in; the other providers have none until it is chosen. */
+    aiModel: string;
+    /** The address of an OpenAI-compatible server, up to and excluding /chat/completions. */
+    aiBaseUrl: string;
+    /** The id of the secret in Obsidian's secret storage that holds the API key. Never the key itself. */
+    aiKeySecret: string;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -232,6 +241,11 @@ export const DEFAULT_SETTINGS: SRSettings = {
     answerKeys: "original",
     reviewLook: "studio",
     learnerName: "",
+    // AI-generated cards
+    aiProvider: "anthropic",
+    aiModel: "claude-sonnet-5-5",
+    aiBaseUrl: "",
+    aiKeySecret: "",
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

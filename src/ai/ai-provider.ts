@@ -1,5 +1,7 @@
 import type { RequestUrlParam, RequestUrlResponse } from "obsidian";
 
+import { t } from "src/lang/helpers";
+
 /*
  * Requests to an AI provider, for "Generate cards with AI". Every call goes through Obsidian's `requestUrl`, which
  * works on phones and is not blocked by CORS; this file only builds the request and reads the reply, so it can be
@@ -118,10 +120,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function unexpectedShape(): AiError {
-    return new AiError(
-        "format",
-        "The provider's reply was not in the expected shape. Check the provider, the model name and the base URL.",
-    );
+    return new AiError("format", t("AI_ERR_SHAPE"));
 }
 
 /** The text of a reply. Throws an AiError of kind "format" when the reply has another shape. */
@@ -178,30 +177,12 @@ function providerDetail(body: string): string {
  * a 401, so an auth error never includes the provider's text.
  */
 export function aiErrorFromStatus(status: number, body: string): AiError {
-    if (status === 401 || status === 403) {
-        return new AiError(
-            "auth",
-            "The provider did not accept the API key. Check the key and the provider in the settings.",
-        );
-    }
-    const detail = providerDetail(body);
-    const suffix = detail === "" ? "" : ` ${detail}`;
-    if (status === 429) {
-        return new AiError(
-            "rate-limit",
-            `The provider is limiting requests, or your quota is used up. Wait a moment and try again.${suffix}`,
-        );
-    }
-    if (status >= 500) {
-        return new AiError(
-            "server",
-            `The provider had a problem (HTTP ${status}). Try again in a moment.${suffix}`,
-        );
-    }
-    return new AiError(
-        "server",
-        `The provider rejected the request (HTTP ${status}). Check the model name.${suffix}`,
-    );
+    if (status === 401 || status === 403) return new AiError("auth", t("AI_ERR_AUTH"));
+    const reason = providerDetail(body);
+    const detail = reason === "" ? "" : ` ${reason}`;
+    if (status === 429) return new AiError("rate-limit", t("AI_ERR_RATE_LIMIT", { detail }));
+    if (status >= 500) return new AiError("server", t("AI_ERR_SERVER", { status, detail }));
+    return new AiError("server", t("AI_ERR_REJECTED", { status, detail }));
 }
 
 /** What the caller must supply to send a request: `requestUrl` in the plugin, a fake in tests. */
@@ -213,14 +194,14 @@ function hostOf(url: string): string {
     try {
         return new URL(url).host;
     } catch {
-        return "the provider";
+        return "the server";
     }
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         const timer = window.setTimeout(
-            () => reject(new AiError("network", "The provider did not answer in time. Try again.")),
+            () => reject(new AiError("network", t("AI_ERR_TIMEOUT"))),
             timeoutMs,
         );
         promise.then(
@@ -250,7 +231,7 @@ export async function requestAiText(
     timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): Promise<string> {
     if (settings.provider !== "openai-compatible" && apiKey.trim() === "") {
-        throw new AiError("no-key", "There is no API key yet. Add it in the settings.");
+        throw new AiError("no-key", t("AI_ERR_NO_KEY"));
     }
 
     try {
@@ -260,9 +241,12 @@ export async function requestAiText(
             response = await withTimeout(request(built), timeoutMs);
         } catch (error) {
             if (error instanceof AiError) throw error;
-            const where = hostOf(built.url);
-            const hint = settings.provider === "openai-compatible" ? " and the base URL" : "";
-            throw new AiError("network", `Could not reach ${where}. Check the connection${hint}.`);
+            const host = hostOf(built.url);
+            const compatible = settings.provider === "openai-compatible";
+            throw new AiError(
+                "network",
+                t(compatible ? "AI_ERR_NETWORK_URL" : "AI_ERR_NETWORK", { host }),
+            );
         }
 
         if (response.status >= 400) throw aiErrorFromStatus(response.status, response.text);
@@ -271,10 +255,7 @@ export async function requestAiText(
         try {
             json = JSON.parse(response.text);
         } catch {
-            throw new AiError(
-                "format",
-                "The provider's reply was not JSON. Check the provider and the base URL.",
-            );
+            throw new AiError("format", t("AI_ERR_NOT_JSON"));
         }
         return readAiText(settings.provider, json);
     } catch (error) {
