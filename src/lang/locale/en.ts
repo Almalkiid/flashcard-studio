@@ -85,6 +85,27 @@ const en: IBaseLocale = {
     TAP_TO_REVEAL: "Tap to reveal",
     PRESS_SPACE_TO_REVEAL: "Press Space to reveal",
     UNDO_LAST_ANSWER: "Undo last answer",
+    // Study modes: multiple choice, typed answers
+    SUGGESTED: "Suggested",
+    MULTIPLE_CHOICE: "Multiple choice",
+    CHOICE_SELECT_ALL: "Select all that apply",
+    CHOICE_CHECK: "Check",
+    CHOICE_YOUR_ANSWER_RIGHT: "Your answer · right",
+    CHOICE_YOUR_ANSWER_WRONG: "Your answer · wrong",
+    CHOICE_RIGHT_ANSWER: "Right answer",
+    TYPE_ANSWERS: "Type answers",
+    TYPE_ANSWERS_SETTING: "Type the answer",
+    TYPE_ANSWERS_SETTING_DESC:
+        "Cards with a short plain answer ask you to type it, and cloze blanks become fields to fill in. Enter checks the answer. Good is suggested for an exact answer, Again otherwise. The study screen menu switches this on for one session.",
+    IGNORE_ACCENTS_WHEN_TYPING: "Ignore accents",
+    IGNORE_ACCENTS_WHEN_TYPING_DESC:
+        "Treat “cafe” and “café” as the same when a typed answer is checked.",
+    SHUFFLE_CHOICES: "Shuffle options",
+    SHUFFLE_CHOICES_DESC:
+        "Show the options of a multiple choice card in a new order each time the card comes up.",
+    TYPED_ANSWER_PLACEHOLDER: "Type the answer",
+    TYPED_PRESS_ENTER: "Press Enter to check",
+    // End study modes: multiple choice, typed answers
     DAILY_LIMITS: "Daily limits",
     DAILY_LIMITS_DESC:
         "Cap how many new cards you learn and how many reviews you do each day, like Anki. Learning steps are never capped.",

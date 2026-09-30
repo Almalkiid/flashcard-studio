@@ -100,3 +100,12 @@ export function shuffledOrder(count: number, random: () => number): number[] {
     }
     return order;
 }
+
+/**
+ * Whether the chosen options (indices into `mc.options`) are exactly the right ones. Choosing nothing is never right.
+ */
+export function isChoiceCorrect(mc: MultipleChoice, chosen: number[]): boolean {
+    const picked = new Set(chosen);
+    if (picked.size === 0) return false;
+    return mc.options.every((option, index) => option.correct === picked.has(index));
+}

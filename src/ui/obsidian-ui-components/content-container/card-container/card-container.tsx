@@ -1,7 +1,13 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-container.css";
 import "src/ui/obsidian-ui-components/content-container/card-container/review-studio.css";
-import { App, Platform, setIcon } from "obsidian";
+import "src/ui/obsidian-ui-components/content-container/card-container/study-additions.css";
+import { App, Component, Platform, setIcon } from "obsidian";
 
+import { Card } from "src/data/data-structures/card/card";
+import {
+    isChoiceCorrect,
+    parseMultipleChoice,
+} from "src/data/data-structures/card/questions/multiple-choice";
 import { CardType } from "src/data/data-structures/card/questions/question";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { SRSettings } from "src/data/settings";
@@ -11,11 +17,28 @@ import { RepItemScheduleInfo } from "src/scheduling/algorithms/base/rep-item-sch
 import { ReviewResponse } from "src/scheduling/algorithms/base/repetition-item";
 import { digitFromKeyCode, responseForDigit } from "src/scheduling/answer-keys";
 import { FlashcardReviewMode } from "src/scheduling/flashcard-review-sequencer";
+import {
+    compareTypedAnswer,
+    normalizeAnswer,
+    typedAnswerTarget,
+} from "src/scheduling/typed-answer";
 import { SessionSummary } from "src/stats/session";
 import { CardActions, FLAG_COUNT } from "src/ui/card-actions";
+import {
+    ChoiceContext,
+    ChoiceFrontHandle,
+    ChoiceState,
+    createChoiceState,
+    renderChoiceBack,
+    renderChoiceFront,
+} from "src/ui/obsidian-ui-components/content-container/card-container/choice-view";
 import ContextSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section";
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar";
+import {
+    renderTypedInput,
+    renderTypedResult,
+} from "src/ui/obsidian-ui-components/content-container/card-container/typed-answer-view";
 import {
     CardState,
     SessionData,
@@ -56,6 +79,16 @@ export class CardContainer {
 
     private clozeInputs: NodeListOf<HTMLInputElement> | null = null;
     private clozeAnswers: NodeListOf<Element> | null = null;
+
+    // Multiple choice and typed answers: what is up on this card, and what the person did with it
+    private choice: ChoiceState | null = null;
+    private choiceHandle: ChoiceFrontHandle | null = null;
+    private choiceComponent: Component | null = null;
+    private typedInput: HTMLInputElement | null = null;
+    private typedValue: string | null = null;
+    /** The menu's "Type answers" for this session; null follows the setting. */
+    private typeAnswersOverride: boolean | null = null;
+    private lastSession: { sessionData: SessionData; settings: SRSettings } | null = null;
 
     private processReviewHandler: (response: ReviewResponse) => Promise<void>;
     private skipCardHandler: () => void;
@@ -123,6 +156,10 @@ export class CardContainer {
             actions,
             closeModal,
         );
+        this.toolbar.setTypeAnswersToggle({
+            isOn: () => this.typeAnswersOn(),
+            toggle: () => this.toggleTypeAnswers(),
+        });
 
         this.scrollWrapper = this.view.createDiv();
         this.scrollWrapper.addClass("sr-scroll-wrapper");
@@ -144,7 +181,7 @@ export class CardContainer {
         this.content.addEventListener("click", (event) => {
             if (!this.view.hasClass("sr-look-studio") || this.cardState !== CardState.Front) return;
             const target = event.target as HTMLElement | null;
-            if (target?.closest("a, input, button, .cloze-input")) return;
+            if (target?.closest("a, input, button, .cloze-input, .fs-choices, .fs-typed")) return;
             this.showAnswerHandler();
         });
 
@@ -189,6 +226,8 @@ export class CardContainer {
         this.cardState = CardState.Closed;
         this.hideAnswerToast();
         this.hideSessionSummary();
+        this.typeAnswersOverride = null;
+        this.resetStudyAids();
         activeDocument.removeEventListener("keydown", this._keydownHandler);
         this.view.addClass("sr-is-hidden");
     }
@@ -298,23 +337,54 @@ export class CardContainer {
         this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
         this.applyAppearance(settings);
         this.content.removeClass("sr-answer-shown");
+        this.lastSession = { sessionData, settings };
+
+        // Multiple choice tiles, or a field to type the answer in, go under the question
+        this.resetStudyAids();
+        const choice = this.choiceFor(sessionData, settings, false);
+        const card = sessionData.cardData.currentCard;
+        const typedTarget =
+            choice === null &&
+            this.typeAnswersOn() &&
+            sessionData.currentQuestion.questionType !== CardType.Cloze
+                ? typedAnswerTarget(card.back)
+                : null;
+        this.content.toggleClass("fs-choice-card", choice !== null);
 
         // Update card content
-        await this.drawCardFrontContent(sessionData, settings);
+        const choiceRoot = await this.drawCardFrontContent(sessionData, settings, choice);
+        const mobile = Platform.isMobile || EmulatedPlatform().isMobile;
+        if (choice !== null && choiceRoot !== null) {
+            this.choice = choice;
+            this.choiceHandle = renderChoiceFront(
+                choiceRoot,
+                choice,
+                this.choiceContext(sessionData),
+                () => this.showAnswerHandler(),
+            );
+        } else if (typedTarget !== null) {
+            this.typedInput = renderTypedInput(this.content, {
+                autofocus: !mobile,
+                onSubmit: () => this.showAnswerHandler(),
+            });
+        }
         if (this.view.hasClass("sr-look-studio")) {
             const hint = this.content.createDiv({ cls: "fs-reveal-hint" });
             setIcon(hint.createSpan({ cls: "fs-reveal-hint-icon" }), "pointer");
             hint.createSpan({
-                text:
-                    Platform.isMobile || EmulatedPlatform().isMobile
-                        ? t("TAP_TO_REVEAL")
-                        : t("PRESS_SPACE_TO_REVEAL"),
+                text: mobile
+                    ? t("TAP_TO_REVEAL")
+                    : this.typedInput !== null
+                      ? t("TYPED_PRESS_ENTER")
+                      : t("PRESS_SPACE_TO_REVEAL"),
             });
         }
         this.animateCardIn();
 
         // Update response buttons
         this.response.resetResponseButtons();
+        // Choosing an option is what shows the answer of a multiple choice card
+        if (this.choice !== null) this.response.hideAllButtons();
 
         // Setup cloze input listeners
         this._setupClozeInputListeners();
@@ -340,12 +410,30 @@ export class CardContainer {
         }
     }
 
-    private async drawCardFrontContent(sessionData: SessionData, settings: SRSettings) {
+    /**
+     * @returns The block that holds a multiple choice card (its label, question, tiles and explanation), or null
+     *          for any other card, whose question is rendered straight into the content.
+     */
+    private async drawCardFrontContent(
+        sessionData: SessionData,
+        settings: SRSettings,
+        choice: ChoiceState | null = null,
+    ): Promise<HTMLElement | null> {
         // Update card content
         this.content.empty();
 
         // Create context section
         this.drawCardContext(sessionData, settings);
+
+        let target: HTMLElement = this.content;
+        let choiceRoot: HTMLElement | null = null;
+        if (choice !== null) {
+            choiceRoot = this.content.createDiv({ cls: "fs-choice-root" });
+            const kind = choiceRoot.createDiv({ cls: "fs-choice-kind" });
+            setIcon(kind.createSpan({ cls: "fs-choice-kind-icon" }), "list-checks");
+            kind.createSpan({ text: t("MULTIPLE_CHOICE") });
+            target = choiceRoot.createDiv({ cls: "fs-choice-question" });
+        }
 
         // Build card content
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
@@ -356,13 +444,82 @@ export class CardContainer {
 
         await wrapper.renderMarkdownWrapper(
             sessionData.cardData.currentCard.front.trimStart(),
-            this.content,
+            target,
             sessionData.currentQuestion.questionText.textDirection,
             // sessionData.cardData.currentCardState
         );
         // Set scroll position back to top
         this.content.scrollTop = 0;
+        return choiceRoot;
     }
+
+    // #region -> Multiple choice and typed answers
+
+    /**
+     * The state of the multiple choice card that is up, or null when it is an ordinary card. A cloze card is never
+     * multiple choice. With `reuse`, the state of this card's front is kept (its order of options and the choice).
+     */
+    private choiceFor(
+        sessionData: SessionData,
+        settings: SRSettings,
+        reuse: boolean,
+    ): ChoiceState | null {
+        const card: Card | null = sessionData.cardData.currentCard;
+        if (card === null || sessionData.currentQuestion.questionType === CardType.Cloze) {
+            return null;
+        }
+        const mc = parseMultipleChoice(card.back);
+        if (mc === null) return null;
+        const current = this.choice;
+        if (
+            reuse &&
+            current !== null &&
+            current.card === card &&
+            current.mc.options.length === mc.options.length &&
+            current.mc.options.every((option, i) => option.text === mc.options[i].text)
+        ) {
+            return current;
+        }
+        return createChoiceState(card, mc, settings.shuffleChoices);
+    }
+
+    private choiceContext(sessionData: SessionData): ChoiceContext {
+        // A fresh owner for every card, so rendered options are cleaned up when the card changes
+        this.choiceComponent?.unload();
+        this.choiceComponent = new Component();
+        this.choiceComponent.load();
+        return {
+            app: this.app,
+            sourcePath: sessionData.currentNote.filePath,
+            component: this.choiceComponent,
+        };
+    }
+
+    /**
+     * Forgets the choice and the typed answer of the card that was up.
+     */
+    private resetStudyAids(): void {
+        this.choice = null;
+        this.choiceHandle = null;
+        this.typedInput = null;
+        this.typedValue = null;
+        this.choiceComponent?.unload();
+        this.choiceComponent = null;
+    }
+
+    private typeAnswersOn(): boolean {
+        return this.typeAnswersOverride ?? this.lastSession?.settings.typeAnswers ?? false;
+    }
+
+    private toggleTypeAnswers(): void {
+        this.typeAnswersOverride = !this.typeAnswersOn();
+        // The card that is up shows its field (or loses it) at once
+        if (this.cardState === CardState.Front && this.lastSession !== null) {
+            void this.drawCardFront(this.lastSession.sessionData, this.lastSession.settings);
+        }
+    }
+
+    // #endregion
 
     /**
      * Studio: a green "Answer" label where the answer starts (after the question, or at the top of a cloze card).
@@ -481,36 +638,51 @@ export class CardContainer {
             });
         });
     }
-    private _evaluateClozeAnswers(): void {
+    /**
+     * Marks each typed cloze answer right or wrong. Case, spacing and trailing punctuation do not count, and accents
+     * only when "Ignore accents" is on.
+     *
+     * @returns Whether every blank was right, or null when the card had no fields to type in.
+     */
+    private _evaluateClozeAnswers(ignoreAccents: boolean): boolean | null {
         this.clozeAnswers = activeDocument.querySelectorAll(".cloze-answer");
 
-        if (this.clozeInputs !== null && this.clozeAnswers.length === this.clozeInputs.length) {
-            for (let i = 0; i < this.clozeAnswers.length; i++) {
-                const clozeInput = this.clozeInputs[i];
-                const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
+        if (
+            this.clozeInputs === null ||
+            this.clozeInputs.length === 0 ||
+            this.clozeAnswers.length !== this.clozeInputs.length
+        ) {
+            return null;
+        }
+        let allRight = true;
+        for (let i = 0; i < this.clozeAnswers.length; i++) {
+            const clozeInput = this.clozeInputs[i];
+            const clozeAnswer = this.clozeAnswers[i] as HTMLElement;
 
-                const inputText = clozeInput.value.trim();
-                const answerText = clozeAnswer.innerText.trim();
+            const inputText = clozeInput.value.trim();
+            const answerText = clozeAnswer.innerText.trim();
+            const right =
+                normalizeAnswer(inputText, ignoreAccents) ===
+                normalizeAnswer(answerText, ignoreAccents);
+            if (!right) allRight = false;
 
-                clozeAnswer.empty();
+            clozeAnswer.empty();
 
-                const answerElement = clozeAnswer.createSpan({
-                    text: escapeHtml(inputText),
-                    cls: "cloze-answer",
+            const answerElement = clozeAnswer.createSpan({
+                text: escapeHtml(inputText),
+                cls: "cloze-answer",
+            });
+
+            answerElement.addClass(right ? "cloze-answer-correct" : "cloze-answer-incorrect");
+
+            if (!right) {
+                clozeAnswer.createSpan({
+                    text: escapeHtml(answerText),
+                    cls: "cloze-answer-wrong",
                 });
-
-                answerElement.addClass(
-                    inputText === answerText ? "cloze-answer-correct" : "cloze-answer-incorrect",
-                );
-
-                if (inputText !== answerText) {
-                    clozeAnswer.createSpan({
-                        text: escapeHtml(answerText),
-                        cls: "cloze-answer-wrong",
-                    });
-                }
             }
         }
+        return allRight;
     }
 
     public async drawBack(
@@ -522,36 +694,81 @@ export class CardContainer {
         this.setCustomHotKeyState(settings.useCustomHotkeys);
         this.applyAppearance(settings);
         this.cardState = sessionData.cardData.currentCardState;
+        this.lastSession = { sessionData, settings };
+
+        // What was typed or chosen on the front, before the content is rebuilt
+        if (this.typedInput !== null) {
+            this.typedValue = this.typedInput.value;
+            this.typedInput = null;
+        }
+        this.choiceHandle = null;
+        const choice = this.choiceFor(sessionData, settings, true);
+        if (choice !== null) {
+            choice.locked = true;
+            this.choice = choice;
+        }
+        this.content.toggleClass("fs-choice-card", choice !== null);
+        // The rating the answer suggests, if there is one
+        let suggestion: ReviewResponse | null = null;
 
         this.toolbar.setResetButtonDisabled(false);
         this.showFlag(sessionData.cardData.currentCard?.meta.flag ?? 0);
 
-        // Show answer text
-        if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
-            await this.drawCardFrontContent(sessionData, settings);
-            const hr: HTMLElement = createEl("hr");
-            this.content.appendChild(hr);
+        if (choice !== null) {
+            // A multiple choice card shows its tiles marked right and wrong, and the explanation
+            const choiceRoot = await this.drawCardFrontContent(sessionData, settings, choice);
+            if (choiceRoot !== null) {
+                await renderChoiceBack(choiceRoot, choice, this.choiceContext(sessionData));
+            }
+            if (choice.chosen.length > 0) {
+                suggestion = isChoiceCorrect(choice.mc, choice.chosen)
+                    ? ReviewResponse.Good
+                    : ReviewResponse.Again;
+            }
         } else {
-            this.content.empty();
-            this.drawCardContext(sessionData, settings);
+            // Show answer text
+            if (sessionData.currentQuestion.questionType !== CardType.Cloze) {
+                await this.drawCardFrontContent(sessionData, settings);
+                const hr: HTMLElement = createEl("hr");
+                this.content.appendChild(hr);
+            } else {
+                this.content.empty();
+                this.drawCardContext(sessionData, settings);
+            }
+
+            const backText = sessionData.cardData.currentCard.back;
+            const typedTarget = this.typedValue !== null ? typedAnswerTarget(backText) : null;
+            if (this.typedValue !== null && typedTarget !== null) {
+                // The answer was typed: show it letter by letter against the expected one
+                const comparison = compareTypedAnswer(
+                    this.typedValue,
+                    typedTarget,
+                    settings.ignoreAccentsWhenTyping,
+                );
+                renderTypedResult(this.content, comparison);
+                suggestion = comparison.exact ? ReviewResponse.Good : ReviewResponse.Again;
+            } else {
+                const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
+                    this.app,
+                    this.plugin,
+                    sessionData.currentNote.filePath,
+                );
+                await wrapper.renderMarkdownWrapper(
+                    backText,
+                    this.content,
+                    sessionData.currentQuestion.questionText.textDirection,
+                    // sessionData.cardData.currentCardState,
+                );
+            }
+
+            // Evaluate cloze answers
+            const clozeRight = this._evaluateClozeAnswers(settings.ignoreAccentsWhenTyping);
+            if (clozeRight !== null) {
+                suggestion = clozeRight ? ReviewResponse.Good : ReviewResponse.Again;
+            }
         }
-
-        const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
-            this.app,
-            this.plugin,
-            sessionData.currentNote.filePath,
-        );
-        await wrapper.renderMarkdownWrapper(
-            sessionData.cardData.currentCard.back,
-            this.content,
-            sessionData.currentQuestion.questionText.textDirection,
-            // sessionData.cardData.currentCardState,
-        );
-
-        // Evaluate cloze answers
-        this._evaluateClozeAnswers();
         this.content.addClass("sr-answer-shown");
-        if (this.view.hasClass("sr-look-studio")) this.insertAnswerLabel();
+        if (choice === null && this.view.hasClass("sr-look-studio")) this.insertAnswerLabel();
 
         // Show response buttons
         this.response.showRatingButtons(
@@ -563,6 +780,9 @@ export class CardContainer {
             settings.showIntervalInReviewButtons,
             determineButtonSchedule,
         );
+        this.response.setSuggested(suggestion);
+        // With the answer tiles showing there may be too little room for the whole card: bring the explanation in view
+        this.content.querySelector(".fs-choice-explanation")?.scrollIntoView({ block: "nearest" });
         // NEW: restore keyboard focus after cloze confirmation
         if (this.plugin.uiManager === null) throw new Error("UI manager not initialized!!!");
         this.plugin.uiManager.setSRViewInFocus(true);
@@ -618,6 +838,12 @@ export class CardContainer {
         // M3a: scheduling. The number keys answer as the "Answer keys" setting says
         const digit = digitFromKeyCode(e.code);
         if (digit !== null) {
+            // On a multiple choice card the number keys choose an option until the answer is shown
+            if (this.cardState === CardState.Front && this.choiceHandle !== null && digit >= 1) {
+                this.choiceHandle.chooseAt(digit - 1);
+                consumeKeyEvent();
+                return;
+            }
             const response = responseForDigit(
                 this.plugin.dataManager.data.settings.answerKeys,
                 digit,

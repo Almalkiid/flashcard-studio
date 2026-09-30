@@ -102,3 +102,19 @@ test("CardType.Cloze", () => {
         ),
     ]);
 });
+
+test("typing answers turns cloze blanks into inline inputs, like the cloze inputs setting", () => {
+    const withInputs = CardFrontBackUtil.expand(CardType.Cloze, "The ==board== approves it.", {
+        ...DEFAULT_SETTINGS,
+        typeAnswers: true,
+    });
+    expect(withInputs).toHaveLength(1);
+    expect(withInputs[0].front).toContain('<input class="cloze-input"');
+    expect(withInputs[0].back).toContain('class="cloze-answer"');
+
+    const plain = CardFrontBackUtil.expand(CardType.Cloze, "The ==board== approves it.", {
+        ...DEFAULT_SETTINGS,
+        typeAnswers: false,
+    });
+    expect(plain[0].front).not.toContain("<input");
+});

@@ -517,6 +517,45 @@ export class UIPreferencesPage extends SettingsPage {
                                 await this.settingsManager.save();
                             }),
                     );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("SHUFFLE_CHOICES"))
+                    .setDesc(t("SHUFFLE_CHOICES_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.shuffleChoices)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.shuffleChoices = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("TYPE_ANSWERS_SETTING"))
+                    .setDesc(t("TYPE_ANSWERS_SETTING_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.typeAnswers)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.typeAnswers = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
+            })
+            .addSetting((setting: Setting) => {
+                setting
+                    .setName(t("IGNORE_ACCENTS_WHEN_TYPING"))
+                    .setDesc(t("IGNORE_ACCENTS_WHEN_TYPING_DESC"))
+                    .addToggle((toggle) =>
+                        toggle
+                            .setValue(this.settingsManager.settings.ignoreAccentsWhenTyping)
+                            .onChange(async (value) => {
+                                this.settingsManager.settings.ignoreAccentsWhenTyping = value;
+                                await this.settingsManager.save();
+                            }),
+                    );
             });
 
         // M3a: scheduling

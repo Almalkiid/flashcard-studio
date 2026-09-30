@@ -96,6 +96,33 @@ The number keys follow **Answer keys** in the settings. **Anki** (1 Again, 2 Har
 
 On a phone, the same actions are in the card menu.
 
+### Multiple choice
+
+A card whose answer is a task list with at least two items, at least one of them checked, is a multiple choice card. No new syntax:
+
+<!-- prettier-ignore -->
+```markdown
+Which body sets the internal audit charter?
+?
+- [ ] The CAE
+- [x] The board
+- [ ] External auditors
+- [ ] Senior management
+Explanation: the board approves the charter (Standard 6.2).
+```
+
+Lines after the list are the explanation, shown after you answer. Text before the list stays above the options. In Spaced Repetition, the original plugin, this is an ordinary card, so your notes keep working there.
+
+In a review the options are tiles. Tap one, or press its number (1 to 9), and the answer shows with the right option in green, a wrong choice in red, and the explanation. The rating the answer suggests, **Good** for a right choice and **Again** for a wrong one, is outlined and tagged **Suggested**; you still choose the rating. With several checked options the question says **Select all that apply**; choose them and press **Check**. To see the answer without choosing, press Space or tap the question, and nothing is suggested. **Shuffle options** in the settings (on by default) shows the options in a new order each time.
+
+Only a real checklist counts. A list with one item, with nothing checked, with nested items or a plain bullet among the items, or a second list after other text, stays an ordinary card.
+
+### Typing the answer
+
+Turn on **Type the answer** in the settings, or **Type answers** in the card menu for one session. A card whose answer is short plain text (one line, at most 120 characters, no image, code, math, table or list) shows a field under the question. Press Enter to check. You see what you typed with each wrong letter marked, and the expected answer below it with the letters you left out marked. **Good** is suggested for an exact answer and **Again** otherwise. Case, extra spaces and a full stop at the end do not count, and accents do unless you turn on **Ignore accents**.
+
+Cloze cards get a field in place of each blank, and the same rules mark them right or wrong. That part follows the setting; the card menu switch does not change it.
+
 ## Where your data lives
 
 - **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the original plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the original plugin ignores.

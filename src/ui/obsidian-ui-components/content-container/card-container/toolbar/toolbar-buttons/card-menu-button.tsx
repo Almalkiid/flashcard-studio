@@ -4,8 +4,15 @@ import { t } from "src/lang/helpers";
 import { CardActions, FLAG_COUNT } from "src/ui/card-actions";
 import MenuButtonComponent from "src/ui/obsidian-ui-components/content-container/menu-button";
 
+/** The "Type answers" switch of the study session, shown in the card menu. */
+export interface TypeAnswersToggle {
+    isOn: () => boolean;
+    toggle: () => void;
+}
+
 export default class CardMenuButtonComponent extends MenuButtonComponent {
     private isResetButtonDisabled: boolean;
+    public typeAnswersToggle: TypeAnswersToggle | null = null;
     public constructor(
         container: HTMLElement,
         isExtended: boolean,
@@ -41,6 +48,7 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     closeModal,
                 );
                 if (actions) this.addCardActions(cardMenu, actions, evt);
+                this.addStudyOptions(cardMenu);
 
                 cardMenu.showAtMouseEvent(evt);
             },
@@ -135,6 +143,18 @@ export default class CardMenuButtonComponent extends MenuButtonComponent {
                     });
             });
         }
+    }
+
+    private addStudyOptions(cardMenu: Menu) {
+        const toggle = this.typeAnswersToggle;
+        if (toggle === null) return;
+        cardMenu.addSeparator();
+        cardMenu.addItem((item) => {
+            item.setTitle(t("TYPE_ANSWERS"))
+                .setIcon("keyboard")
+                .setChecked(toggle.isOn())
+                .onClick(() => toggle.toggle());
+        });
     }
 
     private addCardActions(cardMenu: Menu, actions: CardActions, evt: MouseEvent) {

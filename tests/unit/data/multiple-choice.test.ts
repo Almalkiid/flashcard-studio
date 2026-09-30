@@ -1,4 +1,5 @@
 import {
+    isChoiceCorrect,
     parseMultipleChoice,
     shuffledOrder,
 } from "src/data/data-structures/card/questions/multiple-choice";
@@ -94,4 +95,23 @@ test("shuffledOrder follows the random numbers, and handles zero and one option"
     expect(shuffledOrder(3, () => 0)).toEqual([1, 2, 0]);
     // random() just under 1 never moves anything
     expect(shuffledOrder(3, () => 0.999)).toEqual([0, 1, 2]);
+});
+
+describe("isChoiceCorrect", () => {
+    const single = parseMultipleChoice("- [ ] A\n- [x] B\n- [ ] C");
+    const multi = parseMultipleChoice("- [x] A\n- [ ] B\n- [x] C");
+
+    test("the right option alone is right, any other choice is wrong", () => {
+        expect(isChoiceCorrect(single, [1])).toBe(true);
+        expect(isChoiceCorrect(single, [0])).toBe(false);
+        expect(isChoiceCorrect(single, [0, 1])).toBe(false);
+    });
+    test("a multi-select answer needs every right option and no wrong one", () => {
+        expect(isChoiceCorrect(multi, [2, 0])).toBe(true);
+        expect(isChoiceCorrect(multi, [0])).toBe(false);
+        expect(isChoiceCorrect(multi, [0, 1, 2])).toBe(false);
+    });
+    test("choosing nothing is never right", () => {
+        expect(isChoiceCorrect(single, [])).toBe(false);
+    });
 });

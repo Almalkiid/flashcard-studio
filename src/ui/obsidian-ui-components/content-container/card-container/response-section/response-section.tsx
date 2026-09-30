@@ -74,7 +74,48 @@ export default class ResponseSectionComponent {
         this.easyButton.setLeadingIcon("chevrons-right");
     }
 
+    /**
+     * Outlines a button and tags it "Suggested", or clears the suggestion for null. The person still rates. In cram
+     * mode, which has no Good button, a suggested Good goes to Easy.
+     */
+    public setSuggested(response: ReviewResponse | null) {
+        for (const button of [
+            this.againButton,
+            this.hardButton,
+            this.goodButton,
+            this.easyButton,
+        ]) {
+            button.buttonEl.removeClass("fs-suggested");
+            button.buttonEl.querySelector(".fs-suggested-tag")?.remove();
+        }
+        if (response === null) return;
+        const target =
+            response === ReviewResponse.Good && this.responseEl.hasClass("is-cram")
+                ? ReviewResponse.Easy
+                : response;
+        const button = this.buttonFor(target);
+        if (button === null || button.buttonEl.hasClass("sr-is-hidden")) return;
+        button.buttonEl.addClass("fs-suggested");
+        button.buttonEl.createSpan({ cls: "fs-suggested-tag", text: t("SUGGESTED") });
+    }
+
+    private buttonFor(response: ReviewResponse): SRResponseButtonComponent | null {
+        switch (response) {
+            case ReviewResponse.Again:
+                return this.againButton;
+            case ReviewResponse.Hard:
+                return this.hardButton;
+            case ReviewResponse.Good:
+                return this.goodButton;
+            case ReviewResponse.Easy:
+                return this.easyButton;
+            default:
+                return null;
+        }
+    }
+
     public resetResponseButtons() {
+        this.setSuggested(null);
         // Sets all buttons in to their default state
         if (this.responseEl.hasClass("sr-is-hidden")) {
             this.responseEl.removeClass("sr-is-hidden");
@@ -87,6 +128,7 @@ export default class ResponseSectionComponent {
     }
 
     public hideAllButtons() {
+        this.setSuggested(null);
         if (!this.responseEl.hasClass("sr-is-hidden")) {
             this.responseEl.addClass("sr-is-hidden");
         }

@@ -113,6 +113,13 @@ export interface SRSettings {
     reviewLook: "studio" | "classic";
     /** Shown in the home screen greeting; empty for none. */
     learnerName: string;
+    // Study modes: multiple choice, typed answers
+    /** Type the answer to a card whose answer is short plain text, and fill in cloze blanks in the card. */
+    typeAnswers: boolean;
+    /** A typed answer ignores accents ("cafe" matches "café"). */
+    ignoreAccentsWhenTyping: boolean;
+    /** The options of a multiple choice card show in a new order each time. */
+    shuffleChoices: boolean;
     // M3b: card syntax
     /** Empty (the default) means there are no card regions. See parser.ts. */
     multilineCardStartMarker: string;
@@ -232,6 +239,10 @@ export const DEFAULT_SETTINGS: SRSettings = {
     answerKeys: "original",
     reviewLook: "studio",
     learnerName: "",
+    // Study modes: multiple choice, typed answers
+    typeAnswers: false,
+    ignoreAccentsWhenTyping: false,
+    shuffleChoices: true,
     // M3b: card syntax
     multilineCardStartMarker: "",
     calloutCardTypes: ["flashcard", "question", "card"],

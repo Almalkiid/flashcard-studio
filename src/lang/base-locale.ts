@@ -74,6 +74,24 @@ export interface IBaseLocale {
     TAP_TO_REVEAL: string;
     PRESS_SPACE_TO_REVEAL: string;
     UNDO_LAST_ANSWER: string;
+    // Study modes: multiple choice, typed answers
+    SUGGESTED: string;
+    MULTIPLE_CHOICE: string;
+    CHOICE_SELECT_ALL: string;
+    CHOICE_CHECK: string;
+    CHOICE_YOUR_ANSWER_RIGHT: string;
+    CHOICE_YOUR_ANSWER_WRONG: string;
+    CHOICE_RIGHT_ANSWER: string;
+    TYPE_ANSWERS: string;
+    TYPE_ANSWERS_SETTING: string;
+    TYPE_ANSWERS_SETTING_DESC: string;
+    IGNORE_ACCENTS_WHEN_TYPING: string;
+    IGNORE_ACCENTS_WHEN_TYPING_DESC: string;
+    SHUFFLE_CHOICES: string;
+    SHUFFLE_CHOICES_DESC: string;
+    TYPED_ANSWER_PLACEHOLDER: string;
+    TYPED_PRESS_ENTER: string;
+    // End study modes: multiple choice, typed answers
     DAILY_LIMITS: string;
     DAILY_LIMITS_DESC: string;
     NEW_CARDS_PER_DAY: string;

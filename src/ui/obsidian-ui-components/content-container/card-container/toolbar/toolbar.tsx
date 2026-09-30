@@ -8,7 +8,9 @@ import { CardActions } from "src/ui/card-actions";
 import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 import DeckInfoComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/deck-info/deck-info";
 import BackButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/back-button";
-import CardMenuButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
+import CardMenuButtonComponent, {
+    TypeAnswersToggle,
+} from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/card-menu-button";
 import EditButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/edit-button";
 import ResetButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/reset-button";
 import SkipButtonComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar-buttons/skip-button";
@@ -132,6 +134,14 @@ export default class CardToolbarComponent {
         ];
 
         new ModalCloseButtonComponent(this.toolbar, closeModal, closeButtonClasses);
+    }
+
+    /**
+     * Adds the "Type answers" switch for this session to both card menus.
+     */
+    public setTypeAnswersToggle(toggle: TypeAnswersToggle): void {
+        this.extendedMenuButton.typeAnswersToggle = toggle;
+        this.shortMenuButton.typeAnswersToggle = toggle;
     }
 
     /**
