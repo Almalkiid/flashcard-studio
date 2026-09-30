@@ -72,8 +72,7 @@ jobs:
             - name: Publish the release
               env:
                   GH_TOKEN: ${{ github.token }}
+              # Not a pre-release: BRAT and the community directory skip pre-releases by default
               run: |
-                  prerelease=""
-                  case "${GITHUB_REF_NAME}" in 0.*) prerelease="--prerelease" ;; esac
                   gh release create "${GITHUB_REF_NAME}" release/main.js release/manifest.json release/styles.css \
-                      --title "${GITHUB_REF_NAME}" --notes-file release-notes.md ${prerelease}
+                      --title "${GITHUB_REF_NAME}" --notes-file release-notes.md
