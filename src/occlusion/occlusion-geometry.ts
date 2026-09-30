@@ -150,3 +150,50 @@ export function hitHandle(
     }
     return best;
 }
+
+export interface CardScrollInput {
+    /** The height of the card's scrolling area that can be seen. */
+    view: number;
+    /** The height of everything in it. */
+    content: number;
+    /** Where the top of the block (its question) is. */
+    lead: number;
+    /** Where the bottom of the answer under the picture is, or null when the card has none (the front). */
+    label: { bottom: number } | null;
+    /** Where the mask that the card asks about is. */
+    mask: { top: number; bottom: number };
+    /** Where the picture is. */
+    stage: { top: number; bottom: number };
+}
+
+/** The room kept around what is scrolled to. */
+const SCROLL_PAD = 8;
+
+/** The room above a picture that the card keeps for its own buttons in the corner (the star), when it starts there. */
+const CORNER_CLEARANCE = 44;
+
+/**
+ * How far to scroll a review card, whose picture is as wide as the card and so may be taller than it, so that the mask
+ * that the card asks about is seen without scrolling by hand. All values are in pixels from the top of the card's
+ * scrolling content. As much as fits is shown, in this order: the question, the picture and the answer under it; the
+ * picture and the answer; the mask and the answer; the question down to the mask; the picture down to the mask; and,
+ * when the mask is deep in a picture that is too tall for any of that, the mask in the middle of the card.
+ */
+export function cardScrollTop(input: CardScrollInput): number {
+    const room = input.view - 2 * SCROLL_PAD;
+    // A picture that starts at the top of the card would be under the star, so it starts a little lower
+    const pictureRoom = input.view - CORNER_CLEARANCE - SCROLL_PAD;
+    const pictureTop = input.stage.top - CORNER_CLEARANCE;
+    const max = Math.max(0, input.content - input.view);
+    const end = input.label?.bottom ?? input.stage.bottom;
+
+    let target: number;
+    if (end - input.lead <= room) target = input.lead - SCROLL_PAD;
+    else if (end - input.stage.top <= pictureRoom) target = pictureTop;
+    else if (input.label !== null && input.label.bottom - input.mask.top <= room) {
+        target = input.label.bottom + SCROLL_PAD - input.view;
+    } else if (input.mask.bottom - input.lead <= room) target = input.lead - SCROLL_PAD;
+    else if (input.mask.bottom - input.stage.top <= pictureRoom) target = pictureTop;
+    else target = (input.mask.top + input.mask.bottom) / 2 - input.view / 2;
+    return Math.min(max, Math.max(0, target));
+}

@@ -7,6 +7,7 @@ import {
     OcclusionBlock,
     parseOcclusionBlock,
 } from "src/occlusion/occlusion-block";
+import { cardScrollTop } from "src/occlusion/occlusion-geometry";
 
 export const OCCLUSION_CARD_LANG = "fs-occlusion-card";
 
@@ -119,68 +120,41 @@ export function fitStageToImage(stage: HTMLElement, img: HTMLImageElement): void
     if (img.complete) fit();
 }
 
-// Even in a very small card the picture is this tall, and the card scrolls
-const MIN_FIT_HEIGHT = 80;
-
 /**
- * In the study screen the card has a fixed height and scrolls when its content is taller. The picture is sized to what
- * is left of the card after everything else in it, so that the question, the whole picture and the hint under it show
- * without a scroll, and the mask that is asked about is never below the fold. It is sized again when the card's box
- * changes, or when something is added to the card (the "tap to reveal" hint comes after the card is drawn).
- * Anywhere else (a note, the editor) there is no such card and the picture keeps the height the stylesheet gives it.
+ * Scrolls a review card so that the mask that the card asks about is in view: the card scrolls, because its picture is as
+ * wide as the card and may be taller than it. Also, when the picture is zoomed and so wider than the card, the picture
+ * is scrolled sideways to the mask. Only the card's own scrolling area is moved, never the window.
  */
-function fitStageToCard(
-    el: HTMLElement,
-    scroller: HTMLElement,
-    stage: HTMLElement,
-    owner?: Component,
-): void {
-    let observers: { resize: ResizeObserver; mutate: MutationObserver } | null = null;
-    let last = "";
+function scrollCardToMask(el: HTMLElement, scroller: HTMLElement, stage: HTMLElement): void {
+    const mask = stage.querySelector(".fs-mask.is-active, .fs-mask.is-revealed");
+    const host = el.closest<HTMLElement>(".sr-content");
+    if (mask === null || host === null || !el.isConnected) return;
 
-    const stop = () => {
-        observers?.resize.disconnect();
-        observers?.mutate.disconnect();
-        observers = null;
-    };
-    const fit = () => {
-        const host = el.closest<HTMLElement>(".sr-content");
-        if (!el.isConnected || host === null) return stop();
+    const hostBox = host.getBoundingClientRect();
+    const inContent = (box: DOMRect) => ({
+        top: box.top - hostBox.top - host.clientTop + host.scrollTop,
+        bottom: box.bottom - hostBox.top - host.clientTop + host.scrollTop,
+    });
+    const stageBounds = inContent(stage.getBoundingClientRect());
+    const answer = el.querySelector<HTMLElement>(".fs-occ-answer");
+    const gap = Number.parseFloat(el.win.getComputedStyle(el).rowGap) || 0;
+    host.scrollTo({
+        top: cardScrollTop({
+            view: host.clientHeight,
+            content: host.scrollHeight,
+            lead: inContent(el.getBoundingClientRect()).top,
+            // The answer is under the picture
+            label:
+                answer === null ? null : { bottom: stageBounds.bottom + gap + answer.offsetHeight },
+            mask: inContent(mask.getBoundingClientRect()),
+            stage: stageBounds,
+        }),
+    });
 
-        const px = (value: string) => Number.parseFloat(value) || 0;
-        const style = host.win.getComputedStyle(host);
-        let others = px(style.paddingTop) + px(style.paddingBottom);
-        for (const child of Array.from(host.children) as HTMLElement[]) {
-            // The rows of this card, and what is beside it. Only the bottom margins are counted: the top ones can be
-            // "auto", which is whatever room is left over. A row that is squeezed (the note's title above the card,
-            // when the card is too tall) is counted as tall as its content, or the picture would never get small enough.
-            others += child.contains(el)
-                ? child.offsetHeight - scroller.offsetHeight
-                : Math.max(child.offsetHeight, child.scrollHeight);
-            others += px(host.win.getComputedStyle(child).marginBottom);
-        }
-        const height = `${Math.max(MIN_FIT_HEIGHT, Math.floor(host.clientHeight - others))}px`;
-        if (height === last) return;
-        last = height;
-        stage.setCssProps({ "--fs-occ-max-h": height });
-    };
-
-    // The card is put in its screen after this runs, so it is looked for on the next frames
-    let tries = 0;
-    const start = () => {
-        const host = el.closest<HTMLElement>(".sr-content");
-        if (host === null) {
-            if (el.isConnected || ++tries > 10) return;
-            el.win.requestAnimationFrame(start);
-            return;
-        }
-        observers = { resize: new ResizeObserver(fit), mutate: new MutationObserver(fit) };
-        observers.resize.observe(host);
-        observers.mutate.observe(host, { childList: true });
-        owner?.register(stop);
-        fit();
-    };
-    el.win.requestAnimationFrame(start);
+    const stageBox = stage.getBoundingClientRect();
+    const maskBox = mask.getBoundingClientRect();
+    scroller.scrollLeft =
+        (maskBox.left + maskBox.right) / 2 - stageBox.left - scroller.clientWidth / 2;
 }
 
 /**
@@ -294,16 +268,27 @@ export function renderOcclusion(
         });
     });
 
-    // A tap on the image zooms it on a phone, where the picture is small. The tap is not a tap on the card, which
-    // would show the answer: the answer button is still there.
-    if (Platform.isMobile) {
+    // A review card has the picture as wide as the card, which may be taller than the card: the card is scrolled to the
+    // mask when the picture has loaded (after two frames: the card sets its own scroll to the top when it is drawn).
+    const card = states !== "labels";
+    const scroll = () => scrollCardToMask(el, scroller, stage);
+    if (card) {
+        const later = () =>
+            el.win.requestAnimationFrame(() => el.win.requestAnimationFrame(scroll));
+        img.addEventListener("load", later);
+        if (img.complete) later();
+    }
+
+    // A click or a tap on the picture of a card zooms it (on a phone also in a note, where the picture is small). It is
+    // not a click on the card, which would show the answer: the answer button and the key are still there.
+    if (card || Platform.isMobile) {
         img.addEventListener("click", (event) => {
             event.stopPropagation();
             stage.toggleClass("is-zoomed", !stage.hasClass("is-zoomed"));
+            if (card) el.win.requestAnimationFrame(scroll);
         });
     }
 
     addAnswer();
-    if (states !== "labels") fitStageToCard(el, scroller, stage, owner);
     return stage;
 }

@@ -18,11 +18,6 @@
     margin: 0 0 8px;
 }
 
-/* In the study screen the card has little room: the rows of the card sit closer together */
-.sr-content .fs-occ.fs-studio {
-    gap: 10px;
-}
-
 .fs-occ-question {
     font-size: var(--fs-headline);
     font-weight: 650;
@@ -40,9 +35,10 @@
 }
 
 /*
- * The box the picture and its masks share. It is as wide as the container allows, no wider than the picture itself
- * and, by the picture's proportions, no taller than --fs-occ-max-h, so that the masks (which cover the whole box)
- * always sit exactly on the picture. --fs-occ-ratio and --fs-occ-natural are set when the picture has loaded.
+ * The box the picture and its masks share, exactly the size of the picture, so that the masks (which cover the whole
+ * box) sit on the picture. In a note and in the editor it is as wide as the container allows, no wider than the picture
+ * itself and, by its proportions, no taller than --fs-occ-max-h. --fs-occ-ratio and --fs-occ-natural (the picture's
+ * own width) are set when the picture has loaded.
  */
 .fs-occ-stage {
     position: relative;
@@ -61,11 +57,36 @@
         0 0 0 1px var(--fs-border-strong);
 }
 
-/* A tap on a phone: the picture is shown larger, and scrolls inside its box */
+/* A click or a tap: the picture is shown larger, and scrolls inside its box */
 .fs-occ-stage.is-zoomed {
     width: 180%;
     max-width: none;
     margin-inline: 0;
+}
+
+/*
+ * A review card: the picture is as wide as the card, up to its own width, and as tall as that makes it. The card
+ * scrolls, and is scrolled to the mask that it asks about, so that what is written on the picture can be read.
+ * Zoomed, it is larger, but never more than twice its own width.
+ */
+.fs-occ.is-front .fs-occ-stage,
+.fs-occ.is-back .fs-occ-stage {
+    width: min(100%, var(--fs-occ-natural, 100%));
+}
+
+.fs-occ.is-front .fs-occ-stage.is-zoomed,
+.fs-occ.is-back .fs-occ-stage.is-zoomed {
+    width: min(180%, calc(2 * var(--fs-occ-natural, 100%)));
+}
+
+.fs-occ.is-front .fs-occ-image,
+.fs-occ.is-back .fs-occ-image {
+    cursor: zoom-in;
+}
+
+.fs-occ.is-front .is-zoomed .fs-occ-image,
+.fs-occ.is-back .is-zoomed .fs-occ-image {
+    cursor: zoom-out;
 }
 
 .fs-occ-image {

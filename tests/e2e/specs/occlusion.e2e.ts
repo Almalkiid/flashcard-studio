@@ -151,10 +151,10 @@ async function expectActiveMaskAt(
 }
 
 /**
- * The mask that the card asks about is inside the card's box, and the card does not scroll: the whole picture, the
- * question and the rest of the card are seen at once, also in the default (small) review window on a desktop.
+ * The card scrolls to the mask that it asks about once its picture has loaded: the mask is inside the card's visible scroll
+ * area, and on the back it is not under the answer, which stays in view at the bottom. Nobody scrolls by hand.
  */
-async function expectCardFitsWithMaskInView(): Promise<void> {
+async function expectMaskInView(): Promise<void> {
     const measure = () =>
         browser.execute(() => {
             const card = ".sr-view .sr-card-container";
@@ -163,41 +163,70 @@ async function expectCardFitsWithMaskInView(): Promise<void> {
                 `${card} .fs-mask.is-active, ${card} .fs-mask.is-revealed`,
             );
             if (host === null || mask === null) return null;
-            const box = host.getBoundingClientRect();
+            const area = host.getBoundingClientRect();
             const at = mask.getBoundingClientRect();
+            const answer = document
+                .querySelector(`${card} .fs-occ-answer`)
+                ?.getBoundingClientRect();
             return {
-                maskTop: at.top - box.top,
-                maskBottom: box.bottom - at.bottom,
-                overflow: host.scrollHeight - host.clientHeight,
-                maxH: document
-                    .querySelector<HTMLElement>(`${card} .fs-occ-stage`)
-                    ?.style.getPropertyValue("--fs-occ-max-h"),
-                client: host.clientHeight,
-                rows: Array.from(host.children).map(
-                    (child) =>
-                        `${child.className.toString().slice(0, 24)}:${(child as HTMLElement).offsetHeight}`,
-                ),
-                stage: document.querySelector<HTMLElement>(`${card} .fs-occ-stage`)?.offsetHeight,
+                above: at.top - area.top,
+                below: area.bottom - at.bottom,
+                left: at.left - area.left,
+                right: area.right - at.right,
+                // Room between the mask and the answer that stays at the bottom, when there is one
+                clear: answer === undefined ? 1 : answer.top - at.bottom,
+                scrollTop: Math.round(host.scrollTop),
+                scrollable: host.scrollHeight > host.clientHeight + 2,
             };
         });
-    // The picture is sized to the card on the frames after it is drawn
     let last: unknown = null;
     await browser
         .waitUntil(
             async () => {
-                last = await measure();
-                return ((last as { overflow: number } | null)?.overflow ?? 99) <= 2;
+                const box = (last = await measure());
+                return (
+                    box !== null &&
+                    box.above >= 0 &&
+                    box.below >= 0 &&
+                    box.left >= 0 &&
+                    box.right >= 0 &&
+                    box.clear >= 0
+                );
             },
-            { timeout: 4000 },
+            { timeout: 5000 },
         )
         .catch(() => {
-            throw new Error(
-                `the card still scrolls, the picture was not sized to it: ${JSON.stringify(last)}`,
-            );
+            throw new Error(`the mask is not in view of the card: ${JSON.stringify(last)}`);
         });
-    const fit = await measure();
-    expect(fit?.maskTop).toBeGreaterThanOrEqual(0);
-    expect(fit?.maskBottom).toBeGreaterThanOrEqual(0);
+}
+
+/**
+ * The picture is as wide as the card's content, up to its own width (the picture is 1000 px wide). The block has a little
+ * padding of its own in the study look, so the picture is compared with the block's content, and the block with the card's.
+ */
+async function expectPictureAsWideAsTheCard(): Promise<void> {
+    const sizes = await browser.execute(() => {
+        const card = ".sr-view .sr-card-container";
+        const host = document.querySelector<HTMLElement>(`${card} .sr-content`);
+        const block = document.querySelector<HTMLElement>(`${card} .fs-occ`);
+        const stage = document.querySelector<HTMLElement>(`${card} .fs-occ-stage`);
+        if (host === null || block === null || stage === null) return null;
+        const inner = (el: HTMLElement) => {
+            const style = getComputedStyle(el);
+            return el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        };
+        return {
+            stage: stage.getBoundingClientRect().width,
+            block: inner(block),
+            blockOuter: block.getBoundingClientRect().width,
+            card: inner(host),
+        };
+    });
+    expect(sizes).not.toBeNull();
+    // The picture fills the block, unless it is smaller than that
+    expect(Math.abs((sizes?.stage ?? 0) - Math.min(1000, sizes?.block ?? 0))).toBeLessThan(2);
+    // The block fills the card
+    expect(Math.abs((sizes?.blockOuter ?? 0) - (sizes?.card ?? 0))).toBeLessThan(2);
 }
 
 async function openNote(mode: "preview" | "source"): Promise<void> {
@@ -321,7 +350,8 @@ describe("image occlusion", function () {
         expect(card.tags).toEqual(["?"]);
         expect(card.answer).toBe("");
         await expectActiveMaskAt(RIGHT_ATRIUM, "is-front");
-        await expectCardFitsWithMaskInView();
+        await expectPictureAsWideAsTheCard();
+        await expectMaskInView();
         for (const light of [false, true]) {
             await setTheme(light);
             await screenshot("occlusion-front", light);
@@ -339,20 +369,33 @@ describe("image occlusion", function () {
         await browser.keys("Escape");
         await browser.$(".modal.sr-card-info-modal").waitForExist({ reverse: true });
 
-        // On a phone a tap on the picture zooms it, and is not a tap on the card: the answer stays hidden
-        if (await isMobile()) {
+        // A click or a tap on the picture zooms it, and is not a click on the card: the answer stays hidden. Zoomed, the
+        // picture is larger but never more than twice its own width, and the mask is still in view
+        {
             const stage = ".sr-view .sr-card-container .fs-occ-stage";
+            const widthOf = () =>
+                browser.execute(
+                    (sel: string) =>
+                        document.querySelector(sel)?.getBoundingClientRect().width ?? 0,
+                    stage,
+                );
+            const before = await widthOf();
             await browser.$(`${stage} .fs-occ-image`).click();
             await browser.waitUntil(async () =>
                 ((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
             );
             await browser.pause(200);
             expect((await shownCard()).classes).toContain("is-front");
+            const zoomed = await widthOf();
+            expect(zoomed).toBeGreaterThan(before + 10);
+            expect(zoomed).toBeLessThanOrEqual(2000 + 1);
+            await expectMaskInView();
             await browser.$(`${stage} .fs-occ-image`).click();
             await browser.waitUntil(
                 async () =>
                     !((await browser.$(stage).getAttribute("class")) ?? "").includes("is-zoomed"),
             );
+            await expectMaskInView();
         }
 
         // Back: the same picture once, the mask outlined, its label in it and under the picture
@@ -378,7 +421,8 @@ describe("image occlusion", function () {
             ),
         ).toBe("rgba(0, 0, 0, 0)");
         await expectActiveMaskAt(RIGHT_ATRIUM, "is-back");
-        await expectCardFitsWithMaskInView();
+        await expectPictureAsWideAsTheCard();
+        await expectMaskInView();
         for (const light of [false, true]) {
             await setTheme(light);
             await screenshot("occlusion-back", light);
@@ -396,13 +440,13 @@ describe("image occlusion", function () {
         expect(card.masks[1]).toContain("is-active");
         expect(card.masks[0]).not.toContain("is-active");
         // This mask is in the lower half of the picture
-        await expectCardFitsWithMaskInView();
+        await expectMaskInView();
         await showAnswer();
         card = await shownCard();
         expect(card.masks[1]).toContain("is-revealed");
         expect(card.tags).toEqual([]);
         expect(card.answer).toBe("Left ventricle");
-        await expectCardFitsWithMaskInView();
+        await expectMaskInView();
         expect(
             await browser.execute(
                 () =>
@@ -411,9 +455,14 @@ describe("image occlusion", function () {
             ),
         ).toBe("ventricle");
         await answerEasy();
-        await browser.waitUntil(() => readNote().includes("<!--SR:"), {
-            timeoutMsg: "the schedule was never written to the note",
-        });
+        // Until both cards have a schedule: the note is written after each answer, and read in between it can be empty
+        await browser.waitUntil(
+            () => {
+                const written = readNote();
+                return written.includes("<!--SR:") && !written.includes("fsrs,-,");
+            },
+            { timeoutMsg: "the schedules were never written to the note" },
+        );
 
         // Both schedules are in the one comment after the block, in mask order, and the block itself is untouched
         const text = readNote();
@@ -421,6 +470,42 @@ describe("image occlusion", function () {
         const comments = text.match(/<!--SR:(![^!>]+)+-->/g) ?? [];
         expect(comments).toHaveLength(1);
         expect(comments[0]?.split("!").filter((part) => part.startsWith("fsrs"))).toHaveLength(2);
+    });
+
+    it("reviews in a tab on a desktop: the picture is as wide as the card and the mask is in view", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(NOTE_TEXT);
+        await setSettings({ openViewInNewTab: true });
+        try {
+            await openReview();
+            await browser
+                .$(".sr-view .sr-card-container .sr-show-answer-button")
+                .waitForClickable({ timeoutMsg: "no card was shown" });
+            await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+            await expectPictureAsWideAsTheCard();
+            await expectMaskInView();
+            for (const light of [false, true]) {
+                await setTheme(light);
+                await screenshot("occlusion-front-tab", light);
+            }
+            await setTheme(false);
+
+            await showAnswer();
+            await picturesLoaded(".sr-view .sr-card-container .fs-occ-image");
+            await expectPictureAsWideAsTheCard();
+            await expectMaskInView();
+            for (const light of [false, true]) {
+                await setTheme(light);
+                await screenshot("occlusion-back-tab", light);
+            }
+            await setTheme(false);
+        } finally {
+            await setSettings({ openViewInNewTab: false });
+            // The review is in a tab of its own: close it, so that the next test opens its own
+            await browser.executeObsidian(({ app }) =>
+                app.workspace.detachLeavesOfType("spaced-repetition-tab-view"),
+            );
+        }
     });
 
     it("edits an occlusion card from the study screen: the masks are locked, the answer is changed and written", async function () {
