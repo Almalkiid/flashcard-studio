@@ -1,0 +1,24 @@
+/* The review in a tab: no padding of the view, and clear of the status bar below. */
+
+.fs-tab-view {
+    padding: 0 0 max(32px, var(--safe-area-inset-bottom)) !important;
+}
+
+.fs-center-view {
+    margin: auto;
+}
+
+.fs-tab-view-content {
+    width: var(--fs-view-width);
+    height: var(--fs-view-height);
+    max-width: var(--fs-view-width);
+    max-height: var(--fs-view-height);
+}
+
+body.fs-reduced-bottom-fade-mask {
+    --view-bottom-fade-mask: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.5) 0%,
+        #000000 calc(16px - 0px)
+    );
+}

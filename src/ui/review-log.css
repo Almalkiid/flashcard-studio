@@ -1,0 +1,57 @@
+.fs-review-log {
+    font-size: var(--font-ui-small);
+}
+
+.fs-review-log-summary {
+    margin: var(--fs-space-2) 0;
+    color: var(--fs-ink-muted);
+}
+
+.fs-review-log-table {
+    border-collapse: collapse;
+    width: 100%;
+
+    th,
+    td {
+        padding: var(--fs-space-1) var(--fs-space-2);
+        border-bottom: var(--fs-rule);
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    th {
+        font-weight: var(--font-semibold);
+        color: var(--fs-ink-muted);
+    }
+}
+
+.fs-review-log-card {
+    color: var(--fs-ink-faint);
+    font-family: var(--fs-mono);
+}
+
+.fs-review-log-rating {
+    font-weight: var(--font-semibold);
+}
+
+.fs-rating-1 {
+    color: var(--color-red);
+}
+
+.fs-rating-2 {
+    color: var(--color-orange);
+}
+
+.fs-rating-3 {
+    color: var(--color-green);
+}
+
+.fs-rating-4 {
+    color: var(--color-blue);
+}
+
+.is-phone .fs-review-log-table {
+    :is(th, td):is(:nth-child(2), :nth-child(4)) {
+        display: none;
+    }
+}

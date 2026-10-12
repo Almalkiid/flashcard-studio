@@ -1,0 +1,137 @@
+{
+  "vault": {
+    "a.md": "---\nsr-due: 2023-09-05\nsr-interval: 3\nsr-ease: 250\n---\n#review\n",
+    "b.md": "---\nsr-due: 2023-09-06\nsr-interval: 3\nsr-ease: 250\n---\n#review\n",
+    "c.md": "---\nsr-due: 2023-09-07\nsr-interval: 3\nsr-ease: 250\n---\n#review\n",
+    "d.md": "#review\n"
+  },
+  "note": "dueNotesCount and the 'next note' use the study day (today = midnight of the study day); a note is due when its date is that day or earlier",
+  "runs": [
+    {
+      "startOfDay": "00:00:00",
+      "clock": "2023-09-07T02:00:00",
+      "queueDueNotesCount": 3,
+      "perDeckDue": 3,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    },
+    {
+      "startOfDay": "04:00:00",
+      "clock": "2023-09-07T02:00:00",
+      "queueDueNotesCount": 2,
+      "perDeckDue": 2,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    },
+    {
+      "startOfDay": "04:00:00",
+      "clock": "2023-09-07T04:00:00",
+      "queueDueNotesCount": 3,
+      "perDeckDue": 3,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    },
+    {
+      "startOfDay": "04:00:00",
+      "clock": "2023-09-07T05:00:00",
+      "queueDueNotesCount": 3,
+      "perDeckDue": 3,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    },
+    {
+      "startOfDay": "23:00:00",
+      "clock": "2023-09-06T22:30:00",
+      "queueDueNotesCount": 1,
+      "perDeckDue": 1,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    },
+    {
+      "startOfDay": "23:00:00",
+      "clock": "2023-09-06T23:30:00",
+      "queueDueNotesCount": 2,
+      "perDeckDue": 2,
+      "scheduled": [
+        [
+          "a.md",
+          "2023-09-05 00:00"
+        ],
+        [
+          "b.md",
+          "2023-09-06 00:00"
+        ],
+        [
+          "c.md",
+          "2023-09-07 00:00"
+        ]
+      ],
+      "nextNoteOpenedFirst": "a.md"
+    }
+  ]
+}

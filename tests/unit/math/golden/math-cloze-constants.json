@@ -1,0 +1,6 @@
+[
+ {
+  "name": "MATH_CLOZE_PATTERN",
+  "value": "\ue010[123\ue012]answer[\ue012hint]\ue011"
+ }
+]

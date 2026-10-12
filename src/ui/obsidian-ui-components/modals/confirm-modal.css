@@ -1,0 +1,5 @@
+.fs-confirmation-modal-content {
+    gap: var(--fs-space-4);
+    flex-flow: column;
+    display: flex;
+}

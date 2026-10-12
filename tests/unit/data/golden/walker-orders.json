@@ -1,0 +1,5877 @@
+{
+  "enumValues": {
+    "PickOrder": {
+      "NewFirstSequential": 0,
+      "NewFirstRandom": 1,
+      "DueFirstSequential": 2,
+      "DueFirstRandom": 3,
+      "EveryCardRandomDeckAndCard": 4
+    },
+    "DeckOrder": {
+      "PrevDeckComplete_Sequential": 0,
+      "PrevDeckComplete_Random": 1
+    }
+  },
+  "fixtureText": "#flashcards\nA1::a\nA2::a <!--SR:!2023-09-02,4,270-->\nA3::a\nA4::a <!--SR:!2023-09-02,4,270-->\n\n#flashcards/b\nB1::b\nB2::b <!--SR:!2023-09-02,4,270-->\n\n#flashcards/c #flashcards/b\nM1::m\nM2::m <!--SR:!2023-09-02,4,270-->\n\n#flashcards/d\nD1::d\n",
+  "note": "Tree is the sorted 'remaining' tree from the VaultIndex pipeline (flashcards > b, c, d). Each run uses a fresh clone. Random answers are scripted; asks are the exact (lower, upper, answer) the code requested, in order.",
+  "runs": [
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          0
+        ],
+        [
+          0,
+          9,
+          0
+        ],
+        [
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          7,
+          0
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          10
+        ],
+        [
+          0,
+          9,
+          9
+        ],
+        [
+          0,
+          7,
+          7
+        ],
+        [
+          0,
+          5,
+          5
+        ],
+        [
+          0,
+          4,
+          4
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          1
+        ],
+        [
+          0,
+          9,
+          0
+        ],
+        [
+          0,
+          8,
+          2
+        ],
+        [
+          0,
+          7,
+          1
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          2
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          0
+        ],
+        [
+          0,
+          9,
+          0
+        ],
+        [
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          7,
+          0
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/c"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          10
+        ],
+        [
+          0,
+          9,
+          9
+        ],
+        [
+          0,
+          7,
+          7
+        ],
+        [
+          0,
+          5,
+          5
+        ],
+        [
+          0,
+          4,
+          4
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "(whole tree)",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "A3",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A1",
+          "deck": "flashcards"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "A4",
+          "deck": "flashcards"
+        },
+        {
+          "card": "A2",
+          "deck": "flashcards"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "D1",
+          "deck": "flashcards/d"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          10,
+          1
+        ],
+        [
+          0,
+          9,
+          0
+        ],
+        [
+          0,
+          8,
+          2
+        ],
+        [
+          0,
+          7,
+          1
+        ],
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          2
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "NewFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstSequential",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "DueFirstRandom",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Sequential",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-lowest",
+      "returned": [
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "always-highest",
+      "returned": [
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    },
+    {
+      "start": "#flashcards/b",
+      "cardOrder": "EveryCardRandomDeckAndCard",
+      "deckOrder": "PrevDeckComplete_Random",
+      "randomScript": "cycle-1-0-2",
+      "returned": [
+        {
+          "card": "M1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B1",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "B2",
+          "deck": "flashcards/b"
+        },
+        {
+          "card": "M2",
+          "deck": "flashcards/b"
+        }
+      ],
+      "askedRandom_lo_hi_answer": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "treeAfter": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1",
+              "A3"
+            ],
+            "due": [
+              "A2",
+              "A4"
+            ],
+            "sub": [
+              {
+                "name": "b",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "c",
+                "new": [],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "d",
+                "new": [
+                  "D1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "finalHasCurrentCard": false,
+      "finalCurrentDeck": null
+    }
+  ]
+}

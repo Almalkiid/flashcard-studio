@@ -1,0 +1,139 @@
+{
+  "note": "Notices use the English strings. getLeaf() has no arguments.",
+  "steps": [
+    {
+      "label": "modal command, one deck: opens next note directly (due first)",
+      "opened": [
+        "due-a"
+      ],
+      "notices": [],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review"
+    },
+    {
+      "label": "modal command, two decks: opens a chooser, opens nothing yet",
+      "opened": [],
+      "notices": [],
+      "modalsOpened": [
+        {
+          "deckKeys": [
+            "#review",
+            "#review-2"
+          ],
+          "opened": true
+        }
+      ],
+      "lastSelectedReviewDeck": null
+    },
+    {
+      "label": "choose #review-2 (only a future-dated and a new note): the new note opens",
+      "opened": [
+        "m1"
+      ],
+      "notices": [],
+      "modalsOpened": [
+        {
+          "deckKeys": [
+            "#review",
+            "#review-2"
+          ],
+          "opened": true
+        }
+      ],
+      "lastSelectedReviewDeck": "#review-2",
+      "modalClosed": true
+    },
+    {
+      "label": "modal command, zero decks: opens an EMPTY chooser (no all-caught-up notice)",
+      "opened": [],
+      "notices": [],
+      "modalsOpened": [
+        {
+          "deckKeys": [],
+          "opened": true
+        }
+      ],
+      "lastSelectedReviewDeck": null
+    },
+    {
+      "label": "reviewNextNote(unknown deck): notice, nothing opens, last selected unchanged",
+      "opened": [],
+      "notices": [
+        "No deck exists for #nope"
+      ],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": null
+    },
+    {
+      "label": "deck with nothing due and nothing new: all-caught-up notice; last selected IS set",
+      "opened": [],
+      "notices": [
+        "You're all caught up now :D."
+      ],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review"
+    },
+    {
+      "label": "autoReviewNextNote with autoNextNote off: does nothing at all",
+      "opened": [],
+      "notices": [],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": null
+    },
+    {
+      "label": "autoReviewNextNote on, no remembered deck: first deck in map order",
+      "opened": [
+        "due-a"
+      ],
+      "notices": [],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review"
+    },
+    {
+      "label": "autoReviewNextNote on, zero decks: all-caught-up notice",
+      "opened": [],
+      "notices": [
+        "You're all caught up now :D."
+      ],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": null
+    },
+    {
+      "label": "click a note under #review-2, then auto-next: stays in #review-2",
+      "opened": [
+        "clicked.md",
+        "m1"
+      ],
+      "notices": [],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review-2"
+    },
+    {
+      "label": "remembered deck disappeared after a rescan: unknown-deck notice; it does NOT fall back to another deck",
+      "opened": [
+        "due-a"
+      ],
+      "notices": [
+        "No deck exists for #review"
+      ],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review"
+    },
+    {
+      "label": "openRandomNote on: random draw over the DUE notes only (1 due -> getInteger(0,0))",
+      "opened": [
+        "due-a"
+      ],
+      "notices": [],
+      "modalsOpened": [],
+      "lastSelectedReviewDeck": "#review",
+      "providerCalls": [
+        [
+          0,
+          0,
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "rows": [
+    {
+      "step": "fresh list",
+      "baseEase": 250,
+      "has_a": false,
+      "get_a": null
+    },
+    {
+      "step": "set a=272.5",
+      "dict": {
+        "a.md": 272.5
+      },
+      "get_a": 273,
+      "note": "getEaseByPath rounds (half up); dict keeps the raw number"
+    },
+    {
+      "step": "set b=272.4",
+      "get_b": 272
+    },
+    {
+      "step": "set c=0",
+      "has_c": true,
+      "get_c": 0,
+      "note": "zero is stored and has==true; callers that test truthiness treat it as absent"
+    },
+    {
+      "step": "overwrite a=130",
+      "get_a": 130,
+      "dictSize": 3
+    },
+    {
+      "step": "set n=NaN",
+      "has_n": true,
+      "get_n": "NaN"
+    },
+    {
+      "step": "set m=-0.4",
+      "get_m": "-0"
+    },
+    {
+      "step": "inherited object keys are not paths",
+      "has_constructor": false,
+      "has_toString": false,
+      "get_constructor": null
+    },
+    {
+      "step": "paths are exact strings",
+      "has_A": false,
+      "has_dot_slash": false,
+      "has_empty": false
+    },
+    {
+      "step": "two lists do not share state",
+      "other_dict": {}
+    }
+  ]
+}

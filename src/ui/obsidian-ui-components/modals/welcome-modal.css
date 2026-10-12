@@ -1,0 +1,76 @@
+.fs-welcome-modal {
+    max-width: 560px;
+}
+
+.fs-welcome-lead {
+    margin-top: 0;
+    color: var(--fs-ink-muted);
+}
+
+.fs-welcome-steps {
+    margin: var(--fs-space-4) 0;
+    gap: var(--fs-space-4);
+    flex-flow: column;
+    display: flex;
+}
+
+.fs-welcome-step {
+    align-items: flex-start;
+    gap: var(--fs-space-3);
+    display: flex;
+}
+
+.fs-welcome-step-icon {
+    --step-icon-size: calc(9 * var(--fs-space-1));
+
+    width: var(--step-icon-size);
+    height: var(--step-icon-size);
+    color: var(--interactive-accent);
+    background-color: var(--fs-hover-fill);
+    border-radius: var(--radius-m);
+    align-items: center;
+    flex: none;
+    display: flex;
+    justify-content: center;
+}
+
+.fs-welcome-step-title {
+    font-weight: var(--font-semibold);
+}
+
+.fs-welcome-step-desc {
+    font-size: var(--font-ui-small);
+    color: var(--fs-ink-muted);
+}
+
+.fs-welcome-example {
+    white-space: pre-wrap;
+    font-size: var(--font-ui-small);
+}
+
+.fs-welcome-migrate {
+    margin-bottom: var(--fs-space-4);
+    padding: var(--fs-space-3);
+    gap: var(--fs-space-3);
+    background-color: var(--background-secondary);
+    border-radius: var(--radius-m);
+    align-items: center;
+    display: flex;
+}
+
+.fs-welcome-migrate-text {
+    font-size: var(--font-ui-small);
+    flex: 1;
+}
+
+.fs-welcome-buttons {
+    gap: var(--fs-space-2);
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.is-phone .fs-welcome-migrate {
+    align-items: stretch;
+    flex-direction: column;
+}

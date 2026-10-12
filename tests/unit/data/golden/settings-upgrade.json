@@ -1,0 +1,1966 @@
+{
+  "cases": [
+    {
+      "name": "empty settings object",
+      "note": "A data.json whose settings is {}. Only keys with a rule appear in changes; every other key is filled later by the merge with the defaults.",
+      "input": {},
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        },
+        "scheduleDataVaultLocation": {
+          "from": {
+            "$absent": true
+          },
+          "to": "Spaced Repetition"
+        },
+        "fsrsDesiredRetention": {
+          "from": {
+            "$absent": true
+          },
+          "to": 0.9
+        },
+        "enableReviewReminders": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "reviewReminderIntervalMinutes": {
+          "from": {
+            "$absent": true
+          },
+          "to": 5
+        },
+        "reviewReminderCheckOnStartup": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "reviewReminderMessage": {
+          "from": {
+            "$absent": true
+          },
+          "to": ""
+        },
+        "reviewReminderAutoOpen": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderShowNotice": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderPlaySound": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderBounceDock": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "multilineCardStartMarker": {
+          "from": {
+            "$absent": true
+          },
+          "to": ""
+        },
+        "calloutCardTypes": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "flashcard",
+            "question",
+            "card"
+          ]
+        },
+        "atomicClozes": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "latexClozes": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "legacy random true, no orders",
+      "note": "",
+      "input": {
+        "randomizeCardOrder": true
+      },
+      "changes": {
+        "randomizeCardOrder": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "flashcardCardOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "DueFirstRandom"
+        },
+        "flashcardDeckOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "PrevDeckComplete_Sequential"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "legacy random false, no orders",
+      "note": "",
+      "input": {
+        "randomizeCardOrder": false
+      },
+      "changes": {
+        "randomizeCardOrder": {
+          "from": false,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "flashcardCardOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "DueFirstSequential"
+        },
+        "flashcardDeckOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "PrevDeckComplete_Sequential"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "legacy random true, card order already saved",
+      "note": "nothing happens: the legacy key stays",
+      "input": {
+        "randomizeCardOrder": true,
+        "flashcardCardOrder": "NewFirstSequential"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "legacy random true, only deck order saved",
+      "note": "nothing happens: both orders must be missing",
+      "input": {
+        "randomizeCardOrder": true,
+        "flashcardDeckOrder": "PrevDeckComplete_Random"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "legacy random null",
+      "note": "",
+      "input": {
+        "randomizeCardOrder": null
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "legacy random true, orders null",
+      "note": "null counts as missing",
+      "input": {
+        "randomizeCardOrder": true,
+        "flashcardCardOrder": null,
+        "flashcardDeckOrder": null
+      },
+      "changes": {
+        "randomizeCardOrder": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "flashcardCardOrder": {
+          "from": null,
+          "to": "DueFirstRandom"
+        },
+        "flashcardDeckOrder": {
+          "from": null,
+          "to": "PrevDeckComplete_Sequential"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "showRibbonIcon true",
+      "note": "",
+      "input": {
+        "showRibbonIcon": true
+      },
+      "changes": {
+        "showRibbonIcon": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "showRibbonIcon false",
+      "note": "false is kept",
+      "input": {
+        "showRibbonIcon": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=false bold=false curly=false",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": false,
+        "convertBoldTextToClozes": false,
+        "convertCurlyBracketsToClozes": false
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=true bold=false curly=false",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": true,
+        "convertBoldTextToClozes": false,
+        "convertCurlyBracketsToClozes": false
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "==[123;;]answer[;;hint]=="
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=false bold=true curly=false",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": false,
+        "convertBoldTextToClozes": true,
+        "convertCurlyBracketsToClozes": false
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "**[123;;]answer[;;hint]**"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=false bold=false curly=true",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": false,
+        "convertBoldTextToClozes": false,
+        "convertCurlyBracketsToClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "{{[123;;]answer[;;hint]}}"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=true bold=true curly=true",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": true,
+        "convertBoldTextToClozes": true,
+        "convertCurlyBracketsToClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "==[123;;]answer[;;hint]==",
+            "**[123;;]answer[;;hint]**",
+            "{{[123;;]answer[;;hint]}}"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing; highlights=true bold=false curly=true",
+      "note": "",
+      "input": {
+        "convertHighlightsToClozes": true,
+        "convertBoldTextToClozes": false,
+        "convertCurlyBracketsToClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "==[123;;]answer[;;hint]==",
+            "{{[123;;]answer[;;hint]}}"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns missing and no convert flags at all",
+      "note": "result is an EMPTY list, not the default pattern",
+      "input": {},
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns null",
+      "note": "",
+      "input": {
+        "clozePatterns": null,
+        "convertHighlightsToClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": null,
+          "to": [
+            "==[123;;]answer[;;hint]=="
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns empty list kept",
+      "note": "",
+      "input": {
+        "clozePatterns": [],
+        "convertHighlightsToClozes": true
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "clozePatterns present kept",
+      "note": "",
+      "input": {
+        "clozePatterns": [
+          "{{[123;;]answer[;;hint]}}"
+        ],
+        "convertHighlightsToClozes": true
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "disableFileMenuReviewOptions true",
+      "note": "dropped without being turned into showFileMenuReviewOptions",
+      "input": {
+        "disableFileMenuReviewOptions": true,
+        "showFileMenuReviewOptions": true
+      },
+      "changes": {
+        "disableFileMenuReviewOptions": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "disableFileMenuReviewOptions false",
+      "note": "",
+      "input": {
+        "disableFileMenuReviewOptions": false
+      },
+      "changes": {
+        "disableFileMenuReviewOptions": {
+          "from": false,
+          "to": {
+            "$undefined": true
+          }
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "disableFileMenuReviewOptions null",
+      "note": "",
+      "input": {
+        "disableFileMenuReviewOptions": null
+      },
+      "changes": {
+        "disableFileMenuReviewOptions": {
+          "from": null,
+          "to": {
+            "$undefined": true
+          }
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "editLaterTag set",
+      "note": "",
+      "input": {
+        "editLaterTag": "#edit-later"
+      },
+      "changes": {
+        "editLaterTag": {
+          "from": "#edit-later",
+          "to": {
+            "$undefined": true
+          }
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "editLaterTag empty",
+      "note": "falsy: untouched",
+      "input": {
+        "editLaterTag": ""
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation null",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": null
+      },
+      "changes": {
+        "scheduleDataVaultLocation": {
+          "from": null,
+          "to": "Spaced Repetition"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \"\"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": ""
+      },
+      "changes": {
+        "scheduleDataVaultLocation": {
+          "from": "",
+          "to": "Spaced Repetition"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \"   \"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": "   "
+      },
+      "changes": {
+        "scheduleDataVaultLocation": {
+          "from": "   ",
+          "to": "Spaced Repetition"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \"\\t\"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": "\t"
+      },
+      "changes": {
+        "scheduleDataVaultLocation": {
+          "from": "\t",
+          "to": "Spaced Repetition"
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \"My Folder\"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": "My Folder"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \" x \"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": " x "
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation \"Spaced Repetition\"",
+      "note": "",
+      "input": {
+        "scheduleDataVaultLocation": "Spaced Repetition"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "scheduleDataVaultLocation missing",
+      "note": "",
+      "input": {},
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "fsrsDesiredRetention null",
+      "note": "",
+      "input": {
+        "fsrsDesiredRetention": null
+      },
+      "changes": {
+        "fsrsDesiredRetention": {
+          "from": null,
+          "to": 0.9
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "fsrsDesiredRetention 0",
+      "note": "",
+      "input": {
+        "fsrsDesiredRetention": 0
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "fsrsDesiredRetention 0.85",
+      "note": "",
+      "input": {
+        "fsrsDesiredRetention": 0.85
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "fsrsDesiredRetention \"0.9\"",
+      "note": "",
+      "input": {
+        "fsrsDesiredRetention": "0.9"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "fsrsDesiredRetention 1.5",
+      "note": "",
+      "input": {
+        "fsrsDesiredRetention": 1.5
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes null",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": null
+      },
+      "changes": {
+        "reviewReminderIntervalMinutes": {
+          "from": null,
+          "to": 5
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 0",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 0
+      },
+      "changes": {
+        "reviewReminderIntervalMinutes": {
+          "from": 0,
+          "to": 5
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 0.5",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 0.5
+      },
+      "changes": {
+        "reviewReminderIntervalMinutes": {
+          "from": 0.5,
+          "to": 5
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 1",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 1
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 1.5",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 1.5
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 5",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 5
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes 30",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": 30
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes -3",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": -3
+      },
+      "changes": {
+        "reviewReminderIntervalMinutes": {
+          "from": -3,
+          "to": 5
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes \"10\"",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": "10"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderIntervalMinutes \"abc\"",
+      "note": "",
+      "input": {
+        "reviewReminderIntervalMinutes": "abc"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "enableReviewReminders null",
+      "note": "",
+      "input": {
+        "enableReviewReminders": null
+      },
+      "changes": {
+        "enableReviewReminders": {
+          "from": null,
+          "to": false
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "enableReviewReminders false",
+      "note": "",
+      "input": {
+        "enableReviewReminders": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "enableReviewReminders \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "enableReviewReminders": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderCheckOnStartup null",
+      "note": "",
+      "input": {
+        "reviewReminderCheckOnStartup": null
+      },
+      "changes": {
+        "reviewReminderCheckOnStartup": {
+          "from": null,
+          "to": false
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderCheckOnStartup false",
+      "note": "",
+      "input": {
+        "reviewReminderCheckOnStartup": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderCheckOnStartup \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "reviewReminderCheckOnStartup": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderAutoOpen null",
+      "note": "",
+      "input": {
+        "reviewReminderAutoOpen": null
+      },
+      "changes": {
+        "reviewReminderAutoOpen": {
+          "from": null,
+          "to": true
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderAutoOpen false",
+      "note": "",
+      "input": {
+        "reviewReminderAutoOpen": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderAutoOpen \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "reviewReminderAutoOpen": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderShowNotice null",
+      "note": "",
+      "input": {
+        "reviewReminderShowNotice": null
+      },
+      "changes": {
+        "reviewReminderShowNotice": {
+          "from": null,
+          "to": true
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderShowNotice false",
+      "note": "",
+      "input": {
+        "reviewReminderShowNotice": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderShowNotice \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "reviewReminderShowNotice": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderPlaySound null",
+      "note": "",
+      "input": {
+        "reviewReminderPlaySound": null
+      },
+      "changes": {
+        "reviewReminderPlaySound": {
+          "from": null,
+          "to": true
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderPlaySound false",
+      "note": "",
+      "input": {
+        "reviewReminderPlaySound": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderPlaySound \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "reviewReminderPlaySound": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderBounceDock null",
+      "note": "",
+      "input": {
+        "reviewReminderBounceDock": null
+      },
+      "changes": {
+        "reviewReminderBounceDock": {
+          "from": null,
+          "to": true
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderBounceDock false",
+      "note": "",
+      "input": {
+        "reviewReminderBounceDock": false
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderBounceDock \"yes\" (string)",
+      "note": "not checked for type: kept",
+      "input": {
+        "reviewReminderBounceDock": "yes"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderMessage null",
+      "note": "",
+      "input": {
+        "reviewReminderMessage": null
+      },
+      "changes": {
+        "reviewReminderMessage": {
+          "from": null,
+          "to": ""
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "reviewReminderMessage text",
+      "note": "",
+      "input": {
+        "reviewReminderMessage": "Time!"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "multilineCardStartMarker 5",
+      "note": "",
+      "input": {
+        "multilineCardStartMarker": 5
+      },
+      "changes": {
+        "multilineCardStartMarker": {
+          "from": 5,
+          "to": ""
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "multilineCardStartMarker null",
+      "note": "",
+      "input": {
+        "multilineCardStartMarker": null
+      },
+      "changes": {
+        "multilineCardStartMarker": {
+          "from": null,
+          "to": ""
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "multilineCardStartMarker \"\"",
+      "note": "",
+      "input": {
+        "multilineCardStartMarker": ""
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "multilineCardStartMarker \"<<<\"",
+      "note": "",
+      "input": {
+        "multilineCardStartMarker": "<<<"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "multilineCardStartMarker \"  \"",
+      "note": "",
+      "input": {
+        "multilineCardStartMarker": "  "
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "calloutCardTypes \"flashcard\"",
+      "note": "",
+      "input": {
+        "calloutCardTypes": "flashcard"
+      },
+      "changes": {
+        "calloutCardTypes": {
+          "from": "flashcard",
+          "to": [
+            "flashcard",
+            "question",
+            "card"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "calloutCardTypes null",
+      "note": "",
+      "input": {
+        "calloutCardTypes": null
+      },
+      "changes": {
+        "calloutCardTypes": {
+          "from": null,
+          "to": [
+            "flashcard",
+            "question",
+            "card"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "calloutCardTypes []",
+      "note": "",
+      "input": {
+        "calloutCardTypes": []
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "calloutCardTypes [\"a\",\"b\"]",
+      "note": "",
+      "input": {
+        "calloutCardTypes": [
+          "a",
+          "b"
+        ]
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "calloutCardTypes {}",
+      "note": "",
+      "input": {
+        "calloutCardTypes": {}
+      },
+      "changes": {
+        "calloutCardTypes": {
+          "from": {},
+          "to": [
+            "flashcard",
+            "question",
+            "card"
+          ]
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "atomicClozes \"true\"",
+      "note": "",
+      "input": {
+        "atomicClozes": "true"
+      },
+      "changes": {
+        "atomicClozes": {
+          "from": "true",
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "atomicClozes 1",
+      "note": "",
+      "input": {
+        "atomicClozes": 1
+      },
+      "changes": {
+        "atomicClozes": {
+          "from": 1,
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "atomicClozes null",
+      "note": "",
+      "input": {
+        "atomicClozes": null
+      },
+      "changes": {
+        "atomicClozes": {
+          "from": null,
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "atomicClozes true",
+      "note": "",
+      "input": {
+        "atomicClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "atomicClozes false",
+      "note": "",
+      "input": {
+        "atomicClozes": false
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "latexClozes \"true\"",
+      "note": "",
+      "input": {
+        "latexClozes": "true"
+      },
+      "changes": {
+        "latexClozes": {
+          "from": "true",
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "latexClozes 1",
+      "note": "",
+      "input": {
+        "latexClozes": 1
+      },
+      "changes": {
+        "latexClozes": {
+          "from": 1,
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "latexClozes null",
+      "note": "",
+      "input": {
+        "latexClozes": null
+      },
+      "changes": {
+        "latexClozes": {
+          "from": null,
+          "to": false
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "latexClozes true",
+      "note": "",
+      "input": {
+        "latexClozes": true
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "latexClozes false",
+      "note": "",
+      "input": {
+        "latexClozes": false
+      },
+      "changes": {
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": []
+        }
+      },
+      "idempotent": true
+    },
+    {
+      "name": "keys with no rule are untouched",
+      "note": "no validation of values with no rule",
+      "input": {
+        "baseEase": "250",
+        "algorithm": "bogus",
+        "unknownFutureKey": {
+          "a": 1
+        },
+        "startOfDay": "abc"
+      },
+      "changes": {},
+      "idempotent": true
+    },
+    {
+      "name": "typical legacy settings block",
+      "note": "algorithm value 'Default' is the legacy SM-2 label; compare SchedulerKind values",
+      "input": {
+        "flashcardTags": [
+          "#flashcards"
+        ],
+        "convertFoldersToDecks": false,
+        "burySiblingCards": false,
+        "randomizeCardOrder": true,
+        "convertHighlightsToClozes": true,
+        "convertBoldTextToClozes": false,
+        "convertCurlyBracketsToClozes": false,
+        "singleLineCardSeparator": "::",
+        "editLaterTag": "#edit-later",
+        "tagsToReview": [
+          "#review"
+        ],
+        "noteFoldersToIgnore": [
+          "**/*.excalidraw.md"
+        ],
+        "showRibbonIcon": true,
+        "disableFileMenuReviewOptions": false,
+        "baseEase": 250,
+        "lapsesIntervalChange": 0.5,
+        "easyBonus": 1.3,
+        "maximumInterval": 36525,
+        "maxLinkFactor": 1,
+        "dataStore": "NOTES",
+        "scheduleDataVaultLocation": "",
+        "algorithm": "Default"
+      },
+      "changes": {
+        "randomizeCardOrder": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "editLaterTag": {
+          "from": "#edit-later",
+          "to": {
+            "$undefined": true
+          }
+        },
+        "showRibbonIcon": {
+          "from": true,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "disableFileMenuReviewOptions": {
+          "from": false,
+          "to": {
+            "$undefined": true
+          }
+        },
+        "scheduleDataVaultLocation": {
+          "from": "",
+          "to": "Spaced Repetition"
+        },
+        "flashcardCardOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "DueFirstRandom"
+        },
+        "flashcardDeckOrder": {
+          "from": {
+            "$absent": true
+          },
+          "to": "PrevDeckComplete_Sequential"
+        },
+        "clozePatterns": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "==[123;;]answer[;;hint]=="
+          ]
+        },
+        "fsrsDesiredRetention": {
+          "from": {
+            "$absent": true
+          },
+          "to": 0.9
+        },
+        "enableReviewReminders": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "reviewReminderIntervalMinutes": {
+          "from": {
+            "$absent": true
+          },
+          "to": 5
+        },
+        "reviewReminderCheckOnStartup": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "reviewReminderMessage": {
+          "from": {
+            "$absent": true
+          },
+          "to": ""
+        },
+        "reviewReminderAutoOpen": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderShowNotice": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderPlaySound": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "reviewReminderBounceDock": {
+          "from": {
+            "$absent": true
+          },
+          "to": true
+        },
+        "multilineCardStartMarker": {
+          "from": {
+            "$absent": true
+          },
+          "to": ""
+        },
+        "calloutCardTypes": {
+          "from": {
+            "$absent": true
+          },
+          "to": [
+            "flashcard",
+            "question",
+            "card"
+          ]
+        },
+        "atomicClozes": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        },
+        "latexClozes": {
+          "from": {
+            "$absent": true
+          },
+          "to": false
+        }
+      },
+      "idempotent": true
+    }
+  ],
+  "util": {
+    "isSubTagContainedInTag": [
+      {
+        "tag": "#a",
+        "subTag": "#a",
+        "result": true
+      },
+      {
+        "tag": "#a",
+        "subTag": "#a/b",
+        "result": true
+      },
+      {
+        "tag": "#a",
+        "subTag": "#a/b/c",
+        "result": true
+      },
+      {
+        "tag": "#a",
+        "subTag": "#ab",
+        "result": false
+      },
+      {
+        "tag": "#a/b",
+        "subTag": "#a",
+        "result": false
+      },
+      {
+        "tag": "#a",
+        "subTag": "#A",
+        "result": false
+      },
+      {
+        "tag": "#a",
+        "subTag": "a",
+        "result": false
+      },
+      {
+        "tag": "#a/",
+        "subTag": "#a/b",
+        "result": false
+      },
+      {
+        "tag": "#a/",
+        "subTag": "#a",
+        "result": false
+      },
+      {
+        "tag": "",
+        "subTag": "#a",
+        "result": false
+      },
+      {
+        "tag": "",
+        "subTag": "",
+        "result": true
+      },
+      {
+        "tag": "#a",
+        "subTag": "",
+        "result": false
+      },
+      {
+        "tag": "#a",
+        "subTag": "#a/",
+        "result": true
+      }
+    ],
+    "isTagInList": [
+      {
+        "list": [
+          "#a",
+          "#b"
+        ],
+        "tag": "#b/c",
+        "exact": false,
+        "result": true
+      },
+      {
+        "list": [
+          "#a",
+          "#b"
+        ],
+        "tag": "#b/c",
+        "exact": true,
+        "result": false
+      },
+      {
+        "list": [
+          "#a",
+          "#b"
+        ],
+        "tag": "#b",
+        "exact": true,
+        "result": true
+      },
+      {
+        "list": [],
+        "tag": "#b",
+        "exact": false,
+        "result": false
+      },
+      {
+        "list": [
+          "#a"
+        ],
+        "tag": "#a/b/",
+        "exact": false,
+        "result": true
+      }
+    ],
+    "isFlashcardTag": [
+      {
+        "tag": "#flashcards",
+        "result": true
+      },
+      {
+        "tag": "#flashcards/x",
+        "result": true
+      },
+      {
+        "tag": "#flashcardsx",
+        "result": false
+      },
+      {
+        "tag": "#other",
+        "result": false
+      }
+    ],
+    "isAnyTagANoteReviewTag": [
+      {
+        "tags": [
+          "#review"
+        ],
+        "expected": true,
+        "result": true
+      },
+      {
+        "tags": [
+          "#review/sub"
+        ],
+        "expected": true,
+        "result": true
+      },
+      {
+        "tags": [
+          "#reviewing"
+        ],
+        "expected": false,
+        "result": false
+      },
+      {
+        "tags": [],
+        "expected": false,
+        "result": false
+      },
+      {
+        "tags": [
+          "#x",
+          "#review"
+        ],
+        "expected": true,
+        "result": true
+      }
+    ],
+    "filterForNoteReviewTag": [
+      {
+        "settingTagsToReview": [
+          "#review",
+          "#read",
+          "#read"
+        ],
+        "tags": [
+          "#read",
+          "#review/x"
+        ],
+        "result": [
+          "#review",
+          "#read",
+          "#read"
+        ]
+      },
+      {
+        "settingTagsToReview": [
+          "#review",
+          "#read",
+          "#read"
+        ],
+        "tags": [
+          "#read"
+        ],
+        "result": [
+          "#read",
+          "#read"
+        ]
+      },
+      {
+        "settingTagsToReview": [
+          "#review",
+          "#read",
+          "#read"
+        ],
+        "tags": [],
+        "result": []
+      },
+      {
+        "settingTagsToReview": [
+          "#review",
+          "#read",
+          "#read"
+        ],
+        "tags": [
+          "#readx"
+        ],
+        "result": []
+      }
+    ],
+    "isAnyTagIgnoredForFlashcards": [
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [
+          "#ignore"
+        ],
+        "result": true
+      },
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [
+          "#ignore/sub"
+        ],
+        "result": true
+      },
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [
+          "#x"
+        ],
+        "result": false
+      },
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [
+          "#x/y/z"
+        ],
+        "result": true
+      },
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [
+          "#ignored"
+        ],
+        "result": false
+      },
+      {
+        "ignoreList": [
+          "#ignore",
+          "#x/y"
+        ],
+        "tags": [],
+        "result": false
+      }
+    ],
+    "isAnyTagIgnoredForNotes": [
+      {
+        "ignoreList": [
+          "#skip"
+        ],
+        "tags": [
+          "#skip"
+        ],
+        "result": true
+      },
+      {
+        "ignoreList": [
+          "#skip"
+        ],
+        "tags": [
+          "#skip/a"
+        ],
+        "result": true
+      },
+      {
+        "ignoreList": [
+          "#skip"
+        ],
+        "tags": [
+          "#skipper"
+        ],
+        "result": false
+      }
+    ],
+    "isPathInFoldersToIgnore": [
+      {
+        "pattern": "**/*.excalidraw.md",
+        "results": {
+          "a/b/draw.excalidraw.md": true,
+          "draw.excalidraw.md": true,
+          "Templates": false,
+          "Templates/t.md": false,
+          "Archive/x/y.md": false,
+          "Archive": false,
+          "x.tmp.md": false,
+          "d/x.tmp.md": false,
+          "Private/a.md": false,
+          "Private/sub/a.md": false,
+          "notes/a.md": false
+        }
+      },
+      {
+        "pattern": "Templates",
+        "results": {
+          "a/b/draw.excalidraw.md": false,
+          "draw.excalidraw.md": false,
+          "Templates": true,
+          "Templates/t.md": true,
+          "Archive/x/y.md": false,
+          "Archive": false,
+          "x.tmp.md": false,
+          "d/x.tmp.md": false,
+          "Private/a.md": false,
+          "Private/sub/a.md": false,
+          "notes/a.md": false
+        }
+      },
+      {
+        "pattern": "Archive/**",
+        "results": {
+          "a/b/draw.excalidraw.md": false,
+          "draw.excalidraw.md": false,
+          "Templates": false,
+          "Templates/t.md": false,
+          "Archive/x/y.md": true,
+          "Archive": false,
+          "x.tmp.md": false,
+          "d/x.tmp.md": false,
+          "Private/a.md": false,
+          "Private/sub/a.md": false,
+          "notes/a.md": false
+        }
+      },
+      {
+        "pattern": "*.tmp.md",
+        "results": {
+          "a/b/draw.excalidraw.md": false,
+          "draw.excalidraw.md": false,
+          "Templates": false,
+          "Templates/t.md": false,
+          "Archive/x/y.md": false,
+          "Archive": false,
+          "x.tmp.md": true,
+          "d/x.tmp.md": false,
+          "Private/a.md": false,
+          "Private/sub/a.md": false,
+          "notes/a.md": false
+        }
+      },
+      {
+        "pattern": "Private/*",
+        "results": {
+          "a/b/draw.excalidraw.md": false,
+          "draw.excalidraw.md": false,
+          "Templates": false,
+          "Templates/t.md": false,
+          "Archive/x/y.md": false,
+          "Archive": false,
+          "x.tmp.md": false,
+          "d/x.tmp.md": false,
+          "Private/a.md": true,
+          "Private/sub/a.md": false,
+          "notes/a.md": false
+        }
+      }
+    ]
+  },
+  "defaultsSnapshot": {
+    "flashcardTags": [
+      "#flashcards"
+    ],
+    "flashcardTagsToIgnore": [],
+    "convertFoldersToDecks": false,
+    "burySiblingCards": false,
+    "flashcardCardOrder": "DueFirstRandom",
+    "flashcardDeckOrder": "PrevDeckComplete_Sequential",
+    "convertClozePatternsToInputs": false,
+    "convertHighlightsToClozes": true,
+    "convertBoldTextToClozes": false,
+    "convertCurlyBracketsToClozes": false,
+    "clozePatterns": [
+      "==[123;;]answer[;;hint]=="
+    ],
+    "singleLineCardSeparator": "::",
+    "singleLineReversedCardSeparator": ":::",
+    "multilineCardSeparator": "?",
+    "multilineReversedCardSeparator": "??",
+    "multilineCardEndMarker": "",
+    "editLaterTag": {
+      "$undefined": true
+    },
+    "enableReviewReminders": false,
+    "reviewReminderIntervalMinutes": 5,
+    "reviewReminderCheckOnStartup": false,
+    "reviewReminderMessage": "",
+    "reviewReminderAutoOpen": true,
+    "reviewReminderShowNotice": true,
+    "reviewReminderPlaySound": true,
+    "reviewReminderBounceDock": true,
+    "randomizeCardOrder": {
+      "$undefined": true
+    },
+    "enableNoteReviewPaneOnStartup": true,
+    "tagsToReview": [
+      "#review"
+    ],
+    "noteTagsToIgnore": [],
+    "noteFoldersToIgnore": [
+      "**/*.excalidraw.md"
+    ],
+    "openRandomNote": false,
+    "autoNextNote": false,
+    "disableFileMenuReviewOptions": {
+      "$undefined": true
+    },
+    "showFileMenuReviewOptions": true,
+    "deleteTagsOnSchedulingDataDeletion": false,
+    "maxNDaysNotesReviewQueue": 365,
+    "showRibbonIcon": {
+      "$undefined": true
+    },
+    "showStatusBar": true,
+    "showCardStatusBarItem": true,
+    "showNoteStatusBarItem": true,
+    "showUpdateAvailableStatusBarItem": false,
+    "initiallyExpandAllSubdecksInTree": true,
+    "showContextInCards": true,
+    "showIntervalInReviewButtons": true,
+    "flashcardHeightPercentage": 60,
+    "flashcardWidthPercentage": 60,
+    "flashcardHeightPercentageMobile": 100,
+    "flashcardWidthPercentageMobile": 100,
+    "flashcardAgainText": "Again",
+    "flashcardEasyText": "Easy",
+    "flashcardGoodText": "Good",
+    "flashcardHardText": "Hard",
+    "reviewButtonDelay": 0,
+    "showDeleteButtonInCardView": false,
+    "showDeleteButtonInFileMenu": false,
+    "openViewInNewTab": false,
+    "openViewInNewTabMobile": false,
+    "useCustomHotkeys": false,
+    "useCalloutsForSchedulingComments": false,
+    "algorithm": "SM-2-OSR",
+    "baseEase": 250,
+    "lapsesIntervalChange": 0.5,
+    "easyBonus": 1.3,
+    "loadBalance": true,
+    "maximumInterval": 36525,
+    "maxLinkFactor": 1,
+    "fsrsDesiredRetention": 0.9,
+    "startOfDay": "00:00:00",
+    "leechThreshold": 8,
+    "leechAction": "suspend",
+    "dailyLimitsEnabled": true,
+    "newCardsPerDay": 20,
+    "reviewsPerDay": 200,
+    "dataStore": "NOTES",
+    "cardCommentOnSameLine": false,
+    "scheduleDataVaultLocation": "Spaced Repetition",
+    "reviewLogFolder": "Flashcard Studio/Review log",
+    "showSchedulingDebugMessages": false,
+    "showParserDebugMessages": false,
+    "preferredDateFormatForNoteReviewQueue": "MMM DD YYYY",
+    "preferredLocale": "-",
+    "fsrsLearningSteps": "1m 10m",
+    "fsrsRelearningSteps": "10m",
+    "learnAheadMinutes": 20,
+    "fsrsEnableFuzz": false,
+    "fsrsWeights": "",
+    "answerKeys": "original",
+    "reviewLook": "studio",
+    "desktopLayout": true,
+    "learnerName": "",
+    "aiProvider": "anthropic",
+    "aiModel": "claude-sonnet-5-5",
+    "aiBaseUrl": "",
+    "aiKeySecret": "",
+    "typeAnswers": false,
+    "ignoreAccentsWhenTyping": false,
+    "shuffleChoices": true,
+    "readQuestionAloud": false,
+    "readAnswerAloud": false,
+    "speechVoice": "",
+    "speechRate": 1,
+    "examPassPercent": 75,
+    "multilineCardStartMarker": "",
+    "calloutCardTypes": [
+      "flashcard",
+      "question",
+      "card"
+    ],
+    "atomicClozes": false,
+    "latexClozes": false
+  }
+}

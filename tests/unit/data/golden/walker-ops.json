@@ -1,0 +1,989 @@
+{
+  "fixtureText": "#flashcards\nA1::a\nA2::a <!--SR:!2023-09-02,4,270-->\n\n#flashcards/b #flashcards/c\nM1::m\nM2::m <!--SR:!2023-09-02,4,270-->\n\n#flashcards/b\nB1::b\n",
+  "scenarios": [
+    {
+      "scenario": "1 getters: before iteration, after set topic path, then each nextReviewItem until it returns false (then nextReviewItem again)",
+      "steps": [
+        {
+          "afterConstruct": {
+            "card": null,
+            "deck": null,
+            "has": false
+          },
+          "currentTopicPathBefore": {
+            "ok": {
+              "$undefined": true
+            }
+          }
+        },
+        {
+          "setIteratorTopicPath": "(root)",
+          "result": {
+            "ok": {
+              "$undefined": true
+            }
+          },
+          "state": {
+            "card": null,
+            "deck": null,
+            "has": false
+          }
+        },
+        [
+          {
+            "nextReviewItem": true,
+            "card": "A1",
+            "deck": "flashcards",
+            "has": true
+          },
+          {
+            "nextReviewItem": true,
+            "card": "A2",
+            "deck": "flashcards",
+            "has": true
+          },
+          {
+            "nextReviewItem": true,
+            "card": "M1",
+            "deck": "flashcards/b",
+            "has": true
+          },
+          {
+            "nextReviewItem": true,
+            "card": "B1",
+            "deck": "flashcards/b",
+            "has": true
+          },
+          {
+            "nextReviewItem": true,
+            "card": "M2",
+            "deck": "flashcards/b",
+            "has": true
+          },
+          {
+            "nextReviewItem": false,
+            "card": null,
+            "deck": null,
+            "has": false
+          },
+          {
+            "nextReviewItem": false,
+            "card": null,
+            "deck": null,
+            "has": false
+          }
+        ]
+      ]
+    },
+    {
+      "scenario": "2 destructive: the card shown last is deleted from every deck its question lists when the NEXT one is requested (tree shown after each call)",
+      "steps": [
+        {
+          "n1": true,
+          "card": "A1",
+          "deck": "flashcards",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "n2": true,
+          "card": "A2",
+          "deck": "flashcards",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "n3": true,
+          "card": "M1",
+          "deck": "flashcards/b",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [],
+                "due": [],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "3 moveCurrentReviewItemToEndOfList in deck 'flashcards' (new A1, due A2): no current card afterwards; A1 goes to the end of the NEW list and is shown again after A2? (see steps)",
+      "steps": [
+        {
+          "shown": {
+            "card": "A1",
+            "deck": "flashcards",
+            "has": true
+          }
+        },
+        {
+          "afterMove": {
+            "card": null,
+            "deck": "flashcards",
+            "has": false
+          },
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "next": true,
+          "card": "A1",
+          "deck": "flashcards",
+          "has": true
+        },
+        {
+          "next": true,
+          "card": "A2",
+          "deck": "flashcards",
+          "has": true
+        },
+        {
+          "next": true,
+          "card": "M1",
+          "deck": "flashcards/b",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [],
+                "due": [],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "3b multi-deck card M1 (in b and c) moved to the end while iterating b: only b's copy moves; c's copy stays",
+      "steps": [
+        {
+          "shown": {
+            "card": "M1",
+            "deck": "flashcards/b",
+            "has": true
+          }
+        },
+        {
+          "afterMove": {
+            "card": null,
+            "deck": "flashcards/b",
+            "has": false
+          },
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "B1",
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "seq": [
+            {
+              "ok": true,
+              "card": "B1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "M1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "M2",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": false,
+              "card": null,
+              "deck": null,
+              "has": false
+            }
+          ],
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [],
+                    "due": [],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [],
+                    "due": [],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "4 delete/move with no current card throw; deleteCurrentReviewItemFromAllDecks removes the shown card and returns what nextReviewItem returns",
+      "steps": [
+        {
+          "deleteWithoutCurrent": {
+            "throws": "no current card"
+          }
+        },
+        {
+          "deleteQuestionWithoutCurrent": {
+            "throws": "no current card"
+          }
+        },
+        {
+          "moveWithoutCurrent": {
+            "throws": "no current card"
+          }
+        },
+        {
+          "shown": {
+            "card": "A1",
+            "deck": "flashcards",
+            "has": true
+          }
+        },
+        {
+          "deleteCurrentReviewItem_returns": true,
+          "card": "A2",
+          "deck": "flashcards",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "5 setCurrentReviewItem makes a card current (searching decks in tree order, new list before due list) and iteration continues after it; false leaves no current card",
+      "steps": [
+        {
+          "found": true,
+          "card": "M2",
+          "deck": "flashcards/b",
+          "has": true
+        },
+        {
+          "next": true,
+          "card": "M1",
+          "deck": "flashcards/c",
+          "has": true,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "notFound": false,
+          "card": null,
+          "deck": null,
+          "has": false
+        },
+        {
+          "outsideTopicPath": false,
+          "card": null,
+          "deck": null,
+          "has": false
+        }
+      ]
+    },
+    {
+      "scenario": "6 DueFirstSequential: a card prepended into the due list while the due list is current is shown next (at the next card boundary)",
+      "steps": [
+        {
+          "shown": {
+            "card": "A2",
+            "deck": "flashcards",
+            "has": true
+          }
+        },
+        {
+          "treeAfterPrepend": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [],
+                "due": [
+                  "A1",
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "next": true,
+          "card": "A2",
+          "deck": "flashcards",
+          "has": true
+        }
+      ]
+    },
+    {
+      "scenario": "6b NewFirstSequential: a due-list card prepended while the NEW list is still current waits until the new list is exhausted",
+      "steps": [
+        {
+          "shown": {
+            "card": "M1",
+            "deck": "flashcards/b",
+            "has": true
+          },
+          "newList": [
+            "M1",
+            "B1"
+          ],
+          "dueList": [
+            "M2"
+          ]
+        },
+        {
+          "afterPrepend": {
+            "newList": [
+              "M1"
+            ],
+            "dueList": [
+              "B1",
+              "M2"
+            ]
+          }
+        },
+        {
+          "afterPrependingB1IntoDueListOfB": [
+            {
+              "ok": true,
+              "card": "B1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "M2",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": false,
+              "card": null,
+              "deck": null,
+              "has": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "7 the list of decks to visit is fixed when setIteratorTopicPath is called (decks without cards at that moment are never visited until it is called again)",
+      "steps": [
+        {
+          "firstNextOnEmptySnapshot": false,
+          "card": null,
+          "deck": null,
+          "has": false
+        },
+        {
+          "afterCardAppearsInLateDeck_withoutNewSetIteratorTopicPath": false,
+          "card": null,
+          "deck": null,
+          "has": false
+        },
+        {
+          "afterSetIteratorTopicPathAgain": true,
+          "card": "A1",
+          "deck": "flashcards/late",
+          "has": true
+        }
+      ]
+    },
+    {
+      "scenario": "8 error paths",
+      "steps": [
+        {
+          "setIteratorTopicPath_missingDeck": {
+            "throws": "Cannot read properties of null (reading 'toDeckArray')"
+          }
+        },
+        {
+          "setIteratorTopicPath_nullBase": {
+            "throws": "Cannot read properties of null (reading 'getDeck')"
+          }
+        },
+        {
+          "nextReviewItem_beforeSetIteratorTopicPath": {
+            "throws": "Cannot read properties of undefined (reading 'length')"
+          }
+        },
+        {
+          "shown": "A1",
+          "nextReviewItem_afterShownCardWasRemovedElsewhere": {
+            "throws": "Cannot read properties of undefined (reading 'question')"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "9 setBaseDeck clears the current card but keeps the old list of decks; without setIteratorTopicPath the next card still comes from the OLD tree",
+      "steps": [
+        {
+          "shownBefore": {
+            "card": "A1",
+            "deck": "flashcards",
+            "has": true
+          }
+        },
+        {
+          "afterSetBaseDeck": {
+            "card": null,
+            "deck": "flashcards",
+            "has": false
+          }
+        },
+        {
+          "nextWithoutSetIteratorTopicPath": true,
+          "card": "A1",
+          "deck": "flashcards",
+          "has": true,
+          "oldTreeLeft": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          },
+          "newTreeLeft": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "A1"
+                ],
+                "due": [
+                  "A2"
+                ],
+                "sub": [
+                  {
+                    "name": "b",
+                    "new": [
+                      "M1",
+                      "B1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  },
+                  {
+                    "name": "c",
+                    "new": [
+                      "M1"
+                    ],
+                    "due": [
+                      "M2"
+                    ],
+                    "sub": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "10 an unknown pickOrder value",
+      "steps": [
+        {
+          "next": {
+            "ok": false
+          },
+          "card": null,
+          "deck": null,
+          "has": false
+        },
+        {
+          "next": {
+            "ok": false
+          },
+          "card": null,
+          "deck": null,
+          "has": false
+        },
+        {
+          "next": {
+            "ok": false
+          },
+          "card": null,
+          "deck": null,
+          "has": false
+        }
+      ]
+    },
+    {
+      "scenario": "5b NewFirstSequential, deck new=[N1,N2] due=[D1]: setCurrentReviewItem(D1) then nextReviewItem does not offer N1/N2 (the deck continues in the list it was set into, then moves on); they come back only after setIteratorTopicPath",
+      "steps": [
+        {
+          "setCurrentReviewItem_D1_dueCardWhileNewCardsRemain": true,
+          "card": "D1",
+          "deck": "flashcards",
+          "has": true
+        },
+        {
+          "next": false,
+          "card": null,
+          "deck": null,
+          "has": false,
+          "tree": {
+            "name": "root",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "flashcards",
+                "new": [
+                  "N1",
+                  "N2"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        },
+        {
+          "afterSetIteratorTopicPathAgain": true,
+          "card": "N1",
+          "deck": "flashcards",
+          "has": true
+        }
+      ]
+    },
+    {
+      "scenario": "11 after nextReviewItem returned false the iterator starts again from the first deck of its list on the next call (cards added meanwhile to those decks are found)",
+      "steps": [
+        {
+          "exhaust": [
+            {
+              "ok": true,
+              "card": "M1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "B1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "M2",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": false,
+              "card": null,
+              "deck": null,
+              "has": false
+            }
+          ]
+        },
+        {
+          "cardPrependedToB": [
+            "A1"
+          ]
+        },
+        {
+          "nextReviewItemAfterExhaustionWithoutRefresh": true,
+          "card": "A1",
+          "deck": "flashcards/b",
+          "has": true
+        }
+      ]
+    },
+    {
+      "scenario": "12 moveCurrentReviewItemToEndOfList after the card changed state re-adds it to the list for its NEW state (here new -> due), at the end",
+      "steps": [
+        {
+          "moved": "A1 answered Again (now scheduled) then moved",
+          "newList": [],
+          "dueList": [
+            "A2",
+            "A1"
+          ]
+        },
+        {
+          "seq": [
+            {
+              "ok": true,
+              "card": "A2",
+              "deck": "flashcards",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "A1",
+              "deck": "flashcards",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "M1",
+              "deck": "flashcards/b",
+              "has": true
+            },
+            {
+              "ok": true,
+              "card": "B1",
+              "deck": "flashcards/b",
+              "has": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

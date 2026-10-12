@@ -1,0 +1,710 @@
+/*
+ * Studio look for the study screen (the default; "Classic" keeps the original plugin's look).
+ *
+ * Follows the owner's reference designs: a slim top bar with "4 / 17", a thin progress bar, one large card with a
+ * star in its corner and a "Tap to reveal" hint, a green "Answer" label, and soft tinted answer tiles with an icon,
+ * the name and the next interval. Colours, radii and shadows come from src/ui/design/studio-tokens.css.
+ */
+
+.fs-card-container.fs-look-studio {
+    /* A soft pool of the accent colour behind the card */
+    background:
+        radial-gradient(
+            90% 55% at 50% 0%,
+            color-mix(in srgb, var(--fs-accent) 7%, transparent),
+            transparent 70%
+        ),
+        var(--fs-bg);
+
+    /* MARK: Top bar */
+
+    & .fs-card-toolbar {
+        position: relative;
+        border: none;
+        background: transparent;
+        padding: 4px 12px 0;
+
+        .fs-info-section,
+        .fs-edit-button,
+        .fs-reset-button,
+        .fs-skip-button,
+        > .fs-divider,
+        .fs-short-menu-button {
+            display: none !important;
+        }
+
+        .fs-extended-menu-button {
+            display: flex !important;
+        }
+
+        .fs-button {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border: 1px solid var(--fs-border) !important;
+            border-radius: 50%;
+            background-color: var(--fs-surface) !important;
+            box-shadow: var(--fs-shadow) !important;
+            color: var(--fs-text-2) !important;
+
+            & svg {
+                width: 17px;
+                height: 17px;
+            }
+
+            &:hover {
+                color: var(--fs-text) !important;
+            }
+        }
+    }
+
+    /* The card's deck over "4 / 17", centred in the bar */
+    & .fs-card-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: calc(100% - 180px);
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        pointer-events: none;
+    }
+
+    & .fs-card-title-deck {
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+        gap: 6px;
+        font-weight: 600;
+        font-size: var(--fs-caption);
+        color: var(--fs-text);
+
+        & span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        & .fs-icon-tile {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+
+            & svg {
+                width: 11px;
+                height: 11px;
+                stroke-width: 2.4;
+            }
+        }
+    }
+
+    & .fs-card-title-deck:empty {
+        display: none;
+    }
+
+    & .fs-card-counter {
+        font-size: var(--fs-micro);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+        color: var(--fs-text-3);
+    }
+
+    & .fs-card-title-deck:empty + .fs-card-counter {
+        font-size: var(--fs-body);
+        color: var(--fs-text);
+    }
+
+    /* MARK: Progress */
+
+    /* Progress: filled as far as the session has come, each answer a segment in its rating's colour */
+    & .fs-session-progress {
+        height: 5px;
+        margin: 10px 22px 0;
+        border-radius: 5px;
+        background-color: var(--fs-border);
+        overflow: hidden;
+    }
+
+    & .fs-session-progress-fill {
+        display: flex;
+        gap: 2px;
+        height: 100%;
+        width: calc(var(--fs-progress, 0) * 100%);
+        border-radius: inherit;
+        background-color: var(--fs-accent);
+        transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+        &.fs-has-answers {
+            background-color: transparent;
+        }
+
+        &.fs-many-answers {
+            gap: 0;
+        }
+    }
+
+    & .fs-session-answer {
+        flex: 1;
+        min-width: 1px;
+        border-radius: 2px;
+        background-color: var(--fs-accent);
+        animation: fs-segment-in 320ms ease both;
+    }
+
+    & .fs-many-answers .fs-session-answer {
+        border-radius: 0;
+    }
+
+    & .fs-session-answer-again {
+        background-color: var(--fs-again);
+    }
+
+    & .fs-session-answer-hard {
+        background-color: var(--fs-hard);
+    }
+
+    & .fs-session-answer-good {
+        background-color: var(--fs-good);
+    }
+
+    & .fs-session-answer-easy {
+        background-color: var(--fs-easy);
+    }
+
+    /* MARK: Card */
+
+    & .fs-scroll-wrapper {
+        position: relative;
+        padding: 18px 20px 14px;
+        justify-content: center;
+    }
+
+    /* The star shows a starred card, so it needs no coloured edge as well */
+    & .fs-scroll-wrapper.fs-flag-2 {
+        --fs-flag-color: transparent;
+    }
+
+    & .fs-scroll-wrapper .fs-content {
+        display: flex;
+        max-width: 680px;
+        flex-direction: column;
+        background-color: var(--fs-surface);
+        padding: 26px 26px 20px;
+        border-radius: var(--fs-radius-xl);
+        line-height: 1.55;
+        font-size: 17px;
+        flex-grow: 1;
+        border: 1px solid var(--fs-border);
+        box-shadow:
+            inset 4px 0 0 var(--fs-flag-color, transparent),
+            var(--fs-shadow-lg);
+        font-family: var(--fs-font);
+        color: var(--fs-text);
+    }
+
+    /* Even spacing between blocks (flex items do not collapse margins) */
+    & .fs-content > * {
+        margin-top: 0;
+        margin-bottom: 0.75em;
+    }
+
+    & .fs-content > :last-child {
+        margin-bottom: 0;
+    }
+
+    & .fs-content > hr {
+        display: none;
+    }
+
+    /* The context line (note › heading) as a quiet caption */
+    & .fs-context {
+        font-size: var(--fs-caption);
+        padding-right: 36px;
+        font-style: normal;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--fs-text-3);
+        white-space: nowrap;
+    }
+
+    /* Front: the question, large, between the top of the card and the hint */
+    & .fs-content:not(.fs-answer-shown) > :not(.fs-context, .fs-reveal-hint) {
+        padding: 0 8px;
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1.35;
+        letter-spacing: -0.018em;
+        text-align: center;
+        text-wrap: balance;
+    }
+
+    & .fs-content:not(.fs-answer-shown) > :first-child:not(.fs-context),
+    & .fs-content:not(.fs-answer-shown) > .fs-context + * {
+        margin-top: auto;
+    }
+
+    & .fs-content:not(.fs-answer-shown) {
+        cursor: pointer;
+    }
+
+    & .fs-content:not(.fs-answer-shown) > .fs-context {
+        padding: 0 36px;
+        text-align: center;
+    }
+
+    & .fs-reveal-hint {
+        display: flex;
+        padding-top: 24px;
+        margin-top: auto !important;
+        justify-content: center;
+        gap: 8px;
+        align-items: center;
+        font-size: var(--fs-caption);
+        font-weight: 500;
+        color: var(--fs-text-3);
+    }
+
+    & .fs-answer-shown .fs-reveal-hint {
+        display: none;
+    }
+
+    & .fs-reveal-hint-icon {
+        display: flex;
+
+        & svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    /* Back: the question stays as a quiet line above the "Answer" label, the answer leads */
+    & .fs-content.fs-answer-shown > :not(.fs-context, hr, .fs-answer-pill, .fs-answer-pill ~ *) {
+        font-size: var(--fs-body);
+        font-weight: 500;
+        line-height: 1.45;
+        color: var(--fs-text-3);
+    }
+
+    & .fs-answer-pill {
+        align-self: flex-start;
+        margin-bottom: 12px !important;
+        color: var(--fs-green);
+        background-color: var(--fs-green-soft);
+    }
+
+    &
+        .fs-content.fs-answer-shown
+        > .fs-answer-pill:not(:first-child, .fs-context + .fs-answer-pill) {
+        margin-top: 10px;
+    }
+
+    & .fs-content.fs-answer-shown > .fs-answer-pill ~ * {
+        font-size: 18px;
+        line-height: 1.55;
+        animation: fs-reveal 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    & .fs-content strong {
+        font-weight: 650;
+        color: var(--fs-text);
+    }
+
+    & .fs-content ul,
+    & .fs-content ol {
+        padding-inline-start: 1.3em;
+    }
+
+    & .fs-content li {
+        margin: 0.35em 0;
+    }
+
+    & .fs-content li::marker {
+        color: var(--fs-accent);
+    }
+
+    /* Callouts read as the reference's "Key points" box */
+    & .fs-content .callout {
+        margin-top: 4px;
+        padding: 14px 16px;
+        border: none;
+        border-radius: var(--fs-radius-md);
+        background-color: var(--fs-surface-2);
+        mix-blend-mode: normal;
+        font-size: var(--fs-body);
+    }
+
+    & .fs-content .callout-title {
+        gap: 6px;
+        font-size: var(--fs-caption);
+        font-weight: 650;
+        color: var(--fs-text);
+    }
+
+    & .fs-content .callout-icon {
+        color: var(--fs-accent);
+    }
+
+    & .fs-content .callout-content {
+        color: var(--fs-text-2);
+    }
+
+    /* Star in the card's corner (sets the orange flag) */
+    & .fs-card-star {
+        top: 30px;
+        position: absolute;
+        z-index: 2;
+        box-shadow: none !important;
+        right: max(32px, calc((100% - 720px) / 2 + 32px));
+        justify-content: center;
+        width: 32px;
+        border: none;
+        height: 32px;
+        cursor: pointer;
+        background: transparent !important;
+        border-radius: 50%;
+        display: flex;
+        color: var(--fs-text-3) !important;
+        align-items: center;
+        padding: 0;
+
+        & svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        &:hover,
+        &.is-on {
+            color: var(--fs-amber) !important;
+        }
+
+        &.is-on svg {
+            fill: currentColor;
+        }
+    }
+
+    & .fs-scroll-wrapper.fs-is-hidden .fs-card-star {
+        display: none;
+    }
+
+    /* MARK: Answer tiles */
+
+    & .fs-response {
+        gap: 10px;
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 4px 20px 22px;
+        border-top: none;
+    }
+
+    & .fs-response .fs-response-button {
+        --fs-rating: var(--fs-accent);
+        justify-content: center;
+        line-height: 1.2;
+        padding: 10px 4px;
+        flex-direction: column;
+        box-shadow:
+            inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 12%, transparent),
+            inset 0 1px 0 rgb(255 255 255 / 55%);
+        background-color: var(--fs-rating-soft) !important;
+
+        height: auto;
+        border: none;
+        color: var(--fs-rating) !important;
+        --fs-rating-soft: var(--fs-accent-soft);
+        border-radius: var(--fs-radius-md);
+        min-height: 76px;
+        margin: 0;
+        align-items: center;
+        gap: 4px;
+        display: flex;
+        font-family: var(--fs-font);
+        transition:
+            transform 90ms ease,
+            filter 140ms ease;
+
+        &:hover {
+            filter: brightness(0.97) saturate(1.1);
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+    }
+
+    & .fs-response .fs-again-button {
+        --fs-rating: var(--fs-again);
+        --fs-rating-soft: var(--fs-again-soft);
+    }
+
+    & .fs-response .fs-hard-button {
+        --fs-rating: var(--fs-hard);
+        --fs-rating-soft: var(--fs-hard-soft);
+    }
+
+    & .fs-response .fs-good-button {
+        --fs-rating: var(--fs-good);
+        --fs-rating-soft: var(--fs-good-soft);
+    }
+
+    & .fs-response .fs-easy-button {
+        --fs-rating: var(--fs-easy);
+        --fs-rating-soft: var(--fs-easy-soft);
+    }
+
+    /* The Studio look uses its own icon, label and interval */
+    & .fs-response-button > span.fs-small-text,
+    & .fs-response-button > span.fs-large-text {
+        display: none !important;
+    }
+
+    & .fs-response-button > span.fs-button-icon {
+        display: flex;
+
+        & svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.2;
+        }
+    }
+
+    & .fs-response-button > span.fs-button-label {
+        display: block;
+        font-size: var(--fs-body);
+        font-weight: 650;
+    }
+
+    & .fs-response-button.fs-has-interval > span.fs-button-interval {
+        display: block;
+        font-size: var(--fs-micro);
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        color: var(--fs-text-3);
+    }
+
+    /* Show answer: one clear primary button */
+    & .fs-response .fs-response-button.fs-show-answer-button {
+        min-height: 54px;
+        background-color: var(--fs-accent) !important;
+        color: var(--fs-on-accent) !important;
+        box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--fs-accent) 80%, transparent);
+    }
+
+    & .fs-response .fs-response-button.fs-show-answer-button > span.fs-button-icon {
+        display: none;
+    }
+
+    /* The card already says which key reveals the answer */
+    & .fs-response .fs-response-button.fs-show-answer-button::after {
+        display: none;
+    }
+
+    /* Keyboard hints: a small digit in the tile's corner */
+    & .fs-response-button::after {
+        color: currentColor !important;
+        opacity: 0.45;
+        box-shadow: none !important;
+        border: none;
+        font-family: var(--fs-font) !important;
+        font-size: 10px !important;
+        font-weight: 650;
+        padding: 0 !important;
+        top: 8px;
+        right: 10px !important;
+        bottom: unset !important;
+    }
+
+    /* The answer toast */
+    /* The answer toast drops in under the progress bar, clear of the answer tiles */
+    & .fs-answer-toast {
+        top: 66px;
+        bottom: auto;
+        padding: 6px 6px 6px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--fs-border);
+        background-color: var(--fs-surface);
+        color: var(--fs-text);
+        box-shadow: var(--fs-shadow-lg);
+        font-family: var(--fs-font);
+        font-size: var(--fs-caption);
+        animation-name: fs-toast-in;
+    }
+
+    & .fs-answer-toast-interval {
+        color: var(--fs-text-3);
+    }
+
+    & .fs-answer-toast-undo {
+        height: 28px;
+        padding: 0 12px;
+        border: none;
+        border-radius: 999px;
+        font-family: var(--fs-font);
+        font-size: var(--fs-caption);
+        font-weight: 650;
+        color: var(--fs-accent) !important;
+        background-color: var(--fs-accent-soft) !important;
+        box-shadow: none !important;
+    }
+
+    /* Clozes: a quiet chip for the hidden text, the accent for the revealed answer (the cloze markup sets its
+       colour inline, #2196f3, so it is matched on that) */
+    & .fs-content:not(.fs-answer-shown) span[style*="#2196f3"] {
+        color: var(--fs-accent) !important;
+        background-color: var(--fs-accent-soft);
+        border-radius: 7px;
+        padding: 0.05em 0.45em;
+        letter-spacing: 0.04em;
+    }
+
+    & .fs-content.fs-answer-shown span[style*="#2196f3"] {
+        color: var(--fs-accent) !important;
+        font-weight: 650;
+    }
+
+    & .fs-content .cloze-input {
+        border-radius: 8px;
+        border: 1px solid color-mix(in srgb, var(--fs-accent) 45%, transparent);
+        background-color: var(--fs-accent-soft);
+    }
+}
+
+.theme-dark .fs-card-container.fs-look-studio {
+    background:
+        radial-gradient(
+            80% 50% at 50% 0%,
+            color-mix(in srgb, var(--fs-accent) 13%, transparent),
+            transparent 70%
+        ),
+        var(--fs-bg);
+
+    & .fs-response .fs-response-button:not(.fs-show-answer-button) {
+        background-color: color-mix(in srgb, var(--fs-rating) 9%, var(--fs-surface)) !important;
+        box-shadow:
+            inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 22%, transparent),
+            inset 0 1px 0 rgb(255 255 255 / 4%);
+    }
+
+    & .fs-response-button:not(.fs-show-answer-button) > span.fs-button-label {
+        color: color-mix(in srgb, var(--fs-rating) 80%, white);
+    }
+}
+
+/* With custom hotkeys, Space may not reveal the answer, so the hint keeps its place but says nothing */
+body:not(.is-mobile) .fs-card-container.fs-look-studio.fs-custom-hotkeys .fs-reveal-hint {
+    visibility: hidden;
+}
+
+/* Studio-only pieces stay hidden in the Classic look */
+.fs-card-container:not(.fs-look-studio) {
+    & .fs-card-title,
+    & .fs-card-star,
+    & .fs-reveal-hint,
+    & .fs-answer-pill {
+        display: none;
+    }
+}
+
+/* Key hints follow the chosen answer keys (Anki: 1 Again, 2 Hard, 3 Good, 4 Easy) */
+body:not(.is-mobile) .fs-card-container.fs-keys-anki:not(.fs-custom-hotkeys) {
+    & .fs-response-button.fs-again-button::after {
+        content: "1";
+    }
+
+    & .fs-response-button.fs-hard-button::after {
+        content: "2";
+    }
+
+    & .fs-response-button.fs-good-button::after {
+        content: "3";
+    }
+
+    & .fs-response-button.fs-easy-button::after {
+        content: "4";
+    }
+}
+
+/* MARK: Phones */
+
+.is-phone .fs-card-container.fs-look-studio {
+    & .fs-session-progress {
+        margin: 4px 18px 0;
+    }
+
+    & .fs-scroll-wrapper {
+        padding: 14px 16px 12px;
+    }
+
+    & .fs-scroll-wrapper .fs-content {
+        padding: 22px 20px 18px;
+    }
+
+    & .fs-card-star {
+        top: 24px;
+        right: 26px;
+    }
+
+    & .fs-response {
+        gap: 8px;
+        padding: 2px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    & .fs-response .fs-response-button {
+        min-height: 72px;
+    }
+}
+
+@keyframes fs-toast-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes fs-segment-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fs-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-card-container.fs-look-studio {
+        & .fs-content.fs-answer-shown > .fs-answer-pill ~ * {
+            animation: none;
+        }
+
+        & .fs-session-progress-fill,
+        & .fs-response .fs-response-button {
+            transition: none;
+        }
+
+        & .fs-session-answer {
+            animation: none;
+        }
+    }
+}

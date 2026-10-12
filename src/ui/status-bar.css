@@ -1,0 +1,14 @@
+.fs-status-item {
+    gap: var(--size-2-2);
+    align-items: center;
+    display: inline-flex;
+
+    .fs-status-icon {
+        display: inline-flex;
+
+        svg {
+            width: var(--icon-xs);
+            height: var(--icon-xs);
+        }
+    }
+}

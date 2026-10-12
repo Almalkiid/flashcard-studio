@@ -1,0 +1,40 @@
+/* The dialog that edits the text of a card. */
+
+.fs-edit-view {
+    justify-content: center;
+    flex-flow: column;
+    gap: var(--fs-space-4);
+    align-items: center;
+    display: flex;
+    inline-size: 100%;
+    block-size: 100%;
+
+    textarea.fs-input {
+        resize: none;
+        inline-size: 100%;
+        flex-grow: 1;
+    }
+}
+
+.fs-edit-modal {
+    height: 80vh;
+
+    .fs-response {
+        grid-template-columns: repeat(3, auto);
+        display: grid;
+        inline-size: 100%;
+        padding: 0;
+        margin-top: 0;
+        border-top: none;
+    }
+
+    .fs-response-button {
+        inline-size: 100%;
+    }
+
+    /* Fills the middle column, so that Save and Cancel sit at the two ends */
+    .fs-dummy-button {
+        cursor: default;
+        opacity: 0;
+    }
+}

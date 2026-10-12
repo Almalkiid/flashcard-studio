@@ -1,0 +1,27 @@
+[
+ {
+  "input": {
+   "text": "abcdefg\nhi",
+   "spans": [
+    {
+     "start": 2,
+     "end": 4
+    }
+   ]
+  },
+  "output": {
+   "textOnly": "ab  efg\nhi",
+   "mathOnly": "  cd   \n  "
+  }
+ },
+ {
+  "input": {
+   "text": "abc",
+   "spans": []
+  },
+  "output": {
+   "textOnly": "abc",
+   "mathOnly": "   "
+  }
+ }
+]

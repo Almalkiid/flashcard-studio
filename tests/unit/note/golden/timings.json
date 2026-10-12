@@ -1,0 +1,50 @@
+{
+  "note": "paneRedraw only up to 5000 notes: in jsdom the pane build grows faster than linearly (a 20000-note run took over a minute), which is a jsdom artifact of live element collections, not a measurement of Electron. Node v22.23.1; absolute numbers vary, ratios are the point",
+  "rows": [
+    {
+      "notes": 1000,
+      "newNotes": 334,
+      "scheduledNotes": 666,
+      "msPerOperation": {
+        "addNoteToQueue": 53.34,
+        "calcDueNotesCount": 0.13,
+        "sortNotesByDateAndImportance": 0.34,
+        "histogramPlusSort": 17.86,
+        "updateScheduleInfoOneRating": 0.24,
+        "ratingTotalApprox": 18.23,
+        "paneRedraw": 200.47,
+        "paneDomElements": 5873,
+        "paneFileRows": 980
+      }
+    },
+    {
+      "notes": 5000,
+      "newNotes": 1667,
+      "scheduledNotes": 3333,
+      "msPerOperation": {
+        "addNoteToQueue": 93.09,
+        "calcDueNotesCount": 0.15,
+        "sortNotesByDateAndImportance": 1.8,
+        "histogramPlusSort": 3.35,
+        "updateScheduleInfoOneRating": 0.2,
+        "ratingTotalApprox": 3.7,
+        "paneRedraw": 1024.93,
+        "paneDomElements": 21498,
+        "paneFileRows": 4885
+      }
+    },
+    {
+      "notes": 20000,
+      "newNotes": 6667,
+      "scheduledNotes": 13333,
+      "msPerOperation": {
+        "addNoteToQueue": 317.46,
+        "calcDueNotesCount": 0.31,
+        "sortNotesByDateAndImportance": 10.56,
+        "histogramPlusSort": 11.91,
+        "updateScheduleInfoOneRating": 0.77,
+        "ratingTotalApprox": 12.99
+      }
+    }
+  ]
+}

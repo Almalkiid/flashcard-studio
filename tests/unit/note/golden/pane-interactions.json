@@ -1,0 +1,1185 @@
+{
+  "note": "icons/classes as produced by the real code against the DOM-helper mock",
+  "steps": [
+    {
+      "label": "initial",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "after clicking New (was collapsed)",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "block",
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "after clicking New again",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "after clicking Today (was expanded)",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "after clicking the #review deck folder",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": true,
+          "iconCollapsed": true,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": "none",
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "after a redraw: collapse state comes from deck.activeFolders",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "new-1",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "new-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 03 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-3d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "overdue-1d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "today-a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "today-b",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "tomorrow",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-2d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Oct 06 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-30d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 05 2024",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "in-365d",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        },
+        {
+          "title": "#review-2",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "two-today",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ],
+        "#review-2": [
+          "#review-2",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "clicked file 'tomorrow'",
+      "defaultPrevented": true,
+      "handlerOpenNoteCalls": [
+        [
+          "#review",
+          "s/tomorrow.md"
+        ]
+      ]
+    },
+    {
+      "label": "context button menu (showDeleteButtonInFileMenu true)",
+      "items": [
+        {
+          "title": "Review: Easy",
+          "icon": "StudioIcon",
+          "warning": false
+        },
+        {
+          "title": "Review: Good",
+          "icon": "StudioIcon",
+          "warning": false
+        },
+        {
+          "title": "Review: Hard",
+          "icon": "StudioIcon",
+          "warning": false
+        },
+        "---",
+        {
+          "title": "Delete note scheduling data in note",
+          "icon": "trash",
+          "warning": true
+        }
+      ]
+    },
+    {
+      "label": "menu item clicks routed to plugin.dataManager.saveNoteReviewResponse / confirmation modal",
+      "saveCalls": [
+        [
+          "s/tomorrow.md",
+          "Easy"
+        ],
+        [
+          "s/tomorrow.md",
+          "Good"
+        ],
+        [
+          "s/tomorrow.md",
+          "Hard"
+        ]
+      ],
+      "modalsOpened": 1
+    },
+    {
+      "label": "context button menu (showDeleteButtonInFileMenu false)",
+      "items": [
+        "Review: Easy",
+        "Review: Good",
+        "Review: Hard",
+        "---"
+      ]
+    },
+    {
+      "label": "events subscribed at construction",
+      "whenSettingOn": [
+        "workspace:file-open",
+        "vault:rename"
+      ],
+      "whenSettingOff": []
+    },
+    {
+      "label": "view identity",
+      "viewType": "flashcard-studio-note-queue",
+      "constant": "flashcard-studio-note-queue",
+      "displayText": "Notes Review Queue",
+      "icon": "StudioIcon"
+    }
+  ]
+}

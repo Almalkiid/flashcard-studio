@@ -1,0 +1,51 @@
+[
+ {
+  "input": "a {{p}} $\\cloze{q}{}$\n$$\n{{r}}\n$$",
+  "output": {
+   "textOnly": "a {{p}}              \n  \n     \n  ",
+   "mathOnly": "        $\\cloze{q}{}$\n$$\n{{r}}\n$$"
+  }
+ },
+ {
+  "input": "",
+  "output": {
+   "textOnly": "",
+   "mathOnly": ""
+  }
+ },
+ {
+  "input": "plain",
+  "output": {
+   "textOnly": "plain",
+   "mathOnly": "     "
+  }
+ },
+ {
+  "input": "$x$",
+  "output": {
+   "textOnly": "   ",
+   "mathOnly": "$x$"
+  }
+ },
+ {
+  "input": "x $y$ z\n$$w$$ end",
+  "output": {
+   "textOnly": "x     z\n      end",
+   "mathOnly": "  $y$  \n$$w$$    "
+  }
+ },
+ {
+  "input": "a\n\nb $c$\n\nd",
+  "output": {
+   "textOnly": "a\n\nb    \n\nd",
+   "mathOnly": " \n\n  $c$\n\n "
+  }
+ },
+ {
+  "input": "$$ open\nnever",
+  "output": {
+   "textOnly": "$$ open\nnever",
+   "mathOnly": "       \n     "
+  }
+ }
+]

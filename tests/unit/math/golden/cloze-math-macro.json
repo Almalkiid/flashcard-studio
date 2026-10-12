@@ -1,0 +1,316 @@
+[
+ {
+  "input": {
+   "kind": "register",
+   "variant": "symbolmap"
+  },
+  "output": {
+   "returnedNull": false,
+   "added": [
+    [
+     {
+      "macro": [
+       "fs-cloze"
+      ]
+     },
+     {},
+     -100
+    ]
+   ],
+   "constructed": [
+    {
+     "ctor": "fs-cloze",
+     "json": {
+      "cloze": "Cloze"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "input": {
+   "kind": "register",
+   "variant": "tokenmap"
+  },
+  "output": {
+   "returnedNull": false,
+   "added": [
+    [
+     {
+      "macro": [
+       "fs-cloze"
+      ]
+     },
+     {},
+     -100
+    ]
+   ],
+   "constructed": [
+    {
+     "ctor": "fs-cloze",
+     "json": {
+      "cloze": "Cloze"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "input": {
+   "kind": "register",
+   "variant": "parseutil-alt"
+  },
+  "output": {
+   "returnedNull": false,
+   "added": [
+    [
+     {
+      "macro": [
+       "fs-cloze"
+      ]
+     },
+     {},
+     -100
+    ]
+   ],
+   "constructed": [
+    {
+     "ctor": "fs-cloze",
+     "json": {
+      "cloze": "Cloze"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "input": {
+   "kind": "register",
+   "variant": "no-commandmap"
+  },
+  "output": {
+   "returnedNull": true,
+   "added": [],
+   "constructed": []
+  }
+ },
+ {
+  "input": {
+   "kind": "register",
+   "variant": "no-handlers"
+  },
+  "output": {
+   "returnedNull": true,
+   "added": [],
+   "constructed": []
+  }
+ },
+ {
+  "input": {
+   "kind": "register",
+   "variant": "undefined / {} / partial"
+  },
+  "output": [
+   true,
+   true,
+   true
+  ]
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}{h} + b"
+  },
+  "output": {
+   "ok": "a + b"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a} + b"
+  },
+  "output": {
+   "ok": "a+ b"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze[2]{a} + b"
+  },
+  "output": {
+   "ok": "a+ b"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze[hsa]{a}{h}^2"
+  },
+  "output": {
+   "ok": "a^2"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a} {h}^2"
+  },
+  "output": {
+   "ok": "a^2"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}{h}"
+  },
+  "output": {
+   "ok": "a"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}"
+  },
+  "output": {
+   "ok": "a"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze {a}{h}x"
+  },
+  "output": {
+   "ok": "ax"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze[1]  {a}  {h}  y"
+  },
+  "output": {
+   "ok": "a  y"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{\\frac{1}{2}}{half} + 1"
+  },
+  "output": {
+   "ok": "\\frac{1}{2} + 1"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}x"
+  },
+  "output": {
+   "ok": "ax"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}\\alpha"
+  },
+  "output": {
+   "ok": "a\\alpha"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}{}"
+  },
+  "output": {
+   "ok": "a"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}{}x"
+  },
+  "output": {
+   "ok": "ax"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}+{b}"
+  },
+  "output": {
+   "ok": "a+{b}"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{a}\n{h} z"
+  },
+  "output": {
+   "ok": "a z"
+  }
+ },
+ {
+  "input": {
+   "kind": "expand",
+   "rest": "\\cloze{unclosed"
+  },
+  "output": {
+   "throws": "unclosed"
+  }
+ },
+ {
+  "input": {
+   "kind": "unregister",
+   "variant": "present among others"
+  },
+  "output": {
+   "returned": true,
+   "remaining": [
+    "another",
+    "third"
+   ]
+  }
+ },
+ {
+  "input": {
+   "kind": "unregister",
+   "variant": "second time"
+  },
+  "output": {
+   "returned": true,
+   "remaining": [
+    "another",
+    "third"
+   ]
+  }
+ },
+ {
+  "input": {
+   "kind": "unregister",
+   "variant": "no remove fn"
+  },
+  "output": false
+ },
+ {
+  "input": {
+   "kind": "unregister",
+   "variant": "unreachable"
+  },
+  "output": [
+   false,
+   false,
+   false
+  ]
+ }
+]

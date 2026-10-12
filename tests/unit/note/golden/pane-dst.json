@@ -1,0 +1,304 @@
+{
+  "note": "label given to the notes due the day before, on, one and two days after the base date, at several clock times",
+  "cases": [
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "00:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "00:30:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "00:59:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "01:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "12:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "fall-back-eve-2026-11-01",
+      "time": "23:59:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Nov 03 2026"
+        ]
+      ]
+    },
+    {
+      "id": "spring-forward-2026-03-08",
+      "time": "00:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Mar 10 2026"
+        ]
+      ]
+    },
+    {
+      "id": "spring-forward-2026-03-08",
+      "time": "00:30:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Mar 10 2026"
+        ]
+      ]
+    },
+    {
+      "id": "spring-forward-2026-03-08",
+      "time": "03:30:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Mar 10 2026"
+        ]
+      ]
+    },
+    {
+      "id": "spring-forward-2026-03-08",
+      "time": "12:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Mar 10 2026"
+        ]
+      ]
+    },
+    {
+      "id": "plain-day-2026-06-15",
+      "time": "00:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Jun 17 2026"
+        ]
+      ]
+    },
+    {
+      "id": "plain-day-2026-06-15",
+      "time": "00:30:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Jun 17 2026"
+        ]
+      ]
+    },
+    {
+      "id": "plain-day-2026-06-15",
+      "time": "12:00:00",
+      "tz": "UTC",
+      "labels": [
+        [
+          "m1",
+          "Yesterday"
+        ],
+        [
+          "d0",
+          "Today"
+        ],
+        [
+          "d1",
+          "Tomorrow"
+        ],
+        [
+          "d2",
+          "Jun 17 2026"
+        ]
+      ]
+    }
+  ]
+}

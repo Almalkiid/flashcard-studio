@@ -1,0 +1,62 @@
+[
+ {
+  "input": "$\\cloze{p}{q}$",
+  "output": true
+ },
+ {
+  "input": "$\\cloze {p}{q}$",
+  "output": true
+ },
+ {
+  "input": "$\\cloze\n{p}$",
+  "output": true
+ },
+ {
+  "input": "$\\cloze[3]{p}$",
+  "output": true
+ },
+ {
+  "input": "$\\cloze [3]{p}$",
+  "output": true
+ },
+ {
+  "input": "$\\clozed{p}{q}$",
+  "output": false
+ },
+ {
+  "input": "\\cloze",
+  "output": false
+ },
+ {
+  "input": "\\cloze x",
+  "output": false
+ },
+ {
+  "input": "\\cloze(",
+  "output": false
+ },
+ {
+  "input": "text {{p}}",
+  "output": false
+ },
+ {
+  "input": "",
+  "output": false
+ },
+ {
+  "input": "\\Cloze{a}",
+  "output": false
+ },
+ {
+  "input": "line one \\cloze{ then\nnext line}",
+  "output": true
+ },
+ {
+  "input": "\\\\cloze{a}",
+  "output": false
+ },
+ {
+  "input": "\\cloze[]",
+  "output": true
+ }
+]

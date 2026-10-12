@@ -1,0 +1,98 @@
+[
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "new, no meta",
+  "segment": "!2000-01-01,1,250",
+  "idAfter": null
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "scheduled sm2",
+  "segment": "!2026-10-20,12,260,id=012345",
+  "idAfter": "012345"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "scheduled fsrs",
+  "segment": "!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=6789ab",
+  "idAfter": "6789ab"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "scheduled with existing id",
+  "segment": "!2026-10-20,12,260,id=keep01",
+  "idAfter": "keep01"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "new but suspended",
+  "segment": "!2000-01-01,1,250,id=cdefgh,susp",
+  "idAfter": "cdefgh"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "new, bare id only",
+  "segment": "!2000-01-01,1,250,id=bare01",
+  "idAfter": "bare01"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "new, extras only",
+  "segment": "!2000-01-01,1,250,id=ijklmn,x=1",
+  "idAfter": "ijklmn"
+ },
+ {
+  "algorithm": "SM-2-OSR",
+  "state": "scheduled, all meta",
+  "segment": "!2026-10-20,12,260,id=i1,susp,bury=2026-11-01,flag=5,leech,q=1,r",
+  "idAfter": "i1"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "new, no meta",
+  "segment": "!fsrs,-,0,0,0,0,0,0,0,-",
+  "idAfter": null
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "scheduled sm2",
+  "segment": "!2026-10-20,12,260,id=012345",
+  "idAfter": "012345"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "scheduled fsrs",
+  "segment": "!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=6789ab",
+  "idAfter": "6789ab"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "scheduled with existing id",
+  "segment": "!2026-10-20,12,260,id=keep01",
+  "idAfter": "keep01"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "new but suspended",
+  "segment": "!fsrs,-,0,0,0,0,0,0,0,-,id=cdefgh,susp",
+  "idAfter": "cdefgh"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "new, bare id only",
+  "segment": "!fsrs,-,0,0,0,0,0,0,0,-,id=bare01",
+  "idAfter": "bare01"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "new, extras only",
+  "segment": "!fsrs,-,0,0,0,0,0,0,0,-,id=ijklmn,x=1",
+  "idAfter": "ijklmn"
+ },
+ {
+  "algorithm": "FSRS",
+  "state": "scheduled, all meta",
+  "segment": "!2026-10-20,12,260,id=i1,susp,bury=2026-11-01,flag=5,leech,q=1,r",
+  "idAfter": "i1"
+ }
+]

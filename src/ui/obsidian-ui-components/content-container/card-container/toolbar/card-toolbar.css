@@ -1,0 +1,140 @@
+/* The bar above the card. A wide pane shows every button; a narrow one folds Edit, Reset and Skip into the menu. The Studio look draws only the menu. */
+
+.fs-card-toolbar {
+    height: 46px;
+    padding-block: 0;
+    padding-inline: var(--fs-space-2);
+    border-bottom: var(--fs-rule);
+    gap: var(--fs-space-2);
+    display: flex;
+    align-items: center;
+    flex-flow: row;
+    justify-content: space-between;
+
+    > * {
+        margin-block: var(--fs-space-2);
+        margin-inline: 0;
+    }
+
+    > .fs-divider {
+        --fs-divider-color: var(--fs-line);
+
+        margin: 0;
+        --fs-divider-width: 1px;
+        height: 100%;
+        width: 1px;
+        max-width: 1px;
+    }
+
+    .fs-extended-menu-button,
+    .fs-center-spacer {
+        display: none;
+    }
+
+    /* Resetting loses the card's progress, so the button is red; it stays red in a dark theme too */
+    .fs-reset-button {
+        background-color: var(--interactive-normal);
+        color: var(--fs-ink-error);
+        opacity: 0.7;
+
+        &:is(:hover) {
+            background-color: var(--background-modifier-error-hover);
+        }
+
+        &.mod-disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    .fs-tab-view & {
+        border-top: var(--fs-rule);
+    }
+
+    .is-mobile & {
+        block-size: auto;
+    }
+
+    .is-phone .fs-modal-content & {
+        --fs-deck-name-width: 10ch;
+    }
+
+    .is-phone .fs-tab-view & {
+        --fs-deck-name-width: 15ch;
+    }
+
+    /* On a phone turned sideways the card gets the room, and the bar shrinks to Back, the menu and Close */
+    @media (orientation: landscape) {
+        .is-phone & {
+            height: 40px;
+
+            .fs-info-section {
+                display: none;
+            }
+        }
+    }
+
+    /* Phone: the narrow set of buttons */
+    .is-phone & {
+        .fs-edit-button,
+        .fs-reset-button,
+        .fs-skip-button,
+        > .fs-divider,
+        .fs-short-menu-button,
+        .fs-current-deck-info,
+        .fs-deck-pointer {
+            display: none;
+        }
+
+        .fs-extended-menu-button,
+        .fs-center-spacer {
+            display: flex;
+        }
+    }
+
+    /* A tablet gets it in a pane under 850 px wide */
+    @container fs-view (width < 850px) {
+        .is-mobile & {
+            .fs-edit-button,
+            .fs-reset-button,
+            .fs-skip-button,
+            > .fs-divider,
+            .fs-short-menu-button {
+                display: none;
+            }
+
+            .fs-extended-menu-button,
+            .fs-center-spacer {
+                display: flex;
+            }
+        }
+    }
+
+    @container fs-view (width < 730px) {
+        --fs-deck-name-width: 15ch;
+    }
+
+    /* Any pane under 690 px wide */
+    @container fs-view (width < 690px) {
+        --fs-deck-name-width: 20ch;
+
+        .fs-edit-button,
+        .fs-reset-button,
+        .fs-skip-button,
+        > .fs-divider,
+        .fs-short-menu-button {
+            display: none;
+        }
+
+        .fs-extended-menu-button,
+        .fs-center-spacer {
+            display: flex;
+        }
+    }
+
+    @container fs-view (width < 580px) {
+        .fs-current-deck-info,
+        .fs-deck-pointer {
+            display: none;
+        }
+    }
+}

@@ -1,0 +1,206 @@
+{
+  "note": "dates are local midnight; TZ=UTC",
+  "cases": [
+    {
+      "id": "new-by-rank-desc",
+      "input": {
+        "new": [
+          "a",
+          "b",
+          "c",
+          "d"
+        ],
+        "scheduled": [],
+        "pageranks": {
+          "a": 1,
+          "b": 4,
+          "c": 2,
+          "d": 3
+        }
+      },
+      "newOrder": [
+        "b",
+        "d",
+        "c",
+        "a"
+      ],
+      "scheduledOrder": []
+    },
+    {
+      "id": "new-missing-rank-counts-zero",
+      "input": {
+        "new": [
+          "a",
+          "b",
+          "c"
+        ],
+        "scheduled": [],
+        "pageranks": {
+          "b": 0.5
+        }
+      },
+      "newOrder": [
+        "b",
+        "a",
+        "c"
+      ],
+      "scheduledOrder": []
+    },
+    {
+      "id": "new-equal-ranks-keep-input-order",
+      "input": {
+        "new": [
+          "c",
+          "a",
+          "b"
+        ],
+        "scheduled": [],
+        "pageranks": {
+          "a": 1,
+          "b": 1,
+          "c": 1
+        }
+      },
+      "newOrder": [
+        "c",
+        "a",
+        "b"
+      ],
+      "scheduledOrder": []
+    },
+    {
+      "id": "new-no-ranks-keep-input-order",
+      "input": {
+        "new": [
+          "z",
+          "y",
+          "x"
+        ],
+        "scheduled": [],
+        "pageranks": {}
+      },
+      "newOrder": [
+        "z",
+        "y",
+        "x"
+      ],
+      "scheduledOrder": []
+    },
+    {
+      "id": "sched-date-then-rank",
+      "input": {
+        "new": [],
+        "scheduled": [
+          [
+            "a",
+            "2023-09-08"
+          ],
+          [
+            "b",
+            "2023-09-06"
+          ],
+          [
+            "c",
+            "2023-09-06"
+          ],
+          [
+            "d",
+            "2023-09-08"
+          ]
+        ],
+        "pageranks": {
+          "a": 1,
+          "b": 1,
+          "c": 5,
+          "d": 9
+        }
+      },
+      "newOrder": [],
+      "scheduledOrder": [
+        [
+          "c",
+          "2023-09-06"
+        ],
+        [
+          "b",
+          "2023-09-06"
+        ],
+        [
+          "d",
+          "2023-09-08"
+        ],
+        [
+          "a",
+          "2023-09-08"
+        ]
+      ]
+    },
+    {
+      "id": "sched-same-date-same-rank-keep-input-order",
+      "input": {
+        "new": [],
+        "scheduled": [
+          [
+            "q",
+            "2023-09-06"
+          ],
+          [
+            "p",
+            "2023-09-06"
+          ],
+          [
+            "r",
+            "2023-09-06"
+          ]
+        ],
+        "pageranks": {}
+      },
+      "newOrder": [],
+      "scheduledOrder": [
+        [
+          "q",
+          "2023-09-06"
+        ],
+        [
+          "p",
+          "2023-09-06"
+        ],
+        [
+          "r",
+          "2023-09-06"
+        ]
+      ]
+    },
+    {
+      "id": "sched-rank-never-beats-date",
+      "input": {
+        "new": [],
+        "scheduled": [
+          [
+            "hub",
+            "2023-09-09"
+          ],
+          [
+            "leaf",
+            "2023-09-01"
+          ]
+        ],
+        "pageranks": {
+          "hub": 100,
+          "leaf": 0
+        }
+      },
+      "newOrder": [],
+      "scheduledOrder": [
+        [
+          "leaf",
+          "2023-09-01"
+        ],
+        [
+          "hub",
+          "2023-09-09"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+packages:
+    - "."
+
+# Install scripts that may run (true) or must not run (false)
+allowBuilds:
+    esbuild: true
+    pre-commit: true
+    spawn-sync: true
+    unrs-resolver: true
+    "@parcel/watcher": true
+    classic-level: false
+    edgedriver: false
+    geckodriver: false
+
+onlyBuiltDependencies:
+    - "."
+
+patchedDependencies:
+    clozecraft: patches/clozecraft.patch

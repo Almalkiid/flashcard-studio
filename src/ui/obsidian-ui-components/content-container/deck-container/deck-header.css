@@ -1,0 +1,33 @@
+/* The bar above the list of decks. */
+
+.fs-deck-list-header {
+    inline-size: 100%;
+    padding: var(--fs-space-2);
+    gap: var(--fs-space-2);
+    border-bottom: var(--fs-rule);
+    display: flex;
+    justify-content: center;
+    flex-flow: row;
+    align-items: center;
+
+    .fs-tab-view & {
+        border-top: var(--fs-rule);
+    }
+
+    .fs-title {
+        text-align: center;
+        font-size: var(--font-ui-large);
+        font-weight: var(--font-semibold);
+        line-height: var(--line-height-tight);
+    }
+
+    .fs-deck-icon {
+        display: flex;
+    }
+
+    @media (orientation: landscape) {
+        .is-phone & {
+            display: none;
+        }
+    }
+}

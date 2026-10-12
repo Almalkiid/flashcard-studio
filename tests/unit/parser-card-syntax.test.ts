@@ -1,0 +1,884 @@
+/**
+ * Tests for the M3b card syntaxes: card regions (start marker), callout cards, atomic clozes and
+ * `\cloze{}{}`, and for what the pre-existing end marker does. Backward compatibility of the default
+ * settings is covered by parser-compat-baseline.test.ts.
+ */
+import { parse, ParsedQuestionInfo, ParserOptions } from "src/cards/parse";
+import { CardType } from "src/data/data-structures/card/question";
+import { createClozeNote } from "src/math/math-cloze";
+
+const base: ParserOptions = {
+    singleLineCardSeparator: "::",
+    singleLineReversedCardSeparator: ":::",
+    multilineCardSeparator: "?",
+    multilineReversedCardSeparator: "??",
+    multilineCardEndMarker: "",
+    clozePatterns: ["==[123;;]answer[;;hint]=="],
+};
+
+function parseT(text: string, options: ParserOptions): [CardType, string, number, number][] {
+    return parse(text, options).map((item: ParsedQuestionInfo) => [
+        item.cardType,
+        item.text,
+        item.firstLineNum,
+        item.lastLineNum,
+    ]);
+}
+
+describe("multiline card end marker (what it did before M3b, and still does)", () => {
+    const endMarker: ParserOptions = { ...base, multilineCardEndMarker: "+++" };
+
+    test("blank lines in the ANSWER of a multiline card are kept", () => {
+        expect(
+            parseT("Q\n?\nAnswer 1\n\nAnswer 2\n\n| a | b |\n|---|---|\n+++", endMarker),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Q\n?\nAnswer 1\n\nAnswer 2\n\n| a | b |\n|---|---|", 0, 7],
+        ]);
+    });
+
+    test("without an end marker a blank line ends the card", () => {
+        expect(parseT("Q\n?\nAnswer 1\n\nAnswer 2", base)).toEqual([
+            [CardType.MultiLineBasic, "Q\n?\nAnswer 1", 0, 2],
+        ]);
+    });
+
+    test("a blank line in the QUESTION still restarts the card: the first paragraph is lost", () => {
+        expect(parseT("Paragraph 1\n\nParagraph 2\n?\nA\n+++", endMarker)).toEqual([
+            [CardType.MultiLineBasic, "Paragraph 2\n?\nA", 2, 4],
+        ]);
+    });
+
+    test("a cloze card runs to the end marker, blank lines included", () => {
+        expect(parseT("A ==b==\n\nmore text\n+++\nplain", endMarker)).toEqual([
+            [CardType.Cloze, "A ==b==\n\nmore text", 0, 2],
+        ]);
+    });
+
+    test("an inline card needs no end marker", () => {
+        expect(parseT("Q::A\n\nQ2::A2\n", endMarker)).toEqual([
+            [CardType.SingleLineBasic, "Q::A", 0, 0],
+            [CardType.SingleLineBasic, "Q2::A2", 2, 2],
+        ]);
+    });
+});
+
+describe("a card ends at its scheduling comment when an end marker is set", () => {
+    const endMarker: ParserOptions = { ...base, multilineCardEndMarker: "+++" };
+    const comment1 = "<!--SR:!2021-08-11,4,270-->";
+    const comment2 = "<!--SR:!2021-08-12,5,250-->";
+
+    test("two scheduled cards without markers stay two cards, each with its own schedule", () => {
+        const text = `Q1\n?\nA1\n${comment1}\n\nQ2\n?\nA2\n${comment2}\n`;
+
+        expect(parseT(text, endMarker)).toEqual([
+            [CardType.MultiLineBasic, `Q1\n?\nA1\n${comment1}`, 0, 3],
+            [CardType.MultiLineBasic, `Q2\n?\nA2\n${comment2}`, 5, 8],
+        ]);
+    });
+
+    test("scheduled cloze paragraphs stay separate", () => {
+        const text = `One ==a==\n${comment1}\n\nTwo ==b==\n${comment2}`;
+
+        expect(parseT(text, endMarker).map((c) => c[1])).toEqual([
+            `One ==a==\n${comment1}`,
+            `Two ==b==\n${comment2}`,
+        ]);
+    });
+
+    test("a comment on the same line as the last text also ends the card", () => {
+        const text = `Q1\n?\nA1 ${comment1}\n\nQ2\n?\nA2 ${comment2}`;
+
+        expect(parseT(text, endMarker).map((c) => c[1])).toEqual([
+            `Q1\n?\nA1 ${comment1}`,
+            `Q2\n?\nA2 ${comment2}`,
+        ]);
+    });
+
+    test("a comment followed by a block identifier ends the card", () => {
+        const text = `Q1\n?\nA1 ${comment1} ^abc\n\nQ2\n?\nA2`;
+
+        expect(parseT(text, endMarker).map((c) => c[1])).toEqual([
+            `Q1\n?\nA1 ${comment1} ^abc`,
+            "Q2\n?\nA2",
+        ]);
+    });
+
+    test("blank lines before the comment are still part of the answer", () => {
+        const text = `Q\n?\nA1\n\nA2\n${comment1}\n+++`;
+
+        expect(parseT(text, endMarker)).toEqual([
+            [CardType.MultiLineBasic, `Q\n?\nA1\n\nA2\n${comment1}`, 0, 5],
+        ]);
+    });
+
+    test("without an end marker nothing changes", () => {
+        const text = `Q1\n?\nA1\n${comment1}\n\nQ2\n?\nA2\n${comment2}`;
+
+        expect(parseT(text, base).map((c) => c[1])).toEqual([
+            `Q1\n?\nA1\n${comment1}`,
+            `Q2\n?\nA2\n${comment2}`,
+        ]);
+    });
+});
+
+describe("callout cards", () => {
+    const callouts: ParserOptions = {
+        ...base,
+        calloutCardTypes: ["flashcard", "question", "card"],
+    };
+
+    test("the title is the front and the body the back", () => {
+        expect(parseT("> [!question] What is X?\n> It is Y.", callouts)).toEqual([
+            [CardType.Callout, "> [!question] What is X?\n> It is Y.", 0, 1],
+        ]);
+    });
+
+    test.each(["flashcard", "question", "card", "QUESTION", "Card"])("type %s", (type) => {
+        expect(parseT(`> [!${type}] T\n> B`, callouts)).toHaveLength(1);
+    });
+
+    test("other types are not cards", () => {
+        expect(parseT("> [!note] T\n> B\n\n> [!tip] T\n> B", callouts)).toEqual([]);
+    });
+
+    test.each(["-", "+"])("a fold marker %s is allowed", (fold) => {
+        expect(parseT(`> [!question]${fold} What is X?\n> Y`, callouts)).toEqual([
+            [CardType.Callout, `> [!question]${fold} What is X?\n> Y`, 0, 1],
+        ]);
+    });
+
+    test("callouts are cards only for the configured types", () => {
+        const onlyCard: ParserOptions = { ...base, calloutCardTypes: ["card"] };
+
+        expect(parseT("> [!question] T\n> B\n\n> [!card] T2\n> B2", onlyCard)).toEqual([
+            [CardType.Callout, "> [!card] T2\n> B2", 3, 4],
+        ]);
+    });
+
+    test("an empty list, or no list, turns callout cards off", () => {
+        expect(parseT("> [!question] T\n> B", { ...base, calloutCardTypes: [] })).toEqual([]);
+        expect(parseT("> [!question] T\n> B", base)).toEqual([]);
+    });
+
+    test("type names are matched however the user typed them", () => {
+        const sloppy: ParserOptions = { ...base, calloutCardTypes: [" [!Question] ", "", "CARD"] };
+
+        expect(parseT("> [!question] T\n> B\n\n> [!card] T2\n> B2", sloppy)).toHaveLength(2);
+    });
+
+    test("the schedule comment on the line after the callout belongs to the card", () => {
+        const text = "> [!question]- T\n> B\n<!--SR:!2021-08-11,4,270-->\n\nother::card";
+
+        expect(parseT(text, callouts)).toEqual([
+            [CardType.Callout, "> [!question]- T\n> B\n<!--SR:!2021-08-11,4,270-->", 0, 2],
+            [CardType.SingleLineBasic, "other::card", 4, 4],
+        ]);
+    });
+
+    test("the body may have several lines, blank quote lines and nested callouts", () => {
+        const text =
+            "> [!question] T\n> line 1\n>\n> line 2\n> > [!note] nested\n> > inside\n\nnext ==c==";
+
+        expect(parseT(text, callouts)).toEqual([
+            [
+                CardType.Callout,
+                "> [!question] T\n> line 1\n>\n> line 2\n> > [!note] nested\n> > inside",
+                0,
+                5,
+            ],
+            [CardType.Cloze, "next ==c==", 7, 7],
+        ]);
+    });
+
+    test("a callout directly after a heading or after text is a card", () => {
+        expect(parseT("## Topic\n> [!question] T\n> B", callouts)).toEqual([
+            [CardType.Callout, "> [!question] T\n> B", 1, 2],
+        ]);
+        expect(parseT("Some prose\n> [!card] T\n> B", callouts)).toEqual([
+            [CardType.Callout, "> [!card] T\n> B", 1, 2],
+        ]);
+    });
+
+    test("a callout right after an inline card, or after another callout card, is a card", () => {
+        expect(parseT("Q::A\n> [!card] T\n> B\n\n> [!card] T2\n> B2", callouts)).toEqual([
+            [CardType.SingleLineBasic, "Q::A", 0, 0],
+            [CardType.Callout, "> [!card] T\n> B", 1, 2],
+            [CardType.Callout, "> [!card] T2\n> B2", 4, 5],
+        ]);
+    });
+
+    test("a callout without a title, or without a body, is not a card", () => {
+        expect(parseT("> [!question]\n> B", callouts)).toEqual([]);
+        expect(parseT("> [!question] T", callouts)).toEqual([]);
+        expect(parseT("> [!question] T\n>\n> ", callouts)).toEqual([]);
+    });
+
+    test("an indented callout (a list item, a code block) is not a card", () => {
+        expect(parseT("    > [!question] T\n    > B", callouts)).toEqual([]);
+        expect(parseT("- > [!question] T\n  > B", callouts)).toEqual([]);
+    });
+
+    test("a callout inside a code block is not a card", () => {
+        expect(parseT("```md\n> [!question] T\n> B\n```", callouts)).toEqual([]);
+    });
+
+    describe("other card syntax in the callout wins, as it always did", () => {
+        test("an inline separator", () => {
+            expect(parseT("> [!question] What is std::vector\n> An array", callouts)).toEqual(
+                parseT("> [!question] What is std::vector\n> An array", base),
+            );
+            expect(parseT("> [!question] What is std::vector\n> An array", callouts)).toEqual([
+                [CardType.SingleLineBasic, "> [!question] What is std::vector", 0, 0],
+            ]);
+        });
+
+        test("a cloze", () => {
+            const text = "> [!question] The capital of ==France==\n> is a city";
+
+            expect(parseT(text, callouts)).toEqual(parseT(text, base));
+            expect(parseT(text, callouts)).toEqual([[CardType.Cloze, text, 0, 1]]);
+        });
+
+        test("a cloze in the body of the callout", () => {
+            const text = "> [!card] T\n> the ==answer==";
+
+            expect(parseT(text, callouts)).toEqual([[CardType.Cloze, text, 0, 1]]);
+        });
+
+        test("a multiline separator line right under the callout", () => {
+            const text = "> [!question] T\n> B\n?\nAnswer";
+
+            expect(parseT(text, callouts)).toEqual(parseT(text, base));
+            expect(parseT(text, callouts).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+        });
+
+        test("an inline separator inside inline code does not count", () => {
+            expect(parseT("> [!question] What is `std::vector`?\n> An array", callouts)).toEqual([
+                [CardType.Callout, "> [!question] What is `std::vector`?\n> An array", 0, 1],
+            ]);
+        });
+    });
+
+    test("a callout inside a multiline card answer stays part of that card", () => {
+        const text = "Q\n?\nA\n> [!question] T\n> B";
+
+        expect(parseT(text, callouts)).toEqual(parseT(text, base));
+        expect(parseT(text, callouts)).toEqual([[CardType.MultiLineBasic, text, 0, 4]]);
+    });
+
+    test("the metadata callout after the card is not a card of its own", () => {
+        const text = "> [!question] T\n> B\n> [!sr|card-metadata] \n>  <!--SR:!2021-08-11,4,270-->";
+
+        // (trailing spaces are removed line by line, as for every multiline card)
+        expect(parseT(text, callouts)).toEqual([
+            [CardType.Callout, text.replace("metadata] ", "metadata]"), 0, 3],
+        ]);
+    });
+
+    test("trailing spaces are removed from the card text, as for other multiline cards", () => {
+        expect(parseT("> [!question] T  \n> B   \n\nnext::card", callouts)[0]).toEqual([
+            CardType.Callout,
+            "> [!question] T\n> B",
+            0,
+            1,
+        ]);
+    });
+
+    test("with Windows line endings", () => {
+        expect(parseT("> [!question] T\r\n> B\r\n", callouts)).toEqual([
+            [CardType.Callout, "> [!question] T\n> B", 0, 1],
+        ]);
+    });
+
+    test("html comments around a callout are skipped", () => {
+        expect(parseT("<!-- x -->\n> [!question] T\n> B", callouts)).toEqual([
+            [CardType.Callout, "> [!question] T\n> B", 1, 2],
+        ]);
+    });
+});
+
+describe("atomic clozes", () => {
+    const atomic: ParserOptions = { ...base, atomicClozes: true };
+
+    test("off (the default): the whole paragraph is the card", () => {
+        expect(parseT("intro line\nthe ==cloze== here\nmore text", base)).toEqual([
+            [CardType.Cloze, "intro line\nthe ==cloze== here\nmore text", 0, 2],
+        ]);
+    });
+
+    test("on: only the line with the cloze is the card", () => {
+        expect(parseT("intro line\nthe ==cloze== here\nmore text", atomic)).toEqual([
+            [CardType.Cloze, "the ==cloze== here", 1, 1],
+        ]);
+    });
+
+    test("each line with a cloze is a card of its own", () => {
+        expect(parseT("a ==1==\nplain\nb ==2== ==3==\n\nc ==4==", atomic)).toEqual([
+            [CardType.Cloze, "a ==1==", 0, 0],
+            [CardType.Cloze, "b ==2== ==3==", 2, 2],
+            [CardType.Cloze, "c ==4==", 4, 4],
+        ]);
+    });
+
+    test("a schedule comment under the line belongs to that line's card", () => {
+        const comment1 = "<!--SR:!2021-08-11,4,270-->";
+        const comment2 = "<!--SR:!2021-08-12,5,250!2021-08-13,6,260-->";
+
+        expect(parseT(`a ==1==\n${comment1}\nb ==2== ==3==\n${comment2}\nc ==4==`, atomic)).toEqual(
+            [
+                [CardType.Cloze, `a ==1==\n${comment1}`, 0, 1],
+                [CardType.Cloze, `b ==2== ==3==\n${comment2}`, 2, 3],
+                [CardType.Cloze, "c ==4==", 4, 4],
+            ],
+        );
+    });
+
+    test("a comment on the same line stays on that line", () => {
+        const scheduleComment = "<!--SR:!2021-08-11,4,270-->";
+
+        expect(parseT(`a ==1== ${scheduleComment}\nb ==2==`, atomic)).toEqual([
+            [CardType.Cloze, `a ==1== ${scheduleComment}`, 0, 0],
+            [CardType.Cloze, "b ==2==", 1, 1],
+        ]);
+    });
+
+    test("the metadata callout under the line belongs to it", () => {
+        const text = "a ==1==\n> [!sr|card-metadata] \n>  <!--SR:!2021-08-11,4,270-->\nb ==2==";
+
+        expect(parseT(text, atomic)).toEqual([
+            [
+                CardType.Cloze,
+                "a ==1==\n> [!sr|card-metadata] \n>  <!--SR:!2021-08-11,4,270-->",
+                0,
+                2,
+            ],
+            [CardType.Cloze, "b ==2==", 3, 3],
+        ]);
+    });
+
+    describe("a paragraph that already has one shared schedule stays one card", () => {
+        test("the comment of two clozes on two lines", () => {
+            const text = "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->";
+
+            expect(parseT(text, atomic)).toEqual(parseT(text, base));
+            expect(parseT(text, atomic)).toEqual([[CardType.Cloze, text, 0, 2]]);
+        });
+
+        test("the comment is not under a cloze line", () => {
+            const text = "L ==a==\nplain\n<!--SR:!2021-08-11,4,270-->";
+
+            expect(parseT(text, atomic)).toEqual([[CardType.Cloze, text, 0, 2]]);
+        });
+
+        test("a comment with more entries than the line above has cards", () => {
+            const text = "intro\nL ==a==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->";
+
+            expect(parseT(text, atomic)).toEqual([[CardType.Cloze, text, 0, 2]]);
+        });
+
+        test("a comment with as many entries as the line has cards is that line's", () => {
+            const text = "intro\nL ==a== ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->";
+
+            expect(parseT(text, atomic)).toEqual([
+                [
+                    CardType.Cloze,
+                    "L ==a== ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->",
+                    1,
+                    2,
+                ],
+            ]);
+        });
+
+        test("a following paragraph is judged on its own", () => {
+            const legacy = "L1 ==a==\nL2 ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->";
+
+            expect(parseT(`${legacy}\n\nnew ==c==\nnew ==d==`, atomic)).toEqual([
+                [CardType.Cloze, legacy, 0, 2],
+                [CardType.Cloze, "new ==c==", 4, 4],
+                [CardType.Cloze, "new ==d==", 5, 5],
+            ]);
+        });
+    });
+
+    test("a cloze in the question of a multiline card is not split off", () => {
+        const text = "Q with ==a== cloze\nmore question\n?\nAnswer";
+
+        expect(parseT(text, atomic)).toEqual(parseT(text, base));
+        expect(parseT(text, atomic).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+    });
+
+    test("a cloze in the answer of a multiline card stays in that card", () => {
+        const text = "Q\n?\nAnswer with ==a==\nand more";
+
+        expect(parseT(text, atomic)).toEqual([[CardType.MultiLineBasic, text, 0, 3]]);
+    });
+
+    test("inline cards and other paragraphs are as before", () => {
+        expect(parseT("Q::A\n\nplain\n\nQ2:::A2", atomic)).toEqual(
+            parseT("Q::A\n\nplain\n\nQ2:::A2", base),
+        );
+    });
+
+    test("a cloze in a code block is not a card", () => {
+        expect(parseT("```\n==x==\n```", atomic)).toEqual([]);
+    });
+
+    test("with an end marker, a cloze card is still only its line", () => {
+        expect(
+            parseT("intro\nthe ==cloze==\n\nother\n+++", {
+                ...atomic,
+                multilineCardEndMarker: "+++",
+            }),
+        ).toEqual([[CardType.Cloze, "the ==cloze==", 1, 1]]);
+    });
+
+    test("a start marker turns atomic clozes off: the region is the card", () => {
+        expect(
+            parseT("+++\nintro\n\nthe ==cloze==\n+++", {
+                ...atomic,
+                multilineCardStartMarker: "+++",
+                multilineCardEndMarker: "+++",
+            }),
+        ).toEqual([[CardType.Cloze, "intro\n\nthe ==cloze==", 1, 3]]);
+    });
+});
+
+describe("latex clozes (\\cloze{answer}{hint})", () => {
+    const latex: ParserOptions = { ...base, latexClozes: true };
+
+    test("a line with a macro is a cloze card", () => {
+        expect(parseT("$$\n\\cloze{c^2}{} = \\cloze{a^2 + b^2}{Pythagoras}\n$$", latex)).toEqual([
+            [CardType.Cloze, "$$\n\\cloze{c^2}{} = \\cloze{a^2 + b^2}{Pythagoras}\n$$", 0, 2],
+        ]);
+    });
+
+    test("off (the default): a macro is not a cloze", () => {
+        expect(parseT("$x = \\cloze{a}{b}$", base)).toEqual([]);
+        expect(parseT("$x = \\cloze{a}{b}$", { ...base, latexClozes: false })).toEqual([]);
+    });
+
+    test("a macro without arguments is not a cloze, nor is a longer command name", () => {
+        expect(parseT("$\\cloze x$ and \\clozes{a}{b}", latex)).toEqual([]);
+    });
+
+    test("the hint and a sequence number are optional", () => {
+        expect(parseT("$\\cloze{a}$", latex)).toEqual([[CardType.Cloze, "$\\cloze{a}$", 0, 0]]);
+        expect(parseT("$\\cloze[2]{a}$", latex)).toEqual([
+            [CardType.Cloze, "$\\cloze[2]{a}$", 0, 0],
+        ]);
+    });
+
+    test("a paragraph with a macro and a highlight is one card", () => {
+        expect(parseT("$\\cloze{a}{}$ and ==b==", latex)).toEqual([
+            [CardType.Cloze, "$\\cloze{a}{}$ and ==b==", 0, 0],
+        ]);
+    });
+
+    test("atomic clozes count a macro as a cloze", () => {
+        expect(parseT("intro\n$\\cloze{a}{}$\nplain", { ...latex, atomicClozes: true })).toEqual([
+            [CardType.Cloze, "$\\cloze{a}{}$", 1, 1],
+        ]);
+    });
+});
+
+describe("atomic clozes and display math ($$ ... $$ is not cut in two)", () => {
+    const atomic: ParserOptions = { ...base, atomicClozes: true, latexClozes: true };
+    const scheduleComment = "<!--SR:!2021-08-11,4,270-->";
+
+    test("a macro in a block makes the whole block the card", () => {
+        expect(parseT("intro\n$$\n\\cloze{a}{} + \\cloze{b}{} = c\n$$\nafter", atomic)).toEqual([
+            [CardType.Cloze, "$$\n\\cloze{a}{} + \\cloze{b}{} = c\n$$", 1, 3],
+        ]);
+    });
+
+    test("a block with the macros on several lines is one card", () => {
+        const block = "$$\n\\cloze{a}{} +\n\\cloze{b}{} = c\n$$";
+
+        expect(parseT(`${block}\nplain`, atomic)).toEqual([[CardType.Cloze, block, 0, 3]]);
+    });
+
+    test("a highlight inside a block is not a cloze: inside math, only \\cloze is", () => {
+        expect(parseT("$$\nx = ==a==\n$$", atomic)).toEqual([]);
+    });
+
+    test("display math on one line is just that line", () => {
+        expect(parseT("intro\n$$ \\cloze{a}{} = b $$\nplain", atomic)).toEqual([
+            [CardType.Cloze, "$$ \\cloze{a}{} = b $$", 1, 1],
+        ]);
+    });
+
+    test("a cloze on the line that closes the block", () => {
+        expect(parseT("$$\nx =\n\\cloze{a}{} $$\nplain", atomic)).toEqual([
+            [CardType.Cloze, "$$\nx =\n\\cloze{a}{} $$", 0, 2],
+        ]);
+    });
+
+    test("a cloze on the line that opens the block", () => {
+        expect(parseT("$$ x =\n\\cloze{a}{} $$", atomic)).toEqual([
+            [CardType.Cloze, "$$ x =\n\\cloze{a}{} $$", 0, 1],
+        ]);
+    });
+
+    test("two blocks and a line in one paragraph are three cards", () => {
+        expect(
+            parseT("$$\n\\cloze{a}{}\n$$\n$$\n\\cloze{b}{}\n$$\ntext ==c==", atomic).map(
+                (c) => c[1],
+            ),
+        ).toEqual(["$$\n\\cloze{a}{}\n$$", "$$\n\\cloze{b}{}\n$$", "text ==c=="]);
+    });
+
+    test("the schedule under the block is part of the card", () => {
+        expect(parseT(`$$\n\\cloze{a}{}\n$$\n${scheduleComment}\nplain ==b==`, atomic)).toEqual([
+            [CardType.Cloze, `$$\n\\cloze{a}{}\n$$\n${scheduleComment}`, 0, 3],
+            [CardType.Cloze, "plain ==b==", 4, 4],
+        ]);
+    });
+
+    test("a schedule for the whole paragraph keeps the paragraph whole", () => {
+        // Two cards (the macro, and the highlight), so two entries: the comment of the whole paragraph
+        const text =
+            "$$\n\\cloze{a}{}\n$$\ntext ==b==\n<!--SR:!2021-08-11,4,270!2021-08-12,5,250-->";
+
+        expect(parseT(text, atomic)).toEqual([[CardType.Cloze, text, 0, 4]]);
+    });
+
+    test("a block that is never closed leaves the paragraph as it was", () => {
+        expect(parseT("intro\n$$\n==a== x", atomic)).toEqual([
+            [CardType.Cloze, "intro\n$$\n==a== x", 0, 2],
+        ]);
+    });
+
+    test("a marker ends the paragraph: a $$ before an end marker does not reach past it", () => {
+        // (A block that is never closed above the marker, and a $$ below it, are not one block)
+        expect(
+            parseT("$$\n> body ==c==\n---\nQuestion\n- list ==item==\n$$", {
+                ...atomic,
+                multilineCardEndMarker: "---",
+            }),
+        ).toEqual([
+            [CardType.Cloze, "$$\n> body ==c==", 0, 1],
+            [CardType.Cloze, "- list ==item==", 4, 4],
+        ]);
+    });
+
+    test("an escaped dollar sign is not a delimiter", () => {
+        expect(parseT("cost \\$$ and ==a==\nnext ==b==", atomic).map((c) => c[1])).toEqual([
+            "cost \\$$ and ==a==",
+            "next ==b==",
+        ]);
+    });
+});
+
+describe("image occlusion blocks", () => {
+    const block = "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+    test("a block is one card, with the schedule comment after it", () => {
+        expect(parseT(block + "\n<!--SR:!fsrs,x-->", base)).toEqual([
+            [CardType.ImageOcclusion, block + "\n<!--SR:!fsrs,x-->", 0, 4],
+        ]);
+    });
+    test("cards before and after a block are kept", () => {
+        const text = "Q1::A1\n\n" + block + "\n\nQ2::A2";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([
+            CardType.SingleLineBasic,
+            CardType.ImageOcclusion,
+            CardType.SingleLineBasic,
+        ]);
+    });
+    test("an unclosed block does not swallow the rest of the note", () => {
+        const text = "```image-occlusion\nimage: [[h.png]]\n\nQ::A";
+        expect(parseT(text, base).map((c) => c[0])).toContain(CardType.SingleLineBasic);
+    });
+    test("other code blocks are unchanged", () => {
+        expect(parseT("```js\nconst a = 1;\n```", base)).toEqual([]);
+    });
+    test("the schedule may sit in the metadata callout after the block", () => {
+        const callout = "> [!sr|card-metadata] \n>  <!--SR:!fsrs,x-->";
+        expect(parseT(block + "\n" + callout, base)).toEqual([
+            [CardType.ImageOcclusion, block + "\n" + callout, 0, 5],
+        ]);
+    });
+    test("a block right under a paragraph still starts its own card", () => {
+        expect(parseT("Some intro text\n" + block, base)).toEqual([
+            [CardType.ImageOcclusion, block, 1, 4],
+        ]);
+    });
+    test("a block inside another card's answer stays part of that card", () => {
+        const text = "Q\n?\nA\n" + block;
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+    });
+    test("a block inside a card region is left to the region", () => {
+        const region: ParserOptions = {
+            ...base,
+            multilineCardStartMarker: "<<<",
+            multilineCardEndMarker: ">>>",
+        };
+        expect(parseT("<<<\n" + block + "\n>>>", region).map((c) => c[0])).not.toContain(
+            CardType.ImageOcclusion,
+        );
+    });
+    test("a fence longer than three characters, and a tilde fence, close on their own kind", () => {
+        const long =
+            "````image-occlusion\nimage: h.png\nmask: a rect 0 0 .5 .5 | A\n```\nmore\n````";
+        expect(parseT(long, base)).toEqual([[CardType.ImageOcclusion, long, 0, 5]]);
+        const tilde = "~~~image-occlusion\nimage: h.png\nmask: a rect 0 0 .5 .5 | A\n~~~";
+        expect(parseT(tilde, base)).toEqual([[CardType.ImageOcclusion, tilde, 0, 3]]);
+    });
+    test("a closed block that is not valid is not a card, and its schedule comment is left as text", () => {
+        for (const bad of [
+            "```image-occlusion\nnothing useful\n```",
+            "```image-occlusion\nmask: a rect 0 0 .5 .5 | A\n```", // no image
+            "```image-occlusion\nimage: [[h.png]]\nmask: a rect zero 0 .5 .5 | A\n```", // no valid mask
+        ]) {
+            expect(parseT(bad, base)).toEqual([]);
+            expect(parseT(bad + "\n<!--SR:!fsrs,x-->", base)).toEqual([]);
+            expect(
+                parseT("Q1::A1\n\n" + bad + "\n<!--SR:!fsrs,x-->\n\nQ2::A2", base).map((c) => c[0]),
+            ).toEqual([CardType.SingleLineBasic, CardType.SingleLineBasic]);
+        }
+    });
+    test("an open fence pairs with the next bare fence, as Obsidian shows it: it is all code", () => {
+        const text =
+            "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n\nQ::A\n\n```js\nx\n```";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.ImageOcclusion]);
+    });
+    test("a block directly under a question line is part of that card", () => {
+        const text =
+            "Q\n?\nA\n" + "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+        expect(parseT(text, base).map((c) => c[0])).toEqual([CardType.MultiLineBasic]);
+        const cloze =
+            "A ==cloze== line\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\n```";
+        expect(parseT(cloze, base).map((c) => c[0])).toEqual([CardType.Cloze]);
+    });
+});
+
+describe("card regions: a start marker opens one, the end marker closes it", () => {
+    const regions: ParserOptions = {
+        ...base,
+        multilineCardStartMarker: "<<<",
+        multilineCardEndMarker: ">>>",
+    };
+
+    test("the text between the markers is the card; text outside is ignored", () => {
+        expect(
+            parseT(
+                "Notes on rivers\n<<<\nLongest river in Europe?\n?\nVolga\n>>>\nclosing",
+                regions,
+            ),
+        ).toEqual([[CardType.MultiLineBasic, "Longest river in Europe?\n?\nVolga", 2, 4]]);
+    });
+
+    test("outside a region a multi-line card is not recognised, inline and cloze cards still follow their own rules", () => {
+        expect(parseT("Question\n?\nAnswer\n>>>\ntail", regions)).toEqual([]);
+        expect(
+            parseT("Oxygen :: O\n<<<\nSymbol for gold?\n?\nAu\n>>>\nIron ::: Fe", regions),
+        ).toEqual([
+            [CardType.SingleLineBasic, "Oxygen :: O", 0, 0],
+            [CardType.MultiLineBasic, "Symbol for gold?\n?\nAu", 2, 4],
+            [CardType.SingleLineReversed, "Iron ::: Fe", 6, 6],
+        ]);
+    });
+
+    test("a second start marker inside a region ends the first card and opens the next", () => {
+        expect(
+            parseT("<<<\nBass clef?\n?\nF clef\n<<<\nTreble clef?\n??\nG clef\n>>>", regions),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Bass clef?\n?\nF clef", 1, 3],
+            [CardType.MultiLineReversed, "Treble clef?\n??\nG clef", 5, 7],
+        ]);
+    });
+
+    test("a missing end marker lets the region run to the end of the text, blank lines included", () => {
+        expect(
+            parseT("<<<\nCapital of Peru?\n?\nLima\n\nalso called the City of Kings", regions),
+        ).toEqual([
+            [
+                CardType.MultiLineBasic,
+                "Capital of Peru?\n?\nLima\n\nalso called the City of Kings",
+                1,
+                5,
+            ],
+        ]);
+    });
+
+    test("an end marker with no open region is swallowed", () => {
+        expect(parseT(">>>\n<<<\nPrime after 7?\n?\n11\n>>>\n>>>", regions)).toEqual([
+            [CardType.MultiLineBasic, "Prime after 7?\n?\n11", 2, 4],
+        ]);
+    });
+
+    test("only a start marker configured: the region lasts until the next start marker or the end of the text", () => {
+        const startOnly: ParserOptions = { ...base, multilineCardStartMarker: "<<<" };
+        expect(parseT("<<<\nQ1\n?\nA1\n\nQ2\n?\nA2", startOnly)).toEqual([
+            [CardType.MultiLineBasic, "Q1\n?\nA1\n\nQ2\n?\nA2", 1, 7],
+        ]);
+    });
+
+    test("one marker used for both ends toggles, so what sits between two regions is ignored", () => {
+        const same: ParserOptions = {
+            ...base,
+            multilineCardStartMarker: "***",
+            multilineCardEndMarker: "***",
+        };
+        expect(
+            parseT(
+                "***\nBoiling point of water?\n?\n100 C\n***\nstray\n***\nFreezing point?\n?\n0 C\n***",
+                same,
+            ),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Boiling point of water?\n?\n100 C", 1, 3],
+            [CardType.MultiLineBasic, "Freezing point?\n?\n0 C", 7, 9],
+        ]);
+    });
+
+    test("markers are compared after trimming the line, and may be HTML comments", () => {
+        expect(parseT("   <<<   \nHighest peak?\n?\nEverest\n\t>>>", regions)).toEqual([
+            [CardType.MultiLineBasic, "Highest peak?\n?\nEverest", 1, 3],
+        ]);
+        const comments: ParserOptions = {
+            ...base,
+            multilineCardStartMarker: "<!--begin-->",
+            multilineCardEndMarker: "<!--finish-->",
+        };
+        expect(parseT("<!--begin-->\nSmallest prime?\n?\n2\n<!--finish-->", comments)).toEqual([
+            [CardType.MultiLineBasic, "Smallest prime?\n?\n2", 1, 3],
+        ]);
+    });
+
+    test("inside a region: blank lines in the front and back are kept, leading and trailing ones are not", () => {
+        expect(parseT("<<<\n\n\nStep one\n\nstep two\n?\nDone\n\n>>>", regions)).toEqual([
+            [CardType.MultiLineBasic, "Step one\n\nstep two\n?\nDone", 3, 8],
+        ]);
+    });
+
+    test("separators inside a region: the first ? or ?? line decides, a later one retypes the whole text", () => {
+        expect(parseT("<<<\nTerm\nover two lines\n?\nMeaning ? kept\n>>>", regions)).toEqual([
+            [CardType.MultiLineBasic, "Term\nover two lines\n?\nMeaning ? kept", 1, 4],
+        ]);
+        expect(parseT("<<<\nTerm\n?\nBack part\n??\nlast part\n>>>", regions)).toEqual([
+            [CardType.MultiLineReversed, "Term\n?\nBack part\n??\nlast part", 1, 5],
+        ]);
+        expect(parseT("<<<\nPlain text only\n>>>", regions)).toEqual([]);
+    });
+
+    test("a code fence containing a separator-like line stays inside the card", () => {
+        expect(parseT("<<<\nWhat prints?\n```py\nprint(1)\n```\n?\nOne\n>>>", regions)).toEqual([
+            [CardType.MultiLineBasic, "What prints?\n```py\nprint(1)\n```\n?\nOne", 1, 6],
+        ]);
+    });
+
+    test("a region holding a cloze paragraph is one cloze card, even over a blank line", () => {
+        expect(
+            parseT("<<<\nThe ==heart== pumps blood.\n\nThe ==liver== filters it.\n>>>", regions),
+        ).toEqual([
+            [CardType.Cloze, "The ==heart== pumps blood.\n\nThe ==liver== filters it.", 1, 3],
+        ]);
+    });
+
+    test("with a start marker set, atomic clozes do not split the region", () => {
+        expect(
+            parseT("<<<\nA ==one==\nB ==two==\n>>>", { ...regions, atomicClozes: true }),
+        ).toEqual([[CardType.Cloze, "A ==one==\nB ==two==", 1, 2]]);
+    });
+
+    test("the scheduling comment under the card belongs to it", () => {
+        expect(
+            parseT("<<<\nMoon of Earth?\n?\nLuna\n<!--SR:!2021-08-11,4,270-->\n>>>", regions),
+        ).toEqual([
+            [CardType.MultiLineBasic, "Moon of Earth?\n?\nLuna\n<!--SR:!2021-08-11,4,270-->", 1, 4],
+        ]);
+    });
+
+    test("a callout outside a region still works, one inside a region is not read as a callout card", () => {
+        const withCallouts = { ...regions, calloutCardTypes: ["question"] } as ParserOptions;
+        expect(
+            parseT(
+                "> [!question] Smallest ocean?\n> Arctic\n<<<\n> [!question] Deepest ocean?\n> Pacific\n>>>",
+                withCallouts,
+            ),
+        ).toEqual([[CardType.Callout, "> [!question] Smallest ocean?\n> Arctic", 0, 1]]);
+    });
+});
+
+describe("latex clozes: braces inside math belong to LaTeX", () => {
+    const braces: ParserOptions = {
+        ...base,
+        clozePatterns: ["==[123;;]answer[;;hint]==", "{{[123;;]answer[;;hint]}}"],
+        latexClozes: true,
+    };
+    const plain = {
+        asking: (answer: string, hint: string) => `[ASK ${answer}|${hint}]`,
+        showingAnswer: (answer: string) => `[ANS ${answer}]`,
+        hiding: () => "[HID]",
+    };
+    /** Front and back of every card, with the math put back as written. */
+    const sides = (text: string, latexClozes = true) => {
+        const made = createClozeNote(text, braces.clozePatterns, latexClozes, plain);
+        if (made.note === null) return null;
+        return Array.from({ length: made.note.numCards }, (_unused, card) => [
+            made.render(made.note.getCardFront(card, made.formatter)),
+            made.render(made.note.getCardBack(card, made.formatter)),
+        ]);
+    };
+
+    test("{{ }} inside a formula is not a cloze, a {{ }} outside it still is", () => {
+        expect(parseT("$e^{{x}} + \\frac{{a}}{b}$", braces)).toEqual([]);
+        expect(parseT("$\\frac{a}{b}$ is a ratio, {{kept}}", braces)).toEqual([
+            [CardType.Cloze, "$\\frac{a}{b}$ is a ratio, {{kept}}", 0, 0],
+        ]);
+    });
+
+    test("with the setting off the same text is a cloze card", () => {
+        expect(parseT("$e^{{x}}$", { ...braces, latexClozes: false })).toEqual([
+            [CardType.Cloze, "$e^{{x}}$", 0, 0],
+        ]);
+    });
+
+    test("\\left\\{ and \\right\\} in a formula are neither clozes nor macros", () => {
+        expect(parseT("$A = \\left\\{ 1, 2 \\right\\}$", braces)).toEqual([]);
+        expect(sides("$A = \\left\\{ 1, 2 \\right\\}$")).toBeNull();
+    });
+
+    test("a macro whose answer holds \\frac{a}{b} is one cloze, answer kept whole", () => {
+        expect(parseT("$v = \\cloze{\\frac{d}{t}}{speed}$", braces)).toEqual([
+            [CardType.Cloze, "$v = \\cloze{\\frac{d}{t}}{speed}$", 0, 0],
+        ]);
+        expect(sides("$v = \\cloze{\\frac{d}{t}}{speed}$")).toEqual([
+            ["$v = {\\color{#2196f3}{[\\text{speed}]}}$", "$v = {\\color{#2196f3}{\\frac{d}{t}}}$"],
+        ]);
+    });
+
+    test("an escaped brace in the answer does not end it; a real inner pair is kept", () => {
+        expect(sides("$\\cloze{\\{p,q\\}}{}$")).toEqual([
+            ["${\\color{#2196f3}{[\\ldots]}}$", "${\\color{#2196f3}{\\{p,q\\}}}$"],
+        ]);
+        expect(sides("\\cloze{x{y}z}{note} outside math")).toEqual([
+            ["[ASK x{y}z|note] outside math", "[ANS x{y}z] outside math"],
+        ]);
+    });
+
+    test("a macro with an unclosed answer is left alone and makes no card", () => {
+        expect(sides("\\cloze{open{brace}{hint}")).toBeNull();
+    });
+
+    test("braces and \\left\\{ elsewhere in the same formula stay as written; text clozes get the first cards", () => {
+        expect(sides("$T = \\left\\{ t \\right\\} \\cloze{s}{}$ after {{w}}")).toEqual([
+            [
+                "$T = \\left\\{ t \\right\\} s$ after [ASK w|undefined]",
+                "$T = \\left\\{ t \\right\\} s$ after [ANS w]",
+            ],
+            [
+                "$T = \\left\\{ t \\right\\} {\\color{#2196f3}{[\\ldots]}}$ after w",
+                "$T = \\left\\{ t \\right\\} {\\color{#2196f3}{s}}$ after w",
+            ],
+        ]);
+    });
+
+    test("display math: macros inside count, {{ }} inside the block does not, the card spans the block", () => {
+        expect(
+            parseT("$$\n\\cloze{\\frac{1}{2}}{} + \\frac{{1}}{3}\n$$\n\nbare {{x}}", braces),
+        ).toEqual([
+            [CardType.Cloze, "$$\n\\cloze{\\frac{1}{2}}{} + \\frac{{1}}{3}\n$$", 0, 2],
+            [CardType.Cloze, "bare {{x}}", 4, 4],
+        ]);
+    });
+});

@@ -1,0 +1,78 @@
+/* MARK: Anki import and export modals */
+
+.fs-anki-modal {
+    /* Visually hidden rather than display: none, which some mobile browsers do not open the file picker from */
+    .fs-anki-hidden-input {
+        pointer-events: none;
+        overflow: hidden;
+        opacity: 0;
+        position: absolute;
+        height: 1px;
+        width: 1px;
+    }
+
+    .fs-anki-file-name {
+        margin-top: var(--size-2-1);
+        color: var(--text-normal);
+        overflow-wrap: anywhere;
+        display: block;
+    }
+
+    .setting-item-control select {
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .fs-anki-status {
+        margin: var(--fs-space-2) 0;
+        color: var(--fs-ink-muted);
+        min-height: 1.5em;
+
+        &.fs-anki-error {
+            color: var(--fs-ink-error);
+        }
+    }
+
+    .fs-anki-result-headline {
+        font-weight: var(--font-semibold);
+        overflow-wrap: anywhere;
+    }
+
+    .fs-anki-result-details {
+        padding-left: calc(5 * var(--fs-space-1));
+        margin: var(--fs-space-2) 0;
+        color: var(--fs-ink-muted);
+
+        li {
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .fs-anki-intro {
+        font-size: var(--font-ui-small);
+        color: var(--fs-ink-muted);
+        margin-block: 0 var(--fs-space-2);
+        margin-inline: 0;
+    }
+
+    /* Stays at the bottom of the visible dialog, so that on a phone the buttons are not below a scroll */
+    .fs-anki-buttons {
+        background: var(--modal-background, var(--background-primary));
+        padding-block: var(--fs-space-2);
+        padding-inline: 0;
+        margin-top: var(--fs-space-3);
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        position: sticky;
+        gap: var(--fs-space-2);
+        display: flex;
+        bottom: 0;
+    }
+}
+
+.is-phone .fs-anki-modal .setting-item-control {
+    select,
+    input[type="text"] {
+        max-width: 72vw;
+    }
+}

@@ -1,0 +1,12 @@
+/* MARK: Text prompt dialog */
+
+.fs-text-prompt-input {
+    width: 100%;
+}
+
+.fs-text-prompt-error {
+    margin-top: var(--fs-space-1);
+    min-height: 1.5em;
+    font-size: var(--font-ui-smaller);
+    color: var(--fs-ink-error);
+}

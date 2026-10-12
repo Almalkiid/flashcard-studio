@@ -1,0 +1,52 @@
+/* The Classic look's deck badges. The Studio look hides the whole section. */
+
+.fs-info-section {
+    white-space: nowrap;
+    color: var(--fs-ink-muted);
+    font-weight: bold;
+    gap: var(--fs-space-2);
+    flex-flow: row;
+    display: flex;
+}
+
+.fs-deck-info {
+    gap: var(--fs-space-3);
+    color: #fff;
+    padding-block: 0;
+    border-radius: var(--input-radius);
+    justify-content: center;
+    padding-inline: var(--fs-space-2);
+    align-items: center;
+    display: flex;
+    flex-flow: row;
+
+    .fs-divider {
+        --fs-divider-color: #fff;
+    }
+}
+
+.fs-counter-wrapper {
+    gap: var(--fs-space-1);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.fs-deck-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: var(--fs-deck-name-width, 20ch);
+}
+
+.fs-counter-icon,
+.fs-deck-pointer {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    svg {
+        stroke-width: 2.5px;
+        height: 16px;
+        width: 16px;
+    }
+}

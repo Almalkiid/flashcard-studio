@@ -1,0 +1,742 @@
+{
+  "clock": "2023-09-06T12:00 local (only schedules/intervals read here)",
+  "cases": [
+    {
+      "id": "no-tag-no-folder",
+      "note": "question syntax but no flashcard tag: nothing is read",
+      "text": "Q1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": []
+    },
+    {
+      "id": "other-tag-only",
+      "note": "a tag that is not a flashcard tag",
+      "text": "#other\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": []
+    },
+    {
+      "id": "tag-line0-two-questions",
+      "note": "",
+      "text": "#flashcards\nQ1::A1\nQ2::A2\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 2,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tag-subtag-before-each",
+      "note": "last note-level tag before the question wins",
+      "text": "#flashcards/a\nQ1::A1\n#flashcards/b\nQ2::A2\nQ3::A3\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/a",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 3,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/b",
+            "lineNum": 2
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 4,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/b",
+            "lineNum": 2
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q3",
+              "back": "A3",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tag-after-first-question",
+      "note": "no tag before Q1: falls back to the first flashcard tag of the file",
+      "text": "Q1::A1\n#flashcards/late\nQ2::A2\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 0,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/late",
+            "lineNum": 1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 2,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/late",
+            "lineNum": 1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "question-tag-same-line",
+      "note": "tag on the question's own line is question-specific and wins for that question",
+      "text": "#flashcards/note\n#flashcards/q Q1::A1\nQ2::A2\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/q",
+            "lineNum": 1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 2,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/note",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "question-tag-only-tag-in-file",
+      "note": "the only flashcard tag is question-specific: Q2 has no earlier tag, backward-compat rule uses the first tag in the file",
+      "text": "#flashcards/q Q1::A1\nQ2::A2\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 0,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/q",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/q",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two-tags-one-line",
+      "note": "two note-level tags on one line form one topic path list (card goes into both decks)",
+      "text": "#flashcards/a #flashcards/b\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/a|#flashcards/b",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tags-on-two-lines-before-q",
+      "note": "tags on separate lines are separate lists: only the last list before the question counts",
+      "text": "#flashcards/a\n#flashcards/b\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 2,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/b",
+            "lineNum": 1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontmatter-tags",
+      "note": "frontmatter tags group together even on different lines; later content tag overrides after its line",
+      "text": "---\ntags:\n  - flashcards/fm1\n  - flashcards/fm2\n---\nQ1::A1\n#flashcards/c1\nQ2::A2\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 5,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/fm1|#flashcards/fm2",
+            "lineNum": -1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 7,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/c1",
+            "lineNum": 6
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontmatter-then-question-on-first-body-line",
+      "note": "question on the line right after the closing fence",
+      "text": "---\ntags:\n  - flashcards/fm\n---\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 4,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/fm",
+            "lineNum": -1
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ignored-flashcard-tag-list",
+      "note": "a non-flashcard tag mixed with a flashcard tag",
+      "text": "#todo #flashcards/x\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards/x",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "convert-folders-note-has-no-tags",
+      "note": "convertFoldersToDecks on, folder a/b, note without tags",
+      "text": "Q1::A1\nQ2::A2\n",
+      "settingsOverrides": {
+        "convertFoldersToDecks": true
+      },
+      "folderTopicPath": [
+        "a",
+        "b"
+      ],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 0,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#a/b",
+            "lineNum": null
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#a/b",
+            "lineNum": null
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "convert-folders-ignores-note-tags",
+      "note": "the folder path replaces every tag, question-specific ones too",
+      "text": "#flashcards/x\n#flashcards/y Q1::A1\nQ2::A2\n",
+      "settingsOverrides": {
+        "convertFoldersToDecks": true
+      },
+      "folderTopicPath": [
+        "a",
+        "b"
+      ],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#a/b",
+            "lineNum": null
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        },
+        {
+          "firstLine": 2,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#a/b",
+            "lineNum": null
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q2",
+              "back": "A2",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "convert-folders-note-in-vault-root",
+      "note": "note in the vault root: empty folder path, no flashcard tag: gate fails, nothing read",
+      "text": "Q1::A1\n",
+      "settingsOverrides": {
+        "convertFoldersToDecks": true
+      },
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": []
+    },
+    {
+      "id": "gate-by-folder-but-tags-mode",
+      "note": "folder path given but convertFoldersToDecks off, note without a flashcard tag: gate passes on the folder, no topic found",
+      "text": "Q1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [
+        "a"
+      ],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": []
+    },
+    {
+      "id": "gate-by-folder-but-tags-mode-keep-false",
+      "note": "same with onlyKeepQuestionsWithTopicPath=false: question kept with a null topic path list",
+      "text": "Q1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [
+        "a"
+      ],
+      "onlyKeepQuestionsWithTopicPath": false,
+      "questions": [
+        {
+          "firstLine": 0,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": null,
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schedule-comment-one-card",
+      "note": "schedule comment read from the question",
+      "text": "#flashcards\nQ1::A1\n<!--SR:!2023-09-02,4,270-->\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": "!2023-09-02,4,270"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "schedule-comment-too-many",
+      "note": "more schedules than cards: question.hasChanged, extras dropped",
+      "text": "#flashcards\nQ1::A1\n<!--SR:!2023-09-02,4,270!2023-09-03,5,250-->\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": true,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": "!2023-09-02,4,270"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reversed-two-cards-one-schedule",
+      "note": "a reversed card has two cards; one schedule: second card has none",
+      "text": "#flashcards\nQ1:::A1\n<!--SR:!2023-09-02,4,270-->\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 1,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": "!2023-09-02,4,270"
+            },
+            {
+              "idx": 1,
+              "front": "A1",
+              "back": "Q1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "multiline",
+      "note": "multi-line card",
+      "text": "#flashcards\nLine one\nLine two\n?\nAnswer\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 0,
+          "type": 2,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 1,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Line one\nLine two",
+              "back": "Answer",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "direction-from-default",
+      "note": "file has no direction: default rtl applies",
+      "text": "#flashcards\nQ1::A1\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": [
+        {
+          "firstLine": 1,
+          "type": 0,
+          "hasChanged": false,
+          "topicPathList": {
+            "tags": "#flashcards",
+            "lineNum": 0
+          },
+          "textDirection": 2,
+          "cards": [
+            {
+              "idx": 0,
+              "front": "Q1",
+              "back": "A1",
+              "schedule": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tag-in-frontmatter-only-no-body-question",
+      "note": "frontmatter tag but no card",
+      "text": "---\ntags:\n  - flashcards\n---\nJust prose.\n",
+      "settingsOverrides": {},
+      "folderTopicPath": [],
+      "onlyKeepQuestionsWithTopicPath": true,
+      "questions": []
+    },
+    {
+      "id": "wrappers-loader-vs-parser",
+      "loaderQuestions": 2,
+      "parserQuestions": 2,
+      "filePath": "n.md",
+      "hasChanged": false
+    }
+  ]
+}

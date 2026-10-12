@@ -1,0 +1,419 @@
+{
+  "ops": [
+    {
+      "op": "appendReviewItem x4 (N1 new in a; D1 due in a and b/c; L1 scheduled-not-due in a; R1 new with no topic)",
+      "input": null,
+      "output": {
+        "name": "Root",
+        "new": [
+          "R1"
+        ],
+        "due": [],
+        "sub": [
+          {
+            "name": "a",
+            "new": [
+              "N1"
+            ],
+            "due": [
+              "D1 [due]",
+              "L1 [scheduled-not-due]"
+            ],
+            "sub": []
+          },
+          {
+            "name": "b",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "c",
+                "new": [],
+                "due": [
+                  "D1 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "op": "appendReviewItem(empty list) called on subdeck 'a' puts the card into 'a' itself, not the real root",
+      "input": null,
+      "output": {
+        "a_new": [
+          "N1",
+          "R2"
+        ],
+        "root_new": [
+          "R1"
+        ]
+      }
+    },
+    {
+      "op": "appendReviewItem with the same topic path twice puts the card twice into that deck",
+      "input": null,
+      "output": [
+        "DUP",
+        "DUP"
+      ]
+    },
+    {
+      "op": "prependReviewItem creates missing decks and unshifts into the list that matches the card's current state",
+      "input": null,
+      "output": {
+        "a_due": [
+          "P1",
+          "D1",
+          "L1"
+        ],
+        "newdeck_due": [
+          "P1"
+        ]
+      }
+    },
+    {
+      "op": "prependReviewItem(empty list) goes to the deck it is called on",
+      "input": null,
+      "output": [
+        "P2",
+        "R1"
+      ]
+    },
+    {
+      "op": "a card answered after it was stored stays in the new list; reviewItemState now says due",
+      "input": null,
+      "output": {
+        "inNewList": [
+          "FLIP"
+        ],
+        "inDueList": [],
+        "reviewItemState": "DueItem"
+      }
+    },
+    {
+      "op": "deleteCardFromAllDecks still finds it (both lists are searched)",
+      "input": null,
+      "output": {
+        "newList": [],
+        "dueList": []
+      }
+    },
+    {
+      "op": "getReviewItemListForReviewItemState(AnyItem) is the NEW list",
+      "input": null,
+      "output": [
+        "N1",
+        "R2"
+      ]
+    },
+    {
+      "op": "getReviewItem(0, AnyItem) is from the new list; getReviewItem(99, DueItem) is undefined",
+      "input": null,
+      "output": {
+        "any0": "N1",
+        "due99": "undefined"
+      }
+    },
+    {
+      "op": "getFlattenedReviewItemArray(NewItem,false) returns the deck's own array (same object); AnyItem returns a fresh array",
+      "input": null,
+      "output": {
+        "newItemSameObjectAsList": true,
+        "anyItemSameObject": false,
+        "newItemWithSubdecksSameObject": false
+      }
+    },
+    {
+      "op": "getFlattenedReviewItemArray(AnyItem,true) order: own new, own due, then each subdeck in creation order recursively",
+      "input": null,
+      "output": [
+        "P2",
+        "R1",
+        "N1",
+        "R2",
+        "P1",
+        "D1",
+        "L1",
+        "D1",
+        "DUP",
+        "DUP",
+        "P1"
+      ]
+    },
+    {
+      "op": "getReviewItemCount counts a multi-deck card once per deck; getDistinctReviewItemCount counts it once",
+      "input": null,
+      "output": {
+        "sum": 11,
+        "distinct": 8
+      }
+    },
+    {
+      "op": "getReviewItemCount(AnyItem,false) of the 'a' deck",
+      "input": null,
+      "output": {
+        "new": 2,
+        "due": 3,
+        "any": 5
+      }
+    },
+    {
+      "op": "getQuestionReviewItemCount(question of D1) in deck a and b/c",
+      "input": null,
+      "output": {
+        "a": 1,
+        "bc": 1
+      }
+    },
+    {
+      "op": "getDeck / getDeckByTopicTag",
+      "input": null,
+      "output": {
+        "a": "a",
+        "b/c": "b/c",
+        "missing": null,
+        "A (case differs)": null,
+        "empty path": "(root)",
+        "tag #a": {
+          "ok": "a"
+        },
+        "tag #": {
+          "throws": "Invalid tag"
+        },
+        "tag a": {
+          "throws": "Tag must start with #"
+        },
+        "tag #nope/x": {
+          "ok": null
+        },
+        "tag #/": {
+          "ok": "(root)"
+        },
+        "getDeck does not mutate the argument path": [
+          "b",
+          "c"
+        ]
+      }
+    },
+    {
+      "op": "getOrCreateDeck",
+      "input": null,
+      "output": {
+        "sameObjectTwice": true,
+        "caseSensitiveSeparateDeck": true,
+        "emptySegmentMakesDeckWithEmptyName": [
+          "a",
+          "b",
+          "z",
+          "new",
+          "f",
+          "q",
+          "Q",
+          ""
+        ],
+        "emptyNameChildPath": [
+          "",
+          "x"
+        ],
+        "parentLink": true
+      }
+    },
+    {
+      "op": "getTopicPath / getRootDeck / isRootDeck",
+      "input": null,
+      "output": {
+        "root": {
+          "path": [],
+          "isRoot": true
+        },
+        "deepest": {
+          "path": [
+            "q",
+            "r"
+          ],
+          "isRoot": false,
+          "rootIsRoot": true
+        },
+        "emptyDeckName": "Root",
+        "emptyDeckIsRoot": true,
+        "otherName_rootStillEmptyPath": []
+      }
+    },
+    {
+      "op": "clone(): new decks and lists, same card objects; cloning a subdeck gives a root",
+      "input": null,
+      "output": {
+        "sharesCardObjects": true,
+        "treeEqual": true,
+        "newListIsNewArray": true,
+        "subCloneIsRoot": true,
+        "subCloneTopicPath": [],
+        "subCloneName": "a",
+        "childParentLinks": true
+      }
+    },
+    {
+      "op": "copyWithReviewItemFilter calls the predicate per card: own new list, own due list, then each subdeck (depth first); empty decks are kept",
+      "input": null,
+      "output": {
+        "order": [
+          "P2",
+          "R1",
+          "N1",
+          "R2",
+          "P1",
+          "D1",
+          "L1",
+          "D1",
+          "DUP",
+          "DUP",
+          "P1"
+        ]
+      }
+    },
+    {
+      "op": "copyWithReviewItemFilter(pred, parent) sets the parent pointer only; the parent's subdecks are not touched",
+      "input": null,
+      "output": {
+        "copyParentIsA": true,
+        "aSubdeckCount": 0,
+        "copyIsRoot": false
+      }
+    },
+    {
+      "op": "deleteCardFromAllDecks: card missing from an existing deck",
+      "input": null,
+      "output": {
+        "strict": {
+          "throws": "deleteCardFromThisDeck: Card: GHOST not found in deck: m"
+        },
+        "lenient": {
+          "ok": {
+            "$undefined": true
+          }
+        },
+        "deckMissingStrict": {
+          "ok": {
+            "$undefined": true
+          }
+        }
+      }
+    },
+    {
+      "op": "deleteCardFromAllDecks of a card whose question has NO topic paths deletes nothing (it stays in the deck it was appended to)",
+      "input": null,
+      "output": [
+        "GHOST3"
+      ]
+    },
+    {
+      "op": "deleteCardFromAllDecks removes the card from every deck its question lists",
+      "input": null,
+      "output": {
+        "name": "Root",
+        "new": [
+          "GHOST3"
+        ],
+        "due": [],
+        "sub": [
+          {
+            "name": "m",
+            "new": [],
+            "due": [
+              "Y"
+            ],
+            "sub": []
+          },
+          {
+            "name": "n",
+            "new": [],
+            "due": [],
+            "sub": []
+          }
+        ]
+      }
+    },
+    {
+      "op": "deleteCardFromThisDeck removes only the first occurrence",
+      "input": null,
+      "output": {
+        "remaining": [
+          "TW"
+        ]
+      }
+    },
+    {
+      "op": "deleteCardFromThisDeck message when absent",
+      "input": null,
+      "output": {
+        "throws": "deleteCardFromThisDeck: Card: TW not found in deck: Dk"
+      }
+    },
+    {
+      "op": "deleteQuestionFromAllDecks deletes every card of the question from every listed deck",
+      "input": null,
+      "output": {
+        "name": "Root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "m",
+            "new": [],
+            "due": [],
+            "sub": []
+          }
+        ]
+      }
+    },
+    {
+      "op": "deleteReviewItemAtIndex: index out of range is a no-op, but -1 removes the LAST item (splice semantics)",
+      "input": null,
+      "output": {
+        "new": [],
+        "due": []
+      }
+    },
+    {
+      "op": "otherListType",
+      "input": null,
+      "output": {
+        "new": "DueItem",
+        "due": "NewItem",
+        "any": {
+          "throws": "Invalid reviewItemState"
+        }
+      }
+    },
+    {
+      "op": "toString(0) and toString(1)",
+      "input": null,
+      "output": {
+        "s0": "Root\r\n    u\r\n      New: 0: C1::b\r\n        v\r\n          Due: 0: C2::b\r\n",
+        "s1": "    Root\r\n        u\r\n          New: 0: C1::b\r\n            v\r\n              Due: 0: C2::b\r\n"
+      }
+    },
+    {
+      "op": "toDeckArray order is pre-order depth-first, self first",
+      "input": null,
+      "output": [
+        "(root)",
+        "a",
+        "b",
+        "b/c",
+        "z",
+        "new",
+        "new/deck",
+        "f",
+        "q",
+        "q/r",
+        "Q",
+        "(root)",
+        "/x"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1122 @@
+[
+ {
+  "input": "$x = \\cloze{p}{h}$",
+  "output": {
+   "tokenized": "$x = \ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 5,
+     "end": 17,
+     "seq": null,
+     "answer": "p",
+     "hint": "h",
+     "inMath": true
+    }
+   ],
+   "restored": "$x = p$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{} + \\cloze[2]{q}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011 + \ue0102\ue012\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 12,
+     "seq": null,
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 15,
+     "end": 29,
+     "seq": "2",
+     "answer": "q",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p + q$"
+  }
+ },
+ {
+  "input": "$\\cloze[sah]{\\frac{1}{2}}{half}$",
+  "output": {
+   "tokenized": "$\ue010sah\ue012\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 31,
+     "seq": "sah",
+     "answer": "\\frac{1}{2}",
+     "hint": "half",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\frac{1}{2}$"
+  }
+ },
+ {
+  "input": "nothing",
+  "output": {
+   "tokenized": "nothing",
+   "clozes": [],
+   "restored": "nothing"
+  }
+ },
+ {
+  "input": "$\\cloze{p}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 10,
+     "seq": null,
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze p$",
+  "output": {
+   "tokenized": "$\\cloze p$",
+   "clozes": [],
+   "restored": "$\\cloze p$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{ q } r$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011 r$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": null,
+     "answer": "p",
+     "hint": " q ",
+     "inMath": true
+    }
+   ],
+   "restored": "$p r$"
+  }
+ },
+ {
+  "input": "$\\cloze{p} {q}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 14,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}\n{q}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 14,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze\n{p}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 11,
+     "seq": null,
+     "answer": "p",
+     "hint": "",
+     "inMath": false
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze [1] {p}$",
+  "output": {
+   "tokenized": "$\ue0101\ue012\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": "1",
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze[ 12 ]{p}$",
+  "output": {
+   "tokenized": "$\ue01012\ue012\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 16,
+     "seq": "12",
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze[01]{p}$",
+  "output": {
+   "tokenized": "$\ue01001\ue012\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 14,
+     "seq": "01",
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze[X]{p}$",
+  "output": {
+   "tokenized": "$\\cloze[X]{p}$",
+   "clozes": [],
+   "restored": "$\\cloze[X]{p}$"
+  }
+ },
+ {
+  "input": "$\\cloze[]{p}$",
+  "output": {
+   "tokenized": "$\\cloze[]{p}$",
+   "clozes": [],
+   "restored": "$\\cloze[]{p}$"
+  }
+ },
+ {
+  "input": "$\\cloze[1{p}{q}$",
+  "output": {
+   "tokenized": "$\\cloze[1{p}{q}$",
+   "clozes": [],
+   "restored": "$\\cloze[1{p}{q}$"
+  }
+ },
+ {
+  "input": "$\\cloze[1]{p$",
+  "output": {
+   "tokenized": "$\\cloze[1]{p$",
+   "clozes": [],
+   "restored": "$\\cloze[1]{p$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{q$",
+  "output": {
+   "tokenized": "$\\cloze{p}{q$",
+   "clozes": [],
+   "restored": "$\\cloze{p}{q$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{q}}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011}$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 13,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": true
+    }
+   ],
+   "restored": "$p}$"
+  }
+ },
+ {
+  "input": "$\\clozer{p}{q}$",
+  "output": {
+   "tokenized": "$\\clozer{p}{q}$",
+   "clozes": [],
+   "restored": "$\\clozer{p}{q}$"
+  }
+ },
+ {
+  "input": "$\\cloze1{p}$",
+  "output": {
+   "tokenized": "$\\cloze1{p}$",
+   "clozes": [],
+   "restored": "$\\cloze1{p}$"
+  }
+ },
+ {
+  "input": "$\\cloze_{p}$",
+  "output": {
+   "tokenized": "$\\cloze_{p}$",
+   "clozes": [],
+   "restored": "$\\cloze_{p}$"
+  }
+ },
+ {
+  "input": "$\\cloze{}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 11,
+     "seq": null,
+     "answer": "",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$$"
+  }
+ },
+ {
+  "input": "$\\cloze{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 9,
+     "seq": null,
+     "answer": "",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$$"
+  }
+ },
+ {
+  "input": "$\\cloze{a{b}c}{d{e}f}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 21,
+     "seq": null,
+     "answer": "a{b}c",
+     "hint": "d{e}f",
+     "inMath": true
+    }
+   ],
+   "restored": "$a{b}c$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\{}{h}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 14,
+     "seq": null,
+     "answer": "\\{",
+     "hint": "h",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\{$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\}x}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 12,
+     "seq": null,
+     "answer": "\\}x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\}x$"
+  }
+ },
+ {
+  "input": "$\\cloze{a\\\\}{h}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": null,
+     "answer": "a\\\\",
+     "hint": "h",
+     "inMath": true
+    }
+   ],
+   "restored": "$a\\\\$"
+  }
+ },
+ {
+  "input": "$\\cloze{a}{b\\}}$ rest {c}",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$ rest {c}",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": null,
+     "answer": "a",
+     "hint": "b\\}",
+     "inMath": true
+    }
+   ],
+   "restored": "$a$ rest {c}"
+  }
+ },
+ {
+  "input": "$\\cloze{e^{x^{2}}}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 20,
+     "seq": null,
+     "answer": "e^{x^{2}}",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$e^{x^{2}}$"
+  }
+ },
+ {
+  "input": "$\\frac{1}{\\cloze{\\sqrt{2}}{}}$",
+  "output": {
+   "tokenized": "$\\frac{1}{\ue010\ue0130\ue013\ue011}$",
+   "clozes": [
+    {
+     "start": 10,
+     "end": 28,
+     "seq": null,
+     "answer": "\\sqrt{2}",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\frac{1}{\\sqrt{2}}$"
+  }
+ },
+ {
+  "input": "$\\cloze[AH]{p}$",
+  "output": {
+   "tokenized": "$\\cloze[AH]{p}$",
+   "clozes": [],
+   "restored": "$\\cloze[AH]{p}$"
+  }
+ },
+ {
+  "input": "$\\cloze[hhh]{p}$",
+  "output": {
+   "tokenized": "$\ue010hhh\ue012\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": "hhh",
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p$"
+  }
+ },
+ {
+  "input": "$\\cloze[2]{a}{} \\cloze[2]{b}{}$",
+  "output": {
+   "tokenized": "$\ue0102\ue012\ue0130\ue013\ue011 \ue0102\ue012\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 15,
+     "seq": "2",
+     "answer": "a",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 16,
+     "end": 30,
+     "seq": "2",
+     "answer": "b",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$a b$"
+  }
+ },
+ {
+  "input": "\\cloze{p}{q} outside",
+  "output": {
+   "tokenized": "\ue010\ue0130\ue013\ue011 outside",
+   "clozes": [
+    {
+     "start": 0,
+     "end": 12,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "p outside"
+  }
+ },
+ {
+  "input": "$a$ \\cloze{p}{q}",
+  "output": {
+   "tokenized": "$a$ \ue010\ue0130\ue013\ue011",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 16,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "$a$ p"
+  }
+ },
+ {
+  "input": "$5 and \\cloze{p}{q}$",
+  "output": {
+   "tokenized": "$5 and \ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 7,
+     "end": 19,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": true
+    }
+   ],
+   "restored": "$5 and p$"
+  }
+ },
+ {
+  "input": "costs $5, then \\cloze{p}{q}",
+  "output": {
+   "tokenized": "costs $5, then \ue010\ue0130\ue013\ue011",
+   "clozes": [
+    {
+     "start": 15,
+     "end": 27,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "costs $5, then p"
+  }
+ },
+ {
+  "input": "`\\cloze{p}{q}` and $\\cloze{r}{s}$",
+  "output": {
+   "tokenized": "`\ue010\ue0130\ue013\ue011` and $\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 13,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    },
+    {
+     "start": 20,
+     "end": 32,
+     "seq": null,
+     "answer": "r",
+     "hint": "s",
+     "inMath": true
+    }
+   ],
+   "restored": "`p` and $r$"
+  }
+ },
+ {
+  "input": "`\\cloze{p}{q}`",
+  "output": {
+   "tokenized": "`\ue010\ue0130\ue013\ue011`",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 13,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "`p`"
+  }
+ },
+ {
+  "input": "```\n\\cloze{p}{q}\n```",
+  "output": {
+   "tokenized": "```\n\ue010\ue0130\ue013\ue011\n```",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 16,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "```\np\n```"
+  }
+ },
+ {
+  "input": "$$\n\\cloze{p}{q}\n$$",
+  "output": {
+   "tokenized": "$$\n\ue010\ue0130\ue013\ue011\n$$",
+   "clozes": [
+    {
+     "start": 3,
+     "end": 15,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": true
+    }
+   ],
+   "restored": "$$\np\n$$"
+  }
+ },
+ {
+  "input": "$$ \\cloze{p}{q}",
+  "output": {
+   "tokenized": "$$ \ue010\ue0130\ue013\ue011",
+   "clozes": [
+    {
+     "start": 3,
+     "end": 15,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "$$ p"
+  }
+ },
+ {
+  "input": "\\\\cloze{p}{q}",
+  "output": {
+   "tokenized": "\\\ue010\ue0130\ue013\ue011",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 13,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": false
+    }
+   ],
+   "restored": "\\p"
+  }
+ },
+ {
+  "input": "$\\cloze{\\cloze{in}{}}{out}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 26,
+     "seq": null,
+     "answer": "\\cloze{in}{}",
+     "hint": "out",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\cloze{in}{}$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{q}\\cloze{r}{s}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 13,
+     "seq": null,
+     "answer": "p",
+     "hint": "q",
+     "inMath": true
+    },
+    {
+     "start": 13,
+     "end": 25,
+     "seq": null,
+     "answer": "r",
+     "hint": "s",
+     "inMath": true
+    }
+   ],
+   "restored": "$pr$"
+  }
+ },
+ {
+  "input": "$\\cloze{p}{} \\cloze{p}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011 \ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 12,
+     "seq": null,
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 13,
+     "end": 24,
+     "seq": null,
+     "answer": "p",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$p p$"
+  }
+ },
+ {
+  "input": "$x\\le\\cloze{c_0}{}$",
+  "output": {
+   "tokenized": "$x\\le\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 5,
+     "end": 18,
+     "seq": null,
+     "answer": "c_0",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$x\\le c_0$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}x$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011x$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha x$"
+  }
+ },
+ {
+  "input": "$\\le\\cloze{\\alpha}{}x$",
+  "output": {
+   "tokenized": "$\\le\ue010\ue0130\ue013\ue011x$",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 20,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\le\\alpha x$"
+  }
+ },
+ {
+  "input": "$\\le\\cloze{2}{}$",
+  "output": {
+   "tokenized": "$\\le\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 15,
+     "seq": null,
+     "answer": "2",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\le2$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}^2$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011^2$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha^2$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}\\cloze{x}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 17,
+     "end": 28,
+     "seq": null,
+     "answer": "x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha x$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}\\cloze{\\beta}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 17,
+     "end": 32,
+     "seq": null,
+     "answer": "\\beta",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha \\beta$"
+  }
+ },
+ {
+  "input": "$\\cloze{a}{}\\cloze{\\alpha}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 12,
+     "seq": null,
+     "answer": "a",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 12,
+     "end": 28,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$a\\alpha$"
+  }
+ },
+ {
+  "input": "$\\sin\\cloze{x}{}$",
+  "output": {
+   "tokenized": "$\\sin\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 5,
+     "end": 16,
+     "seq": null,
+     "answer": "x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\sin x$"
+  }
+ },
+ {
+  "input": "$\\sin\\cloze{\\x}{}$",
+  "output": {
+   "tokenized": "$\\sin\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 5,
+     "end": 17,
+     "seq": null,
+     "answer": "\\x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\sin\\x$"
+  }
+ },
+ {
+  "input": "$\\le\\cloze{ x}{}$",
+  "output": {
+   "tokenized": "$\\le\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 16,
+     "seq": null,
+     "answer": " x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\le x$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{} x$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011 x$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha x$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}\\,x$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\\,x$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha\\,x$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}1$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue0111$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha1$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}{x}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011{x}$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha{x}$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}\\cloze{1}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 17,
+     "end": 28,
+     "seq": null,
+     "answer": "1",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alpha 1$"
+  }
+ },
+ {
+  "input": "$\\le\\cloze{\\alpha}{}\\cloze{x}{}$",
+  "output": {
+   "tokenized": "$\\le\ue010\ue0130\ue013\ue011\ue010\ue0131\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 20,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    },
+    {
+     "start": 20,
+     "end": 31,
+     "seq": null,
+     "answer": "x",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\le\\alpha x$"
+  }
+ },
+ {
+  "input": "$\\cloze{é}{}$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 12,
+     "seq": null,
+     "answer": "é",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$é$"
+  }
+ },
+ {
+  "input": "$\\le\\cloze{é}{}$",
+  "output": {
+   "tokenized": "$\\le\ue010\ue0130\ue013\ue011$",
+   "clozes": [
+    {
+     "start": 4,
+     "end": 15,
+     "seq": null,
+     "answer": "é",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\leé$"
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}é$",
+  "output": {
+   "tokenized": "$\ue010\ue0130\ue013\ue011é$",
+   "clozes": [
+    {
+     "start": 1,
+     "end": 17,
+     "seq": null,
+     "answer": "\\alpha",
+     "hint": "",
+     "inMath": true
+    }
+   ],
+   "restored": "$\\alphaé$"
+  }
+ }
+]

@@ -1,0 +1,735 @@
+{
+ "flashcardTags": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts",
+   "src/data/data-structures/deck/topic-path.ts",
+   "src/import-export/export-collector.ts",
+   "src/import-export/ui/anki-export-modal.ts",
+   "src/import-export/ui/anki-import-modal.ts",
+   "src/note/note-question-parser.ts",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 5
+ },
+ "flashcardTagsToIgnore": {
+  "readerFiles": [],
+  "nUI": 2
+ },
+ "convertFoldersToDecks": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts",
+   "src/data/data-structures/card/questions/question.ts",
+   "src/data/data-structures/deck/topic-path.ts",
+   "src/note/note-question-parser.ts"
+  ],
+  "nUI": 1
+ },
+ "burySiblingCards": {
+  "readerFiles": [
+   "src/data/core.ts",
+   "src/scheduling/review/review-session.ts"
+  ],
+  "nUI": 1
+ },
+ "randomizeCardOrder": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "flashcardCardOrder": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/toolbar/toolbar.tsx",
+   "src/ui/review-queue-loader.ts"
+  ],
+  "nUI": 2
+ },
+ "flashcardDeckOrder": {
+  "readerFiles": [
+   "src/ui/review-queue-loader.ts"
+  ],
+  "nUI": 1
+ },
+ "convertClozePatternsToInputs": {
+  "readerFiles": [
+   "src/data/data-structures/card/questions/question-type.ts"
+  ],
+  "nUI": 1
+ },
+ "convertHighlightsToClozes": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "convertBoldTextToClozes": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "convertCurlyBracketsToClozes": {
+  "readerFiles": [
+   "src/import-export/anki-cloze.ts"
+  ],
+  "nUI": 1
+ },
+ "clozePatterns": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/import-export/anki-cloze.ts",
+   "src/import-export/export-collector.ts",
+   "src/note/note-question-parser.ts",
+   "src/parser.ts"
+  ],
+  "nUI": 9
+ },
+ "singleLineCardSeparator": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/import-export/ui/anki-import-modal.ts",
+   "src/parser.ts",
+   "src/ui/obsidian-ui-components/modals/edit-modal.tsx"
+  ],
+  "nUI": 2
+ },
+ "singleLineReversedCardSeparator": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/import-export/ui/anki-import-modal.ts",
+   "src/parser.ts",
+   "src/ui/obsidian-ui-components/modals/edit-modal.tsx"
+  ],
+  "nUI": 2
+ },
+ "multilineCardSeparator": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/import-export/ui/anki-import-modal.ts",
+   "src/parser.ts",
+   "src/ui/obsidian-ui-components/modals/edit-modal.tsx"
+  ],
+  "nUI": 2
+ },
+ "multilineReversedCardSeparator": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/import-export/ui/anki-import-modal.ts",
+   "src/parser.ts",
+   "src/ui/obsidian-ui-components/modals/edit-modal.tsx"
+  ],
+  "nUI": 2
+ },
+ "multilineCardEndMarker": {
+  "readerFiles": [
+   "src/parser.ts"
+  ],
+  "nUI": 5
+ },
+ "editLaterTag": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "enableReviewReminders": {
+  "readerFiles": [
+   "src/scheduling/reminder-manager.ts"
+  ],
+  "nUI": 3
+ },
+ "reviewReminderIntervalMinutes": {
+  "readerFiles": [
+   "src/scheduling/reminder-manager.ts"
+  ],
+  "nUI": 3
+ },
+ "reviewReminderCheckOnStartup": {
+  "readerFiles": [
+   "src/scheduling/reminder-manager.ts"
+  ],
+  "nUI": 2
+ },
+ "reviewReminderMessage": {
+  "readerFiles": [
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "reviewReminderAutoOpen": {
+  "readerFiles": [
+   "src/scheduling/reminder-manager.ts"
+  ],
+  "nUI": 1
+ },
+ "reviewReminderShowNotice": {
+  "readerFiles": [
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "reviewReminderPlaySound": {
+  "readerFiles": [
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "reviewReminderBounceDock": {
+  "readerFiles": [
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "enableNoteReviewPaneOnStartup": {
+  "readerFiles": [
+   "src/main.ts",
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/sidebar-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "tagsToReview": {
+  "readerFiles": [
+   "src/import-export/export-collector.ts",
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 5
+ },
+ "noteTagsToIgnore": {
+  "readerFiles": [],
+  "nUI": 2
+ },
+ "noteFoldersToIgnore": {
+  "readerFiles": [],
+  "nUI": 10
+ },
+ "openRandomNote": {
+  "readerFiles": [
+   "src/note/next-note-review-handler.ts",
+   "src/note/note-review-deck.ts"
+  ],
+  "nUI": 1
+ },
+ "autoNextNote": {
+  "readerFiles": [
+   "src/data/data-manager.ts",
+   "src/note/next-note-review-handler.ts"
+  ],
+  "nUI": 1
+ },
+ "disableFileMenuReviewOptions": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "showFileMenuReviewOptions": {
+  "readerFiles": [
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "deleteTagsOnSchedulingDataDeletion": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "maxNDaysNotesReviewQueue": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx"
+  ],
+  "nUI": 2
+ },
+ "showRibbonIcon": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "showStatusBar": {
+  "readerFiles": [
+   "src/ui/status-bar-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 4
+ },
+ "showCardStatusBarItem": {
+  "readerFiles": [
+   "src/ui/status-bar-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "showNoteStatusBarItem": {
+  "readerFiles": [
+   "src/ui/status-bar-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "showUpdateAvailableStatusBarItem": {
+  "readerFiles": [
+   "src/ui/status-bar-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "initiallyExpandAllSubdecksInTree": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.tsx"
+  ],
+  "nUI": 1
+ },
+ "showContextInCards": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/context-section/context-section.tsx"
+  ],
+  "nUI": 1
+ },
+ "showIntervalInReviewButtons": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.tsx"
+  ],
+  "nUI": 1
+ },
+ "flashcardHeightPercentage": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx",
+   "src/ui/obsidian-ui-components/modals/studio-modal-view.tsx"
+  ],
+  "nUI": 1
+ },
+ "flashcardWidthPercentage": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx",
+   "src/ui/obsidian-ui-components/modals/studio-modal-view.tsx"
+  ],
+  "nUI": 1
+ },
+ "flashcardHeightPercentageMobile": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx",
+   "src/ui/obsidian-ui-components/modals/studio-modal-view.tsx"
+  ],
+  "nUI": 1
+ },
+ "flashcardWidthPercentageMobile": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx",
+   "src/ui/obsidian-ui-components/modals/studio-modal-view.tsx"
+  ],
+  "nUI": 1
+ },
+ "flashcardAgainText": {
+  "readerFiles": [
+   "src/command-manager.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.tsx"
+  ],
+  "nUI": 3
+ },
+ "flashcardEasyText": {
+  "readerFiles": [
+   "src/command-manager.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.tsx",
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 3
+ },
+ "flashcardGoodText": {
+  "readerFiles": [
+   "src/command-manager.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.tsx",
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 3
+ },
+ "flashcardHardText": {
+  "readerFiles": [
+   "src/command-manager.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/card-container/response-section/response-section.tsx",
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 3
+ },
+ "reviewButtonDelay": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "openViewInNewTabMobile": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "showDeleteButtonInCardView": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 1
+ },
+ "showDeleteButtonInFileMenu": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "openViewInNewTab": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx",
+   "src/ui/ui-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "useCustomHotkeys": {
+  "readerFiles": [
+   "src/command-manager.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx"
+  ],
+  "nUI": 6
+ },
+ "useCalloutsForSchedulingComments": {
+  "readerFiles": [
+   "src/data/data-structures/card/questions/question.ts"
+  ],
+  "nUI": 1
+ },
+ "algorithm": {
+  "readerFiles": [
+   "src/data/core.ts",
+   "src/data/data-manager.ts",
+   "src/data/data-store/base/data-store-algorithm.ts",
+   "src/data/data-store/notes-data-store/sm2-note-store.ts",
+   "src/data/data-structures/card/questions/question.ts",
+   "src/data/plugin-data-manager.ts",
+   "src/data/plugin-data.ts",
+   "src/occlusion/occlusion-rewrite.ts",
+   "src/scheduling/display.ts",
+   "src/scheduling/due-histogram.ts",
+   "src/scheduling/fsrs/fsrs-scheduler.ts",
+   "src/scheduling/fsrs/sm2-to-fsrs-card.ts",
+   "src/scheduling/fsrs/fsrs-card-scheduler.ts",
+   "src/scheduling/optimizer/evaluate.ts",
+   "src/scheduling/review/review-session.ts",
+   "src/scheduling/schedule/fsrs-state.ts",
+   "src/scheduling/schedule/sm2-state.ts",
+   "src/scheduling/schedule/schedule-state.ts",
+   "src/scheduling/sm2/sm2-scheduler.ts",
+   "src/ui/obsidian-ui-components/content-container/desktop/desktop-data.ts",
+   "src/ui/review-queue-loader.ts"
+  ],
+  "nUI": 22
+ },
+ "baseEase": {
+  "readerFiles": [
+   "src/data/data-store/notes-data-store/sm2-note-store.ts",
+   "src/note/note-ease-list.ts",
+   "src/occlusion/occlusion-rewrite.ts",
+   "src/scheduling/sm2/sm2-scheduler.ts"
+  ],
+  "nUI": 4
+ },
+ "lapsesIntervalChange": {
+  "readerFiles": [
+   "src/scheduling/sm2/sm2-schedule.ts"
+  ],
+  "nUI": 3
+ },
+ "easyBonus": {
+  "readerFiles": [
+   "src/scheduling/sm2/sm2-schedule.ts"
+  ],
+  "nUI": 4
+ },
+ "loadBalance": {
+  "readerFiles": [
+   "src/scheduling/sm2/sm2-schedule.ts"
+  ],
+  "nUI": 2
+ },
+ "maximumInterval": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts",
+   "src/scheduling/sm2/sm2-schedule.ts"
+  ],
+  "nUI": 9
+ },
+ "maxLinkFactor": {
+  "readerFiles": [
+   "src/scheduling/sm2/sm2-scheduler.ts"
+  ],
+  "nUI": 3
+ },
+ "fsrsDesiredRetention": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts",
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx",
+   "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.tsx",
+   "src/ui/statistics-view/statistics-view.ts"
+  ],
+  "nUI": 8
+ },
+ "startOfDay": {
+  "readerFiles": [
+   "src/data/core.ts",
+   "src/ui/obsidian-ui-components/modals/fsrs-optimizer-modal.ts"
+  ],
+  "nUI": 7
+ },
+ "leechThreshold": {
+  "readerFiles": [
+   "src/scheduling/review/review-session.ts"
+  ],
+  "nUI": 3
+ },
+ "leechAction": {
+  "readerFiles": [
+   "src/scheduling/review/review-session.ts"
+  ],
+  "nUI": 1
+ },
+ "dailyLimitsEnabled": {
+  "readerFiles": [
+   "src/scheduling/daily-limits.ts",
+   "src/ui/obsidian-ui-components/modals/custom-study-modal.ts"
+  ],
+  "nUI": 3
+ },
+ "newCardsPerDay": {
+  "readerFiles": [
+   "src/scheduling/daily-limits.ts"
+  ],
+  "nUI": 2
+ },
+ "reviewsPerDay": {
+  "readerFiles": [
+   "src/scheduling/daily-limits.ts"
+  ],
+  "nUI": 2
+ },
+ "dataStore": {
+  "readerFiles": [
+   "src/data/data-manager.ts"
+  ],
+  "nUI": 1
+ },
+ "cardCommentOnSameLine": {
+  "readerFiles": [
+   "src/data/data-structures/card/questions/question.ts"
+  ],
+  "nUI": 1
+ },
+ "scheduleDataVaultLocation": {
+  "readerFiles": [],
+  "nUI": 1
+ },
+ "reviewLogFolder": {
+  "readerFiles": [
+   "src/data/data-manager.ts"
+  ],
+  "nUI": 3
+ },
+ "showSchedulingDebugMessages": {
+  "readerFiles": [
+   "src/data/data-manager.ts"
+  ],
+  "nUI": 1
+ },
+ "showParserDebugMessages": {
+  "readerFiles": [
+   "src/data/plugin-data-manager.ts"
+  ],
+  "nUI": 3
+ },
+ "preferredDateFormatForNoteReviewQueue": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/item-views/flashcard-studio-note-queue.tsx"
+  ],
+  "nUI": 1
+ },
+ "preferredLocale": {
+  "readerFiles": [
+   "src/main.ts"
+  ],
+  "nUI": 1
+ },
+ "fsrsLearningSteps": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts"
+  ],
+  "nUI": 6
+ },
+ "fsrsRelearningSteps": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts",
+   "src/ui/obsidian-ui-components/modals/fsrs-optimizer-modal.ts"
+  ],
+  "nUI": 12
+ },
+ "learnAheadMinutes": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "fsrsEnableFuzz": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts"
+  ],
+  "nUI": 4
+ },
+ "fsrsWeights": {
+  "readerFiles": [
+   "src/scheduling/fsrs/fsrs-settings.ts",
+   "src/ui/obsidian-ui-components/modals/fsrs-optimizer-modal.ts"
+  ],
+  "nUI": 16
+ },
+ "answerKeys": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx"
+  ],
+  "nUI": 2
+ },
+ "reviewLook": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/deck-container/deck-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.tsx",
+   "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell.ts",
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx"
+  ],
+  "nUI": 3
+ },
+ "desktopLayout": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell.ts",
+   "src/ui/obsidian-ui-components/item-views/studio-tab-view.tsx"
+  ],
+  "nUI": 2
+ },
+ "learnerName": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/deck-container/deck-list.tsx",
+   "src/ui/obsidian-ui-components/content-container/deck-container/studio-home.ts",
+   "src/ui/obsidian-ui-components/content-container/desktop/desktop-home.ts"
+  ],
+  "nUI": 2
+ },
+ "aiProvider": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts"
+  ],
+  "nUI": 6
+ },
+ "aiModel": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts"
+  ],
+  "nUI": 10
+ },
+ "aiBaseUrl": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts"
+  ],
+  "nUI": 2
+ },
+ "aiKeySecret": {
+  "readerFiles": [
+   "src/ai/generate-cards-modal.ts"
+  ],
+  "nUI": 4
+ },
+ "typeAnswers": {
+  "readerFiles": [
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 2
+ },
+ "ignoreAccentsWhenTyping": {
+  "readerFiles": [
+   "src/exam/exam-view.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx",
+   "src/ui/obsidian-ui-components/content-container/content-manager.tsx"
+  ],
+  "nUI": 1
+ },
+ "shuffleChoices": {
+  "readerFiles": [
+   "src/exam/exam-setup-modal.ts",
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 1
+ },
+ "readQuestionAloud": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 2
+ },
+ "readAnswerAloud": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 2
+ },
+ "speechVoice": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 4
+ },
+ "speechRate": {
+  "readerFiles": [
+   "src/ui/obsidian-ui-components/content-container/card-container/card-container.tsx"
+  ],
+  "nUI": 1
+ },
+ "examPassPercent": {
+  "readerFiles": [
+   "src/exam/exam-setup-modal.ts"
+  ],
+  "nUI": 1
+ },
+ "multilineCardStartMarker": {
+  "readerFiles": [
+   "src/ai/card-generation.ts",
+   "src/parser.ts"
+  ],
+  "nUI": 6
+ },
+ "calloutCardTypes": {
+  "readerFiles": [
+   "src/parser.ts"
+  ],
+  "nUI": 5
+ },
+ "atomicClozes": {
+  "readerFiles": [
+   "src/parser.ts"
+  ],
+  "nUI": 1
+ },
+ "latexClozes": {
+  "readerFiles": [
+   "src/math/math-cloze.ts",
+   "src/data/data-structures/card/questions/question-type.ts",
+   "src/main.ts",
+   "src/note/note-question-parser.ts",
+   "src/parser.ts"
+  ],
+  "nUI": 3
+ }
+}

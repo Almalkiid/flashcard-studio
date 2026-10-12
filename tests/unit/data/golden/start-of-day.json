@@ -1,0 +1,237 @@
+{
+  "note": "VaultIndex constructor: an invalid startOfDay logs one console.warn and leaves the previous boundary in place; a valid one replaces it. 'boundary' is globalDateProvider.getDayBoundary() afterwards.",
+  "fromNoBoundary": [
+    {
+      "startOfDay": "00:00:00",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "04:00:00",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "23:59:59",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 23,
+        "minute": 59,
+        "second": 59
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "4:0:0",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "04:0:0",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "4:30:5",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 30,
+        "second": 5
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "04:00",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "4",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "garbage",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "24:00:00",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "12:60:00",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "12:00:60",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": " 04:00:00",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "04:00:00 ",
+      "previousBoundary": null,
+      "boundary": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 0
+    },
+    {
+      "startOfDay": "-1:00:00",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "0x10:00:00",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "4.5:00:00",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "04:00:00.5",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": null,
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": "(undefined)",
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": 4,
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    },
+    {
+      "startOfDay": {},
+      "previousBoundary": null,
+      "boundary": null,
+      "warned": 1
+    }
+  ],
+  "invalidKeepsPrevious": [
+    {
+      "startOfDay": "",
+      "previousBoundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "boundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 1
+    },
+    {
+      "startOfDay": "garbage",
+      "previousBoundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "boundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 1
+    },
+    {
+      "startOfDay": "24:00:00",
+      "previousBoundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "boundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 1
+    },
+    {
+      "startOfDay": "12:60:00",
+      "previousBoundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "boundary": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0
+      },
+      "warned": 1
+    }
+  ]
+}

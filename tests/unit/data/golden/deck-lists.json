@@ -1,0 +1,1129 @@
+{
+  "today": "2023-09-06",
+  "rootDeckNameFromCore": "root",
+  "vectors": [
+    {
+      "id": "tags-basic-multideck",
+      "note": "Tag decks. Q4 and Q5 carry two tags so they sit in two decks (same card object). Q3 is scheduled but not due yet.",
+      "settings": {},
+      "files": [
+        {
+          "path": "Science/physics.md",
+          "text": "#flashcards\nQ1::A1\nQ2::A2 <!--SR:!2023-09-02,4,270-->\nQ3::A3 <!--SR:!2023-12-01,4,270-->\n\n#flashcards/science #flashcards/trivia\nQ4::A4\nQ5::A5 <!--SR:!2023-09-02,4,270-->\n\n#flashcards/science/physics\nQ6::A6\n\n#flashcards/art\nQ7::A7\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Q1"
+            ],
+            "due": [
+              "Q2 [due]",
+              "Q3 [scheduled-not-due]"
+            ],
+            "sub": [
+              {
+                "name": "art",
+                "new": [
+                  "Q7"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "science",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": [
+                  {
+                    "name": "physics",
+                    "new": [
+                      "Q6"
+                    ],
+                    "due": [],
+                    "sub": []
+                  }
+                ]
+              },
+              {
+                "name": "trivia",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 5,
+        "sumDue": 4,
+        "distinctNew": 4,
+        "distinctDue": 3,
+        "distinctAny": 7
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Q1"
+            ],
+            "due": [
+              "Q2 [due]"
+            ],
+            "sub": [
+              {
+                "name": "art",
+                "new": [
+                  "Q7"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "science",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": [
+                  {
+                    "name": "physics",
+                    "new": [
+                      "Q6"
+                    ],
+                    "due": [],
+                    "sub": []
+                  }
+                ]
+              },
+              {
+                "name": "trivia",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 5,
+        "sumDue": 3,
+        "distinctNew": 4,
+        "distinctDue": 2,
+        "distinctAny": 6
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Q1"
+            ],
+            "due": [
+              "Q2 [due]",
+              "Q3 [scheduled-not-due]"
+            ],
+            "sub": [
+              {
+                "name": "art",
+                "new": [
+                  "Q7"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "science",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": [
+                  {
+                    "name": "physics",
+                    "new": [
+                      "Q6"
+                    ],
+                    "due": [],
+                    "sub": []
+                  }
+                ]
+              },
+              {
+                "name": "trivia",
+                "new": [
+                  "Q4"
+                ],
+                "due": [
+                  "Q5 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sort-order-of-subdecks",
+      "note": "Subdeck names are created in file order and sorted by plain character-code comparison (not locale, case-sensitive). A tag ends at the first space, so the tag with a space is the deck a.",
+      "settings": {},
+      "files": [
+        {
+          "path": "n.md",
+          "text": "#flashcards/zeta\nZ::1\n\n#flashcards/alpha\nA::1\n\n#flashcards/Beta\nB::1\n\n#flashcards/10\nT::1\n\n#flashcards/9\nN::1\n\n#flashcards/éclair\nE::1\n\n#flashcards/Zeta\nZZ::1\n\n#flashcards/a b\nSP::1\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "10",
+                "new": [
+                  "T"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "9",
+                "new": [
+                  "N"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Beta",
+                "new": [
+                  "B"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Zeta",
+                "new": [
+                  "ZZ"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "a",
+                "new": [
+                  "SP"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "alpha",
+                "new": [
+                  "A"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "zeta",
+                "new": [
+                  "Z"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "éclair",
+                "new": [
+                  "E"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 8,
+        "sumDue": 0,
+        "distinctNew": 8,
+        "distinctDue": 0,
+        "distinctAny": 8
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "10",
+                "new": [
+                  "T"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "9",
+                "new": [
+                  "N"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Beta",
+                "new": [
+                  "B"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Zeta",
+                "new": [
+                  "ZZ"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "a",
+                "new": [
+                  "SP"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "alpha",
+                "new": [
+                  "A"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "zeta",
+                "new": [
+                  "Z"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "éclair",
+                "new": [
+                  "E"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 8,
+        "sumDue": 0,
+        "distinctNew": 8,
+        "distinctDue": 0,
+        "distinctAny": 8
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "10",
+                "new": [
+                  "T"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "9",
+                "new": [
+                  "N"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Beta",
+                "new": [
+                  "B"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "Zeta",
+                "new": [
+                  "ZZ"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "a",
+                "new": [
+                  "SP"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "alpha",
+                "new": [
+                  "A"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "zeta",
+                "new": [
+                  "Z"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "éclair",
+                "new": [
+                  "E"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "folders-as-decks",
+      "note": "convertFoldersToDecks on: the deck is the folder path of the file; tags are not needed; a note in the vault root has no deck and is skipped.",
+      "settings": {
+        "convertFoldersToDecks": true
+      },
+      "files": [
+        {
+          "path": "Math/Algebra/a.md",
+          "text": "A1::a1\nA2::a2 <!--SR:!2023-09-02,4,270-->\n"
+        },
+        {
+          "path": "Math/b.md",
+          "text": "B1::b1\n"
+        },
+        {
+          "path": "Languages/Arabic/c.md",
+          "text": "C1::c1\n"
+        },
+        {
+          "path": "Math/Algebra/d.md",
+          "text": "D1::d1\n"
+        },
+        {
+          "path": "root.md",
+          "text": "R1::r1\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "Languages",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "Arabic",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "Math",
+            "new": [
+              "B1"
+            ],
+            "due": [],
+            "sub": [
+              {
+                "name": "Algebra",
+                "new": [
+                  "A1",
+                  "D1"
+                ],
+                "due": [
+                  "A2 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 4,
+        "sumDue": 1,
+        "distinctNew": 4,
+        "distinctDue": 1,
+        "distinctAny": 5
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "Languages",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "Arabic",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "Math",
+            "new": [
+              "B1"
+            ],
+            "due": [],
+            "sub": [
+              {
+                "name": "Algebra",
+                "new": [
+                  "A1",
+                  "D1"
+                ],
+                "due": [
+                  "A2 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 4,
+        "sumDue": 1,
+        "distinctNew": 4,
+        "distinctDue": 1,
+        "distinctAny": 5
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "Languages",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "Arabic",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "Math",
+            "new": [
+              "B1"
+            ],
+            "due": [],
+            "sub": [
+              {
+                "name": "Algebra",
+                "new": [
+                  "A1",
+                  "D1"
+                ],
+                "due": [
+                  "A2 [due]"
+                ],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "folders-off-no-tag-skips-note",
+      "note": "Without the flashcard tag a note contributes nothing; a tag that is only a prefix of the flashcard tag does not count.",
+      "settings": {},
+      "files": [
+        {
+          "path": "a.md",
+          "text": "X1::x1\n"
+        },
+        {
+          "path": "b.md",
+          "text": "#flashcardsX\nY1::y1\n"
+        },
+        {
+          "path": "c.md",
+          "text": "#flashcards\nOK1::ok1\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "OK1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 1,
+        "sumDue": 0,
+        "distinctNew": 1,
+        "distinctDue": 0,
+        "distinctAny": 1
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "OK1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 1,
+        "sumDue": 0,
+        "distinctNew": 1,
+        "distinctDue": 0,
+        "distinctAny": 1
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "OK1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "two-flashcard-tags-and-question-level-tag",
+      "note": "flashcardTags has two entries. The note-level tag decides the deck; a tag written at the start of a question overrides it for that question only.",
+      "settings": {
+        "flashcardTags": [
+          "#cards",
+          "#flashcards"
+        ]
+      },
+      "files": [
+        {
+          "path": "n.md",
+          "text": "#flashcards/x\nF1::f1\n#cards/y F2::f2\nF3::f3\n\n#cards/z\nC1::c1\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "cards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "y",
+                "new": [
+                  "F2"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "z",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "x",
+                "new": [
+                  "F1",
+                  "F3"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 4,
+        "sumDue": 0,
+        "distinctNew": 4,
+        "distinctDue": 0,
+        "distinctAny": 4
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "cards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "y",
+                "new": [
+                  "F2"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "z",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "x",
+                "new": [
+                  "F1",
+                  "F3"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 4,
+        "sumDue": 0,
+        "distinctNew": 4,
+        "distinctDue": 0,
+        "distinctAny": 4
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "cards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "y",
+                "new": [
+                  "F2"
+                ],
+                "due": [],
+                "sub": []
+              },
+              {
+                "name": "z",
+                "new": [
+                  "C1"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          },
+          {
+            "name": "flashcards",
+            "new": [],
+            "due": [],
+            "sub": [
+              {
+                "name": "x",
+                "new": [
+                  "F1",
+                  "F3"
+                ],
+                "due": [],
+                "sub": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ignored-tags",
+      "note": "A note carrying a tag listed in flashcardTagsToIgnore (or a sub-tag of it) is skipped entirely, even for cards under another valid tag.",
+      "settings": {
+        "flashcardTagsToIgnore": [
+          "#ignore"
+        ]
+      },
+      "files": [
+        {
+          "path": "a.md",
+          "text": "#flashcards #ignore/sub\nI1::i1\n"
+        },
+        {
+          "path": "b.md",
+          "text": "#flashcards\nK1::k1\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "K1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 1,
+        "sumDue": 0,
+        "distinctNew": 1,
+        "distinctDue": 0,
+        "distinctAny": 1
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "K1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 1,
+        "sumDue": 0,
+        "distinctNew": 1,
+        "distinctDue": 0,
+        "distinctAny": 1
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "K1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "statuses-suspended-buried-postponed",
+      "note": "Remaining tree leaves out suspended cards, cards buried until a later day (study day is 2023-09-06), and questions on the buried-cards list. bury=2023-09-06 is NOT buried (strictly later day needed).",
+      "settings": {},
+      "files": [
+        {
+          "path": "s.md",
+          "text": "#flashcards\nN1::a\nN2::a <!--SR:!2023-09-02,4,270,susp-->\nN3::a <!--SR:!2023-09-02,4,270,bury=2023-09-07-->\nN4::a <!--SR:!2023-09-02,4,270,bury=2023-09-06-->\nN5::a <!--SR:!2023-09-02,4,270,bury=2023-09-05-->\nN6::a <!--SR:!2023-12-01,4,270-->\nP1::a\nN7::a <!--SR:!2023-09-02,4,270,flag=3,leech-->\n"
+        }
+      ],
+      "postponedFronts": [
+        "P1"
+      ],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "N1",
+              "P1"
+            ],
+            "due": [
+              "N2 [due]",
+              "N3 [due]",
+              "N4 [due]",
+              "N5 [due]",
+              "N6 [scheduled-not-due]",
+              "N7 [due]"
+            ],
+            "sub": []
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 2,
+        "sumDue": 6,
+        "distinctNew": 2,
+        "distinctDue": 6,
+        "distinctAny": 8
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "N1"
+            ],
+            "due": [
+              "N4 [due]",
+              "N5 [due]",
+              "N7 [due]"
+            ],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 1,
+        "sumDue": 3,
+        "distinctNew": 1,
+        "distinctDue": 3,
+        "distinctAny": 4
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "N1"
+            ],
+            "due": [
+              "N4 [due]",
+              "N5 [due]",
+              "N6 [scheduled-not-due]",
+              "N7 [due]"
+            ],
+            "sub": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "reversed-and-cloze-siblings",
+      "note": "One question can make several cards (siblings) in the same deck, in card order.",
+      "settings": {},
+      "files": [
+        {
+          "path": "r.md",
+          "text": "#flashcards\nFwd:::Back\n\nThe ==cloze one== and ==cloze two== here\n\nPlain::line\n"
+        }
+      ],
+      "postponedFronts": [],
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Fwd",
+              "Back",
+              "The <span style='color:#2196f3'>[...]</span> and cloze two here",
+              "The cloze one and <span style='color:#2196f3'>[...]</span> here",
+              "Plain"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "reviewableCounts": {
+        "sumNew": 5,
+        "sumDue": 0,
+        "distinctNew": 5,
+        "distinctDue": 0,
+        "distinctAny": 5
+      },
+      "remainingTreeReviewMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Fwd",
+              "Back",
+              "The <span style='color:#2196f3'>[...]</span> and cloze two here",
+              "The cloze one and <span style='color:#2196f3'>[...]</span> here",
+              "Plain"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCountsReviewMode": {
+        "sumNew": 5,
+        "sumDue": 0,
+        "distinctNew": 5,
+        "distinctDue": 0,
+        "distinctAny": 5
+      },
+      "remainingTreeCramMode": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "Fwd",
+              "Back",
+              "The <span style='color:#2196f3'>[...]</span> and cloze two here",
+              "The cloze one and <span style='color:#2196f3'>[...]</span> here",
+              "Plain"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      }
+    }
+  ]
+}

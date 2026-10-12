@@ -1,0 +1,61 @@
+{
+  "vault": [
+    "a.md: #review #review-2",
+    "b.md: #review-2",
+    "c.md: #review"
+  ],
+  "runs": [
+    {
+      "tagsToReview": [
+        "#review",
+        "#review-2"
+      ],
+      "deckOrder": [
+        "#review",
+        "#review-2"
+      ],
+      "decks": [
+        {
+          "deck": "#review",
+          "newNotes": [
+            "a.md",
+            "c.md"
+          ]
+        },
+        {
+          "deck": "#review-2",
+          "newNotes": [
+            "a.md",
+            "b.md"
+          ]
+        }
+      ]
+    },
+    {
+      "tagsToReview": [
+        "#review-2",
+        "#review"
+      ],
+      "deckOrder": [
+        "#review-2",
+        "#review"
+      ],
+      "decks": [
+        {
+          "deck": "#review-2",
+          "newNotes": [
+            "a.md",
+            "b.md"
+          ]
+        },
+        {
+          "deck": "#review",
+          "newNotes": [
+            "a.md",
+            "c.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

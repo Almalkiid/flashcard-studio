@@ -1,0 +1,202 @@
+{
+  "steps": [
+    {
+      "label": "initial: New is collapsed",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "user clicked New: expanded",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "block",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today"
+        ]
+      }
+    },
+    {
+      "label": "file-open redraw with c active",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": true,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ]
+      }
+    },
+    {
+      "label": "any later redraw",
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": true,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ]
+      }
+    }
+  ]
+}

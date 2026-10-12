@@ -1,0 +1,538 @@
+{
+  "note": "first redraw vs the next one",
+  "cases": [
+    {
+      "id": "active-is-first-in-collapsed-group",
+      "activeFile": "n/a.md",
+      "firstRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "secondRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersAfterFirst": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ]
+      }
+    },
+    {
+      "id": "active-is-third-in-collapsed-group",
+      "activeFile": "n/c.md",
+      "firstRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": true,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "secondRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": true,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersAfterFirst": {
+        "#review": [
+          "#review",
+          "Today",
+          "New"
+        ]
+      }
+    },
+    {
+      "id": "active-is-second-in-collapsed-dated-group",
+      "activeFile": "s/y.md",
+      "firstRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "secondRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersAfterFirst": {
+        "#review": [
+          "#review",
+          "Today",
+          "Sep 08 2023"
+        ]
+      }
+    },
+    {
+      "id": "deck-folder-collapsed-active-file-inside",
+      "activeFile": "s/x.md",
+      "firstRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": true,
+          "iconCollapsed": true,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": "none",
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": "none",
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "secondRedraw": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "New",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "a",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "b",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "c",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Sep 08 2023",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "x",
+                  "active": true,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "y",
+                  "active": false,
+                  "hasContextButton": true
+                },
+                {
+                  "name": "z",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ]
+    }
+  ]
+}

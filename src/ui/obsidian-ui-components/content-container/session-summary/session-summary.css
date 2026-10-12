@@ -1,0 +1,252 @@
+/* MARK: Session summary */
+
+/* A Flashcard Studio screen: off-white page, white tiles with tinted icons */
+.fs-session-summary {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    /* safe: a summary taller than the screen scrolls from its top instead of losing it */
+    justify-content: safe center;
+    gap: 8px;
+    min-height: 0;
+    padding: 22px 20px;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.fs-studio .fs-session-summary-badge,
+.fs-session-summary-badge.fs-icon-tile {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 6px;
+    border-radius: 19px;
+    animation: fs-session-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.fs-session-summary-badge::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border: 2px solid var(--fs-green);
+    border-radius: 25px;
+    opacity: 0;
+    animation: fs-session-ring 900ms ease-out 250ms both;
+}
+
+.fs-studio .fs-session-summary-badge svg {
+    width: 30px;
+    height: 30px;
+    stroke-width: 2.5px;
+}
+
+.fs-studio .fs-session-summary-title {
+    margin: 0;
+    color: var(--fs-text);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.fs-session-summary-subtitle {
+    font-size: var(--fs-body);
+    color: var(--fs-text-2);
+}
+
+.fs-session-summary-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    width: min(100%, 580px);
+    margin: 10px 0 4px;
+}
+
+/* Icon beside the number, so the summary fits the review modal without scrolling */
+.fs-studio .fs-session-summary-tile {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 10px;
+    padding: 12px;
+    border-radius: var(--fs-radius-md);
+    text-align: left;
+}
+
+.fs-session-summary-tile-text {
+    min-width: 0;
+}
+
+.fs-studio .fs-session-summary-tile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.fs-studio .fs-session-summary-tile-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.fs-session-summary-value {
+    color: var(--fs-text);
+    font-size: 21px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.fs-session-summary-label {
+    margin-top: 3px;
+    color: var(--fs-text-3);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.theme-dark .fs-session-summary-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.fs-studio .fs-session-summary-streak {
+    height: 30px;
+    padding: 0 14px;
+    background-color: var(--fs-orange-soft);
+    color: var(--fs-orange);
+}
+
+.fs-session-summary-streak-icon {
+    display: flex;
+}
+
+.fs-session-summary-streak-icon .svg-icon {
+    width: 15px;
+    height: 15px;
+}
+
+.fs-session-summary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+/* Obsidian styles every button; the summary's are scoped under it to win */
+.fs-session-summary.fs-studio .fs-session-summary-back {
+    min-width: 160px;
+}
+
+.fs-session-summary.fs-studio .fs-session-summary-mistakes {
+    min-width: 160px;
+}
+
+.fs-session-summary-mistakes-icon {
+    display: flex;
+
+    & svg {
+        width: 17px;
+        height: 17px;
+    }
+}
+
+.fs-session-summary.fs-studio .fs-session-summary-secondary,
+.fs-session-summary.fs-studio .fs-session-summary-stats {
+    height: 44px;
+    min-width: 160px;
+    padding: 0 20px;
+    border: 1px solid var(--fs-border-strong);
+    border-radius: 14px;
+    background-color: var(--fs-surface);
+    box-shadow: var(--fs-shadow);
+    color: var(--fs-text);
+    font-family: var(--fs-font);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.fs-session-summary.fs-studio .fs-session-summary-secondary:hover,
+.fs-session-summary.fs-studio .fs-session-summary-stats:hover {
+    border-color: var(--fs-accent);
+    color: var(--fs-accent);
+}
+
+.fs-session-summary.fs-studio .fs-session-summary-undo {
+    height: auto;
+    margin-top: 2px;
+    padding: 6px 10px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--fs-text-3);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+}
+
+.fs-session-summary.fs-studio .fs-session-summary-undo:hover {
+    background: transparent;
+    box-shadow: none;
+    color: var(--fs-text);
+}
+
+.is-phone .fs-session-summary-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 340px);
+}
+
+.is-phone .fs-session-summary.fs-studio .fs-session-summary-actions button {
+    min-height: 48px;
+}
+
+.is-phone .fs-session-summary-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* While the summary shows there is no card, so the card actions of the toolbar have nothing to act on */
+.fs-summary-open .fs-card-toolbar {
+    .fs-edit-button,
+    .fs-reset-button,
+    .fs-skip-button,
+    .fs-menu-dots-button,
+    > .fs-divider {
+        display: none !important;
+    }
+}
+
+@keyframes fs-session-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fs-session-ring {
+    from {
+        opacity: 0.6;
+        transform: scale(0.85);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.25);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-session-summary-badge,
+    .fs-session-summary-badge::after {
+        animation: none;
+    }
+}

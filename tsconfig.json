@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "ES2018",
+        "lib": ["dom", "dom.Iterable", "scripthost", "ES5", "ES6", "ES7", "ES2021"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "allowJs": true,
+        "importHelpers": true,
+        "noEmit": true,
+        "noImplicitAny": true,
+        "strictBindCallApply": true,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "jsx": "react",
+        "jsxFactory": "h",
+        "types": ["node", "jest"],
+        "paths": { "src/*": ["./src/*"] }
+    },
+    "include": ["src/**/*", "tests/**/*"],
+    "exclude": ["build", "coverage", "node_modules", "tests/e2e"],
+    "files": ["node_modules/jest-expect-message/types/index.d.ts", "eslint.config.mjs"]
+}

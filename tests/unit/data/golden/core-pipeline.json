@@ -1,0 +1,192 @@
+{
+  "today": "2023-09-06",
+  "vectors": [
+    {
+      "id": "mixed-notes-and-cards",
+      "note": "Notes tagged #review enter the note review queue; notes with the flashcard tag feed the deck hierarchy; one note can do both. sr-due in the past (relative to 2023-09-06) counts as due.",
+      "settings": {},
+      "files": [
+        {
+          "path": "a.md",
+          "text": "#review\nplain note a\n"
+        },
+        {
+          "path": "b.md",
+          "text": "---\nsr-due: 2023-09-01\nsr-interval: 4\nsr-ease: 270\n---\n#review\nscheduled and overdue note b\n"
+        },
+        {
+          "path": "c.md",
+          "text": "---\nsr-due: 2023-10-01\nsr-interval: 4\nsr-ease: 270\n---\n#review/sub\nscheduled later\n"
+        },
+        {
+          "path": "d.md",
+          "text": "#flashcards #review\nD1::d1\n"
+        },
+        {
+          "path": "e.md",
+          "text": "#flashcards\nE1::e1\n"
+        }
+      ],
+      "noteReviewDecks": [
+        {
+          "name": "#review",
+          "newNotes": [
+            "a.md",
+            "d.md"
+          ],
+          "scheduled": [
+            "b.md",
+            "c.md"
+          ],
+          "due": 1
+        }
+      ],
+      "dueNotesCount": 1,
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "D1",
+              "E1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCounts": 2
+    },
+    {
+      "id": "note-tags-to-ignore",
+      "note": "noteTagsToIgnore keeps a note out of the review queue (but not out of the flashcards).",
+      "settings": {
+        "noteTagsToIgnore": [
+          "#skip"
+        ]
+      },
+      "files": [
+        {
+          "path": "a.md",
+          "text": "#review #skip\nx\n"
+        },
+        {
+          "path": "b.md",
+          "text": "#flashcards #review #skip\nB1::b1\n"
+        },
+        {
+          "path": "c.md",
+          "text": "#review\nx\n"
+        }
+      ],
+      "noteReviewDecks": [
+        {
+          "name": "#review",
+          "newNotes": [
+            "c.md"
+          ],
+          "scheduled": [],
+          "due": 0
+        }
+      ],
+      "dueNotesCount": 0,
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "B1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "remainingCounts": 1
+    },
+    {
+      "id": "two-review-tags",
+      "note": "tagsToReview lists two tags: a note carrying both is queued in both decks (new) in the order of the setting.",
+      "settings": {
+        "tagsToReview": [
+          "#review",
+          "#read"
+        ]
+      },
+      "files": [
+        {
+          "path": "a.md",
+          "text": "#read #review\nx\n"
+        },
+        {
+          "path": "b.md",
+          "text": "#read\ny\n"
+        }
+      ],
+      "noteReviewDecks": [
+        {
+          "name": "#review",
+          "newNotes": [
+            "a.md"
+          ],
+          "scheduled": [],
+          "due": 0
+        },
+        {
+          "name": "#read",
+          "newNotes": [
+            "a.md",
+            "b.md"
+          ],
+          "scheduled": [],
+          "due": 0
+        }
+      ],
+      "dueNotesCount": 0,
+      "reviewableTree": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": []
+      },
+      "remainingCounts": 0
+    },
+    {
+      "id": "before-loadInitialStateOfCore",
+      "remainingTreeAfterFinalize": null,
+      "finalizeResult": null,
+      "reviewableTreeName": "root"
+    },
+    {
+      "id": "second-load-of-empty-state",
+      "note": "loadInitialStateOfCore starts a new empty full tree but leaves the previously published reviewable/remaining trees in place until finalizeLoad replaces them",
+      "reviewableBeforeFinalize": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": [
+          {
+            "name": "flashcards",
+            "new": [
+              "A1"
+            ],
+            "due": [],
+            "sub": []
+          }
+        ]
+      },
+      "reviewableAfterFinalize": {
+        "name": "root",
+        "new": [],
+        "due": [],
+        "sub": []
+      }
+    }
+  ]
+}

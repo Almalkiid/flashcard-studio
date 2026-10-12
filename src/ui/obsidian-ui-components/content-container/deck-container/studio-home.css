@@ -1,0 +1,354 @@
+/* Studio home (the deck list in the Studio look). Built only from the tokens in src/ui/design/studio-tokens.css. */
+
+.fs-home {
+    gap: 14px;
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 6px 2px 28px;
+}
+
+/* MARK: Greeting */
+
+.fs-home-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 4px 4px;
+}
+
+.fs-home-greeting {
+    font-size: var(--fs-title);
+    font-weight: 500;
+    color: var(--fs-text);
+    letter-spacing: -0.01em;
+}
+
+.fs-home-name {
+    font-size: var(--fs-display);
+    font-weight: 750;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--fs-text);
+}
+
+.fs-home-tagline {
+    margin-top: 6px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
+.fs-home-head-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.fs-studio .fs-round-button {
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    align-items: center;
+    border-radius: 50%;
+    color: var(--fs-text-2) !important;
+    border: 1px solid var(--fs-border);
+    box-shadow: var(--fs-shadow);
+    width: 38px;
+    background-color: var(--fs-surface) !important;
+    cursor: pointer;
+
+    & svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover {
+        color: var(--fs-text) !important;
+    }
+}
+
+/* MARK: Daily goal */
+
+.fs-home-goal {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    gap: 18px;
+    cursor: pointer;
+    transition: transform 120ms ease;
+
+    &:active {
+        transform: scale(0.99);
+    }
+}
+
+.fs-home-ring {
+    --fs-ring: 0;
+
+    flex: none;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background:
+        radial-gradient(closest-side, var(--fs-surface) 76%, transparent 77%),
+        conic-gradient(var(--fs-accent) calc(var(--fs-ring) * 360deg), var(--fs-accent-soft) 0);
+    transition: background 400ms ease;
+}
+
+.fs-home-goal-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-home-goal-label {
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    color: var(--fs-text-2);
+}
+
+.fs-home-goal-number {
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.fs-home-goal-done {
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    color: var(--fs-text);
+}
+
+.fs-home-goal-target {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--fs-text-2);
+}
+
+.fs-home-goal-detail {
+    margin-top: 2px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
+.fs-home-chevron {
+    display: flex;
+    color: var(--fs-text-3);
+
+    & svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* MARK: Insight tiles */
+
+.fs-home-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.fs-home-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px 12px;
+    text-align: center;
+}
+
+.fs-home-tile-icon {
+    display: flex;
+    color: var(--fs-tile);
+
+    & svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 2;
+    }
+}
+
+.fs-home-tile-value {
+    margin-top: 8px;
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fs-text);
+}
+
+.fs-home-tile-label {
+    margin-top: 1px;
+    font-size: var(--fs-micro);
+    color: var(--fs-text-3);
+}
+
+/* MARK: Focus */
+
+.fs-home-focus-slot:empty {
+    display: none;
+}
+
+.fs-home-focus {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 14px;
+    border-color: color-mix(in srgb, var(--fs-orange) 28%, var(--fs-border));
+    background: linear-gradient(120deg, var(--fs-orange-soft), transparent 70%), var(--fs-surface);
+}
+
+.fs-home-focus-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-home-focus-label {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fs-orange);
+}
+
+.fs-home-focus-icon {
+    display: flex;
+
+    & svg {
+        width: 13px;
+        height: 13px;
+        stroke-width: 2.4;
+    }
+}
+
+.fs-home-focus-deck {
+    margin-top: 2px;
+    font-size: var(--fs-body);
+    font-weight: 650;
+    color: var(--fs-text);
+}
+
+.fs-home-focus-detail {
+    margin-top: 1px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
+/* MARK: Decks */
+
+.fs-home-section {
+    display: flex;
+    flex-direction: column;
+    margin-top: 6px;
+    gap: 10px;
+}
+
+.fs-home-section-title {
+    padding: 0 4px;
+    font-size: var(--fs-headline);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--fs-text);
+}
+
+.fs-home-decks {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.fs-home-deck {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 14px;
+    transition:
+        transform 120ms ease,
+        box-shadow 140ms ease;
+
+    &[data-depth="1"] {
+        margin-left: 18px;
+    }
+
+    &[data-depth="2"],
+    &[data-depth="3"] {
+        margin-left: 36px;
+    }
+
+    &.is-clickable {
+        cursor: pointer;
+    }
+
+    &.is-clickable:hover,
+    &.is-clickable:focus-visible {
+        box-shadow: var(--fs-shadow-lg);
+        outline: none;
+    }
+
+    &.is-clickable:active {
+        transform: scale(0.99);
+    }
+
+    &.is-done .fs-icon-tile {
+        filter: grayscale(0.6);
+        opacity: 0.7;
+    }
+
+    &.is-done .fs-home-chevron {
+        color: var(--fs-green);
+    }
+}
+
+.fs-home-deck-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.fs-home-deck-name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--fs-text);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.fs-home-deck-sub {
+    margin-top: 2px;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+}
+
+.fs-studio .fs-home-study {
+    flex: none;
+    height: 34px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--fs-font);
+    font-size: var(--fs-caption);
+    font-weight: 650;
+    color: var(--fs-on-accent) !important;
+    background-color: var(--fs-accent) !important;
+    box-shadow: 0 6px 14px -8px color-mix(in srgb, var(--fs-accent) 80%, transparent);
+    cursor: pointer;
+}
+
+/* MARK: Phones */
+
+.is-phone .fs-home {
+    padding-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-home-goal,
+    .fs-home-deck,
+    .fs-home-ring {
+        transition: none;
+    }
+}

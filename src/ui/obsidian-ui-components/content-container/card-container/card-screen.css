@@ -1,0 +1,147 @@
+/* The card screen: the card itself, its flag, the answer toast. The Studio look (review-studio.css) restyles all of it. */
+
+.fs-card-container {
+    position: relative;
+    --fs-card-side-padding: 8px;
+
+    /* The card takes what the toolbar and the answer row leave, and scrolls inside that */
+    .fs-scroll-wrapper {
+        overflow: hidden;
+        height: 100px;
+        flex-grow: 1;
+        display: flex;
+    }
+
+    .fs-content {
+        padding-block: var(--fs-space-2) 0;
+        padding-inline: var(--fs-card-side-padding);
+        overflow: hidden auto;
+        user-select: text;
+        font-size: var(--font-text-size);
+        word-break: break-word;
+        flex-grow: 1;
+
+        p {
+            margin-top: 0;
+        }
+
+        /* The line between the question and the answer */
+        hr {
+            margin: var(--fs-space-4) 0;
+            backdrop-filter: invert(0.4);
+            border-top-style: dashed;
+        }
+
+        .cloze-input {
+            block-size: 1.4rem;
+        }
+
+        /* A typed cloze answer: right in green, wrong crossed out in red */
+        .cloze-answer-correct,
+        .cloze-answer-wrong {
+            text-decoration: none;
+            color: green;
+        }
+
+        .cloze-answer-incorrect {
+            text-decoration: line-through;
+            color: red;
+        }
+    }
+
+    @media (orientation: landscape) {
+        .is-phone & .fs-content {
+            padding-block-start: 0;
+
+            hr {
+                margin-block: 2px;
+                margin-inline: 0;
+            }
+        }
+    }
+
+    @media (max-height: 490px) and (orientation: landscape) {
+        .is-phone & .fs-content {
+            hr {
+                margin: 4px 0;
+            }
+
+            p {
+                margin-block: 4px;
+            }
+        }
+    }
+}
+
+/* Card flags (Anki colours): Studio draws them as a bar on the card, Classic as a border */
+.fs-scroll-wrapper {
+    &.fs-flag-1 {
+        --fs-flag-color: var(--color-red);
+    }
+
+    &.fs-flag-2 {
+        --fs-flag-color: var(--color-orange);
+    }
+
+    &.fs-flag-3 {
+        --fs-flag-color: var(--color-green);
+    }
+
+    &.fs-flag-4 {
+        --fs-flag-color: var(--color-blue);
+    }
+
+    &.fs-flag-5 {
+        --fs-flag-color: var(--color-pink);
+    }
+
+    &.fs-flag-6 {
+        --fs-flag-color: var(--color-cyan);
+    }
+
+    &.fs-flag-7 {
+        --fs-flag-color: var(--color-purple);
+    }
+}
+
+.fs-look-classic .fs-scroll-wrapper[class*="fs-flag-"] {
+    border-left: solid 4px var(--fs-flag-color, transparent);
+}
+
+/* Short-lived confirmation of the last answer, with undo */
+.fs-answer-toast {
+    animation: fs-toast-in 160ms ease-out;
+    z-index: var(--layer-popover);
+    white-space: nowrap;
+    font-size: var(--font-ui-small);
+    box-shadow: var(--shadow-s);
+    background-color: var(--background-secondary-alt);
+    border-radius: var(--radius-l);
+    padding: var(--fs-space-2) var(--fs-space-3);
+    gap: var(--fs-space-3);
+    align-items: center;
+    display: flex;
+    transform: translateX(-50%);
+    bottom: calc(var(--fs-space-4) + var(--size-4-16));
+    left: 50%;
+    position: absolute;
+}
+
+.fs-answer-toast-rating {
+    font-weight: var(--font-semibold);
+}
+
+.fs-answer-toast-interval {
+    color: var(--fs-ink-muted);
+}
+
+.fs-answer-toast-undo {
+    padding: var(--size-2-1) var(--fs-space-2);
+    font-size: var(--font-ui-small);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-answer-toast {
+        animation: none;
+    }
+}

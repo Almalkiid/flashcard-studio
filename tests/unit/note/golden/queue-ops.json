@@ -1,0 +1,283 @@
+{
+  "note": "paths are fake; due dates local midnight",
+  "steps": [
+    {
+      "label": "after four adds (n4 has no tags: no deck, no entry)",
+      "deckOrder": [
+        "#a",
+        "#b"
+      ],
+      "decks": [
+        {
+          "deck": "#a",
+          "dueNotesCount": 0,
+          "newNotes": [
+            "n1.md",
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#a",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#b",
+          "dueNotesCount": 0,
+          "newNotes": [
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#b",
+            "Today"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "after calcDueNotesCount(2023-09-06)",
+      "deckOrder": [
+        "#a",
+        "#b"
+      ],
+      "dueNotesCount": 2,
+      "decks": [
+        {
+          "deck": "#a",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n1.md",
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#a",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#b",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#b",
+            "Today"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "n3 (new, in #b then #a) rated: only the FIRST deck in map order (#a) is updated",
+      "deckOrder": [
+        "#a",
+        "#b"
+      ],
+      "dueNotesCount": 2,
+      "decks": [
+        {
+          "deck": "#a",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n1.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "n3.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#a",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#b",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#b",
+            "Today"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "n2 (scheduled, in #a and #b) rated: only #a updated; #b keeps the old due date",
+      "deckOrder": [
+        "#a",
+        "#b"
+      ],
+      "dueNotesCount": 2,
+      "decks": [
+        {
+          "deck": "#a",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n1.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-30 00:00",
+                "ms": 1696032000000
+              }
+            },
+            {
+              "path": "n3.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#a",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#b",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#b",
+            "Today"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "unknown note: nothing changes",
+      "deckOrder": [
+        "#a",
+        "#b"
+      ],
+      "dueNotesCount": 2,
+      "decks": [
+        {
+          "deck": "#a",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n1.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-30 00:00",
+                "ms": 1696032000000
+              }
+            },
+            {
+              "path": "n3.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#a",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#b",
+          "dueNotesCount": 1,
+          "newNotes": [
+            "n3.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "n2.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#b",
+            "Today"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "after init(): all decks gone; dueNotesCount keeps its last value until calcDueNotesCount",
+      "deckOrder": [],
+      "dueNotesCount": 2,
+      "decks": []
+    }
+  ]
+}

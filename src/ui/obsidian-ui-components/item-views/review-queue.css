@@ -1,0 +1,71 @@
+/* The list of notes waiting for review. */
+
+.fs-note-review-header-subtitle-wrapper {
+    color: var(--fs-ink-faint);
+    font-size: var(--font-ui-small);
+}
+
+.fs-note-review-header-title {
+    font-weight: var(--font-semibold);
+    font-size: var(--font-ui-large);
+}
+
+.fs-note-review-header-title-icon {
+    align-items: center;
+    display: flex;
+}
+
+.fs-note-review-header-title-wrapper {
+    gap: var(--fs-space-2);
+    display: flex;
+    align-items: center;
+    flex-flow: row;
+}
+
+.fs-note-review-header {
+    padding: var(--fs-space-2);
+    gap: var(--fs-space-2);
+    border-bottom: var(--fs-rule);
+    flex-flow: column;
+    display: flex;
+}
+
+.fs-review-context-btn {
+    cursor: pointer;
+}
+
+.fs-review-context-btn:hover {
+    --context-btn-hover: var(--background-modifier-hover, transparent);
+
+    background-color: var(--context-btn-hover);
+}
+
+.fs-note-review-page {
+    gap: var(--fs-space-4);
+    flex-flow: column;
+    display: flex;
+
+    /* The folders sit directly under the title, without an arrow's indent or a guide line */
+    .mod-root.tree-item > .tree-item-children {
+        border-inline-start: none;
+        margin-inline-start: 0;
+        padding-inline-start: 0;
+    }
+
+    .tree-item-self:hover {
+        --queue-row-hover: var(--background-modifier-hover, transparent);
+
+        border-radius: var(--input-radius);
+        background-color: var(--queue-row-hover);
+    }
+
+    .nav-file-title {
+        justify-content: space-between;
+        flex-flow: row;
+        display: flex;
+    }
+
+    .nav-file-title-content {
+        flex-grow: 1;
+    }
+}

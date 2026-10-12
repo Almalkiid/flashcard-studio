@@ -1,0 +1,2187 @@
+{
+  "vault": {
+    "inbox/alpha.md": "#review\nSee [[beta]] and [[gamma]]\n",
+    "inbox/beta.md": "---\nsr-due: 2023-09-05\nsr-interval: 3\nsr-ease: 250\n---\n#review\nLinks to [[alpha]]\n",
+    "inbox/gamma.md": "---\ntags: review\nauthor: me\n---\nGamma body [[alpha]]\n",
+    "inbox/eta.md": "#review #review-2\n[[alpha]]\n",
+    "inbox/zeta.md": "#review #ignore-me\n",
+    "inbox/late.md": "---\nsr-due: 2023-08-20\nsr-interval: 10\nsr-ease: 250\n---\n#review\n",
+    "inbox/future.md": "---\nsr-due: 2023-09-20\nsr-interval: 14\nsr-ease: 250\n---\n#review\n"
+  },
+  "cases": [
+    {
+      "id": "new-easy",
+      "note": "new note, no links to reviewed notes",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/alpha.md",
+      "response": "Easy",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-10",
+        "sr-interval: 4",
+        "sr-ease: 270"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-10 00:00",
+                  "ms": 1694304000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-10 00:00",
+                  "ms": 1694304000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/alpha.md": 270,
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "new-good",
+      "note": "",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/alpha.md",
+      "response": "Good",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-09",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/alpha.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "new-hard",
+      "note": "",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/alpha.md",
+      "response": "Hard",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-07",
+        "sr-interval: 1",
+        "sr-ease: 230"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-07 00:00",
+                  "ms": 1694044800000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-07 00:00",
+                  "ms": 1694044800000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/alpha.md": 230,
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "new-with-frontmatter-keeps-other-keys",
+      "note": "frontmatter without schedule keys: other keys stay, three keys appended",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/gamma.md",
+      "response": "Good",
+      "frontmatterBefore": [
+        "tags: review",
+        "author: me"
+      ],
+      "frontmatterAfter": [
+        "tags: review",
+        "author: me",
+        "sr-due: 2023-09-09",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/gamma.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/gamma.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/gamma.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "scheduled-overdue-good",
+      "note": "due 2023-09-05, interval 3, rated a day late",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/beta.md",
+      "response": "Good",
+      "frontmatterBefore": [
+        "sr-due: 2023-09-05",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "frontmatterAfter": [
+        "sr-due: 2023-09-15",
+        "sr-interval: 9",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-15 00:00",
+                  "ms": 1694736000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-15 00:00",
+                  "ms": 1694736000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "scheduled-overdue-easy",
+      "note": "",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/beta.md",
+      "response": "Easy",
+      "frontmatterBefore": [
+        "sr-due: 2023-09-05",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "frontmatterAfter": [
+        "sr-due: 2023-09-19",
+        "sr-interval: 13",
+        "sr-ease: 270"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-19 00:00",
+                  "ms": 1695081600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-19 00:00",
+                  "ms": 1695081600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 270,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "scheduled-overdue-hard",
+      "note": "",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/beta.md",
+      "response": "Hard",
+      "frontmatterBefore": [
+        "sr-due: 2023-09-05",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "frontmatterAfter": [
+        "sr-due: 2023-09-08",
+        "sr-interval: 2",
+        "sr-ease: 230"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-08 00:00",
+                  "ms": 1694131200000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-08 00:00",
+                  "ms": 1694131200000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 230,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "scheduled-very-late-good",
+      "note": "due 2023-08-20 (17 days late), interval 10",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/late.md",
+      "response": "Good",
+      "frontmatterBefore": [
+        "sr-due: 2023-08-20",
+        "sr-interval: 10",
+        "sr-ease: 250"
+      ],
+      "frontmatterAfter": [
+        "sr-due: 2023-10-22",
+        "sr-interval: 46",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              },
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-10-22 00:00",
+                  "ms": 1697932800000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 1,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 1,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              },
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-10-22 00:00",
+                  "ms": 1697932800000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "scheduled-early-good",
+      "note": "due 2023-09-20 (14 days early), interval 14",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {},
+      "path": "inbox/future.md",
+      "response": "Good",
+      "frontmatterBefore": [
+        "sr-due: 2023-09-20",
+        "sr-interval: 14",
+        "sr-ease: 250"
+      ],
+      "frontmatterAfter": [
+        "sr-due: 2023-10-11",
+        "sr-interval: 35",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-10-11 00:00",
+                  "ms": 1696982400000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-10-11 00:00",
+                  "ms": 1696982400000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "two-decks-good",
+      "note": "note in #review and #review-2: only the first deck is updated in memory",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {
+        "tagsToReview": [
+          "#review",
+          "#review-2"
+        ]
+      },
+      "path": "inbox/eta.md",
+      "response": "Good",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-09",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review",
+          "#review-2"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          },
+          {
+            "deck": "#review-2",
+            "dueNotesCount": 0,
+            "newNotes": [
+              "inbox/eta.md"
+            ],
+            "scheduledNotes": [],
+            "activeFolders": [
+              "#review-2",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review",
+          "#review-2"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/eta.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          },
+          {
+            "deck": "#review-2",
+            "dueNotesCount": 0,
+            "newNotes": [
+              "inbox/eta.md"
+            ],
+            "scheduledNotes": [],
+            "activeFolders": [
+              "#review-2",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review",
+          "#review-2"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/eta.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          },
+          {
+            "deck": "#review-2",
+            "dueNotesCount": 0,
+            "newNotes": [],
+            "scheduledNotes": [
+              {
+                "path": "inbox/eta.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review-2",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/eta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "ignored-by-tag-good",
+      "note": "note with a tag in noteTagsToIgnore: schedule is written but the queue never had it",
+      "clock": "2023-09-06T12:00:00",
+      "settingsOverrides": {
+        "noteTagsToIgnore": [
+          "#ignore-me"
+        ]
+      },
+      "path": "inbox/zeta.md",
+      "response": "Good",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-09",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250,
+        "inbox/zeta.md": 250
+      }
+    },
+    {
+      "id": "boundary-0400-at-0200-good",
+      "note": "startOfDay 04:00:00 and it is 02:00 on 2023-09-07: the study day is still 2023-09-06",
+      "clock": "2023-09-07T02:00:00",
+      "settingsOverrides": {
+        "startOfDay": "04:00:00"
+      },
+      "path": "inbox/alpha.md",
+      "response": "Good",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-09",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-09 00:00",
+                  "ms": 1694217600000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/alpha.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    },
+    {
+      "id": "boundary-0400-at-0500-good",
+      "note": "same boundary at 05:00: the study day is 2023-09-07",
+      "clock": "2023-09-07T05:00:00",
+      "settingsOverrides": {
+        "startOfDay": "04:00:00"
+      },
+      "path": "inbox/alpha.md",
+      "response": "Good",
+      "frontmatterBefore": null,
+      "frontmatterAfter": [
+        "sr-due: 2023-09-10",
+        "sr-interval: 3",
+        "sr-ease: 250"
+      ],
+      "queueBefore": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/alpha.md",
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRating": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-10 00:00",
+                  "ms": 1694304000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "queueAfterRescan": {
+        "deckOrder": [
+          "#review"
+        ],
+        "dueNotesCount": 2,
+        "decks": [
+          {
+            "deck": "#review",
+            "dueNotesCount": 2,
+            "newNotes": [
+              "inbox/gamma.md",
+              "inbox/eta.md",
+              "inbox/zeta.md"
+            ],
+            "scheduledNotes": [
+              {
+                "path": "inbox/late.md",
+                "due": {
+                  "local": "2023-08-20 00:00",
+                  "ms": 1692489600000
+                }
+              },
+              {
+                "path": "inbox/beta.md",
+                "due": {
+                  "local": "2023-09-05 00:00",
+                  "ms": 1693872000000
+                }
+              },
+              {
+                "path": "inbox/alpha.md",
+                "due": {
+                  "local": "2023-09-10 00:00",
+                  "ms": 1694304000000
+                }
+              },
+              {
+                "path": "inbox/future.md",
+                "due": {
+                  "local": "2023-09-20 00:00",
+                  "ms": 1695168000000
+                }
+              }
+            ],
+            "activeFolders": [
+              "#review",
+              "Today"
+            ]
+          }
+        ]
+      },
+      "noteEaseList": {
+        "inbox/alpha.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/future.md": 250,
+        "inbox/late.md": 250
+      }
+    }
+  ]
+}

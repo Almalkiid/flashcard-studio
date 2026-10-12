@@ -1,0 +1,105 @@
+/* Studio look for the deck list: calm rows, counts as coloured numbers instead of pills. */
+
+.fs-deck-container.fs-look-studio {
+    background-color: var(--background-secondary);
+
+    .fs-content {
+        padding-block: var(--fs-space-2) var(--fs-space-4);
+        padding-inline: var(--fs-space-4);
+    }
+
+    /* Column titles */
+    .fs-header-row {
+        .fs-tree-item-row {
+            padding-bottom: var(--fs-space-2);
+            margin-bottom: var(--fs-space-2);
+            border-bottom: var(--fs-rule);
+        }
+
+        .fs-tree-numbers-text,
+        .fs-tree-row-text {
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--fs-ink-faint) !important;
+            font-size: var(--font-ui-smaller);
+            font-weight: var(--font-semibold);
+        }
+    }
+
+    /* Deck rows */
+    .fs-tree-container {
+        .fs-tree-item-row {
+            transition: background-color 120ms ease;
+            padding-block: var(--fs-space-1);
+            border-radius: var(--radius-m);
+            align-items: center;
+            min-height: 40px;
+
+            &.is-clickable:hover {
+                background-color: var(--fs-hover-fill);
+            }
+
+            &.is-disabled {
+                opacity: 0.55;
+            }
+        }
+
+        .tag-pane-tag-self {
+            color: var(--text-normal);
+            font-size: var(--font-ui-medium);
+        }
+
+        /* The first row ("All decks") leads the list */
+        > .tree-item:first-child > .tree-item-self .tag-pane-tag-self {
+            font-weight: var(--font-semibold);
+        }
+    }
+
+    /* Counts: due and new in colour, the rest quiet, zero faded. The extra class outranks the original rule that
+       forces white text on the coloured pills. */
+    .fs-tree-stats-count {
+        &.tree-item-flair {
+            font-variant-numeric: tabular-nums;
+            color: var(--fs-ink-muted) !important;
+            font-weight: var(--font-semibold);
+            background: none !important;
+            text-align: right;
+            min-width: 2.6em;
+            padding: 0;
+        }
+
+        &.fs-bg-green {
+            color: var(--color-green) !important;
+        }
+
+        &.fs-bg-blue {
+            color: var(--color-blue) !important;
+        }
+
+        &.fs-bg-red,
+        &.fs-bg-yellow {
+            font-weight: var(--font-normal);
+        }
+
+        &.fs-is-zero {
+            font-weight: var(--font-normal);
+            color: var(--fs-ink-faint) !important;
+            opacity: 0.6;
+        }
+    }
+}
+
+.theme-dark .fs-deck-container.fs-look-studio {
+    background-color: var(--background-primary);
+}
+
+.is-phone .fs-deck-container.fs-look-studio {
+    .fs-content {
+        padding-block: var(--fs-space-2) var(--fs-space-3);
+        padding-inline: var(--fs-space-3);
+    }
+
+    .fs-tree-container .fs-tree-item-row {
+        min-height: 46px;
+    }
+}

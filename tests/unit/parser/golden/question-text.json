@@ -1,0 +1,303 @@
+[
+ {
+  "id": "qt-plain",
+  "options": {},
+  "original": "Q::A",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-trailing-ws",
+  "options": {},
+  "original": "Q::A   \n",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-leading-ws",
+  "options": {},
+  "original": "   Q::A",
+  "actualQuestion": "   Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "   Q::A",
+  "textHash": "2b4b365cd343e",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag",
+  "options": {},
+  "original": "#flashcards/x Q::A",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": {
+   "pre": "",
+   "tag": "#flashcards/x",
+   "post": " "
+  },
+  "formatTopicAndQuestion": "#flashcards/x Q::A",
+  "textHash": "197b447a5506d5",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-ws",
+  "options": {},
+  "original": "  #flashcards/x   Q::A",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": {
+   "pre": "  ",
+   "tag": "#flashcards/x",
+   "post": "   "
+  },
+  "formatTopicAndQuestion": "  #flashcards/x   Q::A",
+  "textHash": "175cf43f3b9bdc",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-only",
+  "options": {},
+  "original": "#flashcards/x",
+  "actualQuestion": "",
+  "blockId": null,
+  "topic": {
+   "pre": "",
+   "tag": "#flashcards/x",
+   "post": ""
+  },
+  "formatTopicAndQuestion": "#flashcards/x",
+  "textHash": "b81143b2fa2d4",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-nested-hash",
+  "options": {},
+  "original": "#a#b Q::A",
+  "actualQuestion": "#b Q::A",
+  "blockId": null,
+  "topic": {
+   "pre": "",
+   "tag": "#a",
+   "post": ""
+  },
+  "formatTopicAndQuestion": "#a#b Q::A",
+  "textHash": "fa9b69653c7ad",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-line2",
+  "options": {},
+  "original": "Q\n#flashcards/x\n?\nA",
+  "actualQuestion": "Q\n#flashcards/x\n?\nA",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q\n#flashcards/x\n?\nA",
+  "textHash": "1acae194061ab6",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-folder",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "original": "#flashcards/x Q::A",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-blockid",
+  "options": {},
+  "original": "Q::A ^abc-1",
+  "actualQuestion": "Q::A",
+  "blockId": "^abc-1",
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-blockid-nospace",
+  "options": {},
+  "original": "Q::A^abc",
+  "actualQuestion": "Q::A^abc",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A^abc",
+  "textHash": "b84211395f688",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-blockid-mid",
+  "options": {},
+  "original": "Q::A ^abc more",
+  "actualQuestion": "Q::A ^abc more",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A ^abc more",
+  "textHash": "98c5ac5c3dbc",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-blockid-ml",
+  "options": {},
+  "original": "Q\n?\nA ^zz",
+  "actualQuestion": "Q\n?\nA",
+  "blockId": "^zz",
+  "topic": null,
+  "formatTopicAndQuestion": "Q\n?\nA",
+  "textHash": "b93b633cad880",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-blockid-bad-chars",
+  "options": {},
+  "original": "Q::A ^ab_c",
+  "actualQuestion": "Q::A ^ab_c",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A ^ab_c",
+  "textHash": "f75e60a907d21",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment",
+  "options": {},
+  "original": "Q::A <!--SR:!2026-10-20,12,260-->",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment-nextline",
+  "options": {},
+  "original": "Q::A\n<!--SR:!2026-10-20,12,260-->",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment-blockid",
+  "options": {},
+  "original": "Q::A <!--SR:!2026-10-20,12,260--> ^abc",
+  "actualQuestion": "Q::A",
+  "blockId": "^abc",
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A",
+  "textHash": "1dd13d8b1b6400",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment-callout",
+  "options": {},
+  "original": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260-->",
+  "actualQuestion": "Q::A\n> [!sr|card-metadata] \n>",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q::A\n> [!sr|card-metadata] \n>",
+  "textHash": "f92c163a2bcae",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment-mid",
+  "options": {},
+  "original": "Q <!--SR:!2026-10-20,12,260--> tail::x",
+  "actualQuestion": "Q  tail::x",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q  tail::x",
+  "textHash": "1ae95082f10b91",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-two-comments",
+  "options": {},
+  "original": "A <!--SR:!2026-10-20,12,260--> B <!--SR:!2026-10-21,5,250--> C",
+  "actualQuestion": "A  C",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "A  C",
+  "textHash": "16f5c635120a78",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-comment-two-lines",
+  "options": {},
+  "original": "Q\n<!--SR:!2026-10-20,12,260-->\n<!--SR:!2026-10-21,5,250-->",
+  "actualQuestion": "Q",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q",
+  "textHash": "1543089e390910",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-comment-blockid",
+  "options": {},
+  "original": "#flashcards/x  Q::A <!--SR:!2026-10-20,12,260--> ^abc",
+  "actualQuestion": "Q::A",
+  "blockId": "^abc",
+  "topic": {
+   "pre": "",
+   "tag": "#flashcards/x",
+   "post": "  "
+  },
+  "formatTopicAndQuestion": "#flashcards/x  Q::A",
+  "textHash": "1eec96d933e7d3",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-codeblock-end",
+  "options": {},
+  "original": "Q\n?\n```py\nx\n```",
+  "actualQuestion": "Q\n?\n```py\nx\n```",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "Q\n?\n```py\nx\n```",
+  "textHash": "7d11dafc38e92",
+  "endsWithCodeBlock": true
+ },
+ {
+  "id": "qt-empty",
+  "options": {},
+  "original": "",
+  "actualQuestion": "",
+  "blockId": null,
+  "topic": null,
+  "formatTopicAndQuestion": "",
+  "textHash": "bdcb81aee8d83",
+  "endsWithCodeBlock": false
+ },
+ {
+  "id": "qt-tag-then-newline",
+  "options": {},
+  "original": "#flashcards/x\nQ::A",
+  "actualQuestion": "Q::A",
+  "blockId": null,
+  "topic": {
+   "pre": "",
+   "tag": "#flashcards/x",
+   "post": "\n"
+  },
+  "formatTopicAndQuestion": "#flashcards/x\nQ::A",
+  "textHash": "15f5e6becd2099",
+  "endsWithCodeBlock": false
+ }
+]

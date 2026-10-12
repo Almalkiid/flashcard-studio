@@ -1,0 +1,14 @@
+/* Where the card is from. The Studio look makes it a one-line caption. */
+
+.fs-context {
+    padding-bottom: var(--fs-space-2);
+    color: var(--fs-ink-faint);
+    font-style: italic;
+    word-break: break-word;
+
+    @media (orientation: landscape) {
+        .is-phone & {
+            display: none;
+        }
+    }
+}

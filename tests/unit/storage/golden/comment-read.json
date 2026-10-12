@@ -1,0 +1,768 @@
+[
+ {
+  "id": "c-one",
+  "input": "Q::A <!--SR:!2026-10-20,12,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q::A ",
+  "warnings": 0
+ },
+ {
+  "id": "c-two",
+  "input": "Q::A <!--SR:!2026-10-20,12,260!2026-10-21,5,250-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   },
+   {
+    "comment": "!2026-10-21,5,250",
+    "interval": 5,
+    "ease": 250
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q::A ",
+  "warnings": 0
+ },
+ {
+  "id": "c-placeholder",
+  "input": "Q::A <!--SR:!2000-01-01,1,250!2026-10-21,5,250-->",
+  "schedules": [
+   null,
+   {
+    "comment": "!2026-10-21,5,250",
+    "interval": 5,
+    "ease": 250
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q::A ",
+  "warnings": 0
+ },
+ {
+  "id": "c-fsrs",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z-->",
+  "schedules": [
+   {
+    "comment": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+    "interval": 12,
+    "ease": 250
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-fsrs-empty",
+  "input": "Q <!--SR:!fsrs,-,0,0,0,0,0,0,0,--->",
+  "schedules": [
+   null
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-fsrs-then-sm2",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z!2026-10-20,12,260-->",
+  "schedules": [
+   {
+    "comment": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+    "interval": 12,
+    "ease": 250
+   },
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-fsrs-9-fields",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0-->",
+  "schedules": [
+   {
+    "comment": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,-",
+    "interval": 12,
+    "ease": 250
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-fsrs-8-fields",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0-->",
+  "schedules": [
+   null
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 1
+ },
+ {
+  "id": "c-fsrs-bad-state",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,9,3,0,0,-->",
+  "schedules": [
+   null
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 1
+ },
+ {
+  "id": "c-meta",
+  "input": "Q <!--SR:!2026-10-20,12,260,id=k3f9a2,susp,bury=2026-11-01,flag=3,leech-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": "k3f9a2",
+    "suspended": true,
+    "buryUntil": "2026-11-01",
+    "flag": 3,
+    "leech": true,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-meta-fsrs",
+  "input": "Q <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=ab12cd,flag=2!2026-10-20,12,260,susp-->",
+  "schedules": [
+   {
+    "comment": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+    "interval": 12,
+    "ease": 250
+   },
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": "ab12cd",
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 2,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": true,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-meta-extras",
+  "input": "Q <!--SR:!2026-10-20,12,260,zz=1,id=abc,unknown-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": "abc",
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": [
+     "zz=1",
+     "unknown"
+    ]
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-meta-bad",
+  "input": "Q <!--SR:!2026-10-20,12,260,id=ABC,flag=9,bury=tomorrow-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": [
+     "id=ABC",
+     "flag=9",
+     "bury=tomorrow"
+    ]
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-meta-dup-token",
+  "input": "Q <!--SR:!2026-10-20,12,260,id=aaa,id=bbb,flag=1,flag=2-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": "bbb",
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 2,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-no-bang",
+  "input": "Q <!--SR:2026-10-20,12,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-empty",
+  "input": "Q <!--SR:-->",
+  "schedules": [],
+  "meta": [],
+  "removeScheduleInfo": "Q <!--SR:-->",
+  "warnings": 0
+ },
+ {
+  "id": "c-bangs-only",
+  "input": "Q <!--SR:!!!-->",
+  "schedules": [],
+  "meta": [],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-garbage",
+  "input": "Q <!--SR:!garbage-->",
+  "schedules": [
+   null
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 1
+ },
+ {
+  "id": "c-garbage-between",
+  "input": "Q <!--SR:!2026-10-20,12,260!garbage!2026-10-21,5,250-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   },
+   null,
+   {
+    "comment": "!2026-10-21,5,250",
+    "interval": 5,
+    "ease": 250
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   },
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 1
+ },
+ {
+  "id": "c-fraction",
+  "input": "Q <!--SR:!2026-10-20,12.5,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12.5,260",
+    "interval": 12.5,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-ease-fraction",
+  "input": "Q <!--SR:!2026-10-20,12,260.7-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-dd-mm-yyyy",
+  "input": "Q <!--SR:!20-10-2026,12,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-ddd",
+  "input": "Q <!--SR:!Tue Oct 20 2026,12,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-spaces",
+  "input": "Q <!--SR:! 2026-10-20 , 12 , 260 -->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-multi-line-comment",
+  "input": "Q <!--SR:!2026-10-20,12,\n260-->",
+  "schedules": [],
+  "meta": [],
+  "removeScheduleInfo": "Q <!--SR:!2026-10-20,12,\n260-->",
+  "warnings": 0
+ },
+ {
+  "id": "c-two-comments",
+  "input": "Q <!--SR:!2026-10-20,12,260--> mid <!--SR:!2026-10-21,5,250-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-comment-in-callout",
+  "input": "Q\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q\n> [!sr|card-metadata] \n> ",
+  "warnings": 0
+ },
+ {
+  "id": "c-legacy-fragment",
+  "input": "Wow !2026-10-20,12,260 is a fragment",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [],
+  "removeScheduleInfo": "Wow !2026-10-20,12,260 is a fragment",
+  "warnings": 0
+ },
+ {
+  "id": "c-legacy-fragment-two",
+  "input": "a !2026-10-20,12,260 b !2026-10-21,5,250",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   },
+   {
+    "comment": "!2026-10-21,5,250",
+    "interval": 5,
+    "ease": 250
+   }
+  ],
+  "meta": [],
+  "removeScheduleInfo": "a !2026-10-20,12,260 b !2026-10-21,5,250",
+  "warnings": 0
+ },
+ {
+  "id": "c-with-blockid",
+  "input": "Q <!--SR:!2026-10-20,12,260--> ^abc",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q  ^abc",
+  "warnings": 0
+ },
+ {
+  "id": "c-greedy-line",
+  "input": "Q <!--SR:!2026-10-20,12,260--> mid <!--x--> tail",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q  tail",
+  "warnings": 0
+ },
+ {
+  "id": "c-none",
+  "input": "Q::A",
+  "schedules": [],
+  "meta": [],
+  "removeScheduleInfo": "Q::A",
+  "warnings": 0
+ },
+ {
+  "id": "c-sm2-negative",
+  "input": "Q <!--SR:!2026-10-20,-5,260-->",
+  "schedules": [
+   {
+    "comment": "!2026-10-20,-5,260",
+    "interval": -5,
+    "ease": 260
+   }
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 0
+ },
+ {
+  "id": "c-sm2-zero-date",
+  "input": "Q <!--SR:!0000-00-00,1,250-->",
+  "schedules": [
+   null
+  ],
+  "meta": [
+   {
+    "id": null,
+    "suspended": false,
+    "buryUntil": null,
+    "flag": 0,
+    "leech": false,
+    "extras": []
+   }
+  ],
+  "removeScheduleInfo": "Q ",
+  "warnings": 1
+ }
+]

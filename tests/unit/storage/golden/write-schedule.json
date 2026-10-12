@@ -1,0 +1,2312 @@
+[
+ {
+  "id": "w-sl-next",
+  "note": "first review: comment goes on the next line, card gets an id",
+  "options": {},
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-same",
+  "note": "comment on the same line",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-callout",
+  "note": "comment in the metadata callout",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n>  <!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-callout-same",
+  "note": "callout setting wins over same-line",
+  "options": {
+   "useCalloutsForSchedulingComments": true,
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n>  <!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-again",
+  "note": "second review replaces the comment in place",
+  "options": {},
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-30",
+    "interval": 40,
+    "ease": 270
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-11-30,40,270,id=abc123-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-11-30,40,270",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-again-same",
+  "note": "second review, same-line comment",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-30",
+    "interval": 40,
+    "ease": 270
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A <!--SR:!2026-11-30,40,270,id=abc123-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-11-30,40,270",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-moves-line",
+  "note": "comment was on the same line, setting now says next line: it moves",
+  "options": {},
+  "input": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-moves-same",
+  "note": "comment was on the next line, setting now says same line: it moves",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-callout-again",
+  "note": "second review with the metadata callout",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\n\nR::S",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-30"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-11-30,12,260,id=abc123-->\n\nR::S",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-11-30,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-callout-setting-off",
+  "note": "existing metadata callout kept when the setting is off",
+  "options": {},
+  "input": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\n\nR::S",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-30"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-11-30,12,260,id=abc123-->\n\nR::S",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-11-30,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-callout-undo",
+  "note": "schedule removed while the callout wrapper exists: wrapper stays",
+  "options": {},
+  "input": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\n\nR::S",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n>\n\nR::S",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-undo",
+  "note": "schedule removed: the note returns to how it was",
+  "options": {},
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-undo-same",
+  "note": "same-line comment removed",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123-->\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-sl-undo-blockid",
+  "note": "schedule removed, block id stays",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123--> ^b1\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A ^b1\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-blockid-next",
+  "note": "block id with comment on next line: block id stays on the question line",
+  "options": {},
+  "input": "#flashcards\nQ::A ^b1\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A ^b1\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-blockid-same",
+  "note": "block id after the same-line comment",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A ^b1\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=012345--> ^b1\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-blockid-callout",
+  "note": "block id with the callout",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\nQ::A ^b1\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n> [!sr|card-metadata] \n>  <!--SR:!2026-10-20,12,260,id=012345--> ^b1\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-blockid-again",
+  "note": "re-review keeps the block id",
+  "options": {},
+  "input": "#flashcards\nQ::A ^b1\n<!--SR:!2026-10-20,12,260,id=abc123-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A ^b1\n<!--SR:!2026-10-20,12,260,id=abc123-->",
+  "noteChanged": false,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-tag-prefix",
+  "note": "question tag is written back as it was",
+  "options": {},
+  "input": "#flashcards\n  #flashcards/x   Q::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n  #flashcards/x   Q::A\n<!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-tag-folder-deck",
+  "note": "with folders as decks the question tag is dropped from the note on rewrite",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "input": "#flashcards/x Q::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "Q::A\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": []
+ },
+ {
+  "id": "w-ml",
+  "note": "multi-line card",
+  "options": {},
+  "input": "#flashcards\nQ\n?\nA\n\nnext::x",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260,id=012345-->\n\nnext::x",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-ml-again",
+  "note": "multi-line re-review",
+  "options": {},
+  "input": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260,id=abc123-->\n\nnext::x",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260,id=abc123-->\n\nnext::x",
+  "noteChanged": false,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-ml-same",
+  "note": "multi-line same-line",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ\n?\nA",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\nA <!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-ml-codeblock",
+  "note": "answer ends in a code block: comment always on the next line",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ\n?\n```py\nx = 1\n```",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\n```py\nx = 1\n```\n<!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-ml-codeblock-callout",
+  "note": "answer ends in a code block with the callout setting",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\nQ\n?\n```py\nx = 1\n```",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\n```py\nx = 1\n```\n> [!sr|card-metadata] \n>  <!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-ml-reversed-second",
+  "note": "review only the reverse of a reversed multi-line card: placeholder first",
+  "options": {},
+  "input": "#flashcards\nQ\n??\nA",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n??\nA\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 3,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-rev-both",
+  "note": "both cards of a reversed card",
+  "options": {},
+  "input": "#flashcards\nQ:::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2",
+    "due": "2026-10-25"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A\n<!--SR:!2026-10-20,12,260,id=012345!2026-10-25,12,260,id=6789ab-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": "!2026-10-25,12,260",
+      "id": "6789ab"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-rev-first-only",
+  "note": "first of a reversed card: second gets a placeholder",
+  "options": {},
+  "input": "#flashcards\nQ:::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A\n<!--SR:!2026-10-20,12,260,id=012345!2000-01-01,1,250-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-rev-fsrs-second",
+  "note": "FSRS: placeholder in FSRS form",
+  "options": {
+   "algorithm": "FSRS"
+  },
+  "input": "#flashcards\nQ:::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "fsrs"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A\n<!--SR:!fsrs,-,0,0,0,0,0,0,0,-!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": "!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-cloze-1of3",
+  "note": "one of three cloze cards",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c== ==d==",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260,id=012345!2000-01-01,1,250-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-cloze-all",
+  "note": "all three",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c== ==d==",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2"
+   },
+   {
+    "q": 0,
+    "c": 2,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2026-10-20,12,260,id=012345!2026-10-20,12,260,id=6789ab!2026-10-20,12,260,id=cdefgh-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "6789ab"
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "cdefgh"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-cloze-update-middle",
+  "note": "update the middle of three, ids and others preserved",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-10-20,12,260,id=bbbbbb!2026-10-20,12,260,id=cccccc-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2",
+    "due": "2026-12-01"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-12-01,12,260,id=bbbbbb!2026-10-20,12,260,id=cccccc-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "aaaaaa"
+     },
+     {
+      "schedule": "!2026-12-01,12,260",
+      "id": "bbbbbb"
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "cccccc"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-cloze-fsrs-mixed",
+  "note": "FSRS comment in a note otherwise SM-2: segments are written in the algorithm of each card",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=aaaaaa-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "fsrs"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=aaaaaa!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "aaaaaa"
+     },
+     {
+      "schedule": "!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-fsrs-first",
+  "note": "FSRS first review",
+  "options": {
+   "algorithm": "FSRS"
+  },
+  "input": "#flashcards\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "fsrs"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!fsrs,2026-10-20T08:00:00.000Z,7,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-fsrs-suspend-new",
+  "note": "suspend a never-reviewed card under FSRS: empty placeholder with the token",
+  "options": {
+   "algorithm": "FSRS"
+  },
+  "input": "#flashcards\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "suspended": true
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!fsrs,-,0,0,0,0,0,0,0,-,id=012345,susp-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-suspend-new",
+  "note": "suspend a never-reviewed card: placeholder segment and id are written",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c==",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "suspended": true
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c==\n<!--SR:!2000-01-01,1,250,id=012345,susp!2000-01-01,1,250-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "012345"
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-suspend-new-sl",
+  "note": "suspend a single card",
+  "options": {},
+  "input": "#flashcards\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "suspended": true
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2000-01-01,1,250,id=012345,susp-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-flag-new",
+  "note": "flag only",
+  "options": {},
+  "input": "#flashcards\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "flag": 3
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2000-01-01,1,250,id=012345,flag=3-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-bury-reviewed",
+  "note": "bury a reviewed card",
+  "options": {},
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "buryUntil": "2026-10-13"
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123,bury=2026-10-13-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-meta-all",
+  "note": "token order is canonical",
+  "options": {},
+  "input": "#flashcards\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 0,
+    "c": 0,
+    "meta": {
+     "id": "zz9",
+     "leech": true,
+     "flag": 7,
+     "suspended": true,
+     "buryUntil": "2026-11-01",
+     "extras": [
+      "x=1"
+     ]
+    }
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=zz9,susp,bury=2026-11-01,flag=7,leech,x=1-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "zz9"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-meta-clear-persistent",
+  "note": "schedule cleared but persistent meta remains: the comment stays with a placeholder",
+  "options": {},
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=abc123,susp-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2000-01-01,1,250,id=abc123,susp-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "abc123"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-clear-one-of-two",
+  "note": "clear one of two cards: the comment keeps a placeholder",
+  "options": {},
+  "input": "#flashcards\nQ:::A\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-10-21,5,250,id=bbbbbb-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A\n<!--SR:!2000-01-01,1,250,id=aaaaaa!2026-10-21,5,250,id=bbbbbb-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": null,
+      "id": "aaaaaa"
+     },
+     {
+      "schedule": "!2026-10-21,5,250",
+      "id": "bbbbbb"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-clear-all-ids-lost",
+  "note": "clearing every card removes the comment and the ids with it",
+  "options": {},
+  "input": "#flashcards\nQ:::A\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-10-21,5,250,id=bbbbbb-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "clear"
+   },
+   {
+    "q": 0,
+    "c": 1,
+    "set": "clear"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-callout-card",
+  "note": "callout card: comment always on the line after, outside the callout",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\n> [!question] T\n> body\n\ntail::x",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n> [!question] T\n> body\n<!--SR:!2026-10-20,12,260,id=012345-->\n\ntail::x",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 5,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-callout-card-again",
+  "note": "callout card re-review",
+  "options": {},
+  "input": "#flashcards\n> [!question] T\n> body\n<!--SR:!2026-10-20,12,260,id=abc123-->\n\ntail::x",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n> [!question] T\n> body\n<!--SR:!2026-10-20,12,260,id=abc123-->\n\ntail::x",
+  "noteChanged": false,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 5,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-occlusion",
+  "note": "occlusion block: comment after the closing fence",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\ntail",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260,id=012345-->\ntail",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 6,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-occlusion-again",
+  "note": "occlusion block re-review",
+  "options": {},
+  "input": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260,id=abc123-->\ntail",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n<!--SR:!2026-10-20,12,260,id=012345!2026-10-20,12,260,id=abc123-->\ntail",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 6,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-cloze-with-callout-wrapper",
+  "note": "cloze paragraph with the callout wrapper",
+  "options": {
+   "useCalloutsForSchedulingComments": true
+  },
+  "input": "#flashcards\nA ==b== ==c==\n\nnext",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA ==b== ==c==\n> [!sr|card-metadata] \n>  <!--SR:!2026-10-20,12,260,id=012345!2000-01-01,1,250-->\n\nnext",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-extra-comments",
+  "note": "two schedule comments inside one card text: the extra survives",
+  "options": {
+   "multilineCardStartMarker": "<!--card-->",
+   "multilineCardEndMarker": "<!--/card-->"
+  },
+  "input": "#flashcards\n<!--card-->\na ==b==\n<!--SR:!2026-10-20,12,260-->\n\nc ==d==\n<!--SR:!2026-10-21,5,250-->\n<!--/card-->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-11"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\n<!--card-->\na ==b==\n\n\nc ==d==\n<!--SR:!2026-11-11,12,260,id=012345!2000-01-01,1,250-->\n<!--SR:!2026-10-21,5,250-->\n<!--/card-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-11-11,12,260",
+      "id": "012345"
+     },
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-substring",
+  "note": "the text of the second card is a prefix of the first card: the match is a plain substring search, so the first card is corrupted",
+  "options": {},
+  "input": "#flashcards\nQ::AB\n\nQ::A",
+  "operations": [
+   {
+    "q": 1,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->B\n\nQ::A",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-dup-second",
+  "note": "two identical cards: reviewing the second writes onto the FIRST occurrence",
+  "options": {},
+  "input": "#flashcards\nQ::A\n\nQ::A",
+  "operations": [
+   {
+    "q": 1,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->\n\nQ::A",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-dup-both",
+  "note": "both identical cards: both comments pile up on the first",
+  "options": {},
+  "input": "#flashcards\nQ::A\n\nQ::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-11-01"
+   },
+   {
+    "q": 1,
+    "c": 0,
+    "set": "sm2",
+    "due": "2026-12-01"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-12-01,12,260,id=6789ab-->\n<!--SR:!2026-11-01,12,260,id=012345-->\n\nQ::A",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-12-01,12,260",
+      "id": "6789ab"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-unterminated-fence",
+  "note": "card whose last fence is unterminated: the write is silently skipped",
+  "options": {},
+  "input": "#flashcards\nQ\n?\n```py\nprint(1)\n\nmore",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\n```py\nprint(1)\n\nmore",
+  "noteChanged": false,
+  "warnings": [
+   "updateQuestionText: Text not found: #flashcards\nQ\n?\n```py\npr"
+  ],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-fence-close-text",
+  "note": "closing fence with trailing text: the write is silently skipped",
+  "options": {},
+  "input": "#flashcards\nQ\n?\n```py\nx\n``` trailing\nafter",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\n```py\nx\n``` trailing\nafter",
+  "noteChanged": false,
+  "warnings": [
+   "updateQuestionText: Text not found: #flashcards\nQ\n?\n```py\nx\n"
+  ],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-trailing-ws-line",
+  "note": "text with trailing spaces on its lines is matched after trimming",
+  "options": {},
+  "input": "#flashcards\nQ  \n?\nA   \n\nx::y",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260,id=012345-->\n\nx::y",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-crlf",
+  "note": "CRLF note: untouched when the verbatim text is found, else normalised to LF",
+  "options": {},
+  "input": "#flashcards\r\nQ::A\r\nR::S\r\n",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\r\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->\r\nR::S\r\n",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-crlf-ml",
+  "note": "CRLF multi-line: text has LF, the note has CRLF: line-wise match, LF written everywhere",
+  "options": {},
+  "input": "#flashcards\r\nQ\r\n?\r\nA\r\n\r\nR::S\r\n",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260,id=012345-->\n\nR::S\n",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 2,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-write-question",
+  "note": "writeQuestion path gives the same text",
+  "options": {},
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeQuestion",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-write-note-file",
+  "note": "Note.writeNoteFile rewrites only questions marked changed",
+  "options": {},
+  "input": "#flashcards\nQ::A\nQ2::A2",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 1,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeNoteFile",
+  "output": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2\n<!--SR:!2026-10-20,12,260,id=6789ab-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "6789ab"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-legacy-trim",
+  "note": "loading a note with surplus segments leaves it alone: writeNoteFile has nothing to write",
+  "options": {},
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-10-21,5,250,id=bbbbbb!2026-10-22,6,250,id=cccccc-->",
+  "operations": [],
+  "writePath": "writeNoteFile",
+  "output": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=aaaaaa!2026-10-21,5,250,id=bbbbbb!2026-10-22,6,250,id=cccccc-->",
+  "noteChanged": false,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "aaaaaa"
+     },
+     {
+      "schedule": "!2026-10-21,5,250",
+      "id": "bbbbbb"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-latex-legacy-remap",
+  "note": "latex clozes on: segments are remapped to the cards that remain",
+  "options": {
+   "latexClozes": true,
+   "clozePatterns": [
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "input": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+  "operations": [],
+  "writePath": "writeNoteFile",
+  "output": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-21,5,250,id=bbb222-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 4,
+    "cards": [
+     {
+      "schedule": "!2026-10-21,5,250",
+      "id": "bbb222"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-base-ease",
+  "note": "placeholder uses the base ease setting",
+  "options": {
+   "baseEase": 300
+  },
+  "input": "#flashcards\nQ:::A",
+  "operations": [
+   {
+    "q": 0,
+    "c": 1,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ:::A\n<!--SR:!2000-01-01,1,300!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 1,
+    "cards": [
+     {
+      "schedule": null,
+      "id": null
+     },
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-code-span-in-q",
+  "note": "question containing backticks",
+  "options": {},
+  "input": "#flashcards\nWhat is `a`?::`b`",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nWhat is `a`?::`b`\n<!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-q-ends-with-space-comment",
+  "note": "a question with a trailing comment of another kind",
+  "options": {},
+  "input": "#flashcards\nQ::A <!-- note -->",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A <!-- note -->\n<!--SR:!2026-10-20,12,260,id=012345-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-comment-in-middle",
+  "note": "the question text already holds a comment in the middle of the line",
+  "options": {
+   "cardCommentOnSameLine": true
+  },
+  "input": "#flashcards\nQ::A <!--SR:!2026-10-20,12,260,id=abc123--> tail",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nQ::A  tail <!--SR:!2026-10-20,12,260,id=abc123-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "abc123"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "w-two-q-adjacent",
+  "note": "adjacent single-line cards each get their own comment on a rewrite",
+  "options": {},
+  "input": "#flashcards\nA::1\nB::2\nC::3",
+  "operations": [
+   {
+    "q": 0,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 1,
+    "c": 0,
+    "set": "sm2"
+   },
+   {
+    "q": 2,
+    "c": 0,
+    "set": "sm2"
+   }
+  ],
+  "writePath": "writeSchedule",
+  "output": "#flashcards\nA::1\n<!--SR:!2026-10-20,12,260,id=012345-->\nB::2\n<!--SR:!2026-10-20,12,260,id=6789ab-->\nC::3\n<!--SR:!2026-10-20,12,260,id=cdefgh-->",
+  "noteChanged": true,
+  "warnings": [],
+  "reparse": [
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "012345"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "6789ab"
+     }
+    ]
+   },
+   {
+    "type": 0,
+    "cards": [
+     {
+      "schedule": "!2026-10-20,12,260",
+      "id": "cdefgh"
+     }
+    ]
+   }
+  ]
+ }
+]

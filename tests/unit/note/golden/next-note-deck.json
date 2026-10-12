@@ -1,0 +1,884 @@
+{
+  "note": "provider = mulberry32(seed); getInteger(lo,hi)=floor(r*(hi-lo+1))+lo; calls list [lo,hi,value]. Clock 2023-09-06T12:00 local, due dates local midnight.",
+  "cases": [
+    {
+      "id": "due+new",
+      "openRandomNote": false,
+      "result": "d-old"
+    },
+    {
+      "id": "due+new",
+      "openRandomNote": true,
+      "seed": 1,
+      "picks": [
+        "d-yesterday",
+        "d-old",
+        "d-yesterday",
+        "d-today",
+        "d-today",
+        "d-old",
+        "d-yesterday",
+        "d-today",
+        "d-yesterday",
+        "d-today",
+        "d-yesterday",
+        "d-yesterday"
+      ],
+      "providerCalls": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "due+new",
+      "openRandomNote": true,
+      "seed": 2,
+      "picks": [
+        "d-today",
+        "d-old",
+        "d-old",
+        "d-yesterday",
+        "d-today",
+        "d-yesterday",
+        "d-yesterday",
+        "d-yesterday",
+        "d-today",
+        "d-old",
+        "d-today",
+        "d-old"
+      ],
+      "providerCalls": [
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "due+new",
+      "openRandomNote": true,
+      "seed": 3,
+      "picks": [
+        "d-today",
+        "d-old",
+        "d-yesterday",
+        "d-old",
+        "d-today",
+        "d-yesterday",
+        "d-yesterday",
+        "d-old",
+        "d-old",
+        "d-yesterday",
+        "d-old",
+        "d-old"
+      ],
+      "providerCalls": [
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "no-due-only-new",
+      "openRandomNote": false,
+      "result": "n1"
+    },
+    {
+      "id": "no-due-only-new",
+      "openRandomNote": true,
+      "seed": 1,
+      "picks": [
+        "n3",
+        "n1",
+        "n3",
+        "n4",
+        "n4",
+        "n2",
+        "n3",
+        "n3",
+        "n2",
+        "n4",
+        "n2",
+        "n2"
+      ],
+      "providerCalls": [
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "no-due-only-new",
+      "openRandomNote": true,
+      "seed": 2,
+      "picks": [
+        "n3",
+        "n2",
+        "n2",
+        "n3",
+        "n4",
+        "n3",
+        "n2",
+        "n2",
+        "n4",
+        "n1",
+        "n4",
+        "n1"
+      ],
+      "providerCalls": [
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "no-due-only-new",
+      "openRandomNote": true,
+      "seed": 3,
+      "picks": [
+        "n3",
+        "n1",
+        "n2",
+        "n1",
+        "n4",
+        "n2",
+        "n2",
+        "n1",
+        "n2",
+        "n3",
+        "n1",
+        "n1"
+      ],
+      "providerCalls": [
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          3,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "nothing-due-nothing-new",
+      "openRandomNote": false,
+      "result": null
+    },
+    {
+      "id": "nothing-due-nothing-new",
+      "openRandomNote": true,
+      "seed": 1,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "nothing-due-nothing-new",
+      "openRandomNote": true,
+      "seed": 2,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "nothing-due-nothing-new",
+      "openRandomNote": true,
+      "seed": 3,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "empty",
+      "openRandomNote": false,
+      "result": null
+    },
+    {
+      "id": "empty",
+      "openRandomNote": true,
+      "seed": 1,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "empty",
+      "openRandomNote": true,
+      "seed": 2,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "empty",
+      "openRandomNote": true,
+      "seed": 3,
+      "picks": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "providerCalls": []
+    },
+    {
+      "id": "one-due",
+      "openRandomNote": false,
+      "result": "only"
+    },
+    {
+      "id": "one-due",
+      "openRandomNote": true,
+      "seed": 1,
+      "picks": [
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only"
+      ],
+      "providerCalls": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "one-due",
+      "openRandomNote": true,
+      "seed": 2,
+      "picks": [
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only"
+      ],
+      "providerCalls": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "one-due",
+      "openRandomNote": true,
+      "seed": 3,
+      "picks": [
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only",
+        "only"
+      ],
+      "providerCalls": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "id": "unsorted-first-due-is-insertion-order",
+      "openRandomNote": false,
+      "result": "late"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+name: Bug report
+description: Something in Flashcard Studio does not work as documented.
+labels: [bug]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for reporting. Please search the existing issues first, and read the FAQ and troubleshooting page in the documentation.
+    - type: textarea
+      id: what-happened
+      attributes:
+          label: What happened
+          description: Describe the problem and what you expected to happen instead.
+      validations:
+          required: true
+    - type: textarea
+      id: steps
+      attributes:
+          label: Steps to reproduce
+          description: The smallest note or sequence of actions that shows the problem. Paste the note text as a code block.
+          placeholder: |
+              1. Create a note with ...
+              2. Run the command ...
+              3. See ...
+      validations:
+          required: true
+    - type: input
+      id: plugin-version
+      attributes:
+          label: Flashcard Studio version
+          placeholder: "0.11.2"
+      validations:
+          required: true
+    - type: input
+      id: obsidian-version
+      attributes:
+          label: Obsidian version
+          placeholder: "1.13.1"
+      validations:
+          required: true
+    - type: dropdown
+      id: platform
+      attributes:
+          label: Platform
+          multiple: true
+          options: [Windows, macOS, Linux, iOS, Android]
+      validations:
+          required: true
+    - type: textarea
+      id: console
+      attributes:
+          label: Console output
+          description: Open the developer console (Ctrl/Cmd+Shift+I) and paste any red errors. On mobile, say so instead.
+          render: text
+    - type: checkboxes
+      id: disabled-others
+      attributes:
+          label: Checks
+          options:
+              - label: The problem still happens with all other community plugins turned off.

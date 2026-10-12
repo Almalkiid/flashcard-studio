@@ -1,0 +1,104 @@
+{
+  "note": "Fake workspace; records the API calls the real SidebarManager makes",
+  "traces": [
+    {
+      "label": "redraw: one live review view",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "reviewLeaf.view.redraw()"
+      ]
+    },
+    {
+      "label": "redraw: one deferred (not yet loaded) review view is skipped",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)"
+      ]
+    },
+    {
+      "label": "redraw: no view",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)"
+      ]
+    },
+    {
+      "label": "init registers the view type; the factory reads the handler from the plugin at creation time",
+      "calls": [
+        "registerView(flashcard-studio-note-queue)",
+        "plugin.nextNoteReviewHandler read"
+      ]
+    },
+    {
+      "label": "activate at startup, setting on, no review leaf: takes the right sidebar leaf and sets the view state (does not reveal)",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)",
+        "freshRightLeaf.setViewState({\"type\":\"flashcard-studio-note-queue\",\"active\":true})"
+      ]
+    },
+    {
+      "label": "activate at startup, setting on, a review leaf exists: sets the state again on that leaf",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "reviewLeaf.setViewState({\"type\":\"flashcard-studio-note-queue\",\"active\":true})"
+      ]
+    },
+    {
+      "label": "activate at startup, setting off: nothing",
+      "calls": []
+    },
+    {
+      "label": "activate when getRightLeaf(false) returns an already occupied leaf (not what obsidian.d.ts documents; a what-if): the code does not check, it sets the state on whatever leaf it got",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)",
+        "existingRightTab(Backlinks).setViewState({\"type\":\"flashcard-studio-note-queue\",\"active\":true})"
+      ]
+    },
+    {
+      "label": "activate, no leaf can be made",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)"
+      ]
+    },
+    {
+      "label": "open command, no review leaf: fresh sidebar leaf gets the view, then is revealed",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)",
+        "freshRightLeaf.setViewState({\"type\":\"flashcard-studio-note-queue\",\"active\":true})",
+        "revealLeaf(freshRightLeaf)"
+      ]
+    },
+    {
+      "label": "open command, review leaf exists: revealed only",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "revealLeaf(reviewLeaf)"
+      ]
+    },
+    {
+      "label": "open command, review leaf exists but not loaded yet (deferred, view type already the review type): revealed only",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "revealLeaf(deferredLeaf)"
+      ]
+    },
+    {
+      "label": "open command when getRightLeaf(false) returns an already occupied leaf (what-if, see above): its view type differs so the state is set on it, then it is revealed",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)",
+        "existingRightTab(Backlinks).setViewState({\"type\":\"flashcard-studio-note-queue\",\"active\":true})",
+        "revealLeaf(existingRightTab(Backlinks))"
+      ]
+    },
+    {
+      "label": "open command, no leaf: nothing",
+      "calls": [
+        "getLeavesOfType(flashcard-studio-note-queue)",
+        "getRightLeaf(false)"
+      ]
+    }
+  ]
+}

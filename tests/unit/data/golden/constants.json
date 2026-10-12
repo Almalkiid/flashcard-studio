@@ -1,0 +1,815 @@
+{
+  "regexDefinitions": {
+    "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+      "source": "\\s?<!--SR:!.+?-->",
+      "flags": "g"
+    },
+    "ALL_SCHEDULE_COMMENTS_FINDER": {
+      "source": "<!--SR:!.+?-->",
+      "flags": "g"
+    },
+    "ONE_SCHEDULE_COMMENT_FINDER": {
+      "source": "<!--SR:!.+?-->",
+      "flags": ""
+    },
+    "FSRS_SCHEDULE_EXTRACTOR": {
+      "source": "<!--SR:!fsrs,(.+?),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(.+?)-->",
+      "flags": "gm"
+    },
+    "SM2_SCHEDULE_INFO_EXTRACTOR": {
+      "source": "<!--SR:!(.+?),(\\d+),(\\d+),*(\\d+)*-->",
+      "flags": "gm"
+    },
+    "YAML_FRONT_MATTER_REGEX": {
+      "source": "^---\\r?\\n((?:.*\\r?\\n)*?)---",
+      "flags": ""
+    },
+    "MULTI_SCHEDULING_EXTRACTOR": {
+      "source": "!([\\d-]+),(\\d+),(\\d+)",
+      "flags": "gm"
+    },
+    "OBSIDIAN_TAG_AT_STARTOFLINE_REGEX": {
+      "source": "^#[^\\s#]+",
+      "flags": "gi"
+    },
+    "OBSIDIAN_BLOCK_ID_ENDOFLINE_REGEX": {
+      "source": " (\\^[a-zA-Z0-9-]+)$",
+      "flags": ""
+    }
+  },
+  "values": {
+    "DATA_ID_TAG": "^sr-data-id-",
+    "CARD_METADATA_CALLOUT": "> [!sr|card-metadata]",
+    "PREFERRED_DATE_FORMAT": "YYYY-MM-DD",
+    "ALLOWED_DATE_FORMATS": [
+      "YYYY-MM-DD",
+      "DD-MM-YYYY",
+      "ddd MMM DD YYYY"
+    ],
+    "COLLAPSE_ICON": "<svg viewBox=\"0 0 100 100\" width=\"8\" height=\"8\" class=\"svg-icon right-triangle\"><path fill=\"currentColor\" stroke=\"currentColor\" d=\"M94.9,20.8c-1.4-2.5-4.1-4.1-7.1-4.1H12.2c-3,0-5.7,1.6-7.1,4.1c-1.3,2.4-1.2,5.2,0.2,7.6L43.1,88c1.5,2.3,4,3.7,6.9,3.7 s5.4-1.4,6.9-3.7l37.8-59.6C96.1,26,96.2,23.2,94.9,20.8L94.9,20.8z\"></path></svg>",
+    "TICKS_PER_DAY": 86400000,
+    "SCHEDULE_COMMENT_PREFIX": "<!--SR:",
+    "SCHEDULE_COMMENT_SUFFIX": "-->",
+    "STUDIO_TAB_VIEW": "flashcard-studio-tab-view"
+  },
+  "srCases": [
+    {
+      "name": "sm2 one",
+      "text": "Q::A <!--SR:!2023-09-02,4,270-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->",
+              "2023-09-02",
+              "4",
+              "270",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A <!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "sm2 on separate line",
+      "text": "Q::A\n<!--SR:!2023-09-02,4,270-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              "\n<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A\n"
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A\n"
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A\n<!--SR:!2023-09-02,4,270-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->",
+              "2023-09-02",
+              "4",
+              "270",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "Q::A\n"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A\n<!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "sm2 two segments",
+      "text": "Q\n?\nA <!--SR:!2023-09-02,4,270!2023-09-05,1,250-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!2023-09-02,4,270!2023-09-05,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q\n?\nA"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270!2023-09-05,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q\n?\nA "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270!2023-09-05,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q\n?\nA "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q\n?\nA <!--SR:!2023-09-02,4,270!2023-09-05,1,250-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270!2023-09-05,1,250-->",
+              "2023-09-02,4,270!2023-09-05",
+              "1",
+              "250",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "Q\n?\nA "
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ],
+            [
+              "!2023-09-05,1,250",
+              "2023-09-05",
+              "1",
+              "250"
+            ]
+          ],
+          "replacedWithEmpty": "Q\n?\nA <!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "fsrs",
+      "text": "Q::A <!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!fsrs,2023-09-02T10:00:00.000Z,3,5.5,4.2,2,1,1,2023-09-01T10:00:00.000Z-->"
+        }
+      }
+    },
+    {
+      "name": "with meta tokens",
+      "text": "Q::A <!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270,id=ab12,susp,bury=2023-09-07-->"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A <!--SR:,id=ab12,susp,bury=2023-09-07-->"
+        }
+      }
+    },
+    {
+      "name": "no space before comment",
+      "text": "Q::A<!--SR:!2023-09-02,4,270-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A<!--SR:!2023-09-02,4,270-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->",
+              "2023-09-02",
+              "4",
+              "270",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A<!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "two comments",
+      "text": "A <!--SR:!2023-09-02,4,270--> B <!--SR:!2023-09-03,4,270-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!2023-09-02,4,270-->"
+            ],
+            [
+              " <!--SR:!2023-09-03,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "A B"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ],
+            [
+              "<!--SR:!2023-09-03,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "A  B "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->"
+            ],
+            [
+              "<!--SR:!2023-09-03,4,270-->"
+            ]
+          ],
+          "replacedWithEmpty": "A  B "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "A <!--SR:!2023-09-02,4,270--> B <!--SR:!2023-09-03,4,270-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2023-09-02,4,270-->",
+              "2023-09-02",
+              "4",
+              "270",
+              {
+                "$undefined": true
+              }
+            ],
+            [
+              "<!--SR:!2023-09-03,4,270-->",
+              "2023-09-03",
+              "4",
+              "270",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "A  B "
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ],
+            [
+              "!2023-09-03,4,270",
+              "2023-09-03",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "A <!--SR:--> B <!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "not a schedule comment",
+      "text": "Q::A <!--hello-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--hello-->"
+        }
+      }
+    },
+    {
+      "name": "unfinished",
+      "text": "Q::A <!--SR:!2023-09-02,4,270",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270"
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270"
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,270"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2023-09-02,4,270",
+              "2023-09-02",
+              "4",
+              "270"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A <!--SR:"
+        }
+      }
+    },
+    {
+      "name": "new-card placeholder date",
+      "text": "Q::A <!--SR:!2000-01-01,1,250-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [
+            [
+              " <!--SR:!2000-01-01,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2000-01-01,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [
+            [
+              "<!--SR:!2000-01-01,1,250-->"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2000-01-01,1,250-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [
+            [
+              "<!--SR:!2000-01-01,1,250-->",
+              "2000-01-01",
+              "1",
+              "250",
+              {
+                "$undefined": true
+              }
+            ]
+          ],
+          "replacedWithEmpty": "Q::A "
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [
+            [
+              "!2000-01-01,1,250",
+              "2000-01-01",
+              "1",
+              "250"
+            ]
+          ],
+          "replacedWithEmpty": "Q::A <!--SR:-->"
+        }
+      }
+    },
+    {
+      "name": "tabs and newlines inside",
+      "text": "Q::A <!--SR:!2023-09-02,4,\n270-->",
+      "results": {
+        "SCHEDULE_COMMENT_AND_SPACE_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        },
+        "ALL_SCHEDULE_COMMENTS_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        },
+        "ONE_SCHEDULE_COMMENT_FINDER": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        },
+        "FSRS_SCHEDULE_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        },
+        "SM2_SCHEDULE_INFO_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        },
+        "MULTI_SCHEDULING_EXTRACTOR": {
+          "matches": [],
+          "replacedWithEmpty": "Q::A <!--SR:!2023-09-02,4,\n270-->"
+        }
+      }
+    }
+  ],
+  "yaml": [
+    {
+      "text": "---\nsr-due: 2023-09-02\n---\nbody",
+      "test": true,
+      "group1": "sr-due: 2023-09-02\n"
+    },
+    {
+      "text": "---\r\nsr-due: x\r\n---\r\nbody",
+      "test": true,
+      "group1": "sr-due: x\r\n"
+    },
+    {
+      "text": "no front matter\n---\nx\n---",
+      "test": false,
+      "group1": null
+    },
+    {
+      "text": "---\n---\nbody",
+      "test": true,
+      "group1": ""
+    },
+    {
+      "text": "---\nkey: v\n--- trailing",
+      "test": true,
+      "group1": "key: v\n"
+    },
+    {
+      "text": " ---\na\n---",
+      "test": false,
+      "group1": null
+    }
+  ],
+  "tagStart": [
+    {
+      "text": "#a Q",
+      "match": [
+        "#a"
+      ],
+      "matchAfterTrimStart": [
+        "#a"
+      ]
+    },
+    {
+      "text": "  #a Q",
+      "match": null,
+      "matchAfterTrimStart": [
+        "#a"
+      ]
+    },
+    {
+      "text": "#a/b/c Q",
+      "match": [
+        "#a/b/c"
+      ],
+      "matchAfterTrimStart": [
+        "#a/b/c"
+      ]
+    },
+    {
+      "text": "##a",
+      "match": null,
+      "matchAfterTrimStart": null
+    },
+    {
+      "text": "#",
+      "match": null,
+      "matchAfterTrimStart": null
+    },
+    {
+      "text": "#a#b",
+      "match": [
+        "#a"
+      ],
+      "matchAfterTrimStart": [
+        "#a"
+      ]
+    },
+    {
+      "text": "x #a",
+      "match": null,
+      "matchAfterTrimStart": null
+    },
+    {
+      "text": "#a,b",
+      "match": [
+        "#a,b"
+      ],
+      "matchAfterTrimStart": [
+        "#a,b"
+      ]
+    },
+    {
+      "text": "#日本 Q",
+      "match": [
+        "#日本"
+      ],
+      "matchAfterTrimStart": [
+        "#日本"
+      ]
+    },
+    {
+      "text": "#a\nQ",
+      "match": [
+        "#a"
+      ],
+      "matchAfterTrimStart": [
+        "#a"
+      ]
+    },
+    {
+      "text": "#a Q",
+      "match": [
+        "#a"
+      ],
+      "matchAfterTrimStart": [
+        "#a"
+      ]
+    },
+    {
+      "text": "#a/ Q",
+      "match": [
+        "#a/"
+      ],
+      "matchAfterTrimStart": [
+        "#a/"
+      ]
+    }
+  ],
+  "blockId": [
+    {
+      "text": "text ^abc-1",
+      "match": [
+        " ^abc-1",
+        "^abc-1"
+      ]
+    },
+    {
+      "text": "text ^abc",
+      "match": [
+        " ^abc",
+        "^abc"
+      ]
+    },
+    {
+      "text": "text^abc",
+      "match": null
+    },
+    {
+      "text": "text ^a_b",
+      "match": null
+    },
+    {
+      "text": "text ^abc def",
+      "match": null
+    },
+    {
+      "text": " ^abc",
+      "match": [
+        " ^abc",
+        "^abc"
+      ]
+    },
+    {
+      "text": "text ^ABC-9 ",
+      "match": null
+    },
+    {
+      "text": "text ^abc\n",
+      "match": null
+    }
+  ],
+  "statefulTestOnGlobalRegex": [
+    true,
+    false,
+    true
+  ],
+  "globalFlags": [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false
+  ]
+}

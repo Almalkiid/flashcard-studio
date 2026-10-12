@@ -1,0 +1,43 @@
+/* MARK: Custom study, postpone and optimizer dialogs */
+
+.fs-custom-study-modal {
+    .setting-item input[type="number"] {
+        width: 6em;
+    }
+
+    .fs-custom-study-filter {
+        margin-top: var(--fs-space-4);
+    }
+}
+
+.fs-optimizer-modal {
+    .fs-optimizer-result {
+        border-collapse: collapse;
+        margin: var(--fs-space-2) 0;
+        width: 100%;
+
+        th,
+        td {
+            border-bottom: var(--fs-rule);
+            padding: var(--fs-space-1) var(--fs-space-2);
+            text-align: left;
+        }
+    }
+
+    .fs-optimizer-note {
+        font-size: var(--font-ui-smaller);
+        color: var(--fs-ink-muted);
+    }
+
+    .fs-optimizer-better {
+        color: var(--text-success);
+    }
+
+    .fs-optimizer-not-better {
+        color: var(--fs-ink-muted);
+    }
+
+    .fs-optimizer-error {
+        color: var(--fs-ink-error);
+    }
+}

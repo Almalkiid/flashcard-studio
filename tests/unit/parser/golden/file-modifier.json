@@ -1,0 +1,371 @@
+{
+ "removeSchedulesInCards": [
+  {
+   "id": "rs-next-line",
+   "input": "Q::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "output": "Q::A\nR::S"
+  },
+  {
+   "id": "rs-same-line",
+   "input": "Q::A <!--SR:!2026-10-20,12,260,id=abc123--> ^b1\nR::S",
+   "output": "Q::A ^b1\nR::S"
+  },
+  {
+   "id": "rs-fsrs",
+   "input": "Q::A\n<!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,-,id=abc123-->\n",
+   "output": "Q::A\n"
+  },
+  {
+   "id": "rs-callout",
+   "input": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\n\nR::S",
+   "output": "Q::A\n> [!sr|card-metadata] \n>\n\nR::S"
+  },
+  {
+   "id": "rs-two-on-line",
+   "input": "a <!--SR:!2026-10-20,12,260--> b <!--SR:!2026-10-21,5,250--> c",
+   "output": "a b c"
+  },
+  {
+   "id": "rs-no-bang",
+   "input": "Q::A\n<!--SR:2026-10-20,12,260-->\n",
+   "output": "Q::A\n<!--SR:2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "rs-multiline-comment",
+   "input": "Q::A <!--SR:!2026-10-20,\n12,260-->\n",
+   "output": "Q::A <!--SR:!2026-10-20,\n12,260-->\n"
+  },
+  {
+   "id": "rs-leading-ws-only-one",
+   "input": "Q::A\n\n  <!--SR:!2026-10-20,12,260-->\nZ",
+   "output": "Q::A\n\n \nZ"
+  },
+  {
+   "id": "rs-crlf",
+   "input": "Q::A\r\n<!--SR:!2026-10-20,12,260-->\r\nR::S\r\n",
+   "output": "Q::A\r\r\nR::S\r\n"
+  },
+  {
+   "id": "rs-in-code-block",
+   "input": "```\n<!--SR:!2026-10-20,12,260-->\n```\n",
+   "output": "```\n```\n"
+  },
+  {
+   "id": "rs-frontmatter-untouched",
+   "input": "---\nsr-due: 2026-10-20\n---\nQ::A <!--SR:!2026-10-20,12,260-->",
+   "output": "---\nsr-due: 2026-10-20\n---\nQ::A"
+  },
+  {
+   "id": "rs-none",
+   "input": "no comments here\n",
+   "output": "no comments here\n"
+  }
+ ],
+ "removeTagsFromFile": [
+  {
+   "id": "rt-simple",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "#flashcards\nQ::A",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": "\nQ::A"
+  },
+  {
+   "id": "rt-nested",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "#flashcards/science/physics Q::A\n#flashcards/x\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": " Q::A\n\n"
+  },
+  {
+   "id": "rt-prefix-collision",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "#flashcards-extra Q::A\n#flashcards2\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": "-extra Q::A\n#flashcards2\n"
+  },
+  {
+   "id": "rt-two-tags",
+   "tagsToDelete": [
+    "#a",
+    "#c"
+   ],
+   "tagsArrayAfterCall": [
+    "#a",
+    "#c"
+   ],
+   "input": "#a/b #c/d\nx #a\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": " \nx \n"
+  },
+  {
+   "id": "rt-order-by-length",
+   "tagsToDelete": [
+    "#flash",
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards",
+    "#flash"
+   ],
+   "input": "#flash #flashcards/x\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": " \n"
+  },
+  {
+   "id": "rt-special-char-in-tag",
+   "tagsToDelete": [
+    "#c++"
+   ],
+   "tagsArrayAfterCall": [
+    "#c++"
+   ],
+   "input": "#c++ and #c\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": "#c++ and #c\n",
+   "error": "SyntaxError: Invalid regular expression: /(#c++[/[a-zA-z-[0-9]*]*/]*[a-zA-z-[0-9]*]*)/gm: Nothing to repeat"
+  },
+  {
+   "id": "rt-not-at-line-start",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "text #flashcards here\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": "text  here\n"
+  },
+  {
+   "id": "rt-uppercase",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "#Flashcards/A\n#flashcards/b\n",
+   "frontmatterBefore": {},
+   "frontmatterAfter": {},
+   "output": "#Flashcards/A\n\n"
+  },
+  {
+   "id": "rt-frontmatter-list",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "---\ntags:\n  - flashcards/a\n  - other\n---\nQ::A",
+   "frontmatterBefore": {
+    "tags": [
+     "flashcards/a",
+     "other"
+    ]
+   },
+   "frontmatterAfter": {
+    "tags": [
+     "other"
+    ]
+   },
+   "output": "---\ntags:\n  - flashcards/a\n  - other\n---\nQ::A"
+  },
+  {
+   "id": "rt-frontmatter-string",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "---\ntags: flashcards/a other\n---\nQ::A",
+   "frontmatterBefore": {
+    "tags": "flashcards/a other"
+   },
+   "frontmatterAfter": {
+    "tags": [
+     "other"
+    ]
+   },
+   "output": "---\ntags: flashcards/a other\n---\nQ::A"
+  },
+  {
+   "id": "rt-frontmatter-none",
+   "tagsToDelete": [
+    "#flashcards"
+   ],
+   "tagsArrayAfterCall": [
+    "#flashcards"
+   ],
+   "input": "---\ntitle: x\n---\nQ::A",
+   "frontmatterBefore": {
+    "title": "x"
+   },
+   "frontmatterAfter": {
+    "title": "x"
+   },
+   "output": "---\ntitle: x\n---\nQ::A"
+  }
+ ],
+ "noteLevel": [
+  {
+   "id": "rn-keys-and-tags",
+   "note": "removes sr-due, sr-interval, sr-ease only (sr-id stays); with deleteTags the tags are removed from the frontmatter and the body",
+   "frontmatterAfter": {
+    "sr-id": "uuid",
+    "tags": [
+     "flashcards/x"
+    ],
+    "title": "t"
+   },
+   "body": "Q::A"
+  },
+  {
+   "id": "rn-delete-all",
+   "note": "deleteAllSchedulingData(deleteTags=true, deckTags=#flashcards, noteTags=#review): per file note keys + note tags first, then card comments + deck tags",
+   "files": {
+    "a.md": "\nQ::A",
+    "b.md": "\ntext"
+   },
+   "frontmatter": {
+    "a.md": {},
+    "b.md": {
+     "tags": []
+    }
+   }
+  }
+ ],
+ "migrateCommentsToCallouts": [
+  {
+   "id": "mg-simple",
+   "input": "Q::A\n<!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "output": "Q::A\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "outputAfterSecondRun": "Q::A\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S"
+  },
+  {
+   "id": "mg-same-line",
+   "input": "Q::A <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "output": "\n> [!sr|card-metadata]\n> Q::A <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> > Q::A <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S"
+  },
+  {
+   "id": "mg-same-line-blockid",
+   "input": "Q::A <!--SR:!2026-10-20,12,260,id=abc123--> ^b1\nR::S",
+   "output": "\n> [!sr|card-metadata]\n> Q::A <!--SR:!2026-10-20,12,260,id=abc123--> ^b1\nR::S",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> > Q::A <!--SR:!2026-10-20,12,260,id=abc123--> ^b1\nR::S"
+  },
+  {
+   "id": "mg-already-callout",
+   "input": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "output": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S",
+   "outputAfterSecondRun": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\nR::S"
+  },
+  {
+   "id": "mg-callout-no-space",
+   "input": "Q::A\n> [!sr|card-metadata]\n><!--SR:!2026-10-20,12,260-->\n",
+   "output": "Q::A\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> ><!--SR:!2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "Q::A\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> > ><!--SR:!2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-first-line",
+   "input": "<!--SR:!2026-10-20,12,260-->\nQ::A",
+   "output": "\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\nQ::A",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\nQ::A"
+  },
+  {
+   "id": "mg-two-cards",
+   "input": "A::1\n<!--SR:!2026-10-20,12,260-->\nB::2\n<!--SR:!2026-10-21,5,250-->\n",
+   "output": "A::1\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\nB::2\n> [!sr|card-metadata]\n> <!--SR:!2026-10-21,5,250-->\n",
+   "outputAfterSecondRun": "A::1\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\nB::2\n> [!sr|card-metadata]\n> <!--SR:!2026-10-21,5,250-->\n"
+  },
+  {
+   "id": "mg-blank-before",
+   "input": "A::1\n\n<!--SR:!2026-10-20,12,260-->\n",
+   "output": "A::1\n\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "A::1\n\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-fsrs",
+   "input": "Q::A\n<!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,-,id=abc123-->\n",
+   "output": "Q::A\n> [!sr|card-metadata]\n> <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,-,id=abc123-->\n",
+   "outputAfterSecondRun": "Q::A\n> [!sr|card-metadata]\n> <!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,-,id=abc123-->\n"
+  },
+  {
+   "id": "mg-no-bang",
+   "input": "Q::A\n<!--SR:2026-10-20,12,260-->\n",
+   "output": "Q::A\n<!--SR:2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "Q::A\n<!--SR:2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-quote-prefix-other",
+   "input": ">> <!--SR:!2026-10-20,12,260-->\n",
+   "output": "\n> [!sr|card-metadata]\n> >> <!--SR:!2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> > >> <!--SR:!2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-indented",
+   "input": "Q::A\n   <!--SR:!2026-10-20,12,260-->\n",
+   "output": "Q::A\n> [!sr|card-metadata]\n>    <!--SR:!2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "Q::A\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> >    <!--SR:!2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-crlf",
+   "input": "Q::A\r\n<!--SR:!2026-10-20,12,260-->\r\nR::S\r\n",
+   "output": "Q::A\r\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\r\nR::S\r\n",
+   "outputAfterSecondRun": "Q::A\r\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\r\nR::S\r\n"
+  },
+  {
+   "id": "mg-no-comments",
+   "input": "nothing\n",
+   "output": "nothing\n",
+   "outputAfterSecondRun": "nothing\n"
+  },
+  {
+   "id": "mg-comment-only-note",
+   "input": "<!--SR:!2026-10-20,12,260-->",
+   "output": "\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->"
+  },
+  {
+   "id": "mg-callout-card",
+   "input": "> [!question] T\n> body\n<!--SR:!2026-10-20,12,260-->\n",
+   "output": "> [!question] T\n> body\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\n",
+   "outputAfterSecondRun": "> [!question] T\n> body\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->\n"
+  },
+  {
+   "id": "mg-two-on-line",
+   "input": "A <!--SR:!2026-10-20,12,260--> B <!--SR:!2026-10-21,5,250-->\n",
+   "output": "\n> [!sr|card-metadata]\n> A <!--SR:!2026-10-20,12,260--> B <!--SR:!2026-10-21,5,250-->\n",
+   "outputAfterSecondRun": "\n> [!sr|card-metadata]\n> [!sr|card-metadata]\n> > A <!--SR:!2026-10-20,12,260--> B <!--SR:!2026-10-21,5,250-->\n"
+  },
+  {
+   "id": "mg-idempotent",
+   "input": "Q::A\n\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->",
+   "output": "Q::A\n\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->",
+   "outputAfterSecondRun": "Q::A\n\n> [!sr|card-metadata]\n> <!--SR:!2026-10-20,12,260-->"
+  }
+ ]
+}

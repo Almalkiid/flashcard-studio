@@ -1,0 +1,182 @@
+[
+ {
+  "input": {
+   "text": "m $\\frac{{p}}{q}$ n {{c}}",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "m \ue0000\ue001 n {{c}}",
+   "restoreOfMasked": "m $\\frac{{p}}{q}$ n {{c}}",
+   "restoreOfForeign": "zzm",
+   "restoreOfInnerPlaceholder": "$\\frac{{p}}{q}$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "nothing {{c}}",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "nothing {{c}}",
+   "restoreOfMasked": "nothing {{c}}",
+   "restoreOfForeign": "zzn",
+   "restoreOfInnerPlaceholder": "\ue0000\ue001",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "",
+   "restoreOfMasked": "",
+   "restoreOfForeign": "zz",
+   "restoreOfInnerPlaceholder": "\ue0000\ue001",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$a$$b$",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "$a$$b$",
+   "restoreOfMasked": "$a$$b$",
+   "restoreOfForeign": "zz$",
+   "restoreOfInnerPlaceholder": "\ue0000\ue001",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$$\n{{p}}\n$$ {{q}}",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "\ue0000\ue001 {{q}}",
+   "restoreOfMasked": "$$\n{{p}}\n$$ {{q}}",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$$\n{{p}}\n$$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "`$x$` {{c}}",
+   "keepPattern": null
+  },
+  "output": {
+   "masked": "`$x$` {{c}}",
+   "restoreOfMasked": "`$x$` {{c}}",
+   "restoreOfForeign": "zz`",
+   "restoreOfInnerPlaceholder": "\ue0000\ue001",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$a KEEP1 b KEEP2$",
+   "keepPattern": "KEEP\\d"
+  },
+  "output": {
+   "masked": "\ue0000\ue001KEEP1\ue0001\ue001KEEP2\ue0002\ue001",
+   "restoreOfMasked": "$a KEEP1 b KEEP2$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$a ",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$KEEP1$",
+   "keepPattern": "KEEP\\d"
+  },
+  "output": {
+   "masked": "\ue0000\ue001KEEP1\ue0001\ue001",
+   "restoreOfMasked": "$KEEP1$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$a$ KEEP9 $b KEEP3 c$",
+   "keepPattern": "KEEP\\d"
+  },
+  "output": {
+   "masked": "\ue0000\ue001 KEEP9 \ue0001\ue001KEEP3\ue0002\ue001",
+   "restoreOfMasked": "$a$ KEEP9 $b KEEP3 c$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$a$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$xy$",
+   "keepPattern": "Q"
+  },
+  "output": {
+   "masked": "\ue0000\ue001",
+   "restoreOfMasked": "$xy$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$xy$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$KEEP1KEEP2$",
+   "keepPattern": "KEEP\\d"
+  },
+  "output": {
+   "masked": "\ue0000\ue001KEEP1KEEP2\ue0001\ue001",
+   "restoreOfMasked": "$KEEP1KEEP2$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ },
+ {
+  "input": {
+   "text": "$$\nKEEP1\n$$",
+   "keepPattern": "KEEP\\d"
+  },
+  "output": {
+   "masked": "\ue0000\ue001KEEP1\ue0001\ue001",
+   "restoreOfMasked": "$$\nKEEP1\n$$",
+   "restoreOfForeign": "zz\ue000",
+   "restoreOfInnerPlaceholder": "$$\n",
+   "restoreOfUnknownIndex": {
+    "ok": "\ue00099\ue001"
+   }
+  }
+ }
+]

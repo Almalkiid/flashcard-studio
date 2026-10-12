@@ -1,0 +1,118 @@
+import "src/ui/obsidian-ui-components/content-container/session-summary/session-summary.css";
+import { setIcon } from "obsidian";
+
+import { t } from "src/lang/translate";
+import { SessionSummary } from "src/stats/session";
+import { formatCount, formatDuration, formatPercent } from "src/ui/statistics-view/format";
+
+export interface SessionSummaryActions {
+    onBackToDecks: () => void;
+    /** How many cards were answered Again in this session. */
+    mistakes: number;
+    /** Studies those cards again. */
+    onReviewMistakes: () => void;
+    onOpenStatistics: () => void;
+    /** Takes back the last answer, which the answer toast would offer but cannot on this screen. */
+    onUndo: () => void;
+}
+
+function createTile(
+    parent: HTMLElement,
+    label: string,
+    value: string,
+    key: string,
+    icon: string,
+    tone: string,
+): void {
+    const tile = parent.createDiv({ cls: "fs-session-summary-tile fs-card" });
+    setIcon(
+        tile.createDiv({ cls: `fs-session-summary-tile-icon fs-icon-tile fs-tone-${tone}` }),
+        icon,
+    );
+    const text = tile.createDiv({ cls: "fs-session-summary-tile-text" });
+    text.createDiv({
+        cls: "fs-session-summary-value",
+        text: value,
+        attr: { "data-stat": key },
+    });
+    text.createDiv({ cls: "fs-session-summary-label", text: label });
+}
+
+/**
+ * The panel shown when a review session ends: a check mark, what was done, the streak, and where to go next.
+ *
+ * @returns The panel, so the caller can remove it again.
+ */
+export function renderSessionSummary(
+    parent: HTMLElement,
+    summary: SessionSummary,
+    actions: SessionSummaryActions,
+): HTMLElement {
+    const panel = parent.createDiv({ cls: "fs-session-summary fs-studio" });
+
+    const badge = panel.createDiv({ cls: "fs-session-summary-badge fs-icon-tile fs-tone-green" });
+    setIcon(badge, "check");
+    panel.createEl("h2", { cls: "fs-session-summary-title", text: t("SESSION_COMPLETE") });
+    panel.createDiv({ cls: "fs-session-summary-subtitle", text: t("SESSION_SUBTITLE") });
+
+    const tiles = panel.createDiv({ cls: "fs-session-summary-tiles" });
+    createTile(tiles, t("SESSION_CARDS"), formatCount(summary.reviews), "cards", "layers", "blue");
+    createTile(tiles, t("SESSION_TIME"), formatDuration(summary.timeMs), "time", "clock", "purple");
+    createTile(tiles, t("SESSION_AGAIN"), formatCount(summary.again), "again", "rotate-ccw", "red");
+    createTile(
+        tiles,
+        t("SESSION_RETENTION"),
+        formatPercent(summary.retention),
+        "retention",
+        "target",
+        "green",
+    );
+
+    if (summary.streak > 0) {
+        const streak = panel.createDiv({ cls: "fs-session-summary-streak fs-pill" });
+        setIcon(streak.createSpan({ cls: "fs-session-summary-streak-icon" }), "flame");
+        streak.createSpan({
+            cls: "fs-session-summary-streak-text",
+            text: `${formatCount(summary.streak)} ${t("SESSION_STREAK")}`,
+            attr: { "data-stat": "streak" },
+        });
+    }
+
+    const buttons = panel.createDiv({ cls: "fs-session-summary-actions" });
+    // With mistakes to go over, that is the next step; otherwise going back is
+    if (actions.mistakes > 0) {
+        const mistakes = buttons.createEl("button", {
+            cls: "fs-primary-button fs-session-summary-mistakes",
+            attr: { type: "button" },
+        });
+        setIcon(mistakes.createSpan({ cls: "fs-session-summary-mistakes-icon" }), "rotate-ccw");
+        mistakes.createSpan({
+            text: t("SESSION_REVIEW_MISTAKES", { count: formatCount(actions.mistakes) }),
+        });
+        mistakes.addEventListener("click", actions.onReviewMistakes);
+    }
+    const back = buttons.createEl("button", {
+        cls:
+            actions.mistakes > 0
+                ? "fs-session-summary-secondary fs-session-summary-back"
+                : "fs-primary-button fs-session-summary-back",
+        text: t("SESSION_BACK_TO_DECKS"),
+        attr: { type: "button" },
+    });
+    back.addEventListener("click", actions.onBackToDecks);
+    const stats = buttons.createEl("button", {
+        cls: "fs-session-summary-stats",
+        text: t("OPEN_STATISTICS"),
+        attr: { type: "button" },
+    });
+    stats.addEventListener("click", actions.onOpenStatistics);
+
+    const undo = panel.createEl("button", {
+        cls: "fs-session-summary-undo",
+        text: t("UNDO_LAST_ANSWER"),
+        attr: { type: "button" },
+    });
+    undo.addEventListener("click", actions.onUndo);
+
+    return panel;
+}

@@ -1,0 +1,19 @@
+# generated output
+build
+coverage
+styles.css
+pnpm-lock.yaml
+node_modules
+.obsidian-cache
+.e2e-plugin
+
+# fixture vaults and recorded data that tests compare byte for byte
+docs/vaults/
+tests/vaults/
+tests/e2e/vault/
+tests/unit/fixtures/parse-baseline.json
+tests/unit/note/golden/
+tests/unit/parser/golden/
+tests/unit/storage/golden/
+tests/unit/data/golden/
+tests/unit/math/golden/

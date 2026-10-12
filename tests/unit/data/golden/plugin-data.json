@@ -1,0 +1,904 @@
+{
+  "defaultData": {
+    "settings": {
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "flashcardTagsToIgnore": [],
+      "convertFoldersToDecks": false,
+      "burySiblingCards": false,
+      "flashcardCardOrder": "DueFirstRandom",
+      "flashcardDeckOrder": "PrevDeckComplete_Sequential",
+      "convertClozePatternsToInputs": false,
+      "convertHighlightsToClozes": true,
+      "convertBoldTextToClozes": false,
+      "convertCurlyBracketsToClozes": false,
+      "clozePatterns": [
+        "==[123;;]answer[;;hint]=="
+      ],
+      "singleLineCardSeparator": "::",
+      "singleLineReversedCardSeparator": ":::",
+      "multilineCardSeparator": "?",
+      "multilineReversedCardSeparator": "??",
+      "multilineCardEndMarker": "",
+      "editLaterTag": {
+        "$undefined": true
+      },
+      "enableReviewReminders": false,
+      "reviewReminderIntervalMinutes": 5,
+      "reviewReminderCheckOnStartup": false,
+      "reviewReminderMessage": "",
+      "reviewReminderAutoOpen": true,
+      "reviewReminderShowNotice": true,
+      "reviewReminderPlaySound": true,
+      "reviewReminderBounceDock": true,
+      "randomizeCardOrder": {
+        "$undefined": true
+      },
+      "enableNoteReviewPaneOnStartup": true,
+      "tagsToReview": [
+        "#review"
+      ],
+      "noteTagsToIgnore": [],
+      "noteFoldersToIgnore": [
+        "**/*.excalidraw.md"
+      ],
+      "openRandomNote": false,
+      "autoNextNote": false,
+      "disableFileMenuReviewOptions": {
+        "$undefined": true
+      },
+      "showFileMenuReviewOptions": true,
+      "deleteTagsOnSchedulingDataDeletion": false,
+      "maxNDaysNotesReviewQueue": 365,
+      "showRibbonIcon": {
+        "$undefined": true
+      },
+      "showStatusBar": true,
+      "showCardStatusBarItem": true,
+      "showNoteStatusBarItem": true,
+      "showUpdateAvailableStatusBarItem": false,
+      "initiallyExpandAllSubdecksInTree": true,
+      "showContextInCards": true,
+      "showIntervalInReviewButtons": true,
+      "flashcardHeightPercentage": 60,
+      "flashcardWidthPercentage": 60,
+      "flashcardHeightPercentageMobile": 100,
+      "flashcardWidthPercentageMobile": 100,
+      "flashcardAgainText": "Again",
+      "flashcardEasyText": "Easy",
+      "flashcardGoodText": "Good",
+      "flashcardHardText": "Hard",
+      "reviewButtonDelay": 0,
+      "showDeleteButtonInCardView": false,
+      "showDeleteButtonInFileMenu": false,
+      "openViewInNewTab": false,
+      "openViewInNewTabMobile": false,
+      "useCustomHotkeys": false,
+      "useCalloutsForSchedulingComments": false,
+      "algorithm": "SM-2-OSR",
+      "baseEase": 250,
+      "lapsesIntervalChange": 0.5,
+      "easyBonus": 1.3,
+      "loadBalance": true,
+      "maximumInterval": 36525,
+      "maxLinkFactor": 1,
+      "fsrsDesiredRetention": 0.9,
+      "startOfDay": "00:00:00",
+      "leechThreshold": 8,
+      "leechAction": "suspend",
+      "dailyLimitsEnabled": true,
+      "newCardsPerDay": 20,
+      "reviewsPerDay": 200,
+      "dataStore": "NOTES",
+      "cardCommentOnSameLine": false,
+      "scheduleDataVaultLocation": "Spaced Repetition",
+      "reviewLogFolder": "Flashcard Studio/Review log",
+      "showSchedulingDebugMessages": false,
+      "showParserDebugMessages": false,
+      "preferredDateFormatForNoteReviewQueue": "MMM DD YYYY",
+      "preferredLocale": "-",
+      "fsrsLearningSteps": "1m 10m",
+      "fsrsRelearningSteps": "10m",
+      "learnAheadMinutes": 20,
+      "fsrsEnableFuzz": false,
+      "fsrsWeights": "",
+      "answerKeys": "original",
+      "reviewLook": "studio",
+      "desktopLayout": true,
+      "learnerName": "",
+      "aiProvider": "anthropic",
+      "aiModel": "claude-sonnet-5-5",
+      "aiBaseUrl": "",
+      "aiKeySecret": "",
+      "typeAnswers": false,
+      "ignoreAccentsWhenTyping": false,
+      "shuffleChoices": true,
+      "readQuestionAloud": false,
+      "readAnswerAloud": false,
+      "speechVoice": "",
+      "speechRate": 1,
+      "examPassPercent": 75,
+      "multilineCardStartMarker": "",
+      "calloutCardTypes": [
+        "flashcard",
+        "question",
+        "card"
+      ],
+      "atomicClozes": false,
+      "latexClozes": false
+    },
+    "buryDate": "",
+    "buryList": [],
+    "historyDeck": null,
+    "scheduleData": {
+      "version": 1,
+      "noteSchedules": {},
+      "cardSchedules": {}
+    },
+    "limitOverride": {
+      "date": "",
+      "extraNew": 0,
+      "extraReviews": 0
+    }
+  },
+  "cases": [
+    {
+      "name": "no data.json (loadData resolves null)",
+      "note": "First run: settings come from the fresh-install settings (FSRS, Anki keys, fuzz on).",
+      "savedDataJson": null,
+      "result": {
+        "isFirstRun": true,
+        "settingsDiffVsShippedDefaults": {
+          "algorithm": {
+            "default": "SM-2-OSR",
+            "loaded": "FSRS"
+          },
+          "fsrsEnableFuzz": {
+            "default": false,
+            "loaded": true
+          },
+          "answerKeys": {
+            "default": "original",
+            "loaded": "anki"
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "loadData resolves undefined",
+      "note": "",
+      "savedDataJson": {
+        "$undefined": true
+      },
+      "result": {
+        "isFirstRun": true,
+        "settingsDiffVsShippedDefaults": {
+          "algorithm": {
+            "default": "SM-2-OSR",
+            "loaded": "FSRS"
+          },
+          "fsrsEnableFuzz": {
+            "default": false,
+            "loaded": true
+          },
+          "answerKeys": {
+            "default": "original",
+            "loaded": "anki"
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "empty object (no settings key)",
+      "note": "Counts as a first run.",
+      "savedDataJson": {},
+      "result": {
+        "isFirstRun": true,
+        "settingsDiffVsShippedDefaults": {
+          "algorithm": {
+            "default": "SM-2-OSR",
+            "loaded": "FSRS"
+          },
+          "fsrsEnableFuzz": {
+            "default": false,
+            "loaded": true
+          },
+          "answerKeys": {
+            "default": "original",
+            "loaded": "anki"
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "settings key null",
+      "note": "Counts as a first run.",
+      "savedDataJson": {
+        "settings": null
+      },
+      "result": {
+        "isFirstRun": true,
+        "settingsDiffVsShippedDefaults": {
+          "algorithm": {
+            "default": "SM-2-OSR",
+            "loaded": "FSRS"
+          },
+          "fsrsEnableFuzz": {
+            "default": false,
+            "loaded": true
+          },
+          "answerKeys": {
+            "default": "original",
+            "loaded": "anki"
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "settings = {}",
+      "note": "NOT a first run (the key exists): shipped defaults, algorithm SM2.",
+      "savedDataJson": {
+        "settings": {}
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "settings with one value",
+      "note": "",
+      "savedDataJson": {
+        "settings": {
+          "openViewInNewTab": true
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          },
+          "openViewInNewTab": {
+            "default": false,
+            "loaded": true
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "legacy random order setting upgraded on load",
+      "note": "",
+      "savedDataJson": {
+        "settings": {
+          "randomizeCardOrder": true,
+          "flashcardTags": [
+            "#cards"
+          ]
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "flashcardTags": {
+            "default": [
+              "#flashcards"
+            ],
+            "loaded": [
+              "#cards"
+            ]
+          },
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "unknown settings key is kept",
+      "note": "",
+      "savedDataJson": {
+        "settings": {
+          "legacyThing": {
+            "a": 1
+          },
+          "flashcardTags": [
+            "#x"
+          ]
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "flashcardTags": {
+            "default": [
+              "#flashcards"
+            ],
+            "loaded": [
+              "#x"
+            ]
+          },
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          },
+          "legacyThing": {
+            "default": {
+              "$absent": true
+            },
+            "loaded": {
+              "a": 1
+            }
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "null value overrides a default",
+      "note": "Object.assign copies null: the default is lost",
+      "savedDataJson": {
+        "settings": {
+          "flashcardTags": null
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "flashcardTags": {
+            "default": [
+              "#flashcards"
+            ],
+            "loaded": null
+          },
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "undefined-only keys",
+      "note": "",
+      "savedDataJson": {
+        "settings": {
+          "showRibbonIcon": true
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "bury data present",
+      "note": "",
+      "savedDataJson": {
+        "settings": {},
+        "buryDate": "2023-09-05",
+        "buryList": [
+          "abc",
+          "def"
+        ]
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "2023-09-05",
+          "buryList": [
+            "abc",
+            "def"
+          ],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "scheduleData replaced wholesale",
+      "note": "shallow merge: the default noteSchedules/cardSchedules keys vanish",
+      "savedDataJson": {
+        "settings": {},
+        "scheduleData": {
+          "version": 2
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 2
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "limitOverride partial replaced wholesale",
+      "note": "",
+      "savedDataJson": {
+        "settings": {},
+        "limitOverride": {
+          "date": "2023-09-06"
+        }
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "2023-09-06"
+          }
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "extra top-level keys survive",
+      "note": "",
+      "savedDataJson": {
+        "settings": {},
+        "welcomeShown": true,
+        "historyDeck": "x",
+        "somethingNew": [
+          1,
+          2
+        ]
+      },
+      "result": {
+        "isFirstRun": false,
+        "settingsDiffVsShippedDefaults": {
+          "clozePatterns": {
+            "default": [
+              "==[123;;]answer[;;hint]=="
+            ],
+            "loaded": []
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "",
+          "buryList": [],
+          "historyDeck": "x",
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          },
+          "welcomeShown": true,
+          "somethingNew": [
+            1,
+            2
+          ]
+        },
+        "saveCalls": 0
+      }
+    },
+    {
+      "name": "first run keeps other top-level data",
+      "note": "No settings but other keys: first run, other keys preserved",
+      "savedDataJson": {
+        "buryDate": "2023-09-05",
+        "buryList": [
+          "abc"
+        ],
+        "welcomeShown": true
+      },
+      "result": {
+        "isFirstRun": true,
+        "settingsDiffVsShippedDefaults": {
+          "algorithm": {
+            "default": "SM-2-OSR",
+            "loaded": "FSRS"
+          },
+          "fsrsEnableFuzz": {
+            "default": false,
+            "loaded": true
+          },
+          "answerKeys": {
+            "default": "original",
+            "loaded": "anki"
+          }
+        },
+        "otherTopLevel": {
+          "buryDate": "2023-09-05",
+          "buryList": [
+            "abc"
+          ],
+          "historyDeck": null,
+          "scheduleData": {
+            "version": 1,
+            "noteSchedules": {},
+            "cardSchedules": {}
+          },
+          "limitOverride": {
+            "date": "",
+            "extraNew": 0,
+            "extraReviews": 0
+          },
+          "welcomeShown": true
+        },
+        "saveCalls": 0
+      }
+    }
+  ],
+  "sharing": {
+    "otherManagerBuryList": [],
+    "otherManagerFlashcardTags": [
+      "#flashcards"
+    ],
+    "DEFAULT_DATA_buryList": [],
+    "DEFAULT_SETTINGS_tags_untouched": [
+      "#flashcards"
+    ]
+  },
+  "beforeLoad": {
+    "isLoaded": {
+      "throws": "Cant access the plugin data, as the plugin data is not yet loaded!!"
+    },
+    "pluginData": {
+      "throws": "Cant access the plugin data, as the plugin data is not yet loaded!!"
+    },
+    "savePluginData": "throws Cant access the plugin data, as the plugin data is not yet loaded!!",
+    "writeSettings": "throws Cant access the plugin data, as the plugin data is not yet loaded!!"
+  },
+  "writeSettings": {
+    "sameObject": true,
+    "saves": 1,
+    "savedLearner": "Ed"
+  },
+  "settingsManager": {
+    "saveCalls": [
+      "",
+      "",
+      "",
+      "New"
+    ],
+    "saveWhenWriteFails": "resolved",
+    "saveOrThrowWhenWriteFails": "rejected disk full",
+    "warnCalls": 1,
+    "afterSaveSettingsSameObject": true
+  },
+  "debugLogger": {
+    "getLog_info": "i1\ni2",
+    "getLog_error": "e1",
+    "getAllLogs": "\"i1\\ni2\\ne1\\nw1\"",
+    "emptyAll": {
+      "afterEmptyInfo": "\"\\ne1\\nw1\"",
+      "afterEmptyAll": "\"\\n\\n\""
+    },
+    "unknownType": {
+      "ok": {
+        "$undefined": true
+      }
+    }
+  },
+  "isInReviewLogFolder": {
+    "\"Flashcard Studio/Review log\"": {
+      "Flashcard Studio/Review log/2026-10.md": true,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"Flashcard Studio/Review log/\"": {
+      "Flashcard Studio/Review log/2026-10.md": true,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"Flashcard Studio/Review log//\"": {
+      "Flashcard Studio/Review log/2026-10.md": true,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"\"": {
+      "Flashcard Studio/Review log/2026-10.md": false,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"/\"": {
+      "Flashcard Studio/Review log/2026-10.md": false,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"Log\"": {
+      "Flashcard Studio/Review log/2026-10.md": false,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": true,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"log\"": {
+      "Flashcard Studio/Review log/2026-10.md": false,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": true,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": false
+    },
+    "\"/Log\"": {
+      "Flashcard Studio/Review log/2026-10.md": false,
+      "Flashcard Studio/Review log": false,
+      "Flashcard Studio/Review log2/x.md": false,
+      "Flashcard Studio/Review logs/x.md": false,
+      "Log/x.md": false,
+      "log/x.md": false,
+      "Other/Log/x.md": false,
+      "x.md": false,
+      "/Log/x.md": true
+    }
+  }
+}

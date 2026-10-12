@@ -1,0 +1,2872 @@
+[
+ {
+  "id": "n-no-tag",
+  "source": "written for this inventory",
+  "note": "no flashcard tag: nothing is read",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "Q::A",
+  "questions": []
+ },
+ {
+  "id": "n-simple",
+  "source": "written for this inventory",
+  "note": "tag then cards",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ1::A1\n\nQ2:::A2",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q1::A1",
+    "actualQuestion": "Q1::A1",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "c4ddf78ff81fe",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q1",
+      "back": "A1",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineReversed",
+    "firstLine": 3,
+    "lastLine": 3,
+    "original": "Q2:::A2",
+    "actualQuestion": "Q2:::A2",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1db9b44beba2d",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q2",
+      "back": "A2",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A2",
+      "back": "Q2",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-nested-tag",
+  "source": "written for this inventory",
+  "note": "nested tag",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards/science/physics\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/science/physics",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-fm-tag",
+  "source": "written for this inventory",
+  "note": "frontmatter tag list",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "---\ntags:\n  - flashcards/philosophy\n---\n\nWho::Socrates",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 5,
+    "lastLine": 5,
+    "original": "Who::Socrates",
+    "actualQuestion": "Who::Socrates",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/philosophy",
+    "textHash": "5cd104fd2bb70",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Who",
+      "back": "Socrates",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-fm-and-line-tag",
+  "source": "written for this inventory",
+  "note": "line tag after the first card overrides from its line on",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "---\ntags:\n  - flashcards/a\n---\nQ1::A1\n\n#flashcards/b\nQ2::A2",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 4,
+    "lastLine": 4,
+    "original": "Q1::A1",
+    "actualQuestion": "Q1::A1",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/a",
+    "textHash": "c4ddf78ff81fe",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q1",
+      "back": "A1",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 7,
+    "lastLine": 7,
+    "original": "Q2::A2",
+    "actualQuestion": "Q2::A2",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/b",
+    "textHash": "93823894bcdf3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q2",
+      "back": "A2",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-tag-after-q",
+  "source": "written for this inventory",
+  "note": "only a tag after the question: backward compatible fallback to the first tag",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "Q::A\n\n#flashcards/late",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 0,
+    "lastLine": 0,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/late",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-question-tag",
+  "source": "written for this inventory",
+  "note": "tag inside the card line overrides the note tag",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards/a\n#flashcards/b Q::A\n\nR::S",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "#flashcards/b Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards/b",
+     "postWs": " "
+    },
+    "topics": "#flashcards/b",
+    "textHash": "1956a689610ff1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 3,
+    "lastLine": 3,
+    "original": "R::S",
+    "actualQuestion": "R::S",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/a",
+    "textHash": "9d269d5cf0de3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-question-tag-ws",
+  "source": "written for this inventory",
+  "note": "whitespace around a question tag is kept",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n  #flashcards/x   Q::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "  #flashcards/x   Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "  ",
+     "tag": "#flashcards/x",
+     "postWs": "   "
+    },
+    "topics": "#flashcards/x",
+    "textHash": "175cf43f3b9bdc",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-two-tags-one-line",
+  "source": "written for this inventory",
+  "note": "two flashcard tags on the same line form one topic list",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards/a #flashcards/b\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/a|#flashcards/b",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-non-flashcard-tag",
+  "source": "written for this inventory",
+  "note": "other tags are ignored",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards #other\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-folder-deck",
+  "source": "written for this inventory",
+  "note": "folders as decks",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "folderTopicPath": [
+   "Dir",
+   "Sub"
+  ],
+  "path": "note.md",
+  "input": "Q::A\n#flashcards/ignored R::S",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 0,
+    "lastLine": 0,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Dir/Sub",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "#flashcards/ignored R::S",
+    "actualQuestion": "R::S",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Dir/Sub",
+    "textHash": "9d269d5cf0de3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-folder-deck-notag",
+  "source": "written for this inventory",
+  "note": "folders as decks: no tag needed",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "folderTopicPath": [
+   "Dir"
+  ],
+  "path": "note.md",
+  "input": "Q::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 0,
+    "lastLine": 0,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Dir",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-blockid",
+  "source": "written for this inventory",
+  "note": "block id",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A ^abc\n\nR::S <!--SR:!2026-10-20,12,260--> ^def",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q::A ^abc",
+    "actualQuestion": "Q::A",
+    "blockId": "^abc",
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 3,
+    "lastLine": 3,
+    "original": "R::S <!--SR:!2026-10-20,12,260--> ^def",
+    "actualQuestion": "R::S",
+    "blockId": "^def",
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "9d269d5cf0de3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-sl",
+  "source": "written for this inventory",
+  "note": "single schedule",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-sl-meta",
+  "source": "written for this inventory",
+  "note": "metadata tokens",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=k3f9a2,susp,bury=2026-11-01,flag=3,leech,zz=1-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12,260,id=k3f9a2,susp,bury=2026-11-01,flag=3,leech,zz=1-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": "k3f9a2",
+       "suspended": true,
+       "buryUntil": "2026-11-01",
+       "flag": 3,
+       "leech": true,
+       "extras": [
+        "zz=1"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-fsrs",
+  "source": "written for this inventory",
+  "note": "FSRS schedule",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=ab12cd-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z,id=ab12cd-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+      "meta": {
+       "id": "ab12cd",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-rev-both",
+  "source": "written for this inventory",
+  "note": "reversed card with two schedules",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ:::A\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250-->",
+  "questions": [
+   {
+    "type": "SingleLineReversed",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q:::A\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250-->",
+    "actualQuestion": "Q:::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1faa19c9128d10",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A",
+      "back": "Q",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-rev-placeholder-first",
+  "source": "written for this inventory",
+  "note": "placeholder then real: the reverse is scheduled, the forward is new",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ:::A\n<!--SR:!2000-01-01,1,250!2026-10-21,5,250-->",
+  "questions": [
+   {
+    "type": "SingleLineReversed",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q:::A\n<!--SR:!2000-01-01,1,250!2026-10-21,5,250-->",
+    "actualQuestion": "Q:::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1faa19c9128d10",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A",
+      "back": "Q",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-rev-placeholder-last",
+  "source": "written for this inventory",
+  "note": "real then placeholder",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ:::A\n<!--SR:!2026-10-21,5,250!2000-01-01,1,250-->",
+  "questions": [
+   {
+    "type": "SingleLineReversed",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q:::A\n<!--SR:!2026-10-21,5,250!2000-01-01,1,250-->",
+    "actualQuestion": "Q:::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1faa19c9128d10",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A",
+      "back": "Q",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-fsrs-placeholders",
+  "source": "written for this inventory",
+  "note": "FSRS placeholders",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ:::A\n<!--SR:!fsrs,-,0,0,0,0,0,0,0,-!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z-->",
+  "questions": [
+   {
+    "type": "SingleLineReversed",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q:::A\n<!--SR:!fsrs,-,0,0,0,0,0,0,0,-!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z-->",
+    "actualQuestion": "Q:::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1faa19c9128d10",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A",
+      "back": "Q",
+      "schedule": "!fsrs,2026-10-20T08:00:00.000Z,12,7.25,5.5,2,3,0,0,2026-10-01T08:00:00.000Z",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-too-few",
+  "source": "written for this inventory",
+  "note": "cloze with 3 cards and 1 segment: the rest are new",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nA ==b== ==c== ==d==\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "A ==b== ==c== ==d==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "162a591dd128fe",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "A <span style='color:#2196f3'>[...]</span> c d\n",
+      "back": "A <span style='color:#2196f3'>b</span> c d\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A b <span style='color:#2196f3'>[...]</span> d\n",
+      "back": "A b <span style='color:#2196f3'>c</span> d\n",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 2,
+      "front": "A b c <span style='color:#2196f3'>[...]</span>\n",
+      "back": "A b c <span style='color:#2196f3'>d</span>\n",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-too-many",
+  "source": "written for this inventory",
+  "note": "cloze with 2 cards and 3 segments: the extra one is left out of the cards and the note is not rewritten for it",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250!2026-10-22,6,250-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250!2026-10-22,6,250-->",
+    "actualQuestion": "A ==b== ==c==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "1bc88998b1a7d1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "A <span style='color:#2196f3'>[...]</span> c\n",
+      "back": "A <span style='color:#2196f3'>b</span> c\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A b <span style='color:#2196f3'>[...]</span>\n",
+      "back": "A b <span style='color:#2196f3'>c</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-too-many-meta",
+  "source": "written for this inventory",
+  "note": "extra segment has metadata: left out of the cards, not rewritten",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": "aaa111",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-unreadable",
+  "source": "written for this inventory",
+  "note": "an unreadable segment keeps its place as an unscheduled card",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!garbage,x,y!2026-10-21,5,250-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nA ==b== ==c==\n<!--SR:!garbage,x,y!2026-10-21,5,250-->",
+    "actualQuestion": "A ==b== ==c==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "1bc88998b1a7d1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "A <span style='color:#2196f3'>[...]</span> c\n",
+      "back": "A <span style='color:#2196f3'>b</span> c\n",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A b <span style='color:#2196f3'>[...]</span>\n",
+      "back": "A b <span style='color:#2196f3'>c</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-empty-comment",
+  "source": "written for this inventory",
+  "note": "empty comment body",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:-->",
+    "actualQuestion": "Q::A\n<!--SR:-->",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "dce9867654e4f",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A\n<!--SR:-->",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-no-bang",
+  "source": "written for this inventory",
+  "note": "comment without leading bang",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:2026-10-20,12,260-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-fraction",
+  "source": "written for this inventory",
+  "note": "fractional interval",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12.5,260-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12.5,260-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12.5,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-date-formats",
+  "source": "written for this inventory",
+  "note": "alternate date formats",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!20-10-2026,12,260!Tue Oct 20 2026,3,250-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nA ==b== ==c==\n<!--SR:!20-10-2026,12,260!Tue Oct 20 2026,3,250-->",
+    "actualQuestion": "A ==b== ==c==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "1bc88998b1a7d1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "A <span style='color:#2196f3'>[...]</span> c\n",
+      "back": "A <span style='color:#2196f3'>b</span> c\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A b <span style='color:#2196f3'>[...]</span>\n",
+      "back": "A b <span style='color:#2196f3'>c</span>\n",
+      "schedule": "!2026-10-20,3,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-bad-id",
+  "source": "written for this inventory",
+  "note": "ids that do not match the id format are kept as extra tokens",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=ABC!2026-10-21,5,250,id=toolongtoolongtoolong1-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nA ==b== ==c==\n<!--SR:!2026-10-20,12,260,id=ABC!2026-10-21,5,250,id=toolongtoolongtoolong1-->",
+    "actualQuestion": "A ==b== ==c==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "1bc88998b1a7d1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "A <span style='color:#2196f3'>[...]</span> c\n",
+      "back": "A <span style='color:#2196f3'>b</span> c\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": [
+        "id=ABC"
+       ]
+      }
+     },
+     {
+      "idx": 1,
+      "front": "A b <span style='color:#2196f3'>[...]</span>\n",
+      "back": "A b <span style='color:#2196f3'>c</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": [
+        "id=toolongtoolongtoolong1"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-dup-id",
+  "source": "written for this inventory",
+  "note": "two cards with the same id are not detected",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n<!--SR:!2026-10-20,12,260,id=same11-->\n\nR::S\n<!--SR:!2026-10-20,12,260,id=same11-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12,260,id=same11-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": "same11",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 4,
+    "lastLine": 5,
+    "original": "R::S\n<!--SR:!2026-10-20,12,260,id=same11-->",
+    "actualQuestion": "R::S",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "9d269d5cf0de3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": "same11",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-callout",
+  "source": "written for this inventory",
+  "note": "schedule in the metadata callout",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260-->\n\nR::S",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 3,
+    "original": "Q::A\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "Q::A\n> [!sr|card-metadata] \n>",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "f92c163a2bcae",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A\n> [!sr|card-metadata] \n>",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 5,
+    "lastLine": 5,
+    "original": "R::S",
+    "actualQuestion": "R::S",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "9d269d5cf0de3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-ml",
+  "source": "written for this inventory",
+  "note": "multi-line with schedule",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 0,
+    "lastLine": 4,
+    "original": "#flashcards\nQ\n?\nA\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "Q\n?\nA\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "1d5f65899e64ad",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-callout-card",
+  "source": "written for this inventory",
+  "note": "callout card with a schedule below",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n> [!question] T\n> body\n<!--SR:!2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "Callout",
+    "firstLine": 1,
+    "lastLine": 3,
+    "original": "> [!question] T\n> body\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "> [!question] T\n> body",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1452309737ea2a",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "T",
+      "back": "body",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-occlusion-sched",
+  "source": "written for this inventory",
+  "note": "occlusion block with one schedule for the second mask",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260-->",
+  "questions": [
+   {
+    "type": "ImageOcclusion",
+    "firstLine": 1,
+    "lastLine": 6,
+    "original": "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n<!--SR:!2000-01-01,1,250!2026-10-20,12,260-->",
+    "actualQuestion": "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1320e622265566",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":0,\"side\":\"front\"}\n```",
+      "back": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":0,\"side\":\"back\"}\n```",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":1,\"side\":\"front\"}\n```",
+      "back": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":1,\"side\":\"back\"}\n```",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-occlusion",
+  "source": "written for this inventory",
+  "note": "occlusion block, new",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```",
+  "questions": [
+   {
+    "type": "ImageOcclusion",
+    "firstLine": 1,
+    "lastLine": 5,
+    "original": "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```",
+    "actualQuestion": "```image-occlusion\nimage: [[h.png]]\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1320e622265566",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":0,\"side\":\"front\"}\n```",
+      "back": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":0,\"side\":\"back\"}\n```",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":1,\"side\":\"front\"}\n```",
+      "back": "```fs-occlusion-card\n{\"block\":{\"image\":\"[[h.png]]\",\"mode\":\"hide-all\",\"question\":\"\",\"masks\":[{\"id\":\"a\",\"shape\":\"rect\",\"x\":0,\"y\":0,\"w\":0.5,\"h\":0.5,\"label\":\"A\"},{\"id\":\"b\",\"shape\":\"rect\",\"x\":0.5,\"y\":0.5,\"w\":0.5,\"h\":0.5,\"label\":\"B\"}]},\"active\":1,\"side\":\"back\"}\n```",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-atomic-legacy-comment",
+  "source": "written for this inventory",
+  "note": "atomic clozes switched on for a paragraph that has a shared comment: paragraph stays whole",
+  "options": {
+   "atomicClozes": true
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\na ==b==\nc ==d==\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 3,
+    "original": "#flashcards\na ==b==\nc ==d==\n<!--SR:!2026-10-20,12,260!2026-10-21,5,250-->",
+    "actualQuestion": "a ==b==\nc ==d==\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "5fc729a025f1a",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "a <span style='color:#2196f3'>[...]</span>\nc d\n",
+      "back": "a <span style='color:#2196f3'>b</span>\nc d\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "a b\nc <span style='color:#2196f3'>[...]</span>\n",
+      "back": "a b\nc <span style='color:#2196f3'>d</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-atomic-new",
+  "source": "written for this inventory",
+  "note": "atomic clozes, new",
+  "options": {
+   "atomicClozes": true
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\na ==b==\nc ==d==",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "a ==b==",
+    "actualQuestion": "a ==b==",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1e9ab8c1da6d3",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "a <span style='color:#2196f3'>[...]</span>",
+      "back": "a <span style='color:#2196f3'>b</span>",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "Cloze",
+    "firstLine": 2,
+    "lastLine": 2,
+    "original": "c ==d==",
+    "actualQuestion": "c ==d==",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "e2f5aefeface1",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "c <span style='color:#2196f3'>[...]</span>",
+      "back": "c <span style='color:#2196f3'>d</span>",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-latex-legacy",
+  "source": "written for this inventory",
+  "note": "latex clozes on, comment from before 0.11 that had a card for a cloze inside math",
+  "options": {
+   "latexClozes": true,
+   "clozePatterns": [
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+    "actualQuestion": "$x = {{a}}$ and {{b}}\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "3d548551bab94",
+    "hasChanged": true,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "$x = {{a}}$ and <span style='color:#2196f3'>[...]</span>\n",
+      "back": "$x = {{a}}$ and <span style='color:#2196f3'>b</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": "bbb222",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-latex-legacy-off",
+  "source": "written for this inventory",
+  "note": "same with latex clozes off",
+  "options": {
+   "clozePatterns": [
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\n$x = {{a}}$ and {{b}}\n<!--SR:!2026-10-20,12,260,id=aaa111!2026-10-21,5,250,id=bbb222-->",
+    "actualQuestion": "$x = {{a}}$ and {{b}}\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "3d548551bab94",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "$x = <span style='color:#2196f3'>[...]</span>$ and b\n",
+      "back": "$x = <span style='color:#2196f3'>a</span>$ and b\n",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": "aaa111",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "$x = a$ and <span style='color:#2196f3'>[...]</span>\n",
+      "back": "$x = a$ and <span style='color:#2196f3'>b</span>\n",
+      "schedule": "!2026-10-21,5,250",
+      "meta": {
+       "id": "bbb222",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-type-answers",
+  "source": "written for this inventory",
+  "note": "typed answers render cloze inputs",
+  "options": {
+   "typeAnswers": true
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\na ==b== c",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 1,
+    "original": "#flashcards\na ==b== c",
+    "actualQuestion": "a ==b== c",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "16358ef2f8f93e",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "a <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span> c",
+      "back": "a <span class=\"cloze-answer\" style='color:#2196f3'>b</span> c",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-convert-inputs",
+  "source": "written for this inventory",
+  "note": "cloze patterns as inputs",
+  "options": {
+   "convertClozePatternsToInputs": true
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\na ==bcd;;hint== c",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 1,
+    "original": "#flashcards\na ==bcd;;hint== c",
+    "actualQuestion": "a ==bcd;;hint== c",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "13e4b86270b0e0",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "a <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"3\" />[hint]</span> c",
+      "back": "a <span class=\"cloze-answer\" style='color:#2196f3'>bcd</span> c",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-crlf",
+  "source": "written for this inventory",
+  "note": "CRLF note",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\r\nQ::A\r\n<!--SR:!2026-10-20,12,260-->\r\n\r\nR\r\n?\r\nB\r\n",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Q::A\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 4,
+    "lastLine": 6,
+    "original": "R\n?\nB",
+    "actualQuestion": "R\n?\nB",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "2c5ccd40860cb",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "B",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-frontmatter-no-tags",
+  "source": "written for this inventory",
+  "note": "frontmatter without tags, tag in body",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "---\ntitle: x\n---\n#flashcards\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 4,
+    "lastLine": 4,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-frontmatter-unclosed",
+  "source": "written for this inventory",
+  "note": "frontmatter never closed is plain content",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "---\ntags:\n  - flashcards\nQ::A",
+  "questions": []
+ },
+ {
+  "id": "n-ignored-tag-in-code",
+  "source": "written for this inventory",
+  "note": "the unit helper finds tags anywhere, a real vault would not",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n```\n#flashcards/x\n```\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 4,
+    "lastLine": 4,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/x",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-sched-two-in-paragraph",
+  "source": "written for this inventory",
+  "note": "two cloze cards in one region each with a comment: the second comment is an extra",
+  "options": {
+   "multilineCardStartMarker": "<!--card-->",
+   "multilineCardEndMarker": "<!--/card-->"
+  },
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\n<!--card-->\na ==b==\n<!--SR:!2026-10-20,12,260-->\n\nc ==d==\n<!--SR:!2026-10-20,12,260-->\n<!--/card-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 2,
+    "lastLine": 6,
+    "original": "a ==b==\n<!--SR:!2026-10-20,12,260-->\n\nc ==d==\n<!--SR:!2026-10-20,12,260-->",
+    "actualQuestion": "a ==b==\n\n\nc ==d==",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1a2db472306189",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "a <span style='color:#2196f3'>[...]</span>\n\n\nc d",
+      "back": "a <span style='color:#2196f3'>b</span>\n\n\nc d",
+      "schedule": "!2026-10-20,12,260",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "a b\n\n\nc <span style='color:#2196f3'>[...]</span>",
+      "back": "a b\n\n\nc <span style='color:#2196f3'>d</span>",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-dup-questions",
+  "source": "written for this inventory",
+  "note": "two identical cards share a text hash",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards\nQ::A\n\nQ::A",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 3,
+    "lastLine": 3,
+    "original": "Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "1dd13d8b1b6400",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "n-tag-only-question-tags",
+  "source": "written for this inventory",
+  "note": "all topic tags are question specific",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "note.md",
+  "input": "#flashcards/a Q::A\n\n#flashcards/b R::S",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 0,
+    "lastLine": 0,
+    "original": "#flashcards/a Q::A",
+    "actualQuestion": "Q::A",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards/a",
+     "postWs": " "
+    },
+    "topics": "#flashcards/a",
+    "textHash": "1ee29f773c8529",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Q",
+      "back": "A",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 2,
+    "lastLine": 2,
+    "original": "#flashcards/b R::S",
+    "actualQuestion": "R::S",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards/b",
+     "postWs": " "
+    },
+    "topics": "#flashcards/b",
+    "textHash": "a1420c68d1a53",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "R",
+      "back": "S",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "vault:tests/e2e/vault/CIA/Part1/Deck.md",
+  "source": "vault file, flashcards as folders",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "folderTopicPath": [
+   "Part1"
+  ],
+  "path": "tests/e2e/vault/CIA/Part1/Deck.md",
+  "input": "#flashcards\n\n**What is the purpose of internal auditing?**\n?\n- Provide **independent, objective assurance** and consulting\n- Add value and improve operations\n> [!tip] The board\n> Internal audit reports functionally to the board.\n\n**Who owns and manages risk in the Three Lines Model?**\n?\n- **Management**, in the first and second lines\n- Internal audit is the **third line**\n> [!tip] Independence\n> Internal audit provides assurance on risk, it does not own it.\n\n**What does CAE stand for?**\n?\n- **Chief Audit Executive**\n- The head of the internal audit function\n> [!tip] Reporting lines\n> The CAE reports functionally to the board and administratively to senior management.\n\nThe CAE reports ==functionally== to the ==board==.\n",
+  "questions": [
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 2,
+    "lastLine": 7,
+    "original": "**What is the purpose of internal auditing?**\n?\n- Provide **independent, objective assurance** and consulting\n- Add value and improve operations\n> [!tip] The board\n> Internal audit reports functionally to the board.",
+    "actualQuestion": "**What is the purpose of internal auditing?**\n?\n- Provide **independent, objective assurance** and consulting\n- Add value and improve operations\n> [!tip] The board\n> Internal audit reports functionally to the board.",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Part1",
+    "textHash": "14530e9fa3b902",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "**What is the purpose of internal auditing?**",
+      "back": "- Provide **independent, objective assurance** and consulting\n- Add value and improve operations\n> [!tip] The board\n> Internal audit reports functionally to the board.",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 9,
+    "lastLine": 14,
+    "original": "**Who owns and manages risk in the Three Lines Model?**\n?\n- **Management**, in the first and second lines\n- Internal audit is the **third line**\n> [!tip] Independence\n> Internal audit provides assurance on risk, it does not own it.",
+    "actualQuestion": "**Who owns and manages risk in the Three Lines Model?**\n?\n- **Management**, in the first and second lines\n- Internal audit is the **third line**\n> [!tip] Independence\n> Internal audit provides assurance on risk, it does not own it.",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Part1",
+    "textHash": "99a3ebc554aae",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "**Who owns and manages risk in the Three Lines Model?**",
+      "back": "- **Management**, in the first and second lines\n- Internal audit is the **third line**\n> [!tip] Independence\n> Internal audit provides assurance on risk, it does not own it.",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 16,
+    "lastLine": 21,
+    "original": "**What does CAE stand for?**\n?\n- **Chief Audit Executive**\n- The head of the internal audit function\n> [!tip] Reporting lines\n> The CAE reports functionally to the board and administratively to senior management.",
+    "actualQuestion": "**What does CAE stand for?**\n?\n- **Chief Audit Executive**\n- The head of the internal audit function\n> [!tip] Reporting lines\n> The CAE reports functionally to the board and administratively to senior management.",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Part1",
+    "textHash": "5b4ce6cd5ce54",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "**What does CAE stand for?**",
+      "back": "- **Chief Audit Executive**\n- The head of the internal audit function\n> [!tip] Reporting lines\n> The CAE reports functionally to the board and administratively to senior management.",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "Cloze",
+    "firstLine": 23,
+    "lastLine": 23,
+    "original": "The CAE reports ==functionally== to the ==board==.",
+    "actualQuestion": "The CAE reports ==functionally== to the ==board==.",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Part1",
+    "textHash": "5a9390c27ce9e",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "The CAE reports <span style='color:#2196f3'>[...]</span> to the board.",
+      "back": "The CAE reports <span style='color:#2196f3'>functionally</span> to the board.",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "The CAE reports functionally to the <span style='color:#2196f3'>[...]</span>.",
+      "back": "The CAE reports functionally to the <span style='color:#2196f3'>board</span>.",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-block-and-schedule",
+  "source": "written for this suite",
+  "note": "block id and schedule on one card",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "notes/b.md",
+  "input": "#flashcards/kitchen\nWhich pan for eggs?::Non-stick ^pan1\n<!--SR:!2026-11-02,9,255,id=pn01aa-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Which pan for eggs?::Non-stick ^pan1\n<!--SR:!2026-11-02,9,255,id=pn01aa-->",
+    "actualQuestion": "Which pan for eggs?::Non-stick",
+    "blockId": "^pan1",
+    "questionTopic": null,
+    "topics": "#flashcards/kitchen",
+    "textHash": "148bc2fb460725",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Which pan for eggs?",
+      "back": "Non-stick",
+      "schedule": "!2026-11-02,9,255",
+      "meta": {
+       "id": "pn01aa",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-fsrs-cloze",
+  "source": "written for this suite",
+  "note": "two cloze cards with FSRS segments",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "notes/b.md",
+  "input": "#flashcards\nThe ==cello== has ==four== strings\n<!--SR:!fsrs,2026-11-03T08:00:00.000Z,5,6.5,4.5,2,3,0,0,2026-10-20T08:00:00.000Z!fsrs,-,0,0,0,0,0,0,0,-,id=zz09yy-->",
+  "questions": [
+   {
+    "type": "Cloze",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "#flashcards\nThe ==cello== has ==four== strings\n<!--SR:!fsrs,2026-11-03T08:00:00.000Z,5,6.5,4.5,2,3,0,0,2026-10-20T08:00:00.000Z!fsrs,-,0,0,0,0,0,0,0,-,id=zz09yy-->",
+    "actualQuestion": "The ==cello== has ==four== strings\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards",
+     "postWs": "\n"
+    },
+    "topics": "#flashcards",
+    "textHash": "7310bd3f61715",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "The <span style='color:#2196f3'>[...]</span> has four strings\n",
+      "back": "The <span style='color:#2196f3'>cello</span> has four strings\n",
+      "schedule": "!fsrs,2026-11-03T08:00:00.000Z,5,6.5,4.5,2,3,0,0,2026-10-20T08:00:00.000Z",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     },
+     {
+      "idx": 1,
+      "front": "The cello has <span style='color:#2196f3'>[...]</span> strings\n",
+      "back": "The cello has <span style='color:#2196f3'>four</span> strings\n",
+      "schedule": null,
+      "meta": {
+       "id": "zz09yy",
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-card-tag-with-schedule",
+  "source": "written for this suite",
+  "note": "a tag on the card line with a schedule",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "notes/b.md",
+  "input": "#flashcards/music\n#flashcards/music/jazz Who played the sax?::Parker\n<!--SR:!2026-11-05,4,270-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "#flashcards/music/jazz Who played the sax?::Parker\n<!--SR:!2026-11-05,4,270-->",
+    "actualQuestion": "Who played the sax?::Parker\n",
+    "blockId": null,
+    "questionTopic": {
+     "preWs": "",
+     "tag": "#flashcards/music/jazz",
+     "postWs": " "
+    },
+    "topics": "#flashcards/music/jazz",
+    "textHash": "1151dddc2963a5",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Who played the sax?",
+      "back": "Parker\n",
+      "schedule": "!2026-11-05,4,270",
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-folder-ml",
+  "source": "written for this suite",
+  "note": "folders as decks with a multi-line card",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "folderTopicPath": [
+   "Sailing",
+   "Knots"
+  ],
+  "path": "Sailing/Knots/n.md",
+  "input": "Name the loop knot\n?\nBowline",
+  "questions": [
+   {
+    "type": "MultiLineBasic",
+    "firstLine": 0,
+    "lastLine": 2,
+    "original": "Name the loop knot\n?\nBowline",
+    "actualQuestion": "Name the loop knot\n?\nBowline",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#Sailing/Knots",
+    "textHash": "1bb9536721703",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Name the loop knot",
+      "back": "Bowline",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-suspended",
+  "source": "written for this suite",
+  "note": "a suspended and flagged card",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "notes/b.md",
+  "input": "#flashcards\nWho wrote Hamlet?::Shakespeare\n<!--SR:!2026-11-08,6,260,id=hm77ab,susp,flag=3-->",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 2,
+    "original": "Who wrote Hamlet?::Shakespeare\n<!--SR:!2026-11-08,6,260,id=hm77ab,susp,flag=3-->",
+    "actualQuestion": "Who wrote Hamlet?::Shakespeare",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards",
+    "textHash": "a03d8804c4f69",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Who wrote Hamlet?",
+      "back": "Shakespeare",
+      "schedule": "!2026-11-08,6,260",
+      "meta": {
+       "id": "hm77ab",
+       "suspended": true,
+       "buryUntil": null,
+       "flag": 3,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "own-n-two-questions-one-tag",
+  "source": "written for this suite",
+  "note": "one note tag shared by two cards",
+  "options": {},
+  "folderTopicPath": [],
+  "path": "notes/b.md",
+  "input": "#flashcards/maps\nCapital of Chile?::Santiago\n\nCapital of Ghana?::Accra",
+  "questions": [
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 1,
+    "lastLine": 1,
+    "original": "Capital of Chile?::Santiago",
+    "actualQuestion": "Capital of Chile?::Santiago",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/maps",
+    "textHash": "1445b6bb66c136",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Capital of Chile?",
+      "back": "Santiago",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   },
+   {
+    "type": "SingleLineBasic",
+    "firstLine": 3,
+    "lastLine": 3,
+    "original": "Capital of Ghana?::Accra",
+    "actualQuestion": "Capital of Ghana?::Accra",
+    "blockId": null,
+    "questionTopic": null,
+    "topics": "#flashcards/maps",
+    "textHash": "18c6ed1958cbe4",
+    "hasChanged": false,
+    "cards": [
+     {
+      "idx": 0,
+      "front": "Capital of Ghana?",
+      "back": "Accra",
+      "schedule": null,
+      "meta": {
+       "id": null,
+       "suspended": false,
+       "buryUntil": null,
+       "flag": 0,
+       "leech": false,
+       "extras": []
+      }
+     }
+    ]
+   }
+  ]
+ }
+]

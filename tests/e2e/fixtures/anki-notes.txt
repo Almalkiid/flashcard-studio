@@ -1,0 +1,7 @@
+#separator:tab
+#deck column:3
+#tags column:4
+capital of France	Paris	Geography::Europe	cities
+"two lines
+of question"	"answer with ""quotes"""	Geography::Europe	
+capital of Japan	Tokyo	Geography::Asia	cities

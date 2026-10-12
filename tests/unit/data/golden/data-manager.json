@@ -1,0 +1,94 @@
+{
+  "skipAndOrder": {
+    "filesInVaultOrder": [
+      "Flashcard Studio/Review log/2026-10-flashcard-studio.md",
+      "Flashcard Studio/Exams/Exam 1.md",
+      "Templates/t.md",
+      "Drawings/a.excalidraw.md",
+      "notes/b.md",
+      "a.md"
+    ],
+    "processedInOrder": [
+      "notes/b.md",
+      "a.md"
+    ],
+    "reviewableTree": {
+      "name": "root",
+      "new": [],
+      "due": [],
+      "sub": [
+        {
+          "name": "flashcards",
+          "new": [
+            "B1",
+            "A1"
+          ],
+          "due": [],
+          "sub": []
+        }
+      ]
+    },
+    "syncLockAfter": false
+  },
+  "emptyReviewLogFolderSettingSkipsNothingForLog": {
+    "processed": [
+      "Flashcard Studio/Review log/2026-10-flashcard-studio.md",
+      "Templates/t.md",
+      "notes/b.md",
+      "a.md"
+    ]
+  },
+  "reviewLogFolderWithTrailingSlash": {
+    "processed": [
+      "Flashcard Studio/Review log/2026-10-flashcard-studio.md",
+      "Drawings/a.excalidraw.md",
+      "notes/b.md",
+      "a.md"
+    ]
+  },
+  "concurrentSync": {
+    "secondCallReturnsSamePromise": false,
+    "loadVaultCalls": 2,
+    "afterwardsAnotherSyncRuns": true
+  },
+  "loadVaultReentrancy": {
+    "syncLockWhileRunning": true,
+    "processedCountAfterTwoCalls": 3,
+    "secondCallResolvedWithoutScanning": 3
+  },
+  "metadataCacheWait_timeout": {
+    "registeredResolvedHandlers": 1,
+    "doneBeforeTimeout": false,
+    "doneAt2999ms": false,
+    "doneAt3000ms": true,
+    "handlersLeft": 0
+  },
+  "metadataCacheWait_resolvedEvent": {
+    "processedBeforeEvent": 0,
+    "processedAfter": 3
+  },
+  "vaultIndexBeforeInit": "throws Vault index not initialized!!!",
+  "isVaultIndexLoaded": true,
+  "isVaultIndexLoadedFresh": false,
+  "syncBeforeInit": "throws Vault index not initialized!!!",
+  "loadNote": {
+    "forCardNoteWithTagAndFoldersOff_questions": [
+      "A1::a1"
+    ],
+    "examsFolderNote": null
+  },
+  "algorithmChosenBySetting": {
+    "FSRS": "FsrsCardScheduler"
+  },
+  "algorithmChosenBySetting2": {
+    "SM-2-OSR": "Sm2Scheduler"
+  },
+  "algorithmChosenBySetting3": {
+    "bogus": "Sm2Scheduler"
+  },
+  "buryListSharing": {
+    "buriedCardsUsesTheSameArrayAsPluginDataBuryList": true,
+    "savesDuringInit": 1,
+    "buryDateAfterInit": "2023-09-06"
+  }
+}

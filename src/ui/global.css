@@ -1,0 +1,137 @@
+/* Shared by every screen of the plugin: the colours, the hidden state, the base of buttons and of the review views. */
+
+/* Spacing steps and the hairline rule, shared by the classic screens (a step is a multiple of Obsidian's 4 px unit) */
+body {
+    --fs-space-1: calc(1 * var(--size-4-1));
+    --fs-space-2: calc(2 * var(--size-4-1));
+    --fs-space-3: calc(3 * var(--size-4-1));
+    --fs-space-4: calc(4 * var(--size-4-1));
+    --fs-line: var(--background-modifier-border);
+    --fs-rule: solid 1px var(--fs-line);
+    --fs-hover-fill: var(--background-modifier-hover);
+    --fs-ink-faint: var(--text-faint);
+    --fs-ink-muted: var(--text-muted);
+    --fs-ink-error: var(--text-error);
+    --fs-mono: var(--font-monospace);
+}
+
+/* The card-metadata callout that the plugin writes into notes stays in the note, as an invisible marker */
+.callout[data-callout="sr"][data-callout-metadata="card-metadata"] {
+    background-color: transparent;
+    display: inline-block;
+
+    :is(.callout-title, .callout-content) {
+        display: none;
+    }
+}
+
+/* Colours: a flat fill with white text, and the same colours as plain text. Each name sets a tone and its pressed shade;
+   the rules below the table turn the tone into a fill or a text colour. */
+.fs-bg-blue,
+.fs-fg-blue {
+    --tone: #3591dd;
+    --tone-pressed: #2e8ddc;
+}
+
+.fs-bg-red,
+.fs-fg-red {
+    --tone: #f25d50;
+    --tone-pressed: #f15041;
+}
+
+.fs-bg-yellow,
+.fs-fg-yellow {
+    --tone: #e87743;
+    --tone-pressed: #e66f37;
+}
+
+.fs-bg-green,
+.fs-fg-green {
+    --tone: #47a84a;
+    --tone-pressed: #429e45;
+}
+
+:is(.fs-bg-blue, .fs-bg-red, .fs-bg-yellow, .fs-bg-green) {
+    background-color: var(--tone) !important;
+    color: #fff !important;
+}
+
+:is(.fs-fg-blue, .fs-fg-red, .fs-fg-yellow, .fs-fg-green) {
+    color: var(--tone) !important;
+}
+
+/* A button, or a count pill of a hovered deck row, is a little darker under the pointer */
+:is(.fs-bg-blue, .fs-bg-red, .fs-bg-yellow, .fs-bg-green) {
+    &.fs-response-button:hover,
+    .fs-deck-container .fs-tree-item-row:hover & {
+        background-color: var(--tone-pressed) !important;
+    }
+}
+
+.fs-is-hidden {
+    display: none !important;
+}
+
+.fs-centered {
+    align-items: center;
+    flex-flow: column;
+    display: flex;
+    justify-content: center;
+}
+
+.fs-button {
+    cursor: pointer;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.fs-flex-spacer {
+    flex-grow: 1;
+}
+
+/* A thin vertical rule between the parts of a bar; the places that use it set their own size and colour */
+.fs-divider {
+    --fs-divider-width: 2px;
+    --fs-divider-height: 2ch;
+    --fs-divider-color: var(--fs-ink-faint);
+
+    border-left: solid var(--fs-divider-color) var(--fs-divider-width);
+    height: var(--fs-divider-height);
+    border-radius: 10px;
+}
+
+/* The review in a modal or a tab. It is a size container: the toolbar and the answer row react to its width, not the window's. */
+.fs-view {
+    container: fs-view / size;
+    flex-flow: column;
+    display: flex;
+
+    .math-block {
+        padding-block: 1em;
+        padding-inline: 0;
+        margin: 0;
+        overflow-x: auto;
+    }
+}
+
+.fs-container {
+    block-size: 100%;
+    inline-size: 100%;
+    flex-flow: column;
+    display: flex;
+}
+
+/* Said to a screen reader and to nobody else */
+.fs-live-region {
+    position: absolute;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}

@@ -1,0 +1,144 @@
+[
+ {
+  "id": "d-middle",
+  "note": "middle card of three",
+  "options": {},
+  "input": "#flashcards\nA::1\n\nB::2\n\nC::3\n",
+  "deletedQuestionIndex": 1,
+  "deletedOriginalText": "B::2",
+  "output": "#flashcards\nA::1\n\n\n\nC::3\n",
+  "written": true
+ },
+ {
+  "id": "d-first",
+  "note": "first",
+  "options": {},
+  "input": "#flashcards\nA::1\n\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1",
+  "output": "#flashcards\n\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-last",
+  "note": "last",
+  "options": {},
+  "input": "#flashcards\nA::1\n\nB::2\n",
+  "deletedQuestionIndex": 1,
+  "deletedOriginalText": "B::2",
+  "output": "#flashcards\nA::1\n\n\n",
+  "written": true
+ },
+ {
+  "id": "d-adjacent",
+  "note": "adjacent lines",
+  "options": {},
+  "input": "#flashcards\nA::1\nB::2\nC::3\n",
+  "deletedQuestionIndex": 1,
+  "deletedOriginalText": "B::2",
+  "output": "#flashcards\nA::1\n\nC::3\n",
+  "written": true
+ },
+ {
+  "id": "d-with-comment",
+  "note": "card with its comment",
+  "options": {},
+  "input": "#flashcards\nA::1\n<!--SR:!2026-10-20,12,260,id=abc123-->\n\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1\n<!--SR:!2026-10-20,12,260,id=abc123-->",
+  "output": "#flashcards\n\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-same-line-comment",
+  "note": "comment on the same line",
+  "options": {},
+  "input": "#flashcards\nA::1 <!--SR:!2026-10-20,12,260,id=abc123--> ^k\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1 <!--SR:!2026-10-20,12,260,id=abc123--> ^k",
+  "output": "#flashcards\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-ml",
+  "note": "multi-line",
+  "options": {},
+  "input": "#flashcards\nQ\n?\nA\n\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "#flashcards\nQ\n?\nA",
+  "output": "\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-callout-meta",
+  "note": "card with the metadata callout",
+  "options": {},
+  "input": "#flashcards\nA::1\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->\n\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1\n> [!sr|card-metadata] \n> <!--SR:!2026-10-20,12,260,id=abc123-->",
+  "output": "#flashcards\n\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-tag-prefix",
+  "note": "question tag: the whole original text (tag included) is removed",
+  "options": {},
+  "input": "#flashcards\n#flashcards/x A::1\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "#flashcards/x A::1",
+  "output": "#flashcards\n\nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-dup",
+  "note": "identical cards: the first occurrence is removed whichever is deleted",
+  "options": {},
+  "input": "#flashcards\nA::1\n\nA::1\n",
+  "deletedQuestionIndex": 1,
+  "deletedOriginalText": "A::1",
+  "output": "#flashcards\n\n\nA::1\n",
+  "written": true
+ },
+ {
+  "id": "d-only-content",
+  "note": "the note is only this card: deleting writes nothing (empty result is treated as not found)",
+  "options": {
+   "convertFoldersToDecks": true
+  },
+  "input": "A::1",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1",
+  "output": "A::1",
+  "written": false
+ },
+ {
+  "id": "d-note-changed",
+  "note": "the note changed since it was loaded: text not found, nothing written",
+  "options": {},
+  "input": "#flashcards\nA::changed\nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1",
+  "output": "#flashcards\nA::changed\nB::2\n",
+  "written": false
+ },
+ {
+  "id": "d-trimmed-match",
+  "note": "padding differences are tolerated line by line",
+  "options": {},
+  "input": "#flashcards\n  A::1   \nB::2\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "A::1",
+  "output": "#flashcards\n     \nB::2\n",
+  "written": true
+ },
+ {
+  "id": "d-crlf",
+  "note": "CRLF note: a deletion by line match rewrites with LF",
+  "options": {},
+  "input": "#flashcards\r\nQ\r\n?\r\nA\r\n\r\nB::2\r\n",
+  "deletedQuestionIndex": 0,
+  "deletedOriginalText": "#flashcards\nQ\n?\nA",
+  "output": "\n\nB::2\n",
+  "written": true
+ }
+]

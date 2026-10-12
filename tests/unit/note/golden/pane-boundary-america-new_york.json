@@ -1,0 +1,76 @@
+{
+  "cases": [
+    {
+      "id": "boundary-0400-at-0200",
+      "note": "study day 2023-09-06 (due count uses it); pane labels use the calendar clock",
+      "dueCountComputedWithTodayEquals": "2023-09-06",
+      "queueDueNotesCount": 1,
+      "contentClasses": "fs-note-review-page",
+      "title": "Review a note",
+      "subtitle": "Click on any note to open it for review. To rate a review click on the 3 dots next to the note.",
+      "decks": [
+        {
+          "title": "#review",
+          "classCollapsed": false,
+          "iconCollapsed": false,
+          "folderInlineDisplay": null,
+          "childrenInlineDisplay": null,
+          "folders": [
+            {
+              "title": "Yesterday",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "d-0",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Today",
+              "classCollapsed": false,
+              "iconCollapsed": false,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": null,
+              "folders": [],
+              "files": [
+                {
+                  "name": "d-1",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            },
+            {
+              "title": "Tomorrow",
+              "classCollapsed": true,
+              "iconCollapsed": true,
+              "folderInlineDisplay": null,
+              "childrenInlineDisplay": "none",
+              "folders": [],
+              "files": [
+                {
+                  "name": "d-2",
+                  "active": false,
+                  "hasContextButton": true
+                }
+              ]
+            }
+          ],
+          "files": []
+        }
+      ],
+      "activeFoldersByDeck": {
+        "#review": [
+          "#review",
+          "Today"
+        ]
+      }
+    }
+  ]
+}

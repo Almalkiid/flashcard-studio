@@ -1,0 +1,119 @@
+/* The table of decks, with the due, new, seen and total counts of each. The Studio look turns the counts into coloured numbers. */
+
+.fs-no-decks-to-review {
+    font-style: italic;
+    padding: 32px;
+}
+
+.fs-deck-container {
+    @media (orientation: landscape) {
+        .is-phone & {
+            .fs-content {
+                padding-top: 2px;
+            }
+
+            .fs-header-row {
+                display: none;
+            }
+        }
+    }
+
+    .fs-scroll-wrapper {
+        flex-flow: column;
+        display: flex;
+        flex-grow: 1;
+        height: 100px;
+        overflow: hidden;
+    }
+
+    .fs-content {
+        padding-top: 16px;
+        padding-right: 4px;
+        padding-bottom: 8px;
+        padding-left: 8px;
+        overflow: hidden auto;
+        flex-grow: 1;
+    }
+
+    .fs-tree-stats-count {
+        .is-mobile & {
+            border-radius: var(--tag-radius);
+            height: 21px;
+        }
+    }
+
+    .fs-tree-item-row {
+        margin-bottom: 0;
+        padding-block: 2px;
+
+        &.is-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.fs-tree-row-text {
+    display: block;
+    overflow: hidden;
+    word-break: keep-all;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* How many cards today's limits hold back, under the name */
+.fs-tree-hidden-note {
+    color: var(--fs-ink-faint);
+    font-size: var(--font-ui-smaller);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.fs-tree-stats-container {
+    gap: var(--fs-space-1);
+    display: flex;
+}
+
+.fs-tree-stats-count {
+    align-items: center;
+    display: flex;
+    min-width: 36px;
+    padding: 4px 2px;
+    text-align: center;
+    justify-content: center;
+
+    &:not([class*="fs-fg-"]) {
+        color: #fff !important;
+    }
+}
+
+.fs-header-row {
+    .fs-tree-stats-count,
+    .fs-tree-row-text {
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .fs-tree-item-row {
+        border-bottom: dashed 1px var(--background-modifier-border);
+        margin-bottom: var(--fs-space-1);
+        border-radius: 0;
+    }
+}
+
+.is-phone .fs-deck-container {
+    .fs-content {
+        padding: 16px 0 0;
+    }
+
+    .fs-tree-item-row {
+        padding-inline-end: var(--fs-space-1);
+    }
+
+    .fs-tree-stats-count {
+        min-width: 32px;
+        width: 32px;
+        padding: 4px 0;
+    }
+}

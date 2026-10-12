@@ -1,0 +1,135 @@
+[
+ {
+  "input": "{{a}} and $\\cloze{b}{}$ and ==c==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $b$ and c",
+      "back": "<span style='color:#2196f3'>a</span> and $b$ and c"
+     },
+     {
+      "front": "a and $b$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "a and $b$ and <span style='color:#2196f3'>c</span>"
+     },
+     {
+      "front": "a and ${\\color{#2196f3}{[\\ldots]}}$ and c",
+      "back": "a and ${\\color{#2196f3}{b}}$ and c"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $\\cloze{b}{}$ and c",
+      "back": "<span style='color:#2196f3'>a</span> and $\\cloze{b}{}$ and c"
+     },
+     {
+      "front": "a and $\\cloze{b}{}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "a and $\\cloze{b}{}$ and <span style='color:#2196f3'>c</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\frac{{a}}{b}$ and {{c}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$\\frac{{a}}{b}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\frac{{a}}{b}$ and <span style='color:#2196f3'>c</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\frac<span style='color:#2196f3'>[...]</span>{b}$ and c",
+      "back": "$\\frac<span style='color:#2196f3'>a</span>{b}$ and c"
+     },
+     {
+      "front": "$\\fraca{b}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\fraca{b}$ and <span style='color:#2196f3'>c</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "{{a}} ==b==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> b",
+      "back": "<span style='color:#2196f3'>a</span> b"
+     },
+     {
+      "front": "a <span style='color:#2196f3'>[...]</span>",
+      "back": "a <span style='color:#2196f3'>b</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> b",
+      "back": "<span style='color:#2196f3'>a</span> b"
+     },
+     {
+      "front": "a <span style='color:#2196f3'>[...]</span>",
+      "back": "a <span style='color:#2196f3'>b</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{x}{}$ {{y;;hint}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$x$ <span style='color:#2196f3'>[hint]</span>",
+      "back": "$x$ <span style='color:#2196f3'>y</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ y",
+      "back": "${\\color{#2196f3}{x}}$ y"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{x}{}$ <span style='color:#2196f3'>[hint]</span>",
+      "back": "$\\cloze{x}{}$ <span style='color:#2196f3'>y</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\{{a}\\}$ {{b}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$\\{{a}\\}$ <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\{{a}\\}$ <span style='color:#2196f3'>b</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\<span style='color:#2196f3'>[...]</span>",
+      "back": "$\\<span style='color:#2196f3'>a}\\}$ {{b</span>"
+     }
+    ]
+   }
+  }
+ }
+]

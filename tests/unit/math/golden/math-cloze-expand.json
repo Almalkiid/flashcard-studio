@@ -1,0 +1,2067 @@
+[
+ {
+  "input": "$f(x) = \\cloze{g(x)}{inner}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$f(x) = {\\color{#2196f3}{[\\text{inner}]}}$",
+      "back": "$f(x) = {\\color{#2196f3}{g(x)}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$f(x) = {\\color{#2196f3}{[\\text{inner}]}}$",
+      "back": "$f(x) = {\\color{#2196f3}{g(x)}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$$\\cloze{c^2}{} = a^2 + b^2$$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$${\\color{#2196f3}{[\\ldots]}} = a^2 + b^2$$",
+      "back": "$${\\color{#2196f3}{c^2}} = a^2 + b^2$$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$${\\color{#2196f3}{[\\ldots]}} = a^2 + b^2$$",
+      "back": "$${\\color{#2196f3}{c^2}} = a^2 + b^2$$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$$\\cloze{p^2}{} + \\cloze{q^2}{} = r^2$$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$${\\color{#2196f3}{[\\ldots]}} + q^2 = r^2$$",
+      "back": "$${\\color{#2196f3}{p^2}} + q^2 = r^2$$"
+     },
+     {
+      "front": "$$p^2 + {\\color{#2196f3}{[\\ldots]}} = r^2$$",
+      "back": "$$p^2 + {\\color{#2196f3}{q^2}} = r^2$$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$${\\color{#2196f3}{[\\ldots]}} + q^2 = r^2$$",
+      "back": "$${\\color{#2196f3}{p^2}} + q^2 = r^2$$"
+     },
+     {
+      "front": "$$p^2 + {\\color{#2196f3}{[\\ldots]}} = r^2$$",
+      "back": "$$p^2 + {\\color{#2196f3}{q^2}} = r^2$$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{e^{x^{2}}}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{e^{x^{2}}}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{e^{x^{2}}}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\frac{1}{\\cloze{\\sqrt{2}}{}}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$\\frac{1}{{\\color{#2196f3}{[\\ldots]}}}$",
+      "back": "$\\frac{1}{{\\color{#2196f3}{\\sqrt{2}}}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$\\frac{1}{{\\color{#2196f3}{[\\ldots]}}}$",
+      "back": "$\\frac{1}{{\\color{#2196f3}{\\sqrt{2}}}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$S = \\cloze{\\{1,2\\}}{set}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$S = {\\color{#2196f3}{[\\text{set}]}}$",
+      "back": "$S = {\\color{#2196f3}{\\{1,2\\}}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$S = {\\color{#2196f3}{[\\text{set}]}}$",
+      "back": "$S = {\\color{#2196f3}{\\{1,2\\}}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze x$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{q$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\clozer{p}{q}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{q} + z$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{q}]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{q}]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p} {q} + z$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{q}]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{q}]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p} + z$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + z$",
+      "back": "${\\color{#2196f3}{p}} + z$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{  }$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{  spaced hint  }$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{spaced hint}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{spaced hint}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{50%}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{50%}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{50%}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{a\\b}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{a\\b}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\text{a\\b}]}}$",
+      "back": "${\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "{{plain}} and $x$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{}$ is {{named}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ is {{named}}",
+      "back": "${\\color{#2196f3}{p}}$ is {{named}}"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ is {{named}}",
+      "back": "${\\color{#2196f3}{p}}$ is {{named}}"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$E = \\cloze{m}{}$ in {{1905}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$E = {\\color{#2196f3}{[\\ldots]}}$ in {{1905}}",
+      "back": "$E = {\\color{#2196f3}{m}}$ in {{1905}}"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$E = {\\color{#2196f3}{[\\ldots]}}$ in {{1905}}",
+      "back": "$E = {\\color{#2196f3}{m}}$ in {{1905}}"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "{{a}} and $\\cloze{b}{}$ and {{c}} and $\\cloze{d}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "{{a}} and ${\\color{#2196f3}{[\\ldots]}}$ and {{c}} and $d$",
+      "back": "{{a}} and ${\\color{#2196f3}{b}}$ and {{c}} and $d$"
+     },
+     {
+      "front": "{{a}} and $b$ and {{c}} and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "{{a}} and $b$ and {{c}} and ${\\color{#2196f3}{d}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "{{a}} and ${\\color{#2196f3}{[\\ldots]}}$ and {{c}} and $d$",
+      "back": "{{a}} and ${\\color{#2196f3}{b}}$ and {{c}} and $d$"
+     },
+     {
+      "front": "{{a}} and $b$ and {{c}} and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "{{a}} and $b$ and {{c}} and ${\\color{#2196f3}{d}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{}$ and ==hi==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$p$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "$p$ and <span style='color:#2196f3'>hi</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and hi",
+      "back": "${\\color{#2196f3}{p}}$ and hi"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{p}{}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze{p}{}$ and <span style='color:#2196f3'>hi</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$p$ and <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"2\" /></span>",
+      "back": "$p$ and <span class=\"cloze-answer\" style='color:#2196f3'>hi</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and hi",
+      "back": "${\\color{#2196f3}{p}}$ and hi"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "==one== and $\\cloze{p}{}$ and ==two==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $p$ and two",
+      "back": "<span style='color:#2196f3'>one</span> and $p$ and two"
+     },
+     {
+      "front": "one and $p$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "one and $p$ and <span style='color:#2196f3'>two</span>"
+     },
+     {
+      "front": "one and ${\\color{#2196f3}{[\\ldots]}}$ and two",
+      "back": "one and ${\\color{#2196f3}{p}}$ and two"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $\\cloze{p}{}$ and two",
+      "back": "<span style='color:#2196f3'>one</span> and $\\cloze{p}{}$ and two"
+     },
+     {
+      "front": "one and $\\cloze{p}{}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "one and $\\cloze{p}{}$ and <span style='color:#2196f3'>two</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"3\" /></span> and $p$ and two",
+      "back": "<span class=\"cloze-answer\" style='color:#2196f3'>one</span> and $p$ and two"
+     },
+     {
+      "front": "one and $p$ and <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"3\" /></span>",
+      "back": "one and $p$ and <span class=\"cloze-answer\" style='color:#2196f3'>two</span>"
+     },
+     {
+      "front": "one and ${\\color{#2196f3}{[\\ldots]}}$ and two",
+      "back": "one and ${\\color{#2196f3}{p}}$ and two"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{}$ is the ==sq==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$p$ is the <span style='color:#2196f3'>[...]</span>",
+      "back": "$p$ is the <span style='color:#2196f3'>sq</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ is the sq",
+      "back": "${\\color{#2196f3}{p}}$ is the sq"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{p}{}$ is the <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze{p}{}$ is the <span style='color:#2196f3'>sq</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$p$ is the <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"2\" /></span>",
+      "back": "$p$ is the <span class=\"cloze-answer\" style='color:#2196f3'>sq</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ is the sq",
+      "back": "${\\color{#2196f3}{p}}$ is the sq"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "==$$ y $$== and $\\cloze{z}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $z$",
+      "back": "<span style='color:#2196f3'>$$ y $$</span> and $z$"
+     },
+     {
+      "front": "$$ y $$ and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$$ y $$ and ${\\color{#2196f3}{z}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[...]</span> and $\\cloze{z}{}$",
+      "back": "<span style='color:#2196f3'>$$ y $$</span> and $\\cloze{z}{}$"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"3\" /></span> and $z$",
+      "back": "<span class=\"cloze-answer\" style='color:#2196f3'>$$ y $$</span> and $z$"
+     },
+     {
+      "front": "$$ y $$ and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$$ y $$ and ${\\color{#2196f3}{z}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$6=\\cloze{1}{?} + \\cloze{2}{?} + \\cloze{3}{?}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$6={\\color{#2196f3}{[\\text{?}]}} + 2 + 3$",
+      "back": "$6={\\color{#2196f3}{1}} + 2 + 3$"
+     },
+     {
+      "front": "$6=1 + {\\color{#2196f3}{[\\text{?}]}} + 3$",
+      "back": "$6=1 + {\\color{#2196f3}{2}} + 3$"
+     },
+     {
+      "front": "$6=1 + 2 + {\\color{#2196f3}{[\\text{?}]}}$",
+      "back": "$6=1 + 2 + {\\color{#2196f3}{3}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$6={\\color{#2196f3}{[\\text{?}]}} + 2 + 3$",
+      "back": "$6={\\color{#2196f3}{1}} + 2 + 3$"
+     },
+     {
+      "front": "$6=1 + {\\color{#2196f3}{[\\text{?}]}} + 3$",
+      "back": "$6=1 + {\\color{#2196f3}{2}} + 3$"
+     },
+     {
+      "front": "$6=1 + 2 + {\\color{#2196f3}{[\\text{?}]}}$",
+      "back": "$6=1 + 2 + {\\color{#2196f3}{3}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[1]{a}{} + \\cloze[2]{b}{} = \\cloze[1]{c}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b = {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{a}} + b = {\\color{#2196f3}{c}}$"
+     },
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}} = c$",
+      "back": "$a + {\\color{#2196f3}{b}} = c$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b = {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{a}} + b = {\\color{#2196f3}{c}}$"
+     },
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}} = c$",
+      "back": "$a + {\\color{#2196f3}{b}} = c$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[2]{a}{} + \\cloze[1]{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[3]{a}{} + \\cloze[1]{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "$a + b$",
+      "back": "$a + b$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "$a + b$",
+      "back": "$a + b$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[1]{E}{} = m$ in ==1;;1905==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} = m$ in <span style='color:#2196f3'>[...]</span>",
+      "back": "${\\color{#2196f3}{E}} = m$ in <span style='color:#2196f3'>1905</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze[1]{E}{} = m$ in <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze[1]{E}{} = m$ in <span style='color:#2196f3'>1905</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} = m$ in <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"4\" /></span>",
+      "back": "${\\color{#2196f3}{E}} = m$ in <span class=\"cloze-answer\" style='color:#2196f3'>1905</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{a}{} + \\cloze[1]{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a + {\\color{#2196f3}{b}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[1]{a}{} + \\cloze{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + b$",
+      "back": "${\\color{#2196f3}{a}} + b$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[0]{a}{}+\\cloze[1]{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a+{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a+{\\color{#2196f3}{b}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a+{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a+{\\color{#2196f3}{b}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[10]{a}{}+\\cloze[2]{b}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a+{\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}+b$",
+      "back": "${\\color{#2196f3}{a}}+b$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$a+{\\color{#2196f3}{b}}$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "$a+b$",
+      "back": "$a+b$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}+b$",
+      "back": "${\\color{#2196f3}{a}}+b$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[ 2 ]{a}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$a$",
+      "back": "$a$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{a}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$a$",
+      "back": "$a$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{a}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[as]{x}{} = \\cloze[ha]{y}{why}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} = {\\color{gray}{[\\text{why}]}}$",
+      "back": "${\\color{#2196f3}{x}} = {\\color{gray}{[\\text{why}]}}$"
+     },
+     {
+      "front": "$x = {\\color{#2196f3}{[\\text{why}]}}$",
+      "back": "$x = {\\color{#2196f3}{y}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} = {\\color{gray}{[\\text{why}]}}$",
+      "back": "${\\color{#2196f3}{x}} = {\\color{gray}{[\\text{why}]}}$"
+     },
+     {
+      "front": "$x = {\\color{#2196f3}{[\\text{why}]}}$",
+      "back": "$x = {\\color{#2196f3}{y}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[ah]{x}{}$ and ==ha;;y==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and <span style='color:var(--code-comment)'>[...]</span>",
+      "back": "${\\color{#2196f3}{x}}$ and <span style='color:var(--code-comment)'>[...]</span>"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "${\\color{gray}{[\\ldots]}}$ and <span style='color:#2196f3'>y</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze[ah]{x}{}$ and <span style='color:var(--code-comment)'>[...]</span>",
+      "back": "$\\cloze[ah]{x}{}$ and <span style='color:var(--code-comment)'>[...]</span>"
+     },
+     {
+      "front": "$\\cloze[ah]{x}{}$ and <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze[ah]{x}{}$ and <span style='color:#2196f3'>y</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and <span style='color:var(--code-comment)'>[...]</span>",
+      "back": "${\\color{#2196f3}{x}}$ and <span style='color:var(--code-comment)'>[...]</span>"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$ and <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span>",
+      "back": "${\\color{gray}{[\\ldots]}}$ and <span class=\"cloze-answer\" style='color:#2196f3'>y</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[sha]{x}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$x$",
+      "back": "$x$"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$",
+      "back": "${\\color{gray}{[\\ldots]}}$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{x}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$x$",
+      "back": "$x$"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$",
+      "back": "${\\color{gray}{[\\ldots]}}$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "${\\color{#2196f3}{x}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[a]{x}{} + \\cloze[s]{y}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[h]{x}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$",
+      "back": "${\\color{gray}{[\\ldots]}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{gray}{[\\ldots]}}$",
+      "back": "${\\color{gray}{[\\ldots]}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[s]{x}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$x$",
+      "back": "$x$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$x$",
+      "back": "$x$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[aha]{x}{} + \\cloze[ss]{y}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}} + y$",
+      "back": "${\\color{gray}{[\\ldots]}} + y$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     },
+     {
+      "front": "${\\color{gray}{[\\ldots]}} + y$",
+      "back": "${\\color{gray}{[\\ldots]}} + y$"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + y$",
+      "back": "${\\color{#2196f3}{x}} + y$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[x]{a}{b}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[]{a}{b}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[1{a}{b}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze[A]{a}{b}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "{{in $\\frac{{a}}{b}$ math}}",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\frac{{a}}{b}$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$$\n{{p}}\n$$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\frac{{a}}{b}$ and {{c}}",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "{{a $x$ b}}",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$$\n\\cloze[1]{(a+b)^2}{} = \\cloze[2]{a^2 + 2ab + b^2}{} \\quad \\cloze[1]{(a-b)^2}{} = a^2\n$$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$$\n{\\color{#2196f3}{[\\ldots]}} = a^2 + 2ab + b^2 \\quad {\\color{#2196f3}{[\\ldots]}} = a^2\n$$",
+      "back": "$$\n{\\color{#2196f3}{(a+b)^2}} = a^2 + 2ab + b^2 \\quad {\\color{#2196f3}{(a-b)^2}} = a^2\n$$"
+     },
+     {
+      "front": "$$\n(a+b)^2 = {\\color{#2196f3}{[\\ldots]}} \\quad (a-b)^2 = a^2\n$$",
+      "back": "$$\n(a+b)^2 = {\\color{#2196f3}{a^2 + 2ab + b^2}} \\quad (a-b)^2 = a^2\n$$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$$\n{\\color{#2196f3}{[\\ldots]}} = a^2 + 2ab + b^2 \\quad {\\color{#2196f3}{[\\ldots]}} = a^2\n$$",
+      "back": "$$\n{\\color{#2196f3}{(a+b)^2}} = a^2 + 2ab + b^2 \\quad {\\color{#2196f3}{(a-b)^2}} = a^2\n$$"
+     },
+     {
+      "front": "$$\n(a+b)^2 = {\\color{#2196f3}{[\\ldots]}} \\quad (a-b)^2 = a^2\n$$",
+      "back": "$$\n(a+b)^2 = {\\color{#2196f3}{a^2 + 2ab + b^2}} \\quad (a-b)^2 = a^2\n$$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "\\cloze{p}{q} outside math",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'>[q]</span> outside math",
+      "back": "<span style='color:#2196f3'>p</span> outside math"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[q]</span> outside math",
+      "back": "<span class=\"cloze-answer\" style='color:#2196f3'>p</span> outside math"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "\\cloze[hs]{p}{q} outside",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "<span style='color:var(--code-comment)'>[q]</span> outside",
+      "back": "<span style='color:var(--code-comment)'>[q]</span> outside"
+     },
+     {
+      "front": "p outside",
+      "back": "p outside"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "<span style='color:var(--code-comment)'>[q]</span> outside",
+      "back": "<span style='color:var(--code-comment)'>[q]</span> outside"
+     },
+     {
+      "front": "p outside",
+      "back": "p outside"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "costs $5, then \\cloze{p}{q}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "costs $5, then <span style='color:#2196f3'>[q]</span>",
+      "back": "costs $5, then <span style='color:#2196f3'>p</span>"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "costs $5, then <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[q]</span>",
+      "back": "costs $5, then <span class=\"cloze-answer\" style='color:#2196f3'>p</span>"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "`\\cloze{p}{q}` and $\\cloze{r}{s}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "`<span style='color:#2196f3'>[q]</span>` and $r$",
+      "back": "`<span style='color:#2196f3'>p</span>` and $r$"
+     },
+     {
+      "front": "`p` and ${\\color{#2196f3}{[\\text{s}]}}$",
+      "back": "`p` and ${\\color{#2196f3}{r}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "`<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[q]</span>` and $r$",
+      "back": "`<span class=\"cloze-answer\" style='color:#2196f3'>p</span>` and $r$"
+     },
+     {
+      "front": "`p` and ${\\color{#2196f3}{[\\text{s}]}}$",
+      "back": "`p` and ${\\color{#2196f3}{r}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "`\\cloze{p}{q}` alone",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "`<span style='color:#2196f3'>[q]</span>` alone",
+      "back": "`<span style='color:#2196f3'>p</span>` alone"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "`<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[q]</span>` alone",
+      "back": "`<span class=\"cloze-answer\" style='color:#2196f3'>p</span>` alone"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "```\n\\cloze{p}{q}\n```\n$\\cloze{r}{s}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "```\n<span style='color:#2196f3'>[q]</span>\n```\n$r$",
+      "back": "```\n<span style='color:#2196f3'>p</span>\n```\n$r$"
+     },
+     {
+      "front": "```\np\n```\n${\\color{#2196f3}{[\\text{s}]}}$",
+      "back": "```\np\n```\n${\\color{#2196f3}{r}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "```\n<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[q]</span>\n```\n$r$",
+      "back": "```\n<span class=\"cloze-answer\" style='color:#2196f3'>p</span>\n```\n$r$"
+     },
+     {
+      "front": "```\np\n```\n${\\color{#2196f3}{[\\text{s}]}}$",
+      "back": "```\np\n```\n${\\color{#2196f3}{r}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$$\n\\cloze{p}{}\n+ 1\n$$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$$\n{\\color{#2196f3}{[\\ldots]}}\n+ 1\n$$",
+      "back": "$$\n{\\color{#2196f3}{p}}\n+ 1\n$$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$$\n{\\color{#2196f3}{[\\ldots]}}\n+ 1\n$$",
+      "back": "$$\n{\\color{#2196f3}{p}}\n+ 1\n$$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$$ \\cloze{p}{} unclosed",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$$ <span style='color:#2196f3'>[...]</span> unclosed",
+      "back": "$$ <span style='color:#2196f3'>p</span> unclosed"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$$ <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span> unclosed",
+      "back": "$$ <span class=\"cloze-answer\" style='color:#2196f3'>p</span> unclosed"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "outside \\cloze{p}{h} and $\\cloze{q}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "outside <span style='color:#2196f3'>[h]</span> and $q$",
+      "back": "outside <span style='color:#2196f3'>p</span> and $q$"
+     },
+     {
+      "front": "outside p and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "outside p and ${\\color{#2196f3}{q}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "outside <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" />[h]</span> and $q$",
+      "back": "outside <span class=\"cloze-answer\" style='color:#2196f3'>p</span> and $q$"
+     },
+     {
+      "front": "outside p and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "outside p and ${\\color{#2196f3}{q}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$x\\le\\cloze{c_0}{}$ and $\\cloze{\\alpha}{}x$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$x\\le{\\color{#2196f3}{[\\ldots]}}$ and $\\alpha x$",
+      "back": "$x\\le{\\color{#2196f3}{c_0}}$ and $\\alpha x$"
+     },
+     {
+      "front": "$x\\le c_0$ and ${\\color{#2196f3}{[\\ldots]}}x$",
+      "back": "$x\\le c_0$ and ${\\color{#2196f3}{\\alpha}}x$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$x\\le{\\color{#2196f3}{[\\ldots]}}$ and $\\alpha x$",
+      "back": "$x\\le{\\color{#2196f3}{c_0}}$ and $\\alpha x$"
+     },
+     {
+      "front": "$x\\le c_0$ and ${\\color{#2196f3}{[\\ldots]}}x$",
+      "back": "$x\\le c_0$ and ${\\color{#2196f3}{\\alpha}}x$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\le\\cloze{\\alpha}{}\\cloze{x}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$\\le{\\color{#2196f3}{[\\ldots]}}x$",
+      "back": "$\\le{\\color{#2196f3}{\\alpha}}x$"
+     },
+     {
+      "front": "$\\le\\alpha{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$\\le\\alpha{\\color{#2196f3}{x}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$\\le{\\color{#2196f3}{[\\ldots]}}x$",
+      "back": "$\\le{\\color{#2196f3}{\\alpha}}x$"
+     },
+     {
+      "front": "$\\le\\alpha{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$\\le\\alpha{\\color{#2196f3}{x}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{\\alpha}{}\\cloze{\\beta}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}\\beta$",
+      "back": "${\\color{#2196f3}{\\alpha}}\\beta$"
+     },
+     {
+      "front": "$\\alpha{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$\\alpha{\\color{#2196f3}{\\beta}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}\\beta$",
+      "back": "${\\color{#2196f3}{\\alpha}}\\beta$"
+     },
+     {
+      "front": "$\\alpha{\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$\\alpha{\\color{#2196f3}{\\beta}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{$$}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$<span style='color:#2196f3'>[...]</span>$",
+      "back": "$<span style='color:#2196f3'>$$</span>$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"2\" /></span>$",
+      "back": "$<span class=\"cloze-answer\" style='color:#2196f3'>$$</span>$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{} $",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$<span style='color:#2196f3'>[...]</span> $",
+      "back": "$<span style='color:#2196f3'>p</span> $"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$<span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span> $",
+      "back": "$<span class=\"cloze-answer\" style='color:#2196f3'>p</span> $"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "text only",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "{{x}}",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$x$",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "\\cloze",
+  "output": {
+   "settingOn": {
+    "ok": []
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": []
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{}$\n\nsecond para ==q==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$p$\n\nsecond para <span style='color:#2196f3'>[...]</span>",
+      "back": "$p$\n\nsecond para <span style='color:#2196f3'>q</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$\n\nsecond para q",
+      "back": "${\\color{#2196f3}{p}}$\n\nsecond para q"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{p}{}$\n\nsecond para <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze{p}{}$\n\nsecond para <span style='color:#2196f3'>q</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$p$\n\nsecond para <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span>",
+      "back": "$p$\n\nsecond para <span class=\"cloze-answer\" style='color:#2196f3'>q</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$\n\nsecond para q",
+      "back": "${\\color{#2196f3}{p}}$\n\nsecond para q"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "line $\\cloze{a}{}$\nline {{b}}",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "line ${\\color{#2196f3}{[\\ldots]}}$\nline {{b}}",
+      "back": "line ${\\color{#2196f3}{a}}$\nline {{b}}"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "line ${\\color{#2196f3}{[\\ldots]}}$\nline {{b}}",
+      "back": "line ${\\color{#2196f3}{a}}$\nline {{b}}"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{}$ ==a;;1== ==b;;2==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$p$ <span style='color:#2196f3'>[...]</span> ==b;;2==",
+      "back": "$p$ <span style='color:#2196f3'>1</span> ==b;;2=="
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{p}{}$ <span style='color:#2196f3'>[...]</span> ==b;;2==",
+      "back": "$\\cloze{p}{}$ <span style='color:#2196f3'>1</span> ==b;;2=="
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$p$ <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span> ==b;;2==",
+      "back": "$p$ <span class=\"cloze-answer\" style='color:#2196f3'>1</span> ==b;;2=="
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{} + \\cloze{p}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + p$",
+      "back": "${\\color{#2196f3}{p}} + p$"
+     },
+     {
+      "front": "$p + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$p + {\\color{#2196f3}{p}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + p$",
+      "back": "${\\color{#2196f3}{p}} + p$"
+     },
+     {
+      "front": "$p + {\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$p + {\\color{#2196f3}{p}}$"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{p}{} + \\cloze{p}{}$ ==p==",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "$p + p$ <span style='color:#2196f3'>[...]</span>",
+      "back": "$p + p$ <span style='color:#2196f3'>p</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + p$ p",
+      "back": "${\\color{#2196f3}{p}} + p$ p"
+     },
+     {
+      "front": "$p + {\\color{#2196f3}{[\\ldots]}}$ p",
+      "back": "$p + {\\color{#2196f3}{p}}$ p"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": [
+     {
+      "front": "$\\cloze{p}{} + \\cloze{p}{}$ <span style='color:#2196f3'>[...]</span>",
+      "back": "$\\cloze{p}{} + \\cloze{p}{}$ <span style='color:#2196f3'>p</span>"
+     }
+    ]
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "$p + p$ <span style='color:#2196f3'><input class=\"cloze-input\" type=\"text\" size=\"1\" /></span>",
+      "back": "$p + p$ <span class=\"cloze-answer\" style='color:#2196f3'>p</span>"
+     },
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}} + p$ p",
+      "back": "${\\color{#2196f3}{p}} + p$ p"
+     },
+     {
+      "front": "$p + {\\color{#2196f3}{[\\ldots]}}$ p",
+      "back": "$p + {\\color{#2196f3}{p}}$ p"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "input": "$\\cloze{x}{}$ and $\\cloze{x}{}$ and $\\cloze{x}{}$",
+  "output": {
+   "settingOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and $x$ and $x$",
+      "back": "${\\color{#2196f3}{x}}$ and $x$ and $x$"
+     },
+     {
+      "front": "$x$ and ${\\color{#2196f3}{[\\ldots]}}$ and $x$",
+      "back": "$x$ and ${\\color{#2196f3}{x}}$ and $x$"
+     },
+     {
+      "front": "$x$ and $x$ and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$x$ and $x$ and ${\\color{#2196f3}{x}}$"
+     }
+    ]
+   },
+   "settingOff": {
+    "ok": []
+   },
+   "inputsOn": {
+    "ok": [
+     {
+      "front": "${\\color{#2196f3}{[\\ldots]}}$ and $x$ and $x$",
+      "back": "${\\color{#2196f3}{x}}$ and $x$ and $x$"
+     },
+     {
+      "front": "$x$ and ${\\color{#2196f3}{[\\ldots]}}$ and $x$",
+      "back": "$x$ and ${\\color{#2196f3}{x}}$ and $x$"
+     },
+     {
+      "front": "$x$ and $x$ and ${\\color{#2196f3}{[\\ldots]}}$",
+      "back": "$x$ and $x$ and ${\\color{#2196f3}{x}}$"
+     }
+    ]
+   }
+  }
+ }
+]

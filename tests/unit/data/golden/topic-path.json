@@ -1,0 +1,790 @@
+{
+  "fromTag": {
+    "#a": {
+      "ok": [
+        "a"
+      ]
+    },
+    "#a/b": {
+      "ok": [
+        "a",
+        "b"
+      ]
+    },
+    "#a/b/c": {
+      "ok": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "#a/": {
+      "ok": [
+        "a"
+      ]
+    },
+    "#a//b": {
+      "ok": [
+        "a",
+        "b"
+      ]
+    },
+    "/#a": {
+      "throws": "Tag must start with #"
+    },
+    "#/a": {
+      "ok": [
+        "a"
+      ]
+    },
+    "#/": {
+      "ok": []
+    },
+    "#//": {
+      "ok": []
+    },
+    "#": {
+      "throws": "Invalid tag"
+    },
+    "": {
+      "throws": "Null/empty tag"
+    },
+    "null": {
+      "throws": "Null/empty tag"
+    },
+    "a": {
+      "throws": "Tag must start with #"
+    },
+    "a/b": {
+      "throws": "Tag must start with #"
+    },
+    "##a": {
+      "ok": [
+        "#a"
+      ]
+    },
+    "#a#b": {
+      "ok": [
+        "a#b"
+      ]
+    },
+    "# a": {
+      "ok": [
+        " a"
+      ]
+    },
+    "#a b": {
+      "ok": [
+        "a b"
+      ]
+    },
+    "#Flashcards/Deep Learning": {
+      "ok": [
+        "Flashcards",
+        "Deep Learning"
+      ]
+    },
+    "#日本語/ひら": {
+      "ok": [
+        "日本語",
+        "ひら"
+      ]
+    },
+    "#a/b/": {
+      "ok": [
+        "a",
+        "b"
+      ]
+    },
+    "#a/./b": {
+      "ok": [
+        "a",
+        ".",
+        "b"
+      ]
+    },
+    "#a/../b": {
+      "ok": [
+        "a",
+        "..",
+        "b"
+      ]
+    },
+    "#a\\b": {
+      "ok": [
+        "a\\b"
+      ]
+    }
+  },
+  "isValid": {
+    "null": {
+      "ok": false
+    },
+    "": {
+      "ok": false
+    },
+    "#": {
+      "ok": false
+    },
+    "a": {
+      "ok": false
+    },
+    "#a": {
+      "ok": true
+    },
+    "##": {
+      "ok": true
+    },
+    "#/": {
+      "ok": true
+    },
+    " #a": {
+      "ok": false
+    },
+    "#a b": {
+      "ok": true
+    }
+  },
+  "cardText": {
+    "\"#flashcards Q::A\"": {
+      "ok": [
+        "flashcards"
+      ]
+    },
+    "\"  #flashcards/a Q::A\"": {
+      "ok": [
+        "flashcards",
+        "a"
+      ]
+    },
+    "\"\\t#a\\nQ::A\"": {
+      "ok": [
+        "a"
+      ]
+    },
+    "\"Q::A #flashcards\"": {
+      "ok": null
+    },
+    "\"#a#b Q::A\"": {
+      "ok": [
+        "a"
+      ]
+    },
+    "\"#a/b/c Q::A\"": {
+      "ok": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "\"#a/ Q::A\"": {
+      "ok": [
+        "a"
+      ]
+    },
+    "\"#flashcards\"": {
+      "ok": [
+        "flashcards"
+      ]
+    },
+    "\"#\"": {
+      "ok": null
+    },
+    "\"# Q::A\"": {
+      "ok": null
+    },
+    "\"#/ Q::A\"": {
+      "ok": []
+    },
+    "\"#a/b #c/d Q::A\"": {
+      "ok": [
+        "a",
+        "b"
+      ]
+    },
+    "\"##a Q\"": {
+      "ok": null
+    },
+    "\"#a,b Q\"": {
+      "ok": [
+        "a,b"
+      ]
+    },
+    "\"\"": {
+      "ok": null
+    },
+    "\"   \"": {
+      "ok": null
+    },
+    "\"#日本 Q\"": {
+      "ok": [
+        "日本"
+      ]
+    }
+  },
+  "ctor": {
+    "[]": {
+      "ok": []
+    },
+    "['a','b']": {
+      "ok": [
+        "a",
+        "b"
+      ]
+    },
+    "['a/b']": {
+      "throws": "path entries must not contain '/'"
+    },
+    "['']": {
+      "ok": [
+        ""
+      ]
+    },
+    "null": {
+      "throws": "path is null"
+    },
+    "undefined": {
+      "throws": "Cannot read properties of undefined (reading 'some')"
+    }
+  },
+  "formatAsTag": {
+    "[]": {
+      "throws": "Empty path"
+    },
+    "['a']": {
+      "ok": "#a"
+    },
+    "['a','b c']": {
+      "ok": "#a/b c"
+    }
+  },
+  "isSameOrAncestorOf": {
+    "[] ancestorOrSame-of []": true,
+    "[] ancestorOrSame-of [\"a\"]": false,
+    "[] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[] ancestorOrSame-of [\"a\",\"b\",\"c\"]": false,
+    "[] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[] ancestorOrSame-of [\"b\"]": false,
+    "[] ancestorOrSame-of [\"A\"]": false,
+    "[] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"a\"] ancestorOrSame-of []": false,
+    "[\"a\"] ancestorOrSame-of [\"a\"]": true,
+    "[\"a\"] ancestorOrSame-of [\"a\",\"b\"]": true,
+    "[\"a\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": true,
+    "[\"a\"] ancestorOrSame-of [\"a\",\"c\"]": true,
+    "[\"a\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"a\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"a\"] ancestorOrSame-of [\"a\",\"\"]": true,
+    "[\"a\",\"b\"] ancestorOrSame-of []": false,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"a\",\"b\"]": true,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": true,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"a\",\"b\"] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of []": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": true,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"a\",\"b\",\"c\"] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of []": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"a\",\"c\"]": true,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"a\",\"c\"] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"b\"] ancestorOrSame-of []": false,
+    "[\"b\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"b\"] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[\"b\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": false,
+    "[\"b\"] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[\"b\"] ancestorOrSame-of [\"b\"]": true,
+    "[\"b\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"b\"] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"A\"] ancestorOrSame-of []": false,
+    "[\"A\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"A\"] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[\"A\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": false,
+    "[\"A\"] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[\"A\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"A\"] ancestorOrSame-of [\"A\"]": true,
+    "[\"A\"] ancestorOrSame-of [\"a\",\"\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of []": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"a\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"a\",\"b\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"a\",\"b\",\"c\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"a\",\"c\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"b\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"A\"]": false,
+    "[\"a\",\"\"] ancestorOrSame-of [\"a\",\"\"]": true
+  },
+  "shift": {
+    "multi": {
+      "shifted": "a",
+      "rest": [
+        "b"
+      ]
+    },
+    "single": {
+      "shifted": "a",
+      "rest": []
+    },
+    "empty": {
+      "throws": "can't shift an empty path"
+    }
+  },
+  "clone": {
+    "orig": [
+      "a",
+      "b"
+    ],
+    "clone": [
+      "b"
+    ]
+  },
+  "aliasing": {
+    "constructorKeepsReference": true
+  },
+  "fileCases": [
+    {
+      "name": "folders on, nested",
+      "path": "a/b/c.md",
+      "fileTags": [],
+      "convertFoldersToDecks": true,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "name": "folders on, root file",
+      "path": "c.md",
+      "fileTags": [],
+      "convertFoldersToDecks": true,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders on, one folder",
+      "path": "Math/c.md",
+      "fileTags": [
+        "#flashcards"
+      ],
+      "convertFoldersToDecks": true,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "Math"
+        ]
+      }
+    },
+    {
+      "name": "folders on, folder with space and dot",
+      "path": "My Notes/v1.2/x.md",
+      "fileTags": [],
+      "convertFoldersToDecks": true,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "My Notes",
+          "v1.2"
+        ]
+      }
+    },
+    {
+      "name": "folders off, exact tag",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards"
+        ]
+      }
+    },
+    {
+      "name": "folders off, subtag",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards/math/algebra"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "math",
+          "algebra"
+        ]
+      }
+    },
+    {
+      "name": "folders off, no match",
+      "path": "x.md",
+      "fileTags": [
+        "#other"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders off, prefix-not-ancestor",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcardsX"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders off, no tags",
+      "path": "x.md",
+      "fileTags": [],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders off, two file tags: first file tag wins",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards/b",
+        "#flashcards/a"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "b"
+        ]
+      }
+    },
+    {
+      "name": "folders off, setting order beats tag order",
+      "path": "x.md",
+      "fileTags": [
+        "#a/x",
+        "#b/y"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#b",
+        "#a"
+      ],
+      "result": {
+        "ok": [
+          "b",
+          "y"
+        ]
+      }
+    },
+    {
+      "name": "folders off, setting order beats tag order (reverse)",
+      "path": "x.md",
+      "fileTags": [
+        "#a/x",
+        "#b/y"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#a",
+        "#b"
+      ],
+      "result": {
+        "ok": [
+          "a",
+          "x"
+        ]
+      }
+    },
+    {
+      "name": "folders off, invalid setting tag skipped",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards/z"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "flashcards",
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "z"
+        ]
+      }
+    },
+    {
+      "name": "folders off, invalid file tag skipped",
+      "path": "x.md",
+      "fileTags": [
+        "flashcards",
+        "#flashcards/z"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "z"
+        ]
+      }
+    },
+    {
+      "name": "folders off, setting tag is deeper than file tag",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards/math"
+      ],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders off, empty settings list",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [],
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "name": "folders off, duplicate file tag",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards/a",
+        "#flashcards/a"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "a"
+        ]
+      }
+    },
+    {
+      "name": "folders off, trailing slash tag",
+      "path": "x.md",
+      "fileTags": [
+        "#flashcards/a/"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": [
+          "flashcards",
+          "a"
+        ]
+      }
+    },
+    {
+      "name": "folders off, case differs",
+      "path": "x.md",
+      "fileTags": [
+        "#Flashcards/a"
+      ],
+      "convertFoldersToDecks": false,
+      "flashcardTags": [
+        "#flashcards"
+      ],
+      "result": {
+        "ok": []
+      }
+    }
+  ],
+  "folderPath": [
+    {
+      "path": "a/b/c.md",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "path": "a/b/c.md",
+      "convertFoldersToDecks": false,
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "path": "c.md",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "path": "a/c.md",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": [
+          "a"
+        ]
+      }
+    },
+    {
+      "path": "a//c.md",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": [
+          "a",
+          ""
+        ]
+      }
+    },
+    {
+      "path": "/c.md",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": [
+          ""
+        ]
+      }
+    },
+    {
+      "path": "a/b/",
+      "convertFoldersToDecks": true,
+      "result": {
+        "ok": [
+          "a",
+          "b"
+        ]
+      }
+    }
+  ],
+  "tpl": {
+    "format_pipe": "#a/b|#c",
+    "format_comma": "#a/b, #c",
+    "formatPsv": "#a/b|#c",
+    "length": 2,
+    "lineNum": 5,
+    "emptyLineNum": null,
+    "emptyLength": 0,
+    "ctorNull": {
+      "throws": "TopicPathList null"
+    },
+    "fromPsv": {
+      "ok": {
+        "paths": [
+          [
+            "a",
+            "b"
+          ],
+          [
+            "c"
+          ]
+        ],
+        "lineNum": 7
+      }
+    },
+    "formatEmpty": {
+      "ok": ""
+    },
+    "formatWithEmptyPath": {
+      "throws": "Empty path"
+    },
+    "filterValid": {
+      "ok": {
+        "paths": [
+          [
+            "flashcards",
+            "computing"
+          ]
+        ],
+        "lineNum": 9
+      }
+    },
+    "isAnyElementSameOrAncestorOf": [
+      true,
+      true,
+      false,
+      false
+    ],
+    "convertTagList": [
+      [
+        "a"
+      ],
+      [
+        "b",
+        "c"
+      ]
+    ]
+  },
+  "withWs": {
+    "ok": "  #a/b ",
+    "emptyPath": {
+      "throws": "topicPath null"
+    },
+    "nullPath": {
+      "throws": "topicPath null"
+    },
+    "defaultsNone": "\t#x\n"
+  },
+  "emptyStatic": {
+    "emptyPathIsNewEachTime": true
+  }
+}

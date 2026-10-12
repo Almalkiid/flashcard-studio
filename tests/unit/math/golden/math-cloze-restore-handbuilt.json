@@ -1,0 +1,58 @@
+[
+ {
+  "input": {
+   "text": "lone key \ue0130\ue013",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "lone key p"
+ },
+ {
+  "input": {
+   "text": "token no seq \ue010\ue0130\ue013\ue011",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "token no seq p"
+ },
+ {
+  "input": {
+   "text": "token with seq \ue0102\ue012\ue0131\ue013\ue011",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "token with seq q"
+ },
+ {
+  "input": {
+   "text": "plain text",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "plain text"
+ },
+ {
+  "input": {
+   "text": "",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": ""
+ },
+ {
+  "input": {
+   "text": "\ue010junk\ue011",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "\ue010junk\ue011"
+ },
+ {
+  "input": {
+   "text": "pre \ue0102\ue012\ue0130\ue013\ue011\ue011",
+   "clozesFrom": "$\\cloze[2]{p}{} + \\cloze{q}{}$"
+  },
+  "output": "pre p\ue011"
+ },
+ {
+  "input": {
+   "text": "\ue0135\ue013",
+   "clozesFrom": "same"
+  },
+  "output": "\ue0135\ue013"
+ }
+]

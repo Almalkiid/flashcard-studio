@@ -1,0 +1,104 @@
+/* The row of answer buttons under the card. The Studio look draws them as tiles and ignores the two text spans. */
+
+.fs-response {
+    padding: var(--fs-space-2);
+    border-top: var(--fs-rule);
+    gap: var(--fs-space-4);
+    flex-flow: row;
+    display: flex;
+
+    .fs-response-button {
+        flex-grow: 1;
+        height: 48px;
+        line-height: 48px;
+        margin: auto;
+        user-select: none;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    @media (orientation: landscape) {
+        .is-phone & {
+            padding-block: 2px 0;
+
+            .fs-response-button {
+                line-height: 38px;
+                height: 38px;
+            }
+        }
+    }
+}
+
+/* Each button says its text in one of two spans (a short one and a long one), or not at all */
+.fs-response-button {
+    > * {
+        display: none;
+    }
+
+    &.fs-show-answer-button > .fs-large-text,
+    &.fs-show-large-text > .fs-large-text,
+    &.fs-show-small-text > .fs-small-text {
+        display: inline;
+    }
+
+    /* On a phone, and in a narrow pane, the long text gives way to the short one */
+    &.fs-show-large-text:not(.fs-show-answer-button) {
+        .is-phone & {
+            > .fs-large-text {
+                display: none;
+            }
+
+            > .fs-small-text {
+                display: inline;
+            }
+        }
+
+        @container fs-view (width < 580px) {
+            & > .fs-large-text {
+                display: none;
+            }
+
+            & > .fs-small-text {
+                display: inline;
+            }
+        }
+    }
+}
+
+/* Key hints: a small chip in the corner of each button that says which key presses it */
+body:not(.is-mobile) .fs-card-container:not(.fs-custom-hotkeys) {
+    .fs-response .fs-response-button {
+        position: relative;
+    }
+
+    .fs-response-button::after {
+        bottom: 4px;
+        content: var(--key-hint);
+        right: 4px;
+        position: absolute;
+        padding: 3px 4px 2px;
+        color: #f7f7f7;
+        box-shadow:
+            inset 1px 1px 0 rgb(255 255 255 / 0.2),
+            inset -1px -1px 0 rgb(0 0 0 / 0.2);
+        font-family: var(--fs-mono);
+        font-size: 10px;
+        line-height: 1.28;
+    }
+
+    .fs-show-answer-button {
+        --key-hint: "Space";
+    }
+
+    .fs-hard-button {
+        --key-hint: "1";
+    }
+
+    .fs-good-button {
+        --key-hint: "2";
+    }
+
+    .fs-easy-button {
+        --key-hint: "3";
+    }
+}

@@ -1,0 +1,27 @@
+name: CI
+
+on:
+    push:
+        branches-ignore: [gh-pages]
+    pull_request:
+        branches-ignore: [gh-pages]
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+            - uses: pnpm/action-setup@v6
+              with:
+                  run_install: false
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: "24"
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - name: Prettier and ESLint
+              run: pnpm lint
+            - name: Unit tests with coverage thresholds
+              run: pnpm test
+            - name: Production build
+              run: pnpm build

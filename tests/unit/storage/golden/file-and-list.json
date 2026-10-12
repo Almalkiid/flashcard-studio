@@ -1,0 +1,586 @@
+{
+ "questionContext": [
+  {
+   "id": "ctx-simple",
+   "headings": [
+    {
+     "heading": "A",
+     "level": 1,
+     "line": 0
+    },
+    {
+     "heading": "B",
+     "level": 2,
+     "line": 3
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 0,
+     "context": [
+      "A"
+     ]
+    },
+    {
+     "cardLine": 1,
+     "context": [
+      "A"
+     ]
+    },
+    {
+     "cardLine": 3,
+     "context": [
+      "A",
+      "B"
+     ]
+    },
+    {
+     "cardLine": 10,
+     "context": [
+      "A",
+      "B"
+     ]
+    }
+   ],
+   "headingsInCacheAfter": [
+    "A",
+    "B"
+   ]
+  },
+  {
+   "id": "ctx-pop-same-level",
+   "headings": [
+    {
+     "heading": "A",
+     "level": 1,
+     "line": 0
+    },
+    {
+     "heading": "B",
+     "level": 2,
+     "line": 2
+    },
+    {
+     "heading": "C",
+     "level": 2,
+     "line": 5
+    },
+    {
+     "heading": "D",
+     "level": 1,
+     "line": 8
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 3,
+     "context": [
+      "A",
+      "B"
+     ]
+    },
+    {
+     "cardLine": 6,
+     "context": [
+      "A",
+      "C"
+     ]
+    },
+    {
+     "cardLine": 9,
+     "context": [
+      "D"
+     ]
+    }
+   ],
+   "headingsInCacheAfter": [
+    "A",
+    "B",
+    "C",
+    "D"
+   ]
+  },
+  {
+   "id": "ctx-skip-level",
+   "headings": [
+    {
+     "heading": "A",
+     "level": 1,
+     "line": 0
+    },
+    {
+     "heading": "C",
+     "level": 3,
+     "line": 2
+    },
+    {
+     "heading": "B",
+     "level": 2,
+     "line": 4
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 3,
+     "context": [
+      "A",
+      "C"
+     ]
+    },
+    {
+     "cardLine": 5,
+     "context": [
+      "A",
+      "B"
+     ]
+    }
+   ],
+   "headingsInCacheAfter": [
+    "A",
+    "C",
+    "B"
+   ]
+  },
+  {
+   "id": "ctx-deeper-first",
+   "headings": [
+    {
+     "heading": "Deep",
+     "level": 4,
+     "line": 0
+    },
+    {
+     "heading": "Top",
+     "level": 1,
+     "line": 2
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 1,
+     "context": [
+      "Deep"
+     ]
+    },
+    {
+     "cardLine": 3,
+     "context": [
+      "Top"
+     ]
+    }
+   ],
+   "headingsInCacheAfter": [
+    "Deep",
+    "Top"
+   ]
+  },
+  {
+   "id": "ctx-footnote-ref",
+   "headings": [
+    {
+     "heading": "Title[^1]",
+     "level": 1,
+     "line": 0
+    },
+    {
+     "heading": " Sub [^23] x ",
+     "level": 2,
+     "line": 2
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 3,
+     "context": [
+      "Title",
+      "Sub  x"
+     ]
+    }
+   ],
+   "headingsInCacheAfter": [
+    "Title",
+    "Sub  x"
+   ]
+  },
+  {
+   "id": "ctx-heading-on-card-line",
+   "headings": [
+    {
+     "heading": "H",
+     "level": 1,
+     "line": 4
+    }
+   ],
+   "results": [
+    {
+     "cardLine": 4,
+     "context": [
+      "H"
+     ]
+    },
+    {
+     "cardLine": 3,
+     "context": []
+    }
+   ],
+   "headingsInCacheAfter": [
+    "H"
+   ]
+  },
+  {
+   "id": "ctx-none",
+   "headings": [],
+   "results": [
+    {
+     "cardLine": 0,
+     "context": []
+    }
+   ],
+   "headingsInCacheAfter": []
+  },
+  {
+   "id": "ctx-no-cache",
+   "headings": [],
+   "results": [
+    {
+     "cardLine": 5,
+     "context": []
+    }
+   ],
+   "headingsInCacheAfter": []
+  }
+ ],
+ "noteSchedule": [
+  {
+   "id": "ns-ok",
+   "frontmatter": {
+    "sr-due": "2026-10-20",
+    "sr-interval": 12,
+    "sr-ease": 260
+   },
+   "result": {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-strings",
+   "frontmatter": {
+    "sr-due": "2026-10-20",
+    "sr-interval": "12.5",
+    "sr-ease": "260.7"
+   },
+   "result": {
+    "comment": "!2026-10-20,12.5,260.7",
+    "interval": 12.5,
+    "ease": 260.7
+   }
+  },
+  {
+   "id": "ns-dd-mm-yyyy",
+   "frontmatter": {
+    "sr-due": "20-10-2026",
+    "sr-interval": 12,
+    "sr-ease": 260
+   },
+   "result": {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-ddd",
+   "frontmatter": {
+    "sr-due": "Tue Oct 20 2026",
+    "sr-interval": 12,
+    "sr-ease": 260
+   },
+   "result": {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-missing-ease",
+   "frontmatter": {
+    "sr-due": "2026-10-20",
+    "sr-interval": 12
+   },
+   "result": null
+  },
+  {
+   "id": "ns-zero-interval",
+   "frontmatter": {
+    "sr-due": "2026-10-20",
+    "sr-interval": 0,
+    "sr-ease": 260
+   },
+   "result": {
+    "comment": "!2026-10-20,0,260",
+    "interval": 0,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-bad-date",
+   "frontmatter": {
+    "sr-due": "soon",
+    "sr-interval": 12,
+    "sr-ease": 260
+   },
+   "result": null
+  },
+  {
+   "id": "ns-bad-interval",
+   "frontmatter": {
+    "sr-due": "2026-10-20",
+    "sr-interval": "abc",
+    "sr-ease": 260
+   },
+   "result": {
+    "comment": "!2026-10-20,NaN,260",
+    "interval": null,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-list-valued",
+   "frontmatter": {
+    "sr-due": [
+     "2026-10-20"
+    ],
+    "sr-interval": [
+     12
+    ],
+    "sr-ease": [
+     260
+    ]
+   },
+   "result": {
+    "comment": "!2026-10-20,12,260",
+    "interval": 12,
+    "ease": 260
+   }
+  },
+  {
+   "id": "ns-no-frontmatter",
+   "frontmatter": null,
+   "result": null
+  }
+ ],
+ "noteIds": {
+  "setNoteScheduleWrote": {
+   "existing": 1,
+   "sr-due": "2026-10-20",
+   "sr-interval": 12.5,
+   "sr-ease": 260
+  },
+  "getNoteId": "abc",
+  "getOrCreateExisting": "abc"
+ },
+ "tagsFromText": [
+  {
+   "id": "tg-list",
+   "cache": {
+    "tags": [
+     {
+      "tag": "#flashcards",
+      "position": {
+       "start": {
+        "line": 3
+       }
+      }
+     }
+    ],
+    "frontmatter": {
+     "tags": [
+      "a",
+      "b/c"
+     ]
+    }
+   },
+   "tags": [
+    {
+     "tag": "#flashcards",
+     "line": 3
+    },
+    {
+     "tag": "#a",
+     "line": -1
+    },
+    {
+     "tag": "#b/c",
+     "line": -1
+    }
+   ]
+  },
+  {
+   "id": "tg-string",
+   "cache": {
+    "frontmatter": {
+     "tags": "a, b"
+    }
+   },
+   "tags": [
+    {
+     "tag": "#a",
+     "line": -1
+    },
+    {
+     "tag": "# b",
+     "line": -1
+    }
+   ]
+  },
+  {
+   "id": "tg-hash-prefixed",
+   "cache": {
+    "frontmatter": {
+     "tags": [
+      "#a",
+      "b"
+     ]
+    }
+   },
+   "tags": [
+    {
+     "tag": "#a",
+     "line": -1
+    },
+    {
+     "tag": "#b",
+     "line": -1
+    }
+   ]
+  },
+  {
+   "id": "tg-null",
+   "cache": {
+    "frontmatter": {
+     "tags": null
+    }
+   },
+   "tags": []
+  },
+  {
+   "id": "tg-missing",
+   "cache": {
+    "frontmatter": {
+     "title": "x"
+    }
+   },
+   "tags": []
+  },
+  {
+   "id": "tg-empty-list",
+   "cache": {
+    "frontmatter": {
+     "tags": []
+    }
+   },
+   "tags": []
+  },
+  {
+   "id": "tg-no-cache",
+   "cache": null,
+   "tags": []
+  }
+ ],
+ "textDirection": [
+  {
+   "frontmatter": {
+    "direction": "rtl"
+   },
+   "textDirection": "Rtl"
+  },
+  {
+   "frontmatter": {
+    "direction": "RTL"
+   },
+   "textDirection": "Rtl"
+  },
+  {
+   "frontmatter": {
+    "direction": "ltr"
+   },
+   "textDirection": "Ltr"
+  },
+  {
+   "frontmatter": {
+    "direction": "weird"
+   },
+   "textDirection": "Ltr"
+  },
+  {
+   "frontmatter": {},
+   "textDirection": "Unspecified"
+  },
+  {
+   "frontmatter": {
+    "direction": 5
+   },
+   "textDirection": "Ltr"
+  }
+ ],
+ "frontmatterMap": [
+  {
+   "frontmatter": {
+    "a": 1,
+    "b": [
+     "x",
+     "y"
+    ],
+    "c": [],
+    "d": "s",
+    "e": null
+   },
+   "map": [
+    [
+     "a",
+     "1"
+    ],
+    [
+     "b",
+     "x"
+    ],
+    [
+     "c",
+     ""
+    ],
+    [
+     "d",
+     "s"
+    ],
+    [
+     "e",
+     "null"
+    ]
+   ]
+  }
+ ],
+ "buriedCards": {
+  "afterAdd": [
+   "h1",
+   "h2"
+  ],
+  "afterRemove": [
+   "h2"
+  ],
+  "sameDay": {
+   "list": [
+    "h2"
+   ],
+   "saves": 0,
+   "buryDate": "2026-10-12"
+  },
+  "newDay": {
+   "list": [],
+   "saves": 1,
+   "buryDate": "2026-10-12"
+  },
+  "nullManagerWriteResolves": true
+ }
+}

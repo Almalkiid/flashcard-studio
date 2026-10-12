@@ -1,0 +1,237 @@
+[
+ {
+  "input": {
+   "text": "$\\cloze{p}{}$ and ==a==",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "{{a}} and $\\frac{{b}}{c}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    0
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$\\frac{{b}}{c}$ {{a}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    1
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$\\frac{{b}}{c} {{d}}$ {{a}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    2
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "{{a}} {{b}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "no clozes here",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "$x$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "$\\cloze{p}{}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "$\\cloze{p}{}+\\frac{{b}}{c}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    1
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$$\n{{b}}\n$$ {{a}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    1
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$\\frac{{b}}{c}$ $\\cloze{p}{}$ {{a}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    1,
+    2
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$\\frac{{b}}{{b}}$ {{a}} {{a}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    2,
+    3
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "$\\frac{{b}}{c}$ $\\frac{{d}}{e}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": []
+  }
+ },
+ {
+  "input": {
+   "text": "{{x}} $\\frac{{x}}{y}$ {{x}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": [
+    0,
+    2
+   ]
+  }
+ },
+ {
+  "input": {
+   "text": "`{{b}}` {{a}} $\\cloze{p}{}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "$\\cloze[1]{p}{} \\frac{{b}}{c}$ {{a;;1}}",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "$\\cloze[hs]{p}{}\\frac{{b}}{c}$",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ },
+ {
+  "input": {
+   "text": "{{a}} \\cloze{q}{} outside",
+   "patterns": [
+    "==[123;;]answer[;;hint]==",
+    "{{[123;;]answer[;;hint]}}"
+   ]
+  },
+  "output": {
+   "ok": null
+  }
+ }
+]

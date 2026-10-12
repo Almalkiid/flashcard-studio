@@ -1,0 +1,42 @@
+site_name: Flashcard Studio
+site_description: Flashcards and note review for Obsidian
+repo_url: https://github.com/Almalkiid/flashcard-studio
+repo_name: Almalkiid/flashcard-studio
+docs_dir: docs/docs
+theme:
+    name: material
+    features:
+        - navigation.sections
+        - navigation.footer
+        - content.code.copy
+markdown_extensions:
+    - admonition
+    - attr_list
+    - def_list
+    - pymdownx.details
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+          alternate_style: true
+nav:
+    - Getting started: index.md
+    - Writing cards:
+          - Basic and reversed: writing-cards.md
+          - Cloze and math: cloze.md
+          - Callout cards: callouts.md
+          - Multiple choice: multiple-choice.md
+          - Image occlusion: image-occlusion.md
+          - Blank lines: card-regions.md
+    - Organising: decks.md
+    - Reviewing: reviewing.md
+    - Scheduling: scheduling.md
+    - Note review: note-review.md
+    - Statistics and exams: statistics-exams.md
+    - AI card generation: ai-cards.md
+    - Settings reference: settings.md
+    - Commands: commands.md
+    - Data and storage: data-storage.md
+    - Import and export: import-export.md
+    - FAQ and troubleshooting: faq.md
+    - Changelog: changelog.md
+    - Contributing: contributing.md
+    - License: license.md

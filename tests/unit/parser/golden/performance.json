@@ -1,0 +1,43 @@
+{
+ "parse_ms": {
+  "singleLine5000Cards": 1.7,
+  "multiLine2000Cards": 1.8,
+  "cloze5000Paragraphs": 2.2,
+  "prose20000Lines_1MB": 2.8,
+  "codeBlock20000Lines": 0.9,
+  "latexClozes_cloze5000Paragraphs": 8.1,
+  "endMarker_cloze5000Paragraphs": 47.9,
+  "region20000Lines": 5.1
+ },
+ "oneBigParagraph": {
+  "oneParagraph250ClozeLines": {
+   "parse_ms": 0.1,
+   "parse_atomic_ms": 5.8,
+   "cards": 250,
+   "expand_ms": 33.3
+  },
+  "oneParagraph500ClozeLines": {
+   "parse_ms": 0.1,
+   "parse_atomic_ms": 10.1,
+   "cards": 500,
+   "expand_ms": 284.3
+  },
+  "oneParagraph1000ClozeLines": {
+   "parse_ms": 0.2,
+   "parse_atomic_ms": 33.8,
+   "cards": 1000,
+   "expand_ms": 2507.3
+  },
+  "oneParagraph2000ClozeLines": {
+   "parse_ms": 0.2,
+   "parse_atomic_ms": 130.5,
+   "cards": 2000,
+   "expand_ms": 18312.5
+  }
+ },
+ "noteLoad_3000ScheduledCards_ms": 80,
+ "writeOneSchedule_lastCardOf3000_ms": 0.38,
+ "write500SchedulesOneByOne_ms": 28,
+ "noteLoad_1000UnscheduledCards_ms": 4,
+ "how": "parse numbers: best of N runs, N shown in code; note-level: single run; Mac Mini M4, node under jest/jsdom"
+}

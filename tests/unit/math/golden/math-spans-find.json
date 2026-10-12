@@ -1,0 +1,446 @@
+[
+ {
+  "input": "a $p+q$ b $r$ c",
+  "output": [
+   {
+    "start": 2,
+    "end": 7,
+    "text": "$p+q$"
+   },
+   {
+    "start": 10,
+    "end": 13,
+    "text": "$r$"
+   }
+  ]
+ },
+ {
+  "input": "$$m$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 5,
+    "text": "$$m$$"
+   }
+  ]
+ },
+ {
+  "input": "line $$k$$ end",
+  "output": [
+   {
+    "start": 5,
+    "end": 10,
+    "text": "$$k$$"
+   }
+  ]
+ },
+ {
+  "input": "pre\n$$\n\\sqrt{n}\n$$\npost",
+  "output": [
+   {
+    "start": 4,
+    "end": 18,
+    "text": "$$\n\\sqrt{n}\n$$"
+   }
+  ]
+ },
+ {
+  "input": "",
+  "output": []
+ },
+ {
+  "input": "no dollars at all",
+  "output": []
+ },
+ {
+  "input": "it costs $7 and $30 today",
+  "output": []
+ },
+ {
+  "input": "between $ 7 $ and",
+  "output": []
+ },
+ {
+  "input": "$ lead space$",
+  "output": []
+ },
+ {
+  "input": "$trail space $",
+  "output": []
+ },
+ {
+  "input": "$x$5",
+  "output": []
+ },
+ {
+  "input": "$x$ 5",
+  "output": [
+   {
+    "start": 0,
+    "end": 3,
+    "text": "$x$"
+   }
+  ]
+ },
+ {
+  "input": "$a$b$",
+  "output": [
+   {
+    "start": 0,
+    "end": 3,
+    "text": "$a$"
+   }
+  ]
+ },
+ {
+  "input": "paid \\$9, then $z$",
+  "output": [
+   {
+    "start": 15,
+    "end": 18,
+    "text": "$z$"
+   }
+  ]
+ },
+ {
+  "input": "$u \\$ v$",
+  "output": [
+   {
+    "start": 0,
+    "end": 8,
+    "text": "$u \\$ v$"
+   }
+  ]
+ },
+ {
+  "input": "\\$ $w$",
+  "output": [
+   {
+    "start": 3,
+    "end": 6,
+    "text": "$w$"
+   }
+  ]
+ },
+ {
+  "input": "use `$q$` as text, then $r$",
+  "output": [
+   {
+    "start": 24,
+    "end": 27,
+    "text": "$r$"
+   }
+  ]
+ },
+ {
+  "input": "``p ` $q$ ``",
+  "output": []
+ },
+ {
+  "input": "a lone ` tick, then $s$",
+  "output": [
+   {
+    "start": 20,
+    "end": 23,
+    "text": "$s$"
+   }
+  ]
+ },
+ {
+  "input": "`unclosed $s$",
+  "output": [
+   {
+    "start": 10,
+    "end": 13,
+    "text": "$s$"
+   }
+  ]
+ },
+ {
+  "input": "```\n$a$\n$$\nb\n$$\n```\n$c$",
+  "output": [
+   {
+    "start": 20,
+    "end": 23,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "~~~\n$a$\n~~~\n$c$",
+  "output": [
+   {
+    "start": 12,
+    "end": 15,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "```\n$a$\n~~~\n$b$\n```\n$c$",
+  "output": [
+   {
+    "start": 20,
+    "end": 23,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "````\n$a$\n```\n$b$\n````\n$c$",
+  "output": [
+   {
+    "start": 22,
+    "end": 25,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "  ```js\n$a$\n  ```\n$c$",
+  "output": [
+   {
+    "start": 18,
+    "end": 21,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "```\n$a$ never closed",
+  "output": []
+ },
+ {
+  "input": "$$ open only\n{{x}}",
+  "output": []
+ },
+ {
+  "input": "$$ one\ntwo $$ three",
+  "output": [
+   {
+    "start": 0,
+    "end": 13,
+    "text": "$$ one\ntwo $$"
+   }
+  ]
+ },
+ {
+  "input": "$$a$$ and $$b$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 5,
+    "text": "$$a$$"
+   },
+   {
+    "start": 10,
+    "end": 15,
+    "text": "$$b$$"
+   }
+  ]
+ },
+ {
+  "input": "$$a$$$b$",
+  "output": [
+   {
+    "start": 0,
+    "end": 5,
+    "text": "$$a$$"
+   },
+   {
+    "start": 5,
+    "end": 8,
+    "text": "$b$"
+   }
+  ]
+ },
+ {
+  "input": "$a $$ b$",
+  "output": []
+ },
+ {
+  "input": "$$x \\$$ y$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 11,
+    "text": "$$x \\$$ y$$"
+   }
+  ]
+ },
+ {
+  "input": "$$x \\$$$ after",
+  "output": [
+   {
+    "start": 0,
+    "end": 8,
+    "text": "$$x \\$$$"
+   }
+  ]
+ },
+ {
+  "input": "$\\frac{{a}}{b}$ and {{c}}",
+  "output": [
+   {
+    "start": 0,
+    "end": 15,
+    "text": "$\\frac{{a}}{b}$"
+   }
+  ]
+ },
+ {
+  "input": "$a\nb$",
+  "output": []
+ },
+ {
+  "input": "$a\n$b$",
+  "output": [
+   {
+    "start": 3,
+    "end": 6,
+    "text": "$b$"
+   }
+  ]
+ },
+ {
+  "input": "$$\n```\nnot a fence\n```\n$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 25,
+    "text": "$$\n```\nnot a fence\n```\n$$"
+   }
+  ]
+ },
+ {
+  "input": "$$ x\n```\n$$\n$y$",
+  "output": [
+   {
+    "start": 0,
+    "end": 11,
+    "text": "$$ x\n```\n$$"
+   },
+   {
+    "start": 12,
+    "end": 15,
+    "text": "$y$"
+   }
+  ]
+ },
+ {
+  "input": "$$$x$$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 6,
+    "text": "$$$x$$"
+   }
+  ]
+ },
+ {
+  "input": "$",
+  "output": []
+ },
+ {
+  "input": "$$",
+  "output": []
+ },
+ {
+  "input": "$$$",
+  "output": []
+ },
+ {
+  "input": "\\",
+  "output": []
+ },
+ {
+  "input": "trailing slash \\",
+  "output": []
+ },
+ {
+  "input": "$x\\",
+  "output": []
+ },
+ {
+  "input": "$x\\$",
+  "output": []
+ },
+ {
+  "input": "$€5$ and $ $",
+  "output": [
+   {
+    "start": 0,
+    "end": 4,
+    "text": "$€5$"
+   }
+  ]
+ },
+ {
+  "input": "$a$ $b$ $c$",
+  "output": [
+   {
+    "start": 0,
+    "end": 3,
+    "text": "$a$"
+   },
+   {
+    "start": 4,
+    "end": 7,
+    "text": "$b$"
+   },
+   {
+    "start": 8,
+    "end": 11,
+    "text": "$c$"
+   }
+  ]
+ },
+ {
+  "input": "$a $b$",
+  "output": [
+   {
+    "start": 0,
+    "end": 6,
+    "text": "$a $b$"
+   }
+  ]
+ },
+ {
+  "input": "Line1 $a$\nLine2 $b$",
+  "output": [
+   {
+    "start": 6,
+    "end": 9,
+    "text": "$a$"
+   },
+   {
+    "start": 16,
+    "end": 19,
+    "text": "$b$"
+   }
+  ]
+ },
+ {
+  "input": "$\\cloze{a}{b}$ then $$\\cloze{c}{}$$",
+  "output": [
+   {
+    "start": 0,
+    "end": 14,
+    "text": "$\\cloze{a}{b}$"
+   },
+   {
+    "start": 20,
+    "end": 35,
+    "text": "$$\\cloze{c}{}$$"
+   }
+  ]
+ },
+ {
+  "input": "$ab$$cd$",
+  "output": []
+ },
+ {
+  "input": "$a$$",
+  "output": []
+ }
+]

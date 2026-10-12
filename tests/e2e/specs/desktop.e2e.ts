@@ -1,0 +1,854 @@
+import { browser, expect } from "@wdio/globals";
+import * as fs from "fs";
+import { after, afterEach, before, beforeEach, describe, it } from "mocha";
+import * as path from "path";
+import { obsidianPage } from "wdio-obsidian-service";
+
+import { buildDemoLog, buildDemoLogFiles, buildDemoNotes } from "../demo-data";
+
+// Runs once per capability in wdio.conf.mts: desktop, and emulated mobile. On the phone the Studio must not get the
+// desktop interface. Set SCREENSHOTS=1 to also save the README screenshots to docs/media/screenshots.
+
+const manifest = JSON.parse(fs.readFileSync(path.resolve("manifest.json"), "utf8")) as {
+    id: string;
+};
+const pluginId = manifest.id;
+const DECK_NOTE = "CIA/Part1/Deck.md";
+const SCREENSHOT_DIR = path.resolve("docs/media/screenshots");
+const TAKE_SCREENSHOTS = process.env.SCREENSHOTS === "1";
+const TAB_VIEW = "flashcard-studio-tab-view";
+const SHELL = ".fs-desktop-shell";
+const CARD = ".fs-view .fs-card-container";
+
+interface PluginWithData {
+    isInitialized?: boolean;
+    dataManager: {
+        data: { settings: Record<string, unknown> };
+        settingsManager: { save: () => Promise<void> };
+    };
+}
+interface AppWithPlugins {
+    plugins: { plugins: Record<string, PluginWithData | undefined> };
+}
+
+async function isMobile(): Promise<boolean> {
+    return browser.executeObsidian(({ obsidian }) => obsidian.Platform.isMobile);
+}
+
+async function setSetting(key: string, value: unknown): Promise<void> {
+    await browser.executeObsidian(
+        async ({ app }, id, settingKey, settingValue) => {
+            const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+            if (plugin === undefined) throw new Error("the plugin is not loaded");
+            plugin.dataManager.data.settings[settingKey] = settingValue;
+            await plugin.dataManager.settingsManager.save();
+        },
+        pluginId,
+        key,
+        value,
+    );
+}
+
+async function getSetting(key: string): Promise<unknown> {
+    return browser.executeObsidian(
+        ({ app }, id, settingKey) => {
+            const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+            if (plugin === undefined) throw new Error("the plugin is not loaded");
+            return plugin.dataManager.data.settings[settingKey];
+        },
+        pluginId,
+        key,
+    );
+}
+
+/** Answering a card buries its question for the day; without this a test would find fewer and fewer cards. */
+async function clearBuryList(): Promise<void> {
+    await browser.executeObsidian(async ({ app }, id) => {
+        const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+        if (plugin === undefined) throw new Error("the plugin is not loaded");
+        (plugin.dataManager.data as unknown as { buryList: string[] }).buryList.length = 0;
+        await plugin.dataManager.settingsManager.save();
+    }, pluginId);
+}
+
+async function createFiles(files: { path: string; content: string }[]): Promise<void> {
+    await browser.executeObsidian(async ({ app }, list) => {
+        for (const file of list) {
+            const parts = file.path.split("/");
+            parts.pop();
+            let folder = "";
+            for (const part of parts) {
+                folder = folder ? `${folder}/${part}` : part;
+                if (!app.vault.getFolderByPath(folder)) await app.vault.createFolder(folder);
+            }
+            const existing = app.vault.getFileByPath(file.path);
+            if (existing) await app.vault.modify(existing, file.content);
+            else await app.vault.create(file.path, file.content);
+        }
+    }, files);
+}
+
+async function waitForTags(notePaths: string[]): Promise<void> {
+    await browser.waitUntil(
+        () =>
+            browser.executeObsidian(({ app }, paths) => {
+                return paths.every((notePath) => {
+                    const file = app.vault.getFileByPath(notePath);
+                    return (
+                        file !== null &&
+                        (app.metadataCache.getFileCache(file)?.tags ?? []).length > 0
+                    );
+                });
+            }, notePaths),
+        { timeoutMsg: "Obsidian never indexed the tags of the notes" },
+    );
+}
+
+async function openStudio(): Promise<void> {
+    await browser.executeObsidianCommand(`${pluginId}:review-flashcards`);
+}
+
+async function closeStudio(): Promise<void> {
+    await browser.executeObsidian(({ app }, type) => {
+        app.workspace.detachLeavesOfType(type);
+    }, TAB_VIEW);
+    await browser.keys("Escape");
+}
+
+/**
+ * Sizes the Obsidian window, through Electron (WebDriver's window commands are not available in Obsidian).
+ *
+ * @returns The size the window has afterwards, which is smaller than asked when the screen is.
+ */
+async function resizeWindow(width: number, height: number): Promise<[number, number]> {
+    await browser.executeObsidian(
+        (_context, w, h) => {
+            const remote = (
+                window as unknown as {
+                    require: (id: string) => {
+                        getCurrentWindow: () => { setSize: (w: number, h: number) => void };
+                    };
+                }
+            ).require("@electron/remote");
+            remote.getCurrentWindow().setSize(w, h);
+        },
+        width,
+        height,
+    );
+    await browser.pause(400);
+    const size = await browser.execute(() => [window.innerWidth, window.innerHeight]);
+    return [size[0], size[1]];
+}
+
+/** Gives the Studio tab the whole window, so the pane is wide enough for the desktop layout. */
+async function useFullWindow(width = 1440, height = 900): Promise<void> {
+    await resizeWindow(width, height);
+    await browser.executeObsidian(({ app }) => {
+        app.workspace.leftSplit.collapse();
+        app.workspace.rightSplit.collapse();
+    });
+    await browser.pause(300);
+}
+
+async function setTheme(light: boolean): Promise<void> {
+    await browser.execute((useLight: boolean) => {
+        document.body.classList.toggle("theme-light", useLight);
+        document.body.classList.toggle("theme-dark", !useLight);
+    }, light);
+    await browser.pause(250);
+}
+
+async function screenshot(name: string): Promise<void> {
+    if (!TAKE_SCREENSHOTS) return;
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    // Obsidian's notices would cover the top of the screen
+    await browser.execute(() => {
+        document.querySelectorAll(".notice, .fs-answer-toast").forEach((el) => el.remove());
+    });
+    await browser.saveScreenshot(path.join(SCREENSHOT_DIR, `${name}.png`));
+}
+
+async function showAnswer(): Promise<void> {
+    const button = browser.$(`${CARD} .fs-show-answer-button`);
+    await button.waitForClickable({ timeoutMsg: "the card front was not shown" });
+    await button.click();
+}
+
+async function answer(buttonClass: string): Promise<void> {
+    const button = browser.$(`${CARD} .${buttonClass}`);
+    await button.waitForClickable({ timeoutMsg: `${buttonClass} was not shown` });
+    await button.click();
+}
+
+/** The text of an element, once it shows something. */
+async function textOf(selector: string): Promise<string> {
+    return browser.$(selector).getText();
+}
+
+/** The text of every element that matches, or the value of one attribute of each. */
+async function listOf(selector: string, attribute?: string): Promise<string[]> {
+    return browser.execute(
+        (css: string, attr: string | null) =>
+            Array.from(document.querySelectorAll(css)).map((el) =>
+                attr === null ? (el.textContent ?? "") : (el.getAttribute(attr) ?? ""),
+            ),
+        selector,
+        attribute ?? null,
+    );
+}
+
+describe("desktop interface", function () {
+    before(async function () {
+        await browser.waitUntil(
+            () =>
+                browser.executeObsidian(({ app }, id) => {
+                    const plugin = (app as unknown as AppWithPlugins).plugins.plugins[id];
+                    return plugin !== undefined && plugin.isInitialized === true;
+                }, pluginId),
+            { timeoutMsg: `plugin ${pluginId} did not finish initialising` },
+        );
+    });
+
+    beforeEach(async function () {
+        await obsidianPage.resetVault();
+        await waitForTags([DECK_NOTE]);
+        await clearBuryList();
+        // A fixed order makes "the first card" the same card every time
+        await setSetting("flashcardCardOrder", "DueFirstSequential");
+        await setSetting("dailyLimitsEnabled", false);
+        await setSetting("reviewLook", "studio");
+        if (!(await isMobile())) {
+            await useFullWindow();
+            await setTheme(true);
+        }
+    });
+
+    afterEach(async function () {
+        await closeStudio();
+    });
+
+    after(async function () {
+        if (!(await isMobile())) await resizeWindow(1280, 800);
+    });
+
+    it("a fresh install opens the Studio as a tab with the desktop shell, whatever Open in new tab says", async function () {
+        if (await isMobile()) this.skip();
+        // The defaults, not something a test set. The Desktop layout setting asks for the tab; the settings that the
+        // phone shares through the synced data (the tab and the sizes of the window) are left as they were
+        expect(await getSetting("desktopLayout")).toEqual(true);
+        expect(await getSetting("openViewInNewTab")).toEqual(false);
+        expect(await getSetting("flashcardWidthPercentage")).toEqual(60);
+        expect(await getSetting("flashcardHeightPercentage")).toEqual(60);
+        await openStudio();
+        await browser.$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] ${SHELL}`).waitForExist({
+            timeoutMsg: "the Studio did not open as a tab with the desktop shell",
+        });
+        expect(await browser.$(".modal-container .fs-view").isExisting()).toEqual(false);
+        // at the full size of the pane, whatever the sizes of the window say
+        const [pane, content] = await browser.execute(() => {
+            const view = document.querySelector(".fs-tab-view");
+            const shell = document.querySelector(".fs-tab-view-content");
+            const width = (el: Element | null) =>
+                el === null ? 0 : el.getBoundingClientRect().width;
+            return [width(view), width(shell)];
+        });
+        expect(pane).toBeGreaterThan(900);
+        expect(Math.abs(pane - content)).toBeLessThan(2);
+    });
+
+    it("the tab setting does not matter: with it on the Studio is still that one tab", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("openViewInNewTab", true);
+        try {
+            await openStudio();
+            await browser
+                .$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] ${SHELL}`)
+                .waitForExist({ timeoutMsg: "the Studio did not open as a tab with the shell" });
+        } finally {
+            await setSetting("openViewInNewTab", false);
+        }
+    });
+
+    it("the phone does not get the desktop interface", async function () {
+        if (!(await isMobile())) this.skip();
+        await openStudio();
+        // With one deck the review opens on its cards, else on the deck list
+        await browser
+            .$(
+                ".fs-view .fs-deck-container:not(.fs-is-hidden), .fs-view .fs-card-container:not(.fs-is-hidden)",
+            )
+            .waitForDisplayed({ timeoutMsg: "the review was not shown" });
+        expect(await browser.$(SHELL).isExisting()).toEqual(false);
+        expect(await browser.$(".fs-desktop-home").isExisting()).toEqual(false);
+    });
+
+    it("shows the sidebar, the dashboard home and no side panel", async function () {
+        if (await isMobile()) this.skip();
+        const now = Date.now();
+        const notes = buildDemoNotes(now);
+        const folder = (await getSetting("reviewLogFolder")) as string;
+        await createFiles([...notes, ...buildDemoLogFiles(folder, buildDemoLog(now))]);
+        await waitForTags(notes.map((note) => note.path));
+
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed({
+            timeoutMsg: "the dashboard home was not shown",
+        });
+
+        // The sidebar: the navigation, the deck hierarchy and Settings
+        const labels = await listOf(`${SHELL} .fs-desktop-nav .fs-desktop-nav-item`, "aria-label");
+        expect(labels).toEqual([
+            "Home",
+            "Study",
+            "Exams",
+            "Browse cards",
+            "Statistics",
+            "Create with AI",
+        ]);
+        expect(
+            await browser.$(`${SHELL} .fs-desktop-nav-item.is-active`).getAttribute("aria-label"),
+        ).toEqual("Home");
+        const names = (await listOf(`${SHELL} .fs-desktop-tree .fs-desktop-deck-name`)).map(
+            (name) => name.toLowerCase(),
+        );
+        expect(names).toEqual(expect.arrayContaining(["flashcards", "cia", "spanish", "anatomy"]));
+        expect(await browser.$(`${SHELL} .fs-desktop-side`).getSize("width")).toBeCloseTo(244, 0);
+        expect(await browser.$(`${SHELL} .fs-desktop-aside`).isDisplayed()).toEqual(false);
+
+        // The home: the greeting, the goal, the strip, the decks table, the activity and the forecast
+        expect(await textOf(`${SHELL} .fs-dh-title`)).toMatch(/^Good (morning|afternoon|evening)/);
+        expect(await textOf(`${SHELL} .fs-dh-sub`)).toMatch(/cards due, about \d+ min/);
+        expect(await browser.$(`${SHELL} .fs-dh-button.is-primary`).getText()).toMatch(
+            /^Study all · \d+$/,
+        );
+        expect(await textOf(`${SHELL} .fs-dh-button:not(.is-primary)`)).toEqual("Take an exam");
+        await browser.waitUntil(async () => (await textOf(`${SHELL} .fs-home-goal-done`)) !== "0", {
+            timeoutMsg: "the goal never showed today's answers",
+        });
+        expect((await listOf(`${SHELL} .fs-dh-deck-row`)).length).toBeGreaterThanOrEqual(3);
+        await browser.waitUntil(
+            async () => (await textOf(`${SHELL} .fs-dh-deck-row .fs-dh-rate`)) !== "–",
+            { timeoutMsg: "the retention of the first deck never showed" },
+        );
+        await browser.waitUntil(
+            async () => (await listOf(`${SHELL} .fs-dh-heat-cell`)).length > 100,
+            { timeoutMsg: "the activity grid was not drawn" },
+        );
+        expect((await listOf(`${SHELL} .fs-dh-bar-col`)).length).toEqual(7);
+        expect(await textOf(`${SHELL} .fs-dh-bar-col.is-today .fs-dh-bar-day`)).toEqual("Today");
+
+        // No exam taken yet: no "Last exam" card
+        expect(await browser.$(`${SHELL} .fs-dh-exam`).isExisting()).toEqual(false);
+
+        await browser.pause(500);
+        await screenshot("desktop-home");
+        await setTheme(false);
+        await screenshot("desktop-home-dark");
+    });
+
+    it("studying collapses the sidebar to a rail, shows the side panel and counts the answers", async function () {
+        if (await isMobile()) this.skip();
+        const now = Date.now();
+        const notes = buildDemoNotes(now);
+        const folder = (await getSetting("reviewLogFolder")) as string;
+        await createFiles([...notes, ...buildDemoLogFiles(folder, buildDemoLog(now))]);
+        await waitForTags(notes.map((note) => note.path));
+
+        await openStudio();
+        const study = browser.$(`${SHELL} .fs-dh-deck-row .fs-dh-study`);
+        await study.waitForClickable({ timeoutMsg: "no deck offered a Study button" });
+        await study.click();
+
+        await browser
+            .$(`${SHELL}.is-study`)
+            .waitForExist({ timeoutMsg: "the shell did not enter study" });
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        expect(await browser.$(`${SHELL} .fs-desktop-side`).getSize("width")).toBeCloseTo(64, 0);
+        expect(await browser.$(`${SHELL} .fs-desktop-nav-label`).isDisplayed()).toEqual(false);
+        expect(await browser.$(`${SHELL} .fs-desktop-tree`).isDisplayed()).toEqual(false);
+        const panel = browser.$(`${SHELL} .fs-study-side-panel`);
+        await panel.waitForDisplayed({ timeoutMsg: "the side panel was not shown" });
+        expect(await panel.getSize("width")).toBeCloseTo(312, 0);
+        expect((await textOf(`${SHELL} .fs-panel-card .fs-panel-title`)).toLowerCase()).toEqual(
+            "this card",
+        );
+        expect((await textOf(`${SHELL} .fs-panel-session .fs-panel-title`)).toLowerCase()).toEqual(
+            "this session",
+        );
+        expect((await textOf(`${SHELL} .fs-panel-keys .fs-panel-title`)).toLowerCase()).toEqual(
+            "keys",
+        );
+
+        // The top bar: the breadcrumb, "1 / N", and the session clock
+        await browser
+            .$(`${SHELL} .fs-desktop-clock`)
+            .waitForDisplayed({ timeoutMsg: "no session clock" });
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toMatch(/^1 \/ \d+$/);
+        expect(await textOf(`${SHELL} .fs-desktop-clock-text`)).toMatch(/^\d\d:\d\d$/);
+
+        // Answer two cards; the session block counts them
+        await showAnswer();
+        await answer("fs-good-button");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await showAnswer();
+        await answer("fs-again-button");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await browser.waitUntil(
+            async () =>
+                (await textOf(`${SHELL} .fs-panel-tile.is-good b`)) === "1" &&
+                (await textOf(`${SHELL} .fs-panel-tile.is-again b`)) === "1" &&
+                (await textOf(`${SHELL} .fs-panel-tile.is-hard b`)) === "0",
+            { timeoutMsg: "the session block did not count the two answers" },
+        );
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toMatch(/^3 \/ \d+$/);
+
+        // The card on screen: its state and lapses are known
+        expect(await textOf(`${SHELL} .fs-panel-card .fs-panel-rows`)).toContain("State");
+
+        // The back of a card, with the tiles under it
+        await showAnswer();
+        await browser.$(`${CARD} .fs-good-button`).waitForDisplayed();
+        await browser.pause(600);
+        await screenshot("desktop-study");
+        await setTheme(false);
+        await screenshot("desktop-study-dark");
+        await setTheme(true);
+
+        // Home goes back to the dashboard, with the sidebar open again
+        await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Home"]`).click();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        expect(await browser.$(SHELL).getAttribute("class")).not.toContain("is-study");
+        expect(await browser.$(`${SHELL} .fs-desktop-side`).getSize("width")).toBeCloseTo(244, 0);
+    });
+
+    it("the answer keys work in the tab", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("answerKeys", "anki");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        await browser.$(`${SHELL} .fs-dh-button.is-primary`).click();
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+
+        // Space shows the answer, 3 answers Good, as in Anki
+        await browser.keys(" ");
+        await browser.$(`${CARD} .fs-good-button`).waitForDisplayed({
+            timeoutMsg: "Space did not show the answer",
+        });
+        await browser.keys("3");
+        await browser.waitUntil(
+            async () => (await textOf(`${SHELL} .fs-panel-tile.is-good b`)) === "1",
+            { timeoutMsg: "the 3 key did not answer Good" },
+        );
+    });
+
+    /** The session's clock, as `mm:ss`. It counts from the start of the session, so a session that starts again shows 00:00. */
+    async function clockNow(): Promise<string> {
+        return textOf(`${SHELL} .fs-desktop-clock-text`);
+    }
+
+    /** Whether the keyboard focus is on something in the sidebar. */
+    async function focusIsInSidebar(): Promise<boolean> {
+        return browser.execute(
+            () =>
+                document.activeElement?.closest(".fs-desktop-side") !== null &&
+                document.activeElement?.closest(".fs-desktop-side") !== undefined,
+        );
+    }
+
+    /** Waits until the clock has moved on from 00:00, so that a session that started again could be told from it. */
+    async function waitForClockToRun(): Promise<string> {
+        await browser.waitUntil(async () => (await clockNow()) >= "00:02", {
+            timeoutMsg: "the session clock did not run",
+        });
+        return clockNow();
+    }
+
+    it("after a click on Study in the sidebar, Space shows the answer of the card on screen", async function () {
+        if (await isMobile()) this.skip();
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        // A random order, as the default has it: a session that started again would show another card
+        await setSetting("flashcardCardOrder", "DueFirstRandom");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+
+        // The sidebar's Study item, in the rail once the session has started: a click, as a person makes it
+        await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Study"]`).click();
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        expect(await focusIsInSidebar()).toEqual(false);
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+        const front = await textOf(`${CARD} .fs-content`);
+        const clock = await waitForClockToRun();
+
+        await browser.keys(" ");
+        await browser.$(`${CARD} .fs-good-button`).waitForDisplayed({
+            timeoutMsg: "Space did not show the answer",
+        });
+        // The same card, in the same session: the position, the front of the card and the clock have not started again
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${CARD} .fs-content`)).toContain(front.split("\n")[0]);
+        expect((await clockNow()) >= clock).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("0");
+    });
+
+    it("after the sidebar's Study item is pressed with the keyboard, Space and Enter are the card's", async function () {
+        if (await isMobile()) this.skip();
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await setSetting("flashcardCardOrder", "DueFirstRandom");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+
+        await browser.execute(() => {
+            document
+                .querySelector<HTMLElement>('.fs-desktop-nav-item[aria-label="Study"]')
+                ?.focus();
+        });
+        await browser.keys("Enter");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        expect(await focusIsInSidebar()).toEqual(false);
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+        const clock = await waitForClockToRun();
+
+        await browser.keys("Enter");
+        await browser.$(`${CARD} .fs-good-button`).waitForDisplayed({
+            timeoutMsg: "Enter did not show the answer",
+        });
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect((await clockNow()) >= clock).toEqual(true);
+    });
+
+    it("the side panel lists the keys the card screen has", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("answerKeys", "original");
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        await browser.$(`${SHELL} .fs-dh-button.is-primary`).click();
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await browser.$(`${SHELL} .fs-panel-keys`).waitForDisplayed();
+        const keys = await listOf(`${SHELL} .fs-panel-key-list .fs-kbd`);
+        // Not a multiple choice card: no option keys. The original keys: 1 to 3 rate, and 0 resets the card
+        expect(keys).toEqual(
+            expect.arrayContaining(["1–3", "0", "Space / Enter", "U", "-", "@", "S", "J"]),
+        );
+        expect(keys).not.toContain("1–9");
+        expect(keys.some((key) => /1–7$/.test(key))).toEqual(true);
+        // Read aloud is listed only where the device can speak
+        const speaks = await browser.execute(() => "speechSynthesis" in window);
+        expect(keys.includes("R")).toEqual(speaks);
+
+        await setSetting("answerKeys", "anki");
+        await browser.$(`${CARD} .fs-show-answer-button`).click();
+        await browser.$(`${CARD} .fs-good-button`).waitForDisplayed();
+        await answer("fs-good-button");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        const anki = await listOf(`${SHELL} .fs-panel-key-list .fs-kbd`);
+        expect(anki).toContain("1–4");
+        expect(anki).not.toContain("0");
+    });
+
+    /** Opens the demo decks, studies the first deck of the table and answers one card Good. */
+    async function studyAndAnswerOne(): Promise<void> {
+        const notes = buildDemoNotes(Date.now());
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await openStudio();
+        const study = browser.$(`${SHELL} .fs-dh-deck-row .fs-dh-study`);
+        await study.waitForClickable({ timeoutMsg: "no deck offered a Study button" });
+        await study.click();
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await showAnswer();
+        await answer("fs-good-button");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await browser.waitUntil(
+            async () =>
+                (await textOf(`${SHELL} .fs-card-counter`)).startsWith("2 / ") &&
+                (await textOf(`${SHELL} .fs-panel-tile.is-good b`)) === "1",
+            { timeoutMsg: "the first answer was not counted" },
+        );
+    }
+
+    it("switching to another tab and back keeps the session", async function () {
+        if (await isMobile()) this.skip();
+        await studyAndAnswerOne();
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+
+        // A note in a tab of its own hides the Studio tab, which then measures 0 wide
+        await browser.executeObsidian(async ({ app }, notePath) => {
+            const file = app.vault.getFileByPath(notePath);
+            if (file === null) throw new Error("the note is missing");
+            await app.workspace.getLeaf("tab").openFile(file);
+        }, DECK_NOTE);
+        await browser.waitUntil(async () => !(await browser.$(SHELL).isDisplayed()), {
+            timeoutMsg: "the Studio tab was not hidden",
+        });
+        // Long enough for the resize of the hidden pane to have been seen and acted on
+        await browser.pause(800);
+
+        await browser.executeObsidian(({ app }, type) => {
+            const leaf = app.workspace.getLeavesOfType(type)[0];
+            app.workspace.setActiveLeaf(leaf, { focus: true });
+        }, TAB_VIEW);
+        await browser.$(SHELL).waitForDisplayed({ timeoutMsg: "the Studio tab did not come back" });
+        await browser.pause(500);
+
+        // Still the desktop shell, still studying, the same position and the same answers
+        expect(await browser.$(`${SHELL}.is-study`).isExisting()).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("1");
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        await browser.executeObsidian(({ app }) => {
+            app.workspace.detachLeavesOfType("markdown");
+        });
+    });
+
+    it("a resize across the limit waits until the session is over", async function () {
+        if (await isMobile()) this.skip();
+        await studyAndAnswerOne();
+        const counter = await textOf(`${SHELL} .fs-card-counter`);
+
+        // Narrower than 900px mid-session: the layout stays, and so does the session
+        await resizeWindow(800, 900);
+        await browser.pause(800);
+        expect(await browser.$(`${SHELL}.is-study`).isExisting()).toEqual(true);
+        expect(await textOf(`${SHELL} .fs-card-counter`)).toEqual(counter);
+        expect(await textOf(`${SHELL} .fs-panel-tile.is-good b`)).toEqual("1");
+
+        // Back on the home, the pane calls for the phone layout, and gets it
+        await browser.$(`${SHELL} .fs-desktop-nav-item[aria-label="Home"]`).click();
+        await browser.waitUntil(async () => !(await browser.$(SHELL).isExisting()), {
+            timeoutMsg: "the narrow pane did not switch to the phone layout after the session",
+        });
+        await browser.$(".fs-view .fs-home").waitForExist();
+
+        await resizeWindow(1440, 900);
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed({
+            timeoutMsg: "a wide pane did not bring the desktop shell back",
+        });
+    });
+
+    it("the decks table fits its card, and every button of the home is inside its card, at every pane width from 900 px", async function () {
+        if (await isMobile()) this.skip();
+        // Real vaults have long deck names, which the table shows in full unless it is made to give way
+        const long = {
+            path: "Long deck names.md",
+            content: [
+                "#flashcards/certified-internal-auditor-exam-preparation-programme-2026-part-one",
+                "",
+                "What does CAE stand for?::Chief Audit Executive",
+                "",
+            ].join("\n"),
+        };
+        const notes = buildDemoNotes(Date.now());
+        await createFiles([...notes, long]);
+        await waitForTags([...notes.map((note) => note.path), long.path]);
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+        await browser.$(`${SHELL} .fs-dh-deck-row .fs-dh-study`).waitForDisplayed();
+
+        // A window with the sidebars closed is a pane about 44 px narrower than it (the ribbon); the last width is the
+        // one of a 1600 px window with the file explorer open, which gives a pane of about 1256 px
+        const widths: [number, boolean][] = [
+            [950, false],
+            [1100, false],
+            [1200, false],
+            [1350, false],
+            [1440, false],
+            [1600, true],
+        ];
+        const problems: string[] = [];
+        for (const [width, explorer] of widths) {
+            await resizeWindow(width, 900);
+            await browser.executeObsidian(({ app }, open) => {
+                if (open) app.workspace.leftSplit.expand();
+                else app.workspace.leftSplit.collapse();
+                app.workspace.rightSplit.collapse();
+            }, explorer);
+            await browser.pause(500);
+
+            const fit = await browser.execute(() => {
+                const inside = (inner: DOMRect, outer: DOMRect) =>
+                    inner.left >= outer.left - 1 &&
+                    inner.right <= outer.right + 1 &&
+                    inner.top >= outer.top - 1 &&
+                    inner.bottom <= outer.bottom + 1;
+                const home = document.querySelector(".fs-desktop-home");
+                const decks = document.querySelector<HTMLElement>(".fs-desktop-home .fs-dh-decks");
+                const table = decks?.querySelector<HTMLElement>(".fs-dh-table");
+                const pane =
+                    document.querySelector(".fs-tab-view")?.getBoundingClientRect().width ?? 0;
+                if (home === null || decks === null || table === null) return null;
+                const outside: string[] = [];
+                for (const button of Array.from(home.querySelectorAll("button"))) {
+                    if (button.getBoundingClientRect().width === 0) continue;
+                    const card = button.closest(".fs-card") ?? home;
+                    if (!inside(button.getBoundingClientRect(), card.getBoundingClientRect())) {
+                        outside.push(button.textContent ?? "");
+                    }
+                }
+                return {
+                    pane: Math.round(pane),
+                    card: Math.round(decks.getBoundingClientRect().width),
+                    hidden: Math.round(decks.scrollWidth - decks.clientWidth),
+                    table: Math.round(table.getBoundingClientRect().width),
+                    outside,
+                    studyButtons: home.querySelectorAll(".fs-dh-study").length,
+                };
+            });
+            const label = `window ${width}${explorer ? " with the file explorer" : ""}`;
+            if (fit === null) {
+                problems.push(`${label}: the home was not drawn`);
+                continue;
+            }
+            const where = `${label} (pane ${fit.pane}, card ${fit.card}, table ${fit.table})`;
+            if (fit.pane < 900) problems.push(`${where}: too narrow for the desktop layout`);
+            if (fit.studyButtons === 0) problems.push(`${where}: no Study buttons`);
+            if (fit.outside.length > 0) {
+                problems.push(`${where}: buttons outside their card: ${fit.outside.join(", ")}`);
+            }
+            // A card that scrolls sideways hides its right edge, where the Study buttons are
+            if (fit.hidden > 1)
+                problems.push(`${where}: the card scrolls sideways by ${fit.hidden}`);
+        }
+        expect(problems).toEqual([]);
+    });
+
+    it("the deck hierarchy studies a deck, and opens and closes its subdecks", async function () {
+        if (await isMobile()) this.skip();
+        const now = Date.now();
+        const notes = buildDemoNotes(now);
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-tree .fs-desktop-deck`).waitForDisplayed();
+
+        // "flashcards" is the top level and starts open, so "cia" shows under it and "part2" is not there
+        const decksAt = (level: number) =>
+            listOf(`${SHELL} .fs-desktop-tree [aria-level="${level}"] .fs-desktop-deck-name`);
+        const chevron = browser.$(
+            `${SHELL} .fs-desktop-tree [aria-level="1"] .fs-desktop-deck-chevron`,
+        );
+        expect(await browser.$(`${SHELL} .fs-desktop-tree [aria-level="2"]`).isDisplayed()).toEqual(
+            true,
+        );
+        await chevron.click();
+        await browser.waitUntil(
+            async () =>
+                !(await browser.$(`${SHELL} .fs-desktop-tree [aria-level="2"]`).isDisplayed()),
+            { timeoutMsg: "the top deck did not close" },
+        );
+        await chevron.click();
+        await browser.$(`${SHELL} .fs-desktop-tree [aria-level="2"]`).waitForDisplayed();
+        expect(await decksAt(2)).toEqual(["Anatomy", "Cia", "Spanish"]);
+
+        // A click on a deck studies it
+        await browser.execute(() => {
+            const rows = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                    ".fs-desktop-tree [aria-level='2'] .fs-desktop-deck-name",
+                ),
+            );
+            rows.find((row) => row.textContent === "Spanish")?.click();
+        });
+        await browser.$(`${SHELL}.is-study`).waitForExist();
+        await browser.$(`${CARD} .fs-show-answer-button`).waitForClickable();
+        expect(await textOf(`${SHELL} .fs-card-title-deck`)).toContain("Spanish");
+    });
+
+    it("the end of a session shows its summary inside the shell", async function () {
+        if (await isMobile()) this.skip();
+        const now = Date.now();
+        const notes = buildDemoNotes(now);
+        await createFiles(notes);
+        await waitForTags(notes.map((note) => note.path));
+        await openStudio();
+        await browser.execute(() => {
+            const rows = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                    ".fs-desktop-tree [aria-level='2'] .fs-desktop-deck-name",
+                ),
+            );
+            rows.find((row) => row.textContent === "Anatomy")?.click();
+        });
+        // Answer every card of the deck, then the summary shows
+        for (let round = 0; round < 12; round++) {
+            const next = await browser.waitUntil(
+                async () => {
+                    if (await browser.$(".fs-session-summary").isDisplayed()) return "summary";
+                    if (await browser.$(`${CARD} .fs-show-answer-button`).isDisplayed())
+                        return "card";
+                    return false;
+                },
+                { timeoutMsg: "neither a card nor the summary appeared" },
+            );
+            if (next === "summary") break;
+            await showAnswer();
+            await answer("fs-easy-button");
+        }
+        await browser.$(".fs-session-summary").waitForDisplayed();
+        expect(await browser.$(`${SHELL}.is-study`).isExisting()).toEqual(true);
+        expect(await browser.$(`${SHELL} .fs-study-side-panel`).isDisplayed()).toEqual(true);
+    });
+
+    it("keeps the phone layout in a narrow pane, and switches back when the pane widens", async function () {
+        if (await isMobile()) this.skip();
+        await openStudio();
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed();
+
+        await resizeWindow(800, 900);
+        await browser.waitUntil(async () => !(await browser.$(SHELL).isExisting()), {
+            timeoutMsg: "a narrow pane kept the desktop shell",
+        });
+        // The deck list, not cards: the switch does not start a session
+        await browser
+            .$(".fs-view .fs-deck-container:not(.fs-is-hidden) .fs-home")
+            .waitForDisplayed();
+
+        await resizeWindow(1440, 900);
+        await browser.$(`${SHELL} .fs-desktop-home`).waitForDisplayed({
+            timeoutMsg: "a wide pane did not bring the desktop shell back",
+        });
+    });
+
+    it("the Classic look keeps its own layout, in the window it always had", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("reviewLook", "classic");
+        await openStudio();
+        // With one deck the review opens on its cards, else on the deck list
+        await browser
+            .$(
+                ".fs-view .fs-deck-container:not(.fs-is-hidden), .fs-view .fs-card-container:not(.fs-is-hidden)",
+            )
+            .waitForDisplayed({ timeoutMsg: "the review was not shown" });
+        expect(await browser.$(SHELL).isExisting()).toEqual(false);
+        // Desktop layout is on, and Open in new tab is off: the Classic look is the modal
+        expect(await getSetting("desktopLayout")).toEqual(true);
+        expect(await browser.$(".modal-container .fs-view").isExisting()).toEqual(true);
+    });
+
+    it("with the Desktop layout off the Studio is the modal it was, or the tab of the phone's layout", async function () {
+        if (await isMobile()) this.skip();
+        await setSetting("desktopLayout", false);
+        try {
+            await openStudio();
+            await browser.$(".modal-container .fs-view").waitForExist({
+                timeoutMsg: "the modal did not open",
+            });
+            expect(await browser.$(SHELL).isExisting()).toEqual(false);
+            await closeStudio();
+
+            // Open in new tab on: the tab, in the layout of the phone
+            await setSetting("openViewInNewTab", true);
+            await openStudio();
+            await browser
+                .$(`.workspace-leaf-content[data-type="${TAB_VIEW}"] .fs-view`)
+                .waitForExist({ timeoutMsg: "the Studio did not open as a tab" });
+            expect(await browser.$(SHELL).isExisting()).toEqual(false);
+        } finally {
+            await setSetting("openViewInNewTab", false);
+            await setSetting("desktopLayout", true);
+        }
+    });
+});

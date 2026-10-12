@@ -1,0 +1,37 @@
+/* The review in a modal window: the whole window is the review, so the dialog's own header and padding go. */
+
+#fs-modal-view {
+    max-height: 100%;
+    max-width: 100%;
+    padding: 0;
+
+    :is(.modal-header, .modal-close-button) {
+        display: none;
+    }
+
+    .fs-modal-content {
+        padding: 0;
+        overflow: visible;
+    }
+
+    &.fs-modal-rounded {
+        border-radius: var(--modal-radius);
+    }
+
+    &.fs-modal-square {
+        border-radius: 0;
+    }
+
+    /* A computer's window can be dragged to another size */
+    body:not(.is-mobile) & {
+        resize: both;
+    }
+
+    /* A phone or tablet's window fills the screen, clear of the notch and the home bar */
+    .is-mobile & {
+        padding-top: var(--safe-area-inset-top) !important;
+        padding-right: var(--safe-area-inset-right) !important;
+        padding-bottom: var(--safe-area-inset-bottom) !important;
+        padding-left: var(--safe-area-inset-left) !important;
+    }
+}

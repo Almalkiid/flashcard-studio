@@ -1,0 +1,164 @@
+[
+ {
+  "input": {
+   "source": "$\\cloze{p}{ hint }$",
+   "answerArg": "\ue0130\ue013",
+   "hintArg": "y"
+  },
+  "output": {
+   "asking": {
+    "ok": "{\\color{#2196f3}{[\\text{hint}]}}"
+   },
+   "showingAnswer": {
+    "ok": "{\\color{#2196f3}{p}}"
+   },
+   "hiding": {
+    "ok": "{\\color{gray}{[\\text{hint}]}}"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{}$",
+   "answerArg": "\ue0130\ue013",
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "{\\color{#2196f3}{[\\ldots]}}"
+   },
+   "showingAnswer": {
+    "ok": "{\\color{#2196f3}{p}}"
+   },
+   "hiding": {
+    "ok": "{\\color{gray}{[\\ldots]}}"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{ }$",
+   "answerArg": "\ue0130\ue013",
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "{\\color{#2196f3}{[\\ldots]}}"
+   },
+   "showingAnswer": {
+    "ok": "{\\color{#2196f3}{p}}"
+   },
+   "hiding": {
+    "ok": "{\\color{gray}{[\\ldots]}}"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "outside \\cloze{p}{ hint }",
+   "answerArg": "\ue0130\ue013",
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(p|hint)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(p|hint)"
+   },
+   "hiding": {
+    "ok": "HIDE(p|hint)"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "outside \\cloze{p}{}",
+   "answerArg": "\ue0130\ue013",
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(p|)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(p|)"
+   },
+   "hiding": {
+    "ok": "HIDE(p|)"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{}$",
+   "answerArg": "not a key",
+   "hintArg": "hnt"
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(not a key|hnt)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(not a key|hnt)"
+   },
+   "hiding": {
+    "ok": "HIDE(not a key|hnt)"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{}$",
+   "answerArg": "\ue0137\ue013",
+   "hintArg": "hnt"
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(\ue0137\ue013|hnt)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(\ue0137\ue013|hnt)"
+   },
+   "hiding": {
+    "ok": "HIDE(\ue0137\ue013|hnt)"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{}$",
+   "answerArg": "x\ue0130\ue013",
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(x\ue0130\ue013|)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(x\ue0130\ue013|)"
+   },
+   "hiding": {
+    "ok": "HIDE(x\ue0130\ue013|)"
+   }
+  }
+ },
+ {
+  "input": {
+   "source": "$\\cloze{p}{}$",
+   "answerArg": null,
+   "hintArg": null
+  },
+  "output": {
+   "asking": {
+    "ok": "ASK(|)"
+   },
+   "showingAnswer": {
+    "ok": "SHOW(undefined|)"
+   },
+   "hiding": {
+    "ok": "HIDE(|)"
+   }
+  }
+ }
+]

@@ -1,0 +1,573 @@
+{
+  "clock": "2023-09-06T12:00:00 local (TZ=UTC)",
+  "vault": {
+    "inbox/alpha.md": "#review\nSee [[beta]] and [[gamma]]\n",
+    "inbox/beta.md": "---\nsr-due: 2023-09-05\nsr-interval: 3\nsr-ease: 250\n---\n#review\nLinks to [[alpha]]\n",
+    "inbox/gamma.md": "---\ntags: review\n---\nGamma body [[alpha]]\n",
+    "inbox/delta.md": "---\nsr-due: 2023-09-06\nsr-interval: 1\nsr-ease: 270\n---\n#review/sub\n",
+    "inbox/epsilon.md": "#reviewer\n",
+    "inbox/zeta.md": "#review #ignore-me\n",
+    "inbox/eta.md": "#review #review-2\n[[alpha]]\n",
+    "inbox/theta.md": "---\nsr-due: 2023-09-08\nsr-interval: 4\nsr-ease: 260\n---\n#review-2\n",
+    "inbox/iota.md": "---\nsr-due: not-a-date\nsr-interval: 1\nsr-ease: 250\n---\n#review\n",
+    "inbox/kappa.md": "---\nsr-due: 2023-09-10\nsr-interval: 4\n---\n#review\n",
+    "inbox/lambda.md": "---\nsr-due: 10-09-2023\nsr-interval: 4\nsr-ease: 250\n---\n#review\n",
+    "inbox/mu.md": "---\nsr-due: Mon Sep 11 2023\nsr-interval: 5\nsr-ease: 250\n---\n#review\n",
+    "archive/old.md": "#review\n",
+    "archive/oldsub/deeper.md": "---\nsr-due: 2023-09-01\nsr-interval: 3\nsr-ease: 250\n---\n#review\n",
+    "drawing.excalidraw.md": "#review\n",
+    "Flashcard Studio/Review log/log.md": "#review\n",
+    "Flashcard Studio/Exams/exam1.md": "#review\n",
+    "inbox/case.md": "#Review\n",
+    "plain.md": "no tags at all\n"
+  },
+  "variants": [
+    {
+      "id": "S1-defaults",
+      "note": "tagsToReview [#review], nothing ignored except the default excalidraw glob",
+      "settingsOverrides": {},
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review"
+      ],
+      "dueNotesCount": 3,
+      "decks": [
+        {
+          "deck": "#review",
+          "dueNotesCount": 3,
+          "newNotes": [
+            "inbox/alpha.md",
+            "inbox/gamma.md",
+            "inbox/eta.md",
+            "archive/old.md",
+            "inbox/iota.md",
+            "inbox/kappa.md",
+            "inbox/zeta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "archive/oldsub/deeper.md",
+              "due": {
+                "local": "2023-09-01 00:00",
+                "ms": 1693526400000
+              }
+            },
+            {
+              "path": "inbox/beta.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            },
+            {
+              "path": "inbox/lambda.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            },
+            {
+              "path": "inbox/mu.md",
+              "due": {
+                "local": "2023-09-11 00:00",
+                "ms": 1694390400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S2-two-review-tags",
+      "note": "tagsToReview [#review, #review-2]",
+      "settingsOverrides": {
+        "tagsToReview": [
+          "#review",
+          "#review-2"
+        ]
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review",
+        "#review-2"
+      ],
+      "dueNotesCount": 3,
+      "decks": [
+        {
+          "deck": "#review",
+          "dueNotesCount": 3,
+          "newNotes": [
+            "inbox/alpha.md",
+            "inbox/gamma.md",
+            "inbox/eta.md",
+            "archive/old.md",
+            "inbox/iota.md",
+            "inbox/kappa.md",
+            "inbox/zeta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "archive/oldsub/deeper.md",
+              "due": {
+                "local": "2023-09-01 00:00",
+                "ms": 1693526400000
+              }
+            },
+            {
+              "path": "inbox/beta.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            },
+            {
+              "path": "inbox/lambda.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            },
+            {
+              "path": "inbox/mu.md",
+              "due": {
+                "local": "2023-09-11 00:00",
+                "ms": 1694390400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#review-2",
+          "dueNotesCount": 0,
+          "newNotes": [
+            "inbox/eta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "inbox/theta.md",
+              "due": {
+                "local": "2023-09-08 00:00",
+                "ms": 1694131200000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review-2",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S3-ignore-tag-and-folder",
+      "note": "noteTagsToIgnore [#ignore-me]; noteFoldersToIgnore [archive] (plus the default glob)",
+      "settingsOverrides": {
+        "noteTagsToIgnore": [
+          "#ignore-me"
+        ],
+        "noteFoldersToIgnore": [
+          "**/*.excalidraw.md",
+          "archive"
+        ]
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "archive/old.md (ignored folder)",
+        "archive/oldsub/deeper.md (ignored folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review"
+      ],
+      "dueNotesCount": 2,
+      "decks": [
+        {
+          "deck": "#review",
+          "dueNotesCount": 2,
+          "newNotes": [
+            "inbox/alpha.md",
+            "inbox/gamma.md",
+            "inbox/eta.md",
+            "inbox/iota.md",
+            "inbox/kappa.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "inbox/beta.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            },
+            {
+              "path": "inbox/lambda.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            },
+            {
+              "path": "inbox/mu.md",
+              "due": {
+                "local": "2023-09-11 00:00",
+                "ms": 1694390400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S4-only-subtag",
+      "note": "tagsToReview [#review/sub]",
+      "settingsOverrides": {
+        "tagsToReview": [
+          "#review/sub"
+        ]
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review/sub"
+      ],
+      "dueNotesCount": 1,
+      "decks": [
+        {
+          "deck": "#review/sub",
+          "dueNotesCount": 1,
+          "newNotes": [],
+          "scheduledNotes": [
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review/sub",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S5-reversed-settings-order",
+      "note": "tagsToReview [#review-2, #review]: deck creation order follows the scan, not the settings",
+      "settingsOverrides": {
+        "tagsToReview": [
+          "#review-2",
+          "#review"
+        ]
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review",
+        "#review-2"
+      ],
+      "dueNotesCount": 3,
+      "decks": [
+        {
+          "deck": "#review",
+          "dueNotesCount": 3,
+          "newNotes": [
+            "inbox/alpha.md",
+            "inbox/gamma.md",
+            "inbox/eta.md",
+            "archive/old.md",
+            "inbox/iota.md",
+            "inbox/kappa.md",
+            "inbox/zeta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "archive/oldsub/deeper.md",
+              "due": {
+                "local": "2023-09-01 00:00",
+                "ms": 1693526400000
+              }
+            },
+            {
+              "path": "inbox/beta.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            },
+            {
+              "path": "inbox/lambda.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            },
+            {
+              "path": "inbox/mu.md",
+              "due": {
+                "local": "2023-09-11 00:00",
+                "ms": 1694390400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review",
+            "Today"
+          ]
+        },
+        {
+          "deck": "#review-2",
+          "dueNotesCount": 0,
+          "newNotes": [
+            "inbox/eta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "inbox/theta.md",
+              "due": {
+                "local": "2023-09-08 00:00",
+                "ms": 1694131200000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review-2",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S6-folder-glob-only-no-default",
+      "note": "noteFoldersToIgnore [] (default glob removed): drawing.excalidraw.md joins",
+      "settingsOverrides": {
+        "noteFoldersToIgnore": []
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)"
+      ],
+      "deckOrder": [
+        "#review"
+      ],
+      "dueNotesCount": 3,
+      "decks": [
+        {
+          "deck": "#review",
+          "dueNotesCount": 3,
+          "newNotes": [
+            "inbox/alpha.md",
+            "inbox/gamma.md",
+            "inbox/eta.md",
+            "archive/old.md",
+            "drawing.excalidraw.md",
+            "inbox/iota.md",
+            "inbox/kappa.md",
+            "inbox/zeta.md"
+          ],
+          "scheduledNotes": [
+            {
+              "path": "archive/oldsub/deeper.md",
+              "due": {
+                "local": "2023-09-01 00:00",
+                "ms": 1693526400000
+              }
+            },
+            {
+              "path": "inbox/beta.md",
+              "due": {
+                "local": "2023-09-05 00:00",
+                "ms": 1693872000000
+              }
+            },
+            {
+              "path": "inbox/delta.md",
+              "due": {
+                "local": "2023-09-06 00:00",
+                "ms": 1693958400000
+              }
+            },
+            {
+              "path": "inbox/lambda.md",
+              "due": {
+                "local": "2023-09-10 00:00",
+                "ms": 1694304000000
+              }
+            },
+            {
+              "path": "inbox/mu.md",
+              "due": {
+                "local": "2023-09-11 00:00",
+                "ms": 1694390400000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 1,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    },
+    {
+      "id": "S7-ignore-parent-tag",
+      "note": "noteTagsToIgnore [#review]: every note carrying #review (or #review/x) leaves note review",
+      "settingsOverrides": {
+        "tagsToReview": [
+          "#review",
+          "#review-2"
+        ],
+        "noteTagsToIgnore": [
+          "#review"
+        ]
+      },
+      "skippedByLoadVault": [
+        "Flashcard Studio/Exams/exam1.md (history folder)",
+        "Flashcard Studio/Review log/log.md (history folder)",
+        "drawing.excalidraw.md (ignored folder)"
+      ],
+      "deckOrder": [
+        "#review-2"
+      ],
+      "dueNotesCount": 0,
+      "decks": [
+        {
+          "deck": "#review-2",
+          "dueNotesCount": 0,
+          "newNotes": [],
+          "scheduledNotes": [
+            {
+              "path": "inbox/theta.md",
+              "due": {
+                "local": "2023-09-08 00:00",
+                "ms": 1694131200000
+              }
+            }
+          ],
+          "activeFolders": [
+            "#review-2",
+            "Today"
+          ]
+        }
+      ],
+      "histogramDueNow": 0,
+      "noteEaseList": {
+        "archive/oldsub/deeper.md": 250,
+        "inbox/beta.md": 250,
+        "inbox/delta.md": 270,
+        "inbox/lambda.md": 250,
+        "inbox/mu.md": 250,
+        "inbox/theta.md": 260
+      }
+    }
+  ]
+}
