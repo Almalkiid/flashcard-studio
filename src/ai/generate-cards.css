@@ -193,18 +193,18 @@
     stroke-width: 2.6;
 }
 
-.fs-studio .fs-ai-chip:has(input:checked) {
+.fs-studio .fs-ai-chip.is-checked {
     border-color: color-mix(in srgb, var(--fs-accent) 45%, transparent);
     background-color: var(--fs-accent-soft);
     color: var(--fs-accent);
 }
 
-.fs-studio .fs-ai-chip:has(input:checked) .fs-ai-chip-tick {
+.fs-studio .fs-ai-chip.is-checked .fs-ai-chip-tick {
     display: inline-flex;
 }
 
-.fs-studio .fs-ai-chip:has(input:focus-visible),
-.fs-studio .fs-ai-segment:has(input:focus-visible) {
+.fs-studio .fs-ai-chip.is-focus-visible,
+.fs-studio .fs-ai-segment.is-focus-visible {
     outline: 2px solid var(--fs-accent);
     outline-offset: 2px;
 }
@@ -269,7 +269,7 @@
     cursor: pointer;
 }
 
-.fs-studio .fs-ai-segment:has(input:checked) {
+.fs-studio .fs-ai-segment.is-checked {
     border-color: var(--fs-accent);
     background-color: var(--fs-accent-soft);
     box-shadow: inset 0 0 0 1px var(--fs-accent);

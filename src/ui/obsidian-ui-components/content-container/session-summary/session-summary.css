@@ -216,7 +216,7 @@
     .fs-skip-button,
     .fs-menu-dots-button,
     > .fs-divider {
-        display: none !important;
+        display: none;
     }
 }
 

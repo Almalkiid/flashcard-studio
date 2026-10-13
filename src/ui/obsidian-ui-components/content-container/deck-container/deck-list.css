@@ -82,10 +82,12 @@
     padding: 4px 2px;
     text-align: center;
     justify-content: center;
+}
 
-    &:not([class*="fs-fg-"]) {
-        color: #fff !important;
-    }
+/* The class four times, as the colour classes in global.css are matched: this white has to win over the pill's other
+   rules, the studio look's colours are the ones that out-rank it */
+.fs-tree-stats-count.fs-tree-stats-count.fs-tree-stats-count:not([class*="fs-fg-"]) {
+    color: #fff;
 }
 
 .fs-header-row {
