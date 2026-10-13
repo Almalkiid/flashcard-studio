@@ -24,36 +24,15 @@
         background: transparent;
         padding: 4px 12px 0;
 
-        .fs-info-section,
-        .fs-edit-button,
-        .fs-reset-button,
-        .fs-skip-button,
-        > .fs-divider,
-        .fs-short-menu-button {
-            display: none !important;
-        }
-
-        .fs-extended-menu-button {
-            display: flex !important;
-        }
-
         .fs-button {
             width: 36px;
             height: 36px;
             padding: 0;
-            border: 1px solid var(--fs-border) !important;
             border-radius: 50%;
-            background-color: var(--fs-surface) !important;
-            box-shadow: var(--fs-shadow) !important;
-            color: var(--fs-text-2) !important;
 
             & svg {
                 width: 17px;
                 height: 17px;
-            }
-
-            &:hover {
-                color: var(--fs-text) !important;
             }
         }
     }
@@ -259,7 +238,6 @@
     & .fs-reveal-hint {
         display: flex;
         padding-top: 24px;
-        margin-top: auto !important;
         justify-content: center;
         gap: 8px;
         align-items: center;
@@ -291,7 +269,6 @@
 
     & .fs-answer-pill {
         align-self: flex-start;
-        margin-bottom: 12px !important;
         color: var(--fs-green);
         background-color: var(--fs-green-soft);
     }
@@ -357,28 +334,20 @@
         top: 30px;
         position: absolute;
         z-index: 2;
-        box-shadow: none !important;
         right: max(32px, calc((100% - 720px) / 2 + 32px));
         justify-content: center;
         width: 32px;
         border: none;
         height: 32px;
         cursor: pointer;
-        background: transparent !important;
         border-radius: 50%;
         display: flex;
-        color: var(--fs-text-3) !important;
         align-items: center;
         padding: 0;
 
         & svg {
             width: 20px;
             height: 20px;
-        }
-
-        &:hover,
-        &.is-on {
-            color: var(--fs-amber) !important;
         }
 
         &.is-on svg {
@@ -410,11 +379,9 @@
         box-shadow:
             inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 12%, transparent),
             inset 0 1px 0 rgb(255 255 255 / 55%);
-        background-color: var(--fs-rating-soft) !important;
 
         height: auto;
         border: none;
-        color: var(--fs-rating) !important;
         --fs-rating-soft: var(--fs-accent-soft);
         border-radius: var(--fs-radius-md);
         min-height: 76px;
@@ -457,11 +424,6 @@
     }
 
     /* The Studio look uses its own icon, label and interval */
-    & .fs-response-button > span.fs-small-text,
-    & .fs-response-button > span.fs-large-text {
-        display: none !important;
-    }
-
     & .fs-response-button > span.fs-button-icon {
         display: flex;
 
@@ -489,8 +451,6 @@
     /* Show answer: one clear primary button */
     & .fs-response .fs-response-button.fs-show-answer-button {
         min-height: 54px;
-        background-color: var(--fs-accent) !important;
-        color: var(--fs-on-accent) !important;
         box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--fs-accent) 80%, transparent);
     }
 
@@ -505,17 +465,10 @@
 
     /* Keyboard hints: a small digit in the tile's corner */
     & .fs-response-button::after {
-        color: currentColor !important;
         opacity: 0.45;
-        box-shadow: none !important;
         border: none;
-        font-family: var(--fs-font) !important;
-        font-size: 10px !important;
         font-weight: 650;
-        padding: 0 !important;
         top: 8px;
-        right: 10px !important;
-        bottom: unset !important;
     }
 
     /* The answer toast */
@@ -546,23 +499,20 @@
         font-family: var(--fs-font);
         font-size: var(--fs-caption);
         font-weight: 650;
-        color: var(--fs-accent) !important;
-        background-color: var(--fs-accent-soft) !important;
-        box-shadow: none !important;
     }
 
     /* Clozes: a quiet chip for the hidden text, the accent for the revealed answer (the cloze markup sets its
-       colour inline, #2196f3, so it is matched on that) */
-    & .fs-content:not(.fs-answer-shown) span[style*="#2196f3"] {
-        color: var(--fs-accent) !important;
+       colour inline, #2196f3; once a card is drawn that is the fs-cloze-accent class, see markdown-render.ts) */
+    & .fs-content:not(.fs-answer-shown) .fs-cloze-accent {
+        color: var(--fs-accent);
         background-color: var(--fs-accent-soft);
         border-radius: 7px;
         padding: 0.05em 0.45em;
         letter-spacing: 0.04em;
     }
 
-    & .fs-content.fs-answer-shown span[style*="#2196f3"] {
-        color: var(--fs-accent) !important;
+    & .fs-content.fs-answer-shown .fs-cloze-accent {
+        color: var(--fs-accent);
         font-weight: 650;
     }
 
@@ -570,6 +520,95 @@
         border-radius: 8px;
         border: 1px solid color-mix(in srgb, var(--fs-accent) 45%, transparent);
         background-color: var(--fs-accent-soft);
+    }
+}
+
+/* What the rules above leave to a rule of more weight. These declarations have to win over Obsidian's own button rules
+   (hover, tap), over the colour classes of global.css and over the rules of the desktop shell, which is what
+   marking them important used to do. The studio class is written three times, which makes every rule here two classes heavier
+   than the rule it would have been in the block above; the rules in desktop-shell.css do the same, so they keep
+   their place over these. */
+.fs-card-container.fs-look-studio.fs-look-studio.fs-look-studio {
+    & .fs-card-toolbar {
+        .fs-info-section,
+        .fs-edit-button,
+        .fs-reset-button,
+        .fs-skip-button,
+        > .fs-divider,
+        .fs-short-menu-button {
+            display: none;
+        }
+
+        .fs-extended-menu-button {
+            display: flex;
+        }
+
+        .fs-button {
+            border: 1px solid var(--fs-border);
+            background-color: var(--fs-surface);
+            box-shadow: var(--fs-shadow);
+            color: var(--fs-text-2);
+
+            &:hover {
+                color: var(--fs-text);
+            }
+        }
+    }
+
+    & .fs-reveal-hint {
+        margin-top: auto;
+    }
+
+    & .fs-answer-pill {
+        margin-bottom: 12px;
+    }
+
+    & .fs-card-star {
+        box-shadow: none;
+        background: transparent;
+        color: var(--fs-text-3);
+
+        &:hover,
+        &.is-on {
+            color: var(--fs-amber);
+        }
+    }
+
+    & .fs-response .fs-response-button {
+        background-color: var(--fs-rating-soft);
+        color: var(--fs-rating);
+    }
+
+    & .fs-response-button > span.fs-small-text,
+    & .fs-response-button > span.fs-large-text {
+        display: none;
+    }
+
+    & .fs-response .fs-response-button.fs-show-answer-button {
+        background-color: var(--fs-accent);
+        color: var(--fs-on-accent);
+    }
+
+    & .fs-response-button::after {
+        color: currentColor;
+        box-shadow: none;
+        font-family: var(--fs-font);
+        font-size: 10px;
+        padding: 0;
+        right: 10px;
+        bottom: unset;
+    }
+
+    & .fs-answer-toast-undo {
+        color: var(--fs-accent);
+        background-color: var(--fs-accent-soft);
+        box-shadow: none;
+    }
+}
+
+.theme-dark .fs-card-container.fs-look-studio.fs-look-studio.fs-look-studio {
+    & .fs-response .fs-response-button:not(.fs-show-answer-button) {
+        background-color: color-mix(in srgb, var(--fs-rating) 9%, var(--fs-surface));
     }
 }
 
@@ -583,7 +622,6 @@
         var(--fs-bg);
 
     & .fs-response .fs-response-button:not(.fs-show-answer-button) {
-        background-color: color-mix(in srgb, var(--fs-rating) 9%, var(--fs-surface)) !important;
         box-shadow:
             inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 22%, transparent),
             inset 0 1px 0 rgb(255 255 255 / 4%);

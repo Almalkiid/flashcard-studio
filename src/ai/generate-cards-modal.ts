@@ -28,6 +28,7 @@ import { SettingsUtil, StudioSettings } from "src/data/settings-model";
 import { IBaseLocale } from "src/lang/en-strings";
 import { t } from "src/lang/translate";
 import type FlashcardStudioPlugin from "src/studio-plugin";
+import { markFocusVisible } from "src/ui/focus-visible";
 
 const MIN_COUNT = 1;
 const MAX_COUNT = 50;
@@ -266,6 +267,8 @@ export class GenerateCardsModal extends Modal {
             const chip = chips.createEl("label", { cls: `fs-ai-chip is-${kind}` });
             const box = chip.createEl("input", { attr: { type: "checkbox", "data-kind": kind } });
             box.checked = this.kinds.has(kind);
+            chip.toggleClass("is-checked", box.checked);
+            markFocusVisible(chip, box);
             setIcon(chip.createSpan({ cls: "fs-ai-chip-tick" }), "check");
             chip.createSpan({ cls: "fs-ai-chip-text", text: t(KIND_LABEL[kind]) });
             box.addEventListener("change", () => {
@@ -277,6 +280,7 @@ export class GenerateCardsModal extends Modal {
                     // At least one kind has to stay on
                     box.checked = true;
                 }
+                chip.toggleClass("is-checked", box.checked);
             });
         }
     }
@@ -289,17 +293,25 @@ export class GenerateCardsModal extends Modal {
             ["append", "AI_DEST_APPEND", "AI_DEST_APPEND_DESC"],
             ["new", "AI_DEST_NEW", "AI_DEST_NEW_DESC"],
         ];
+        const segments: [HTMLElement, HTMLInputElement][] = [];
         for (const [value, title, description] of options) {
             const segment = group.createEl("label", { cls: "fs-ai-segment" });
             const radio = segment.createEl("input", {
                 attr: { type: "radio", name: "fs-ai-destination", value },
             });
             radio.checked = this.destination === value;
+            segment.toggleClass("is-checked", radio.checked);
+            markFocusVisible(segment, radio);
+            segments.push([segment, radio]);
             const text = segment.createDiv({ cls: "fs-ai-segment-text" });
             text.createSpan({ cls: "fs-ai-segment-title", text: t(title) });
             text.createSpan({ cls: "fs-ai-segment-desc", text: t(description) });
             radio.addEventListener("change", () => {
                 if (radio.checked) this.destination = value;
+                // Choosing one unchecks the other without a change event of its own
+                for (const [other, otherRadio] of segments) {
+                    other.toggleClass("is-checked", otherRadio.checked);
+                }
             });
         }
     }

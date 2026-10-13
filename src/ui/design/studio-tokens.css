@@ -205,7 +205,6 @@
     cursor: pointer;
     padding: 0 20px;
     font-family: var(--fs-font);
-    background-color: var(--fs-accent) !important;
     justify-content: center;
     border-radius: 14px;
     font-size: var(--fs-body);
@@ -213,7 +212,6 @@
         0 1px 2px rgb(15 23 42 / 10%),
         0 8px 18px -8px color-mix(in srgb, var(--fs-accent) 70%, transparent);
     font-weight: 600;
-    color: var(--fs-on-accent) !important;
     transition:
         transform 100ms ease,
         filter 120ms ease;
@@ -225,6 +223,12 @@
     &:active {
         transform: scale(0.98);
     }
+}
+
+/* The class three times: Obsidian's button has hover and tap rules that a single one would not win over */
+.fs-studio .fs-primary-button.fs-primary-button.fs-primary-button {
+    background-color: var(--fs-accent);
+    color: var(--fs-on-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

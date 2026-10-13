@@ -29,9 +29,9 @@
 
     /* A phone or tablet's window fills the screen, clear of the notch and the home bar */
     .is-mobile & {
-        padding-top: var(--safe-area-inset-top) !important;
-        padding-right: var(--safe-area-inset-right) !important;
-        padding-bottom: var(--safe-area-inset-bottom) !important;
-        padding-left: var(--safe-area-inset-left) !important;
+        padding-top: var(--safe-area-inset-top);
+        padding-right: var(--safe-area-inset-right);
+        padding-bottom: var(--safe-area-inset-bottom);
+        padding-left: var(--safe-area-inset-left);
     }
 }

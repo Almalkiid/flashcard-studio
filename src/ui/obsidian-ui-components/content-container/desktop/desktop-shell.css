@@ -9,9 +9,10 @@
 
 /* MARK: The tab that holds the shell */
 
-.fs-tab-view.fs-desktop-view {
+/* The class four times, to win over the padding of `.fs-tab-view` in review-tab.css */
+.fs-tab-view.fs-tab-view.fs-tab-view.fs-desktop-view {
     /* The shell fills the whole tab; it keeps clear of the status bar itself */
-    padding-bottom: 0 !important;
+    padding-bottom: 0;
 }
 
 .fs-tab-view.fs-desktop-view .fs-tab-view-content {
@@ -500,7 +501,6 @@
         width: 38px;
         height: 38px;
         border-radius: 11px;
-        box-shadow: none !important;
     }
 
     /* The breadcrumb follows the back button; the counter is placed over the progress bar */
@@ -674,6 +674,14 @@
 
     & .fs-answer-toast {
         top: 80px;
+    }
+}
+
+/* The toolbar buttons have no shadow in the shell. The studio class is written three times, as in review-studio.css,
+   where the shadow of these buttons is given with that weight: this keeps its place over it. */
+.fs-desktop-shell .fs-card-container.fs-look-studio.fs-look-studio.fs-look-studio {
+    & .fs-card-toolbar .fs-button {
+        box-shadow: none;
     }
 }
 
