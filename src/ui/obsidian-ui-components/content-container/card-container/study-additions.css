@@ -150,14 +150,11 @@
         border-color 120ms ease,
         background-color 120ms ease,
         transform 90ms ease;
-    background-color: var(--fsa-tile) !important;
-    box-shadow: none !important;
     display: flex;
     cursor: pointer;
 
     &:hover {
         border-color: color-mix(in srgb, var(--fsa-accent) 55%, transparent);
-        background-color: color-mix(in srgb, var(--fsa-accent) 8%, var(--fsa-tile)) !important;
     }
 
     &:active {
@@ -171,8 +168,6 @@
 
     &.is-selected {
         border-color: var(--fsa-accent);
-        background-color: color-mix(in srgb, var(--fsa-accent) 12%, var(--fsa-tile)) !important;
-        box-shadow: 0 0 0 1px var(--fsa-accent) !important;
     }
 
     &.is-selected .fs-choice-key {
@@ -188,7 +183,6 @@
 
         &:hover {
             border-color: var(--fsa-border);
-            background-color: var(--fsa-tile) !important;
         }
 
         &:active {
@@ -199,11 +193,9 @@
     &.is-result.is-correct {
         color: var(--fsa-text);
         border-color: color-mix(in srgb, var(--fsa-green) 55%, transparent);
-        background-color: color-mix(in srgb, var(--fsa-green) 13%, var(--fsa-tile)) !important;
 
         &:hover {
             border-color: color-mix(in srgb, var(--fsa-green) 55%, transparent);
-            background-color: color-mix(in srgb, var(--fsa-green) 13%, var(--fsa-tile)) !important;
         }
 
         & .fs-choice-key {
@@ -220,11 +212,9 @@
     &.is-result.is-wrong {
         color: var(--fsa-text);
         border-color: color-mix(in srgb, var(--fsa-red) 55%, transparent);
-        background-color: color-mix(in srgb, var(--fsa-red) 12%, var(--fsa-tile)) !important;
 
         &:hover {
             border-color: color-mix(in srgb, var(--fsa-red) 55%, transparent);
-            background-color: color-mix(in srgb, var(--fsa-red) 12%, var(--fsa-tile)) !important;
         }
 
         & .fs-choice-key {
@@ -235,6 +225,44 @@
 
         & .fs-choice-tag {
             color: var(--fsa-red);
+        }
+    }
+}
+
+/* The background and shadow of a tile. The class is written three times, so that these win over Obsidian's own button
+   rules (hover, tap) and keep their order over each other, which is what marking them important used to do. */
+:is(.fs-card-container, .fs-exam) .fs-choices > .fs-choice.fs-choice.fs-choice {
+    background-color: var(--fsa-tile);
+    box-shadow: none;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--fsa-accent) 8%, var(--fsa-tile));
+    }
+
+    &.is-selected {
+        background-color: color-mix(in srgb, var(--fsa-accent) 12%, var(--fsa-tile));
+        box-shadow: 0 0 0 1px var(--fsa-accent);
+    }
+
+    &.is-result {
+        &:hover {
+            background-color: var(--fsa-tile);
+        }
+    }
+
+    &.is-result.is-correct {
+        background-color: color-mix(in srgb, var(--fsa-green) 13%, var(--fsa-tile));
+
+        &:hover {
+            background-color: color-mix(in srgb, var(--fsa-green) 13%, var(--fsa-tile));
+        }
+    }
+
+    &.is-result.is-wrong {
+        background-color: color-mix(in srgb, var(--fsa-red) 12%, var(--fsa-tile));
+
+        &:hover {
+            background-color: color-mix(in srgb, var(--fsa-red) 12%, var(--fsa-tile));
         }
     }
 }

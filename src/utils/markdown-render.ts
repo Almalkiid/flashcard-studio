@@ -76,6 +76,21 @@ export function wireInternalLinks(
     });
 }
 
+/** The colour the cloze markup (see cards/expand.ts) gives its spans, as an inline style. */
+const CLOZE_COLOR_STYLE = "color:#2196f3";
+
+/**
+ * Turns the inline colour of the cloze spans in `root` into the `fs-cloze-accent` class, which has the same colour. A
+ * style sheet cannot restyle an inline colour (only !important could), and the Studio look gives clozes its own.
+ */
+function classifyClozeSpans(root: HTMLElement): void {
+    for (const span of Array.from(root.querySelectorAll("span[style*='#2196f3']"))) {
+        if (span.getAttribute("style")?.replace(/[\s;]/g, "") !== CLOZE_COLOR_STYLE) continue;
+        span.removeAttribute("style");
+        span.addClass("fs-cloze-accent");
+    }
+}
+
 /** What draws the Markdown of one card. */
 export interface CardRenderer {
     /**
@@ -125,6 +140,7 @@ export class CardMarkdown {
                         : target;
                 el.addClass("markdown-rendered");
                 await MarkdownRenderer.render(this.app, markdown, el, sourcePath, owner);
+                classifyClozeSpans(el);
                 return isCurrent();
             },
         };
