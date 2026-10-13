@@ -1,7 +1,8 @@
 /* The review in a tab: no padding of the view, and clear of the status bar below. */
 
-.fs-tab-view {
-    padding: 0 0 max(32px, var(--safe-area-inset-bottom)) !important;
+/* The class three times: Obsidian pads a view with `.workspace-leaf-content .view-content` */
+.fs-tab-view.fs-tab-view.fs-tab-view {
+    padding: 0 0 max(32px, var(--safe-area-inset-bottom));
 }
 
 .fs-center-view {

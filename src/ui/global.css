@@ -51,25 +51,37 @@ body {
     --tone-pressed: #429e45;
 }
 
-:is(.fs-bg-blue, .fs-bg-red, .fs-bg-yellow, .fs-bg-green) {
-    background-color: var(--tone) !important;
-    color: #fff !important;
+/* The colour classes are matched four times over: they have to win over Obsidian's own button rules (hover, tap) and
+   over the other rules of the plugin that set a colour, which is what marking them important used to do. The places that give
+   these a colour of their own match more often than that. Only the four colours below start with fs-bg- or fs-fg- */
+[class*="fs-bg-"][class*="fs-bg-"][class*="fs-bg-"][class*="fs-bg-"] {
+    background-color: var(--tone);
+    color: #fff;
 }
 
-:is(.fs-fg-blue, .fs-fg-red, .fs-fg-yellow, .fs-fg-green) {
-    color: var(--tone) !important;
+[class*="fs-fg-"][class*="fs-fg-"][class*="fs-fg-"][class*="fs-fg-"] {
+    color: var(--tone);
 }
 
 /* A button, or a count pill of a hovered deck row, is a little darker under the pointer */
-:is(.fs-bg-blue, .fs-bg-red, .fs-bg-yellow, .fs-bg-green) {
-    &.fs-response-button:hover,
-    .fs-deck-container .fs-tree-item-row:hover & {
-        background-color: var(--tone-pressed) !important;
-    }
+[class*="fs-bg-"][class*="fs-bg-"][class*="fs-bg-"][class*="fs-bg-"].fs-response-button:hover {
+    background-color: var(--tone-pressed);
 }
 
-.fs-is-hidden {
-    display: none !important;
+.fs-deck-container .fs-tree-item-row:hover [class*="fs-bg-"][class*="fs-bg-"] {
+    background-color: var(--tone-pressed);
+}
+
+/* The blue the cloze markup colours its spans with. Drawn cards carry it as a class instead of an inline style, so
+   that the Studio look can give it its own colour (see markdown-render.ts) */
+.fs-cloze-accent {
+    color: #2196f3;
+}
+
+/* Matched eight times over: this has to win over every rule that sets a display, which the most specific has seven
+   classes in */
+.fs-is-hidden.fs-is-hidden.fs-is-hidden.fs-is-hidden.fs-is-hidden.fs-is-hidden.fs-is-hidden.fs-is-hidden {
+    display: none;
 }
 
 .fs-centered {
@@ -126,7 +138,7 @@ body {
 /* Said to a screen reader and to nobody else */
 .fs-live-region {
     position: absolute;
-    clip-path: inset(50%);
+    clip: rect(0 0 0 0);
     overflow: hidden;
     white-space: nowrap;
     height: 1px;

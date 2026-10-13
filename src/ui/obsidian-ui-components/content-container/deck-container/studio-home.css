@@ -53,20 +53,24 @@
     padding: 0;
     align-items: center;
     border-radius: 50%;
-    color: var(--fs-text-2) !important;
     border: 1px solid var(--fs-border);
     box-shadow: var(--fs-shadow);
     width: 38px;
-    background-color: var(--fs-surface) !important;
     cursor: pointer;
 
     & svg {
         width: 18px;
         height: 18px;
     }
+}
+
+/* The class three times: Obsidian's button has hover and tap rules that a single one would not win over */
+.fs-studio .fs-round-button.fs-round-button.fs-round-button {
+    color: var(--fs-text-2);
+    background-color: var(--fs-surface);
 
     &:hover {
-        color: var(--fs-text) !important;
+        color: var(--fs-text);
     }
 }
 
@@ -333,10 +337,14 @@
     font-family: var(--fs-font);
     font-size: var(--fs-caption);
     font-weight: 650;
-    color: var(--fs-on-accent) !important;
-    background-color: var(--fs-accent) !important;
     box-shadow: 0 6px 14px -8px color-mix(in srgb, var(--fs-accent) 80%, transparent);
     cursor: pointer;
+}
+
+/* The class three times: Obsidian's button has hover and tap rules that a single one would not win over */
+.fs-studio .fs-home-study.fs-home-study.fs-home-study {
+    color: var(--fs-on-accent);
+    background-color: var(--fs-accent);
 }
 
 /* MARK: Phones */

@@ -16,8 +16,12 @@
 .fs-exam-view {
     display: flex;
     flex-direction: column;
-    padding: 0 !important;
     overflow: hidden;
+}
+
+/* The class three times: Obsidian pads a view with `.workspace-leaf-content .view-content` */
+.fs-exam-view.fs-exam-view.fs-exam-view {
+    padding: 0;
 }
 
 /* In the desktop shell, the exam takes the main area */
@@ -45,7 +49,6 @@
     min-height: 0;
     /* Clipped, not hidden: a hidden box can still be scrolled by a script, and the sheet waiting below the bottom edge
        would let a tap on an option scroll the whole exam upwards */
-    overflow: hidden;
     overflow: clip;
     background-color: var(--fs-bg);
     color: var(--fs-text);
@@ -1877,7 +1880,7 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
         cursor: pointer;
     }
 
-    &:has(input:focus-visible) {
+    &.is-focus-visible {
         outline: 2px solid var(--fs-accent);
         outline-offset: -2px;
     }
@@ -2049,13 +2052,13 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
         cursor: pointer;
     }
 
-    &:has(input:checked) {
+    &.is-checked {
         border-color: color-mix(in srgb, var(--fs-accent) 45%, transparent);
         background-color: var(--fs-accent-soft);
         color: var(--fs-accent);
     }
 
-    &:has(input:focus-visible) {
+    &.is-focus-visible {
         outline: 2px solid var(--fs-accent);
         outline-offset: 2px;
     }
@@ -2071,7 +2074,7 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     }
 }
 
-.fs-exam-chip:has(input:checked) .fs-exam-chip-tick {
+.fs-exam-chip.is-checked .fs-exam-chip-tick {
     display: inline-flex;
 }
 
@@ -2102,13 +2105,13 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
         cursor: pointer;
     }
 
-    &:has(input:checked) {
+    &.is-checked {
         border-color: var(--fs-accent);
         background-color: var(--fs-accent-soft);
         box-shadow: inset 0 0 0 1px var(--fs-accent);
     }
 
-    &:has(input:focus-visible) {
+    &.is-focus-visible {
         outline: 2px solid var(--fs-accent);
         outline-offset: 2px;
     }

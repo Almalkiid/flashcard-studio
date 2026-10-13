@@ -20,7 +20,6 @@
         .fs-tree-row-text {
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: var(--fs-ink-faint) !important;
             font-size: var(--font-ui-smaller);
             font-weight: var(--font-semibold);
         }
@@ -60,20 +59,10 @@
     .fs-tree-stats-count {
         &.tree-item-flair {
             font-variant-numeric: tabular-nums;
-            color: var(--fs-ink-muted) !important;
             font-weight: var(--font-semibold);
-            background: none !important;
             text-align: right;
             min-width: 2.6em;
             padding: 0;
-        }
-
-        &.fs-bg-green {
-            color: var(--color-green) !important;
-        }
-
-        &.fs-bg-blue {
-            color: var(--color-blue) !important;
         }
 
         &.fs-bg-red,
@@ -83,8 +72,37 @@
 
         &.fs-is-zero {
             font-weight: var(--font-normal);
-            color: var(--fs-ink-faint) !important;
             opacity: 0.6;
+        }
+    }
+}
+
+/* The colours of the headers and of the counts. The studio class is repeated three times, so that they win over the
+   colour classes of global.css and the white of the pills in deck-list.css, which is what marking them important used to do. */
+.fs-deck-container.fs-look-studio.fs-look-studio.fs-look-studio {
+    .fs-header-row {
+        .fs-tree-numbers-text,
+        .fs-tree-row-text {
+            color: var(--fs-ink-faint);
+        }
+    }
+
+    .fs-tree-stats-count {
+        &.tree-item-flair {
+            color: var(--fs-ink-muted);
+            background: none;
+        }
+
+        &.fs-bg-green {
+            color: var(--color-green);
+        }
+
+        &.fs-bg-blue {
+            color: var(--color-blue);
+        }
+
+        &.fs-is-zero {
+            color: var(--fs-ink-faint);
         }
     }
 }

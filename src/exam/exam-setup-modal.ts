@@ -20,6 +20,7 @@ import { t } from "src/lang/translate";
 import { deckMatches } from "src/stats/scope";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { readableDeckName } from "src/ui/design/deck-identity";
+import { markFocusVisible } from "src/ui/focus-visible";
 import { topLevelDecks } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
 import { formatDate, formatDuration } from "src/ui/statistics-view/format";
 
@@ -359,6 +360,7 @@ export class ExamSetupModal extends Modal {
                 this.refresh();
             });
             this.deckBoxes.set(row.path, box);
+            markFocusVisible(line, box);
             line.createSpan({ cls: "fs-exam-deck-check" });
             line.createSpan({ cls: "fs-exam-deck-line-name", text: row.name });
             line.createSpan({ cls: "fs-exam-deck-line-count", text: String(row.count) });
@@ -407,6 +409,7 @@ export class ExamSetupModal extends Modal {
         row.createSpan({ cls: "fs-exam-unit", text: t("EXAM_MINUTES") });
         const chip = row.createEl("label", { cls: "fs-exam-chip" });
         this.noLimitBox = chip.createEl("input", { attr: { type: "checkbox" } });
+        markFocusVisible(chip, this.noLimitBox);
         setIcon(chip.createSpan({ cls: "fs-exam-chip-tick" }), "check");
         chip.createSpan({ text: t("EXAM_NO_LIMIT") });
         this.noLimitBox.addEventListener("change", () => {
@@ -462,6 +465,7 @@ export class ExamSetupModal extends Modal {
             const radio = segment.createEl("input", {
                 attr: { type: "radio", name: "fs-exam-filter", value },
             });
+            markFocusVisible(segment, radio);
             const text = segment.createDiv({ cls: "fs-exam-segment-text" });
             text.createSpan({ cls: "fs-exam-segment-title", text: title });
             text.createSpan({ cls: "fs-exam-segment-desc", text: description });
@@ -569,8 +573,14 @@ export class ExamSetupModal extends Modal {
             this.minutesInput.disabled = !limited;
         }
         this.minutesInput?.closest(".fs-exam-stepper")?.toggleClass("is-disabled", !limited);
-        if (this.noLimitBox) this.noLimitBox.checked = !limited;
-        for (const [value, radio] of this.filterRadios) radio.checked = value === this.filter;
+        if (this.noLimitBox) {
+            this.noLimitBox.checked = !limited;
+            this.noLimitBox.parentElement?.toggleClass("is-checked", !limited);
+        }
+        for (const [value, radio] of this.filterRadios) {
+            radio.checked = value === this.filter;
+            radio.parentElement?.toggleClass("is-checked", radio.checked);
+        }
 
         if (!this.titleEdited) this.title = this.defaultTitle();
         if (this.titleInput && activeDocument.activeElement !== this.titleInput) {
