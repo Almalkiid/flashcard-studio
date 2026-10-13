@@ -2,6 +2,13 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.12.1]
+
+### Fixed
+
+- Updated the bundled `brace-expansion` library (through `minimatch`) to a version without the published advisory. Build and test tools were updated too.
+- The stylesheet follows Obsidian's plugin review rules: no `!important` and no `:has()` selectors, so themes and CSS snippets can override Flashcard Studio's styles more easily. Nothing looks different.
+
 ## [0.12.0]
 
 ### Changed

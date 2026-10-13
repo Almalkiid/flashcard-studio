@@ -1,7 +1,7 @@
 {
     "id": "flashcard-studio",
     "name": "Flashcard Studio",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "minAppVersion": "1.13.1",
     "description": "Turn notes into flashcards and review them with FSRS scheduling, daily limits, statistics and an exam mode, on desktop and mobile.",
     "author": "Almalkiid",
