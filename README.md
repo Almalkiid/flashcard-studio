@@ -208,11 +208,12 @@ These plain files make it easy for scripts or AI assistants to read your progres
 
 ## Installing
 
-Until Flashcard Studio is in the community plugin directory, install it with [BRAT](https://github.com/TfTHacker/obsidian42-brat):
+1. In Obsidian, open **Settings, Community plugins** and choose **Browse**.
+2. Search for **Flashcard Studio**, then choose **Install** and **Enable**.
 
-1. Install and enable **BRAT** from the community plugins.
-2. Run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/flashcard-studio`.
-3. Enable **Flashcard Studio** in the community plugins.
+Or open [Flashcard Studio in the community directory](https://community.obsidian.md/plugins/flashcard-studio) and choose **Install**.
+
+**Beta versions.** To try a release before it reaches the directory, install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from the community plugins, run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/flashcard-studio`.
 
 **Coming from Spaced Repetition?** Disable it and enable Flashcard Studio. Your cards and schedules work as they are. To keep your settings, use **Settings, Data, Import settings from Spaced Repetition**.
 
