@@ -7,6 +7,8 @@
   <img alt="Flashcard Studio on a phone: the home screen with the daily goal and a focus deck, a question, a session in progress with its answer-coloured progress bar, and the statistics" src="docs/media/hero-light.png">
 </picture>
 
+![Flashcard Studio on the desktop: a review with the side panel, a timed exam with its question map, and the image occlusion editor](docs/media/demo.gif)
+
 Flashcard Studio turns the Markdown you already write into spaced repetition flashcards, and schedules them with [FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm), the modern algorithm Anki uses. It keeps a full review history, so you can undo an answer and see how your memory is doing. Every card and every review stays in plain files in your vault, and it works the same on desktop and on your phone.
 
 > Flashcard Studio reads and writes the same note format as the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so your existing cards and schedules work unchanged, and you can switch back at any time. See [Compatibility and credits](#compatibility-and-credits).
