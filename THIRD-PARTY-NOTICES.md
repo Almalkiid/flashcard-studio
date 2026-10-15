@@ -1,7 +1,7 @@
 # Third-party notices
 
 Small parts of other projects that Flashcard Studio contains, with where they came from and under which licence.
-Only public-domain, MIT, Apache or BSD sources that are not Obsidian plugins are used this way.
+This file distinguishes embedded source attribution from packaged dependency notices.
 
 ## cyrb53
 
@@ -14,3 +14,11 @@ Only public-domain, MIT, Apache or BSD sources that are not Obsidian plugins are
 - **Used in:** `src/utils/hash.ts`. The mixing steps and constants are bryc's; the result is written as hexadecimal text.
   The output is stored in notes and Anki exports, so it must not change. `src/data/decks/walker.ts` has the same mixing
   as a number (`shuffleKey`), to put cards in a stable shuffle without building the text.
+
+## Dependency notice review
+
+The cyrb53 attribution above is not a complete inventory of bundled dependencies. Version 0.12.1 declares ankipack, chart.js, clozecraft, fflate, fzstd, minimatch, sql.js, ts-fsrs and ts-fsrs-optimizer as production dependencies. Transitive packages and bundled WebAssembly also need review.
+
+Before claiming that release licensing has been fully verified, inspect the exact lockfile-resolved packages, retain required copyright/license/NOTICE texts, and verify what the release bundle includes. Do not infer redistribution obligations solely from a package's SPDX label. This launch documentation change does not change the project's license or remove existing attribution.
+
+The installed production dependency inventory and available license texts are in [DEPENDENCY-LICENSES.md](DEPENDENCY-LICENSES.md). It includes BlueOak-1.0.0 for minimatch. The installed `@bufbuild/protobuf` package did not contain a top-level license file; its Apache-2.0 AND BSD-3-Clause notices still need to be resolved.
