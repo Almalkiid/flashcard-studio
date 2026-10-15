@@ -4,15 +4,15 @@ Flashcard Studio turns Markdown in your Obsidian vault into flashcards and sched
 
 ## Install
 
-Once Flashcard Studio is listed in Obsidian’s community plugin directory, install it from **Settings → Community plugins**, search for **Flashcard Studio**, then enable it.
+Requires **Obsidian 1.13.1 or later** on desktop or mobile.
 
-Until then, use BRAT:
+1. Open **Settings → Community plugins → Browse**.
+2. Search for **Flashcard Studio**, then choose **Install** and **Enable**.
+3. Or open the [community directory listing](https://community.obsidian.md/plugins/flashcard-studio).
 
-Until Flashcard Studio is listed in Obsidian's community plugin directory, install it with [BRAT](https://github.com/TfTHacker/obsidian42-brat):
+For beta releases only, use [BRAT](https://github.com/TfTHacker/obsidian42-brat) with `Almalkiid/flashcard-studio`.
 
-1. Install and enable BRAT from Community plugins.
-2. Run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/flashcard-studio`.
-3. Enable **Flashcard Studio**.
+Manual card creation and review are free and work offline. Optional AI generation sends your selected text to your configured provider and may incur provider fees. Directory listing does not imply manual review by Obsidian staff.
 
 ## Your first deck in five minutes
 
@@ -33,3 +33,5 @@ Add two more cards, then select the `#flashcards` deck from the picker. Use `?` 
 Disable the Spaced Repetition plugin, then enable Flashcard Studio. Existing card syntax and schedules remain usable. To copy settings, open **Settings → Data → Import from Spaced Repetition**.
 
 Next: learn the [card formats](writing-cards.md), then set up [decks](decks.md) and [scheduling](scheduling.md).
+
+For a guided exercise with basic, cloze and multiple-choice cards, use [Your first study session](first-session.md).

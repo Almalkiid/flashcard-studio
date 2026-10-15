@@ -4,7 +4,7 @@ Put `#flashcards` anywhere in a note, unless you use folders as decks. The defau
 
 ## One-line card
 
-```markdown
+```text
 What is the capital of France::Paris
 ```
 
@@ -12,7 +12,7 @@ What is the capital of France::Paris
 
 ## Reversed one-line card
 
-```markdown
+```text
 France:::Paris
 ```
 
@@ -22,10 +22,9 @@ France:::Paris
 
 Put `?` on a line by itself.
 
-```markdown
+```text
 What are the purposes of internal auditing?
 ?
-
 - Provide independent, objective assurance and consulting.
 - Add value and improve an organisation's operations.
 ```
@@ -38,19 +37,19 @@ In **Settings → Card formats**, you can change all four separators. Each separ
 
 ## Parser edge cases
 
-```markdown
+```text
 Question::Answer::with a second separator
 ```
 
 This is still an inline card; the parser uses the configured separator in the line. Put literal syntax in inline code when it is prose:
 
-```markdown
+```text
 What does `std::vector` store?::A resizable sequence
 ```
 
 An empty multi-line answer is rejected:
 
-```markdown
+```text
 Question
 ?
 ```
