@@ -2,6 +2,22 @@
 
 **Flashcards that live in your notes, with the scheduling and control you know from Anki, and a study screen made for focus.**
 
+[Install in Obsidian](https://community.obsidian.md/plugins/flashcard-studio) · [Get started](docs/docs/index.md) · [Documentation](docs/docs/index.md) · [Report a problem](https://github.com/Almalkiid/flashcard-studio/issues/new/choose)
+
+**Requires Obsidian 1.13.1 or later. Free, MIT licensed.** Manual card creation and review work offline; optional AI generation uses your chosen provider, which may charge separately. Community listing does not mean a manual security review by Obsidian staff.
+
+## Try your first card
+
+Install and enable **Flashcard Studio** in **Settings → Community plugins → Browse**. Create a note containing:
+
+```text
+#flashcards
+
+What does FSRS stand for::Free Spaced Repetition Scheduler
+```
+
+Run **Flashcard Studio: Review flashcards from all notes**, reveal the answer, then choose a rating. For more card types, follow the [starter walkthrough](docs/docs/first-session.md).
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/hero-dark.png">
   <img alt="Flashcard Studio on a phone: the home screen with the daily goal and a focus deck, a question, a session in progress with its answer-coloured progress bar, and the statistics" src="docs/media/hero-light.png">
@@ -11,7 +27,7 @@
 
 Flashcard Studio turns the Markdown you already write into spaced repetition flashcards, and schedules them with [FSRS](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm), the modern algorithm Anki uses. It keeps a full review history, so you can undo an answer and see how your memory is doing. Every card and every review stays in plain files in your vault, and it works the same on desktop and on your phone.
 
-> Flashcard Studio reads and writes the same note format as the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so your existing cards and schedules work unchanged, and you can switch back at any time. See [Compatibility and credits](#compatibility-and-credits).
+> Flashcard Studio reads and writes the same note format as the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so compatible existing cards and schedules can carry over; back up and test a copy of your vault before switching. See [Compatibility and credits](#compatibility-and-credits).
 
 ## Highlights
 
@@ -26,7 +42,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
 - **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI or a local model), look them over, and add only the ones you want.
 - **Bring your Anki decks.** Import `.apkg` and text files with their media and decks, and export back to Anki.
-- **Your data stays yours.** Cards and schedules are plain text in your notes, and the review history is plain files that sync between devices without conflicts.
+- **Your data stays yours.** Cards and schedules are plain text in your notes, and the review history uses separate files per device to reduce competing writes.
 - **Light and dark, desktop and phone.**
 
 <picture>
@@ -38,13 +54,12 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 
 Tag a note with `#flashcards`, or turn folders into decks in the settings. Then write cards in any of these styles:
 
-```markdown
+```text
 What is the capital of France::Paris
 Question and answer both ways:::Reversed card
 
 **What is the purpose of internal auditing?**
 ?
-
 - Provide independent, objective assurance and consulting
 - Add value and improve an organisation's operations
 
@@ -77,8 +92,7 @@ mode: hide-all
 question: Name the labelled chamber
 mask: a1 rect 0.1250 0.3000 0.1800 0.0950 | Left ventricle
 mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
-````
-
+```
 ````
 
 - Every mask is one card. Coordinates are fractions of the picture, so the masks fit it at any size.
@@ -95,15 +109,15 @@ mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
 
 Run **Flashcard Studio: Review flashcards from all notes** from the command palette, or click the ribbon icon. Rate each card **Again**, **Hard**, **Good** or **Easy**. After an answer, a toast shows when you will see the card again, with an **Undo** button.
 
-| Key | Action |
-| --- | --- |
-| Space or Enter | Show answer, then Good |
-| 1, 2, 3, 4 | Again, Hard, Good, Easy (Anki keys) |
-| Ctrl/Cmd + Z, or U | Undo last answer |
-| - | Bury until tomorrow |
-| @ | Suspend |
-| Ctrl/Cmd + 1 to 7 | Flag (red, orange, green, blue, pink, turquoise, purple) |
-| S | Skip |
+| Key                | Action                                                   |
+| ------------------ | -------------------------------------------------------- |
+| Space or Enter     | Show answer, then Good                                   |
+| 1, 2, 3, 4         | Again, Hard, Good, Easy (Anki keys)                      |
+| Ctrl/Cmd + Z, or U | Undo last answer                                         |
+| -                  | Bury until tomorrow                                      |
+| @                  | Suspend                                                  |
+| Ctrl/Cmd + 1 to 7  | Flag (red, orange, green, blue, pink, turquoise, purple) |
+| S                  | Skip                                                     |
 
 The number keys follow **Answer keys** in the settings. **Anki** (1 Again, 2 Hard, 3 Good, 4 Easy) is the default for new installs. **Original** (1 Hard, 2 Good, 3 Easy, 0 Reset the card) is the layout of the Spaced Repetition plugin, and existing installs keep it until you change the setting.
 
@@ -113,7 +127,7 @@ On a phone, the same actions are in the card menu.
 
 A card whose answer is a task list with at least two items, at least one of them checked, is a multiple choice card. No new syntax:
 
-```markdown
+```text
 Which body sets the internal audit charter?
 ?
 - [ ] The CAE
@@ -121,7 +135,7 @@ Which body sets the internal audit charter?
 - [ ] External auditors
 - [ ] Senior management
 Explanation: the board approves the charter (Standard 6.2).
-````
+```
 
 Lines after the list are the explanation, shown after you answer. Text before the list stays above the options. In the Spaced Repetition plugin this is an ordinary card, so your notes keep working there.
 
@@ -174,35 +188,16 @@ The results show your score against the pass mark, the time taken, the score of 
 
 Each exam is saved as one plain file in `Flashcard Studio/Exams/`, for example `2026-09-30 1405 exam.md`: a summary table, and one JSON line for each question. The setup lists your last five exams and starts from the last one, so a retake is one press of **Start exam**.
 
-## Compared with Spaced Repetition
+## Compatibility boundaries
 
-|                                                      | Spaced Repetition | Flashcard Studio |
-| ---------------------------------------------------- | ----------------- | ---------------- |
-| Cards written in plain Markdown                      | ✓                 | ✓                |
-| FSRS scheduling                                      | ✓                 | ✓                |
-| Works on iPhone, iPad and Android                    | ✓                 | ✓                |
-| Review history of every answer                       |                   | ✓                |
-| Undo last answer                                     |                   | ✓                |
-| Daily new card and review limits                     |                   | ✓                |
-| Suspend, bury and flag cards; leech detection        |                   | ✓                |
-| FSRS learning steps, learn ahead limit and optimizer |                   | ✓                |
-| Custom study (forgotten, ahead, preview, by deck)    |                   | ✓                |
-| Heatmap, true retention, study time and weak areas   |                   | ✓                |
-| Review mistakes after a session                      |                   | ✓                |
-| A desktop interface with a sidebar and a dashboard   |                   | ✓                |
-| Image occlusion cards                                |                   | ✓                |
-| Multiple choice cards                                |                   | ✓                |
-| Typed answers                                        |                   | ✓                |
-| Read aloud                                           |                   | ✓                |
-| Exams with a timer, a score and results to study     |                   | ✓                |
-| Cards written by your own AI provider                |                   | ✓                |
-| Import from and export to Anki                       |                   | ✓                |
-| Sync without conflicts across devices                |                   | ✓                |
+- **Spaced Repetition:** compatible note syntax and schedule comments are supported. Disable the other plugin before reviewing, back up the vault, and test representative cards before migrating. Flashcard Studio-specific features such as image occlusion do not become equivalent interactive cards in the other plugin.
+- **Anki:** imports and exports transfer supported card content and media, **not review schedules or review history**. Image-occlusion exports become basic cards; they do not retain interactive masks. Test a small deck first. See [import and export](docs/docs/import-export.md).
+- **Sync:** per-device review logs reduce competing writes, but schedules in shared notes can still conflict during concurrent use. See [data storage](docs/docs/data-storage.md).
 
 ## Where your data lives
 
 - **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the Spaced Repetition plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the Spaced Repetition plugin ignores.
-- **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
+- **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Separate log files reduce competing writes. Card schedules still live in shared notes: let syncing finish before switching devices, avoid reviewing the same note on two devices at once, and keep backups.
 - **Your exams** are in `Flashcard Studio/Exams/`, one Markdown file each. Like the review log, they are never read as cards. An exam in progress is kept in a file of its own in the plugin's folder (`exam-drafts/`, one file for each exam and device, named like the review log's files) until it is submitted or discarded, so it never touches your settings.
 - **Settings** are in the plugin's `data.json`.
 
@@ -217,7 +212,7 @@ Or open [Flashcard Studio in the community directory](https://community.obsidian
 
 **Beta versions.** To try a release before it reaches the directory, install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from the community plugins, run **BRAT: Add a beta plugin for testing** and enter `Almalkiid/flashcard-studio`.
 
-**Coming from Spaced Repetition?** Disable it and enable Flashcard Studio. Your cards and schedules work as they are. To keep your settings, use **Settings, Data, Import settings from Spaced Repetition**.
+**Coming from Spaced Repetition?** Disable it and enable Flashcard Studio. Back up your vault and test a copy of your cards and schedules first. To keep your settings, use **Settings, Data, Import settings from Spaced Repetition**.
 
 ## Network use
 
@@ -231,8 +226,12 @@ Flashcard Studio works offline. It makes a network request only in two cases:
 - Flashcard Studio reads and writes the note format of the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so cards and schedules you already have carry over.
 - The memory model is [FSRS](https://github.com/open-spaced-repetition/ts-fsrs), through the ts-fsrs library.
 
-All source code in this repository is original to Flashcard Studio, apart from the public-domain cyrb53 hash (by bryc), which card ids depend on. Third-party libraries are used as dependencies under their own licenses (see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
+The project's own license is MIT; third-party components retain their own terms. It uses the public-domain cyrb53 hash by bryc for content hashing and Anki export identifiers, and third-party dependencies under their own licenses. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for the documented attribution and [focused licensing review](docs/launch/licensing-review.md), including unresolved generated Anki code licensing and WebAssembly/distribution questions.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Feedback and support
+
+If you try it, tell us where creating or reviewing your first card became confusing. [Open an issue](https://github.com/Almalkiid/flashcard-studio/issues/new/choose) with the plugin version, Obsidian version, device, and a minimal example without private notes. If the project is useful to you, a GitHub star helps others discover it.
