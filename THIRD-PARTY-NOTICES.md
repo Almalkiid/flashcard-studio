@@ -21,4 +21,8 @@ The cyrb53 attribution above is not a complete inventory of bundled dependencies
 
 Before claiming that release licensing has been fully verified, inspect the exact lockfile-resolved packages, retain required copyright/license/NOTICE texts, and verify what the release bundle includes. Do not infer redistribution obligations solely from a package's SPDX label. This launch documentation change does not change the project's license or remove existing attribution.
 
-The installed production dependency inventory and available license texts are in [DEPENDENCY-LICENSES.md](DEPENDENCY-LICENSES.md). It includes BlueOak-1.0.0 for minimatch. The installed `@bufbuild/protobuf` package did not contain a top-level license file; its Apache-2.0 AND BSD-3-Clause notices still need to be resolved.
+The installed production dependency inventory and available license texts are in [DEPENDENCY-LICENSES.md](DEPENDENCY-LICENSES.md). It includes BlueOak-1.0.0 for minimatch. The installed `@bufbuild/protobuf` package did not contain a top-level license file; its upstream Apache license and the Google BSD notice from `wire/varint` are now reproduced there. Release delivery is still incomplete.
+
+## Focused review — 17 October 2026
+
+See [licensing-review.md](docs/launch/licensing-review.md) for artifact hashes, primary sources, covered notices and remaining gaps. [WASM-NOTICES.md](WASM-NOTICES.md) adds verified sql.js authors and Emscripten/musl texts without claiming complete binary coverage. The released bundle contains generated Anki descriptors with conflicting upstream MIT/AGPL statements; this requires resolution beyond attribution. Existing cyrb53 attribution and the project's MIT license are preserved.

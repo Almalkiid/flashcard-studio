@@ -226,7 +226,7 @@ Flashcard Studio works offline. It makes a network request only in two cases:
 - Flashcard Studio reads and writes the note format of the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so cards and schedules you already have carry over.
 - The memory model is [FSRS](https://github.com/open-spaced-repetition/ts-fsrs), through the ts-fsrs library.
 
-The project is distributed under MIT. It uses the public-domain cyrb53 hash by bryc for content hashing and Anki export identifiers, and third-party dependencies under their own licenses. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for the documented attribution and remaining dependency-notice review.
+The project's own license is MIT; third-party components retain their own terms. It uses the public-domain cyrb53 hash by bryc for content hashing and Anki export identifiers, and third-party dependencies under their own licenses. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for the documented attribution and [focused licensing review](docs/launch/licensing-review.md), including unresolved generated Anki code licensing and WebAssembly/distribution questions.
 
 ## License
 

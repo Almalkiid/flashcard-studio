@@ -2,21 +2,27 @@
 
 Generated from the installed lockfile-resolved production dependency set on 2026-10-15. License metadata is not a legal/provenance certification. These are the license files included in the installed packages; confirm bundled WebAssembly and transitive attribution before redistribution.
 
-| Package            | Version | Declared license              | Packaged license text              |
-| ------------------ | ------- | ----------------------------- | ---------------------------------- |
-| @bufbuild/protobuf | 2.15.0  | (Apache-2.0 AND BSD-3-Clause) | MISSING — resolve before clearance |
-| @kurkle/color      | 0.3.4   | MIT                           | Included below                     |
-| ankipack           | 0.3.1   | MIT                           | Included below                     |
-| balanced-match     | 4.0.4   | MIT                           | Included below                     |
-| brace-expansion    | 5.0.12  | MIT                           | Included below                     |
-| chart.js           | 4.5.1   | MIT                           | Included below                     |
-| clozecraft         | 0.4.0   | MIT                           | Included below                     |
-| fflate             | 0.8.3   | MIT                           | Included below                     |
-| fzstd              | 0.1.1   | MIT                           | Included below                     |
-| sql.js             | 1.14.2  | MIT                           | Included below                     |
-| ts-fsrs            | 5.4.2   | MIT                           | Included below                     |
-| minimatch          | 10.2.6  | BlueOak-1.0.0                 | Included below                     |
-| ts-fsrs-optimizer  | 0.1.2   | BSD-3-Clause                  | Included below                     |
+| Package            | Version | Declared license                                              | Packaged license text                                    |
+| ------------------ | ------- | ------------------------------------------------------------- | -------------------------------------------------------- |
+| @bufbuild/protobuf | 2.15.0  | (Apache-2.0 AND BSD-3-Clause)                                 | Apache + Google BSD text below; release delivery pending |
+| @kurkle/color      | 0.3.4   | MIT                                                           | Included below                                           |
+| ankipack           | 0.3.1   | MIT metadata; generated files carry AGPL-3.0-or-later headers | Included below                                           |
+| balanced-match     | 4.0.4   | MIT                                                           | Included below                                           |
+| brace-expansion    | 5.0.12  | MIT                                                           | Included below                                           |
+| chart.js           | 4.5.1   | MIT                                                           | Included below                                           |
+| clozecraft         | 0.4.0   | MIT                                                           | Included below                                           |
+| fflate             | 0.8.3   | MIT                                                           | Included below                                           |
+| fzstd              | 0.1.1   | MIT                                                           | Included below                                           |
+| sql.js             | 1.14.2  | MIT                                                           | Included below                                           |
+| ts-fsrs            | 5.4.2   | MIT                                                           | Included below                                           |
+| minimatch          | 10.2.6  | BlueOak-1.0.0                                                 | Included below                                           |
+| ts-fsrs-optimizer  | 0.1.2   | BSD-3-Clause                                                  | Included below                                           |
+
+## Review update — 17 October 2026
+
+All 12 previously collected package license texts were checked against a fresh, frozen-lockfile production installation and match (ignoring surrounding whitespace). The protobuf Apache text also matches its upstream tag. The absence of a top-level protobuf LICENSE does **not** mean the package lacks all notices: its distributed `dist/esm/wire/varint.js` and `dist/commonjs/wire/varint.js` retain Google's BSD notice.
+
+**Open findings:** ankipack's generated Anki files have conflicting license statements; the embedded sql.js binary includes an extension whose permission grant was not established; Emscripten/musl per-object coverage and delivery of notices with installed release files remain incomplete. See the [focused review](docs/launch/licensing-review.md) and [WebAssembly notices](WASM-NOTICES.md). Package-level SPDX labels are not a complete component inventory. The project's own MIT LICENSE remains unchanged.
 
 ## @kurkle/color — LICENSE.md
 
@@ -380,7 +386,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## @bufbuild/protobuf — upstream Apache license
 
-Retrieved from the version-specific primary source: https://raw.githubusercontent.com/bufbuild/protobuf-es/v2.15.0/LICENSE . Additional BSD-3-Clause attribution remains to be verified; this is not a complete clearance.
+Retrieved from the version-specific primary source: https://raw.githubusercontent.com/bufbuild/protobuf-es/v2.15.0/LICENSE . The text matches the upstream v2.15.0 LICENSE (ignoring surrounding whitespace). The Google BSD notice is reproduced separately below. Neither this collection nor the package metadata certifies release-distribution compliance.
 
 ```text
 Apache License
@@ -585,3 +591,53 @@ Apache License
    See the License for the specific language governing permissions and
    limitations under the License.
 ```
+
+## @bufbuild/protobuf — Google BSD notice for wire/varint
+
+Source: [v2.15.0 wire/varint.ts](https://github.com/bufbuild/protobuf-es/blob/f72f5295c853b7be8c0828f350e4f2803c8afdde/packages/protobuf/src/wire/varint.ts). The same header is present in the installed ESM and CJS files. This is a separate component license, not a choice to disregard Apache-2.0. No separate NOTICE file was found in the upstream tag or installed package.
+
+```text
+Copyright 2008 Google Inc.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+* Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Code generated by the Protocol Buffer compiler is owned by the owner
+of the input file used when generating it.  This code is not
+standalone and requires a support library to be linked with it.  This
+support library is itself covered by the above license.
+```
+
+## ankipack — retained generated-file attribution (unresolved terms)
+
+All nine `dist/generated/anki/*_pb.js` files in ankipack 0.3.1 carry this header:
+
+```text
+Copyright: Ankitects Pty Ltd and contributors
+License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+```
+
+Upstream [proto/LICENSE at v0.3.1](https://github.com/ImGajeed76/ankipack/blob/36d3bcc459f52f53eb47dd64a9b7e880ca47c4ba/proto/LICENSE) instead asserts that generated code and the package are MIT. This notice preserves the observed attribution; it does not resolve that conflict or establish a right to relicense the generated material. The MIT license reproduced above is retained. Do not treat adding this header or a license URL as resolving possible AGPL source/distribution obligations. See the focused review for the verified released-bundle evidence and required follow-up.
