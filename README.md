@@ -1,6 +1,6 @@
 # Flashcard Studio
 
-**Flashcards that live in your notes, with the scheduling and control you know from Anki, and a study screen made for focus.**
+**An Obsidian plugin for flashcards that live in your notes, with the scheduling and control you know from Anki, and a study screen made for focus.**
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/hero-dark.png">
