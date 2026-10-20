@@ -95,6 +95,7 @@ function isPressable(el: Element | null): boolean {
  * it to, takes the review keys, and hands every action back to the manager.
  */
 export default class CardContainer {
+    private static nextRegionId = 0;
     private readonly view: HTMLDivElement;
     private readonly toolbar: CardToolbarComponent;
     private readonly scroller: HTMLDivElement;
@@ -169,10 +170,17 @@ export default class CardContainer {
         });
         this.toolbar.setSpeakHandler(() => this.readAloud());
 
+        // Obsidian turns aria-label into a hover tooltip, which can cover the answer row.
+        // A referenced hidden label keeps the region named for screen readers without a tooltip.
+        const regionLabelId = `fs-card-region-${CardContainer.nextRegionId++}`;
+        this.view.createSpan({
+            text: t("A11Y_CARD_REGION"),
+            attr: { id: regionLabelId, hidden: "" },
+        });
         this.scroller = this.view.createDiv({ cls: "fs-scroll-wrapper" });
         this.content = this.scroller.createDiv({
             cls: "fs-content",
-            attr: { role: "region", "aria-label": t("A11Y_CARD_REGION") },
+            attr: { role: "region", "aria-labelledby": regionLabelId },
         });
         this.markdown = new CardMarkdown(app, this.content);
 

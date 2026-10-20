@@ -99,6 +99,42 @@ describe("review screen", function () {
         await setSetting("reviewLook", "studio");
     });
 
+    for (const look of ["classic", "studio"]) {
+        it(`${look}: hovering the card does not obscure review controls with a tooltip`, async function () {
+            if (await isMobile()) this.skip();
+            await setSetting("reviewLook", look);
+            try {
+                await openFirstCard();
+                const card = browser.$(".fs-view .fs-card-container .fs-content");
+                expect(await card.getComputedRole()).toBe("region");
+                expect(await card.getComputedLabel()).toBe("Flashcard");
+
+                // Hover near the bottom, where the old aria-label tooltip covered the answer row.
+                const hoverCard = async () => {
+                    const size = await card.getSize();
+                    await card.moveTo({ yOffset: Math.floor(size.height / 2) - 8 });
+                    // Obsidian creates tooltips after a delay; an immediate absence check would pass incorrectly.
+                    await browser.pause(1200);
+                    const tooltips = await browser.$$(".tooltip");
+                    for (const tooltip of tooltips) {
+                        expect(await tooltip.getText()).not.toBe("Flashcard");
+                    }
+                };
+                await hoverCard();
+                const reveal = browser.$(".fs-view .fs-show-answer-button");
+                await expect(reveal).toBeClickable();
+                await reveal.click();
+                await hoverCard();
+                for (const rating of ["again", "hard", "good", "easy"]) {
+                    await expect(browser.$(`.fs-view .fs-${rating}-button`)).toBeClickable();
+                }
+            } finally {
+                await browser.keys("Escape");
+                await setSetting("reviewLook", "studio");
+            }
+        });
+    }
+
     it("the phone layout follows Obsidian's Platform: raised toolbar buttons on a phone, plain icons on desktop", async function () {
         // Both capabilities must take their own branch, or this would check one side twice
         const phone = await isPhone();
