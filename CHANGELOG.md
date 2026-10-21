@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.12.2]
+
+### Fixed
+
+- Hovering over a card during review no longer shows a "Flashcard" tooltip that covered the answer buttons, in both the Classic and Studio looks. Screen readers still announce the card as "Flashcard". ([#2](https://github.com/Almalkiid/flashcard-studio/issues/2))
+
 ## [0.12.1]
 
 ### Fixed
