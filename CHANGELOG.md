@@ -2,6 +2,15 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.13.0]
+
+### Added
+
+- **Check meaning with AI** for typed answers ([#4](https://github.com/Almalkiid/flashcard-studio/issues/4)). Turn it on in Settings → Studying, under Type your answers. When a typed answer on a basic or reversed card does not match exactly, the AI provider you set up for card generation checks whether it means the same, and says "AI: same meaning", "AI: different meaning" or "AI could not decide" under the answer. On "same meaning" the suggested button moves to Good. You still choose the rating; the AI never rates for you.
+    - Off by default. Nothing is sent unless you turn it on; then only the question, the expected answer and your typed answer are sent.
+    - A changed number, a flipped "more than"/"less than", or a "not" on only one side can never count as the same meaning.
+    - The answer and the buttons show at once; the check runs beside them and gives up after 10 seconds. Cloze, image occlusion, multiple choice and exams keep the exact check.
+
 ## [0.12.2]
 
 ### Fixed
