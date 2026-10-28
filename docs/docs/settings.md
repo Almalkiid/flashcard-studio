@@ -147,7 +147,7 @@ Defaults are for a new install. “Shown when” names a condition that hides or
 | Model          | Exact model name sent to the provider.                   | `claude-sonnet-5-5` | Always            |
 | Server address | Base URL before `/chat/completions`.                     | Empty               | Compatible server |
 | API key        | Selects an Obsidian secret-storage key.                  | None                | Always            |
-| Privacy        | Explains that text is sent only after generation is run. | —                   | Always            |
+| Privacy        | Explains generation and optional typed-answer AI checks. | —                   | Always            |
 
 ## Data
 

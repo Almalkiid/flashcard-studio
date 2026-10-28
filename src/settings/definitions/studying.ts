@@ -6,10 +6,15 @@ import type {
 } from "obsidian";
 
 import { DEFAULT_SETTINGS } from "src/data/settings-model";
+import { t } from "src/lang/translate";
 import { SchedulerKind } from "src/scheduling/schedule/scheduler-kind";
 import type { SettingsContext } from "src/settings/context";
 import { bindKeys, restoreDefaultsButton } from "src/settings/definitions/helpers";
-import { nonEmptyError, wholeNumberError } from "src/settings/validators";
+import {
+    nonEmptyError,
+    typedAnswerEvaluationError,
+    wholeNumberError,
+} from "src/settings/validators";
 import { speechAvailable, VoiceWatcher } from "src/ui/speech";
 
 const LABEL_KEYS = [
@@ -295,6 +300,17 @@ export function studyingGroup(ctx: SettingsContext): SettingDefinitionItem[] {
             desc: "Type the answer to short cards and fill in cloze blanks. Enter checks it.",
             aliases: ["typing", "input"],
             control: { type: "toggle", key: "typeAnswers" },
+        },
+        {
+            name: t("AI_MEANING_SETTING"),
+            desc: t("AI_MEANING_SETTING_DESC"),
+            visible: () => ctx.settings.typeAnswers,
+            control: {
+                type: "dropdown",
+                key: "typedAnswerEvaluation",
+                options: { deterministic: t("AI_MEANING_OFF"), "ai-assisted": t("AI_MEANING_ON") },
+                validate: typedAnswerEvaluationError,
+            },
         },
         {
             name: "Ignore accents",

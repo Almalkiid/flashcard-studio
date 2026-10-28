@@ -1,3 +1,4 @@
+import { t } from "src/lang/translate";
 import { parseFsrsSteps, parseFsrsWeights } from "src/scheduling/fsrs/fsrs-settings";
 import { parseStartOfDay } from "src/utils/start-of-day";
 
@@ -111,4 +112,10 @@ export function normalizeVaultFolder(text: string, fallback: string): string {
         .replace(/\/{2,}/g, "/")
         .replace(/^\/+|\/+$/g, "");
     return path === "" ? fallback : path;
+}
+
+export function typedAnswerEvaluationError(value: unknown): string | undefined {
+    return value === "deterministic" || value === "ai-assisted"
+        ? undefined
+        : t("AI_MEANING_SETTING_INVALID");
 }

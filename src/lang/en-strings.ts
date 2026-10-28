@@ -179,6 +179,25 @@ const en = {
     TYPE_ANSWERS: "Type answers",
     TYPED_ANSWER_PLACEHOLDER: "Type the answer",
     TYPED_PRESS_ENTER: "Press Enter to check",
+    AI_MEANING_SETTING: "Check meaning with AI",
+    AI_MEANING_SETTING_DESC:
+        "Needs AI set up for card generation. Sends the question, expected answer and typed answer to that AI provider.",
+    AI_MEANING_OFF: "Off",
+    AI_MEANING_ON: "On",
+    AI_MEANING_SETTING_INVALID: "Choose deterministic or AI-assisted checking.",
+    AI_MEANING_CHECKING: "Checking meaning…",
+    AI_MEANING_EQUIVALENT: "AI: same meaning",
+    AI_MEANING_INCORRECT: "AI: different meaning",
+    AI_MEANING_UNCERTAIN: "AI could not decide",
+    AI_MEANING_UNAVAILABLE: "AI check unavailable — ${reason}",
+    AI_MEANING_SETUP: "Set up AI for card generation first.",
+    AI_MEANING_TIMEOUT: "The check took longer than 10 seconds.",
+    AI_MEANING_PROVIDER: "The AI provider could not complete the check.",
+    AI_MEANING_FORMAT: "The AI reply was incomplete or invalid.",
+    AI_MEANING_CHECKS_DISAGREE: "The meaning checks did not all agree.",
+    AI_PRIVACY_LABEL: "Privacy",
+    AI_PRIVACY_DESC:
+        "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal.",
     // Read aloud
     READ_ALOUD: "Read aloud",
     // End read aloud

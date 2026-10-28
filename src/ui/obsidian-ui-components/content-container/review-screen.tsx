@@ -567,6 +567,7 @@ export default class ContentManager {
         const currentQ = reviewSession.currentQuestion;
         if (currentCard === null) return;
 
+        this.cardPane.invalidateMeaningCheck();
         const previousState = this.ui.uiState;
         this.ui.setUIState(UIState.EditModal);
         // The review keys (skip, undo, grade) would act on the card behind the editor for the keys typed in it, so they
@@ -680,6 +681,7 @@ export default class ContentManager {
     public async _skipCurrentCard(): Promise<void> {
         await this._exclusive(async () => {
             if (!this._hasCardOnScreen) return;
+            this.cardPane.invalidateMeaningCheck();
             this.queueSeq?.skipCurrentCard();
             await this._advance();
         });
@@ -715,6 +717,7 @@ export default class ContentManager {
             ) {
                 return;
             }
+            this.cardPane.invalidateMeaningCheck();
             const durationMs: number = activeWindow.performance.now() - this.cardShownAt;
             await reviewSession.processReview(response, durationMs);
 
@@ -774,6 +777,7 @@ export default class ContentManager {
     public async _undoLastAnswer(): Promise<void> {
         await this._exclusive(async () => {
             if (this.queueSeq === null) return;
+            this.cardPane.invalidateMeaningCheck();
             this.cardPane.hideAnswerToast();
             const result: UndoResult = await this.queueSeq.undoLastAnswer();
             // The undone answer is no longer in the log, so the side panel reads it again

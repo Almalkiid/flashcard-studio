@@ -221,10 +221,11 @@ Or open [Flashcard Studio in the community directory](https://community.obsidian
 
 ## Network use
 
-Flashcard Studio works offline. It makes a network request only in two cases:
+Flashcard Studio works offline. It makes a network request only in three cases:
 
 - You turn on **Show update available status bar item** in the settings (it is off by default). Flashcard Studio then asks GitHub for the latest release of this repository, at most once a day while the status bar item is shown, and compares its version number with yours. The request carries no information about you or your notes.
 - You run **Generate cards with AI**, which sends the note or selection you chose, and your extra instructions, to the provider you set up in the settings. Nothing is sent until you choose **Generate**.
+- You turn on **Check meaning with AI** in the typed-answer settings (it is off by default). Then, when you reveal a typed answer on a basic or reversed card that does not match exactly, the question, the expected answer and your typed answer are sent to that same provider. Nothing else from the note is sent.
 
 ## Compatibility and credits
 
