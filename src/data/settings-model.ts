@@ -150,6 +150,7 @@ export interface StudioSettings {
     tagsToReview: string[];
     /** Type the answer to a card whose answer is short plain text, and fill in cloze blanks in the card. */
     typeAnswers: boolean;
+    typedAnswerEvaluation: "deterministic" | "ai-assisted";
     useCalloutsForSchedulingComments: boolean;
     useCustomHotkeys: boolean;
 }
@@ -267,6 +268,7 @@ export const DEFAULT_SETTINGS: StudioSettings = {
     startOfDay: "00:00:00",
     tagsToReview: ["#review"],
     typeAnswers: false,
+    typedAnswerEvaluation: "deterministic",
     useCalloutsForSchedulingComments: false,
     useCustomHotkeys: false,
 };
@@ -304,6 +306,11 @@ const REMINDER_SWITCHES = [
  * shape of the data, so running it again changes nothing. Values without a rule are not checked.
  */
 export function upgradeSettings(settings: StudioSettings): void {
+    // Meaning checks start off; any value other than AI-assisted is the local check.
+    if (settings.typedAnswerEvaluation !== "ai-assisted") {
+        settings.typedAnswerEvaluation = "deterministic";
+    }
+
     // The ribbon icon switch is gone
     if (settings.showRibbonIcon) settings.showRibbonIcon = undefined;
 

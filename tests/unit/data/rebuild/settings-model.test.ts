@@ -56,6 +56,7 @@ describe("upgradeSettings against the golden vectors (settings-upgrade.json)", (
         ...Object.keys(golden.cases[0].changes),
         "fsrsLoadBalance",
         "fsrsEasyDays",
+        "typedAnswerEvaluation",
     ]);
 
     test.each(golden.cases.map((c: UpgradeCase) => [c.name, c]))("%s", (_name, c: UpgradeCase) => {

@@ -1,5 +1,6 @@
 import { browser, expect } from "@wdio/globals";
 import * as fs from "fs";
+import * as http from "http";
 import { after, afterEach, before, beforeEach, describe, it } from "mocha";
 import * as path from "path";
 import { obsidianPage } from "wdio-obsidian-service";
@@ -651,6 +652,66 @@ describe("multiple choice cards and typed answers", function () {
         await screenshot("typed-answer", false);
         await setTheme(true);
         await screenshot("typed-answer", true);
+    });
+
+    it("checks the meaning of a different answer with AI and suggests Good when it is the same", async function () {
+        // A local OpenAI-compatible server that always grades the answer as the same meaning
+        let requests = 0;
+        const server = http.createServer((req, res) => {
+            req.resume();
+            req.on("end", () => {
+                requests++;
+                const grade = {
+                    verdict: "equivalent",
+                    reason: "Both name the head of the internal audit activity.",
+                    checks: {
+                        essentialFacts: "preserved",
+                        quantitiesAndUnits: "preserved",
+                        polarityAndConditions: "preserved",
+                        completeness: "complete",
+                    },
+                };
+                res.setHeader("content-type", "application/json");
+                res.end(
+                    JSON.stringify({ choices: [{ message: { content: JSON.stringify(grade) } }] }),
+                );
+            });
+        });
+        await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+        const port = (server.address() as { port: number }).port;
+        try {
+            await setSettings({
+                typeAnswers: true,
+                typedAnswerEvaluation: "ai-assisted",
+                aiProvider: "openai-compatible",
+                aiBaseUrl: `http://127.0.0.1:${port}/v1`,
+                aiModel: "test-model",
+                aiKeySecret: "",
+            });
+            await useNote(TYPED_NOTE);
+            await openTypedCard();
+
+            await typeAnswer("The head of internal audit");
+
+            const status = browser.$(`${CARD} .fs-typed-semantic`);
+            await status.waitForExist({ timeoutMsg: "no meaning check was shown" });
+            await browser.waitUntil(
+                async () =>
+                    ((await status.getProperty("textContent")) as string).startsWith(
+                        "AI: same meaning",
+                    ),
+                { timeout: 15000, timeoutMsg: "the meaning check never finished" },
+            );
+            expect(await suggestedRating()).toBe("good");
+            expect(requests).toBe(1);
+
+            await screenshot("typed-answer-ai", false);
+            await setTheme(true);
+            await screenshot("typed-answer-ai", true);
+        } finally {
+            await setSettings({ typedAnswerEvaluation: "deterministic", aiBaseUrl: "" });
+            server.close();
+        }
     });
 
     it("an exact answer, whatever its case, suggests Good", async function () {

@@ -20,6 +20,7 @@ const FLASHCARD_STUDIO_ONLY_KEYS: ReadonlySet<string> = new Set([
     "answerKeys",
     // Study modes
     "typeAnswers",
+    "typedAnswerEvaluation",
     "ignoreAccentsWhenTyping",
     "shuffleChoices",
     "readQuestionAloud",

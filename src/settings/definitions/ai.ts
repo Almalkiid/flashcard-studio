@@ -2,6 +2,7 @@ import { SecretComponent, type SettingDefinitionItem } from "obsidian";
 
 import type { AiProviderId } from "src/ai/ai-provider";
 import { DEFAULT_SETTINGS } from "src/data/settings-model";
+import { t } from "src/lang/translate";
 import type { SettingsContext } from "src/settings/context";
 import { bindKeys } from "src/settings/definitions/helpers";
 import { urlError } from "src/settings/validators";
@@ -69,8 +70,8 @@ export function aiGroup(ctx: SettingsContext): SettingDefinitionItem[] {
                     },
                 }),
                 {
-                    name: "Privacy",
-                    desc: "A note's text is sent to the provider only when you run the command to make cards.",
+                    name: t("AI_PRIVACY_LABEL"),
+                    desc: t("AI_PRIVACY_DESC"),
                 },
             ],
         },

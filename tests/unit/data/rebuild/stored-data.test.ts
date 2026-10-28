@@ -88,6 +88,8 @@ describe("loadData against the golden vectors (plugin-data.json)", () => {
         delete actual.settings.reviewOrder;
         delete actual.settings.fsrsLoadBalance;
         delete actual.settings.fsrsEasyDays;
+        expect(actual.settings.typedAnswerEvaluation).toBe("deterministic");
+        delete actual.settings.typedAnswerEvaluation;
         expect(actual).toEqual(expected);
     });
 });

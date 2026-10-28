@@ -115,6 +115,7 @@ describe("the group", () => {
             "Answer keys",
             "Button delay",
             "Type your answers",
+            "Check meaning with AI",
             "Ignore accents",
             "Shuffle choices",
             "Blanks as input fields",
@@ -142,6 +143,7 @@ describe("the group", () => {
                 "answerKeys",
                 "reviewButtonDelay",
                 "typeAnswers",
+                "typedAnswerEvaluation",
                 "ignoreAccentsWhenTyping",
                 "shuffleChoices",
                 "convertClozePatternsToInputs",
@@ -755,4 +757,14 @@ describe("the leeches page", () => {
             ["tag", "Mark it only"],
         ]);
     });
+});
+
+test("meaning checking is visible only when typing is on and validates its modes", () => {
+    const { items, settings } = build();
+    const row = findControl(items, "typedAnswerEvaluation");
+    settings.typeAnswers = false;
+    expect(truth(row.visible)).toBe(false);
+    settings.typeAnswers = true;
+    expect(truth(row.visible)).toBe(true);
+    expect(validateOf(row)("invalid" as never)).toBeDefined();
 });

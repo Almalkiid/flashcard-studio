@@ -1,5 +1,6 @@
 import { setIcon } from "obsidian";
 
+import type { SemanticOutcome } from "src/ai/typed-answer-grading";
 import { t } from "src/lang/translate";
 import { DiffPart, TypedComparison } from "src/scheduling/typed-answer";
 import { TextDirection } from "src/utils/text";
@@ -62,4 +63,28 @@ export function renderTypedResult(
     setIcon(box.createDiv({ cls: "fs-typed-arrow" }), "arrow-down");
     addParts(box.createDiv({ cls: "fs-typed-line fs-typed-expected" }), comparison.expected);
     return box;
+}
+
+export function renderSemanticStatus(el: HTMLElement, outcome: SemanticOutcome | null): void {
+    if (outcome === null) {
+        el.textContent = t("AI_MEANING_CHECKING");
+        return;
+    }
+    if (outcome.status === "unavailable") {
+        const reasons = {
+            setup: t("AI_MEANING_SETUP"),
+            timeout: t("AI_MEANING_TIMEOUT"),
+            provider: t("AI_MEANING_PROVIDER"),
+            format: t("AI_MEANING_FORMAT"),
+        };
+        el.textContent = t("AI_MEANING_UNAVAILABLE", { reason: reasons[outcome.reason] });
+        return;
+    }
+    const labels = {
+        equivalent: t("AI_MEANING_EQUIVALENT"),
+        incorrect: t("AI_MEANING_INCORRECT"),
+        uncertain: t("AI_MEANING_UNCERTAIN"),
+    };
+    const reason = outcome.grade.reason.replace(/\s+/g, " ").trim().slice(0, 200);
+    el.textContent = `${labels[outcome.grade.verdict]}${reason ? ` — ${reason}` : ""}`;
 }

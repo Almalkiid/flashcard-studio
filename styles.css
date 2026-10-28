@@ -5931,6 +5931,12 @@ body:not(.is-mobile) .fs-card-container.fs-keys-anki:not(.fs-custom-hotkeys) {
     height: 20px;
   }
 }
+.fs-card-container .fs-typed-semantic {
+  margin-top: 10px;
+  font-size: var(--font-ui-small);
+  line-height: 1.4;
+  color: var(--fsa-muted);
+}
 :is(.fs-card-container, .fs-exam) .fs-typed-ok {
   color: var(--fsa-green);
 }

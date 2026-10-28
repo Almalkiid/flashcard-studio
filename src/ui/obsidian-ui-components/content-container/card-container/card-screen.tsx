@@ -1,8 +1,10 @@
 import "src/ui/obsidian-ui-components/content-container/card-container/card-screen.css";
 import "src/ui/obsidian-ui-components/content-container/card-container/review-studio.css";
 import "src/ui/obsidian-ui-components/content-container/card-container/study-additions.css";
-import { App, Component, Platform, setIcon } from "obsidian";
+import { App, Component, Platform, requestUrl, setIcon } from "obsidian";
 
+import { gradeTypedAnswer } from "src/ai/typed-answer-grading";
+import { SemanticReveal } from "src/ai/typed-answer-reveal";
 import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType } from "src/data/data-structures/card/question";
 import {
@@ -40,6 +42,7 @@ import ContextSectionComponent from "src/ui/obsidian-ui-components/content-conta
 import ResponseSectionComponent from "src/ui/obsidian-ui-components/content-container/card-container/response-section/answer-row";
 import CardToolbarComponent from "src/ui/obsidian-ui-components/content-container/card-container/toolbar/card-toolbar";
 import {
+    renderSemanticStatus,
     renderTypedInput,
     renderTypedResult,
 } from "src/ui/obsidian-ui-components/content-container/card-container/typed-answer-view";
@@ -118,6 +121,9 @@ export default class CardContainer {
     private choiceComponent: Component | null = null;
     private typedInput: HTMLInputElement | null = null;
     private typedValue: string | null = null;
+    private readonly semanticReveal = new SemanticReveal();
+    /** The "Checking meaning…" line while its answer is still awaited. */
+    private pendingMeaningStatus: HTMLElement | null = null;
     private clozeInputs: HTMLInputElement[] = [];
     /** The menu's "Type answers" for this session; null follows the setting. */
     private typeAnswersOverride: boolean | null = null;
@@ -646,8 +652,16 @@ export default class CardContainer {
         };
     }
 
+    public invalidateMeaningCheck(): void {
+        this.semanticReveal.invalidate();
+        // Its answer will be ignored, so the line must not keep saying it is checking
+        this.pendingMeaningStatus?.remove();
+        this.pendingMeaningStatus = null;
+    }
+
     /** Forgets the choice and the typed answer of the card that was up. */
     private resetStudyAids(): void {
+        this.semanticReveal.reset();
         this.choice = null;
         this.choiceHandle = null;
         this.typedInput = null;
@@ -787,6 +801,8 @@ export default class CardContainer {
         settings: StudioSettings,
         scheduleFor: (response: ReviewResponse) => ScheduleState | null,
     ): Promise<void> {
+        const revealToken = this.semanticReveal.currentToken();
+        let checkMeaning: (() => void) | null = null;
         this.applyAppearance(settings);
         this.waiting = false;
         this.cardState = CardState.Back;
@@ -859,7 +875,70 @@ export default class CardContainer {
                     typedTarget,
                     settings.ignoreAccentsWhenTyping,
                 );
-                renderTypedResult(this.content, comparison, direction);
+                const result = renderTypedResult(this.content, comparison, direction);
+                if (
+                    [
+                        CardType.SingleLineBasic,
+                        CardType.SingleLineReversed,
+                        CardType.MultiLineBasic,
+                        CardType.MultiLineReversed,
+                    ].includes(questionType)
+                ) {
+                    const input = {
+                        question: session.cardData.currentCard?.front ?? "",
+                        // The answer as shown, without link targets, so hidden text cannot sway the check
+                        expected: typedTarget,
+                        typed: this.typedValue,
+                    };
+                    checkMeaning = () => {
+                        let status: HTMLElement;
+                        const started = this.semanticReveal.start(
+                            settings.typedAnswerEvaluation,
+                            comparison.exact,
+                            input.typed,
+                            () => {
+                                let key = "";
+                                try {
+                                    if (settings.aiKeySecret !== "")
+                                        key = (
+                                            this.app.secretStorage.getSecret(
+                                                settings.aiKeySecret,
+                                            ) ?? ""
+                                        ).trim();
+                                } catch {
+                                    /* Secret storage may be unavailable. */
+                                }
+                                return gradeTypedAnswer(
+                                    input,
+                                    {
+                                        provider: settings.aiProvider,
+                                        model: settings.aiModel,
+                                        baseUrl: settings.aiBaseUrl,
+                                    },
+                                    key,
+                                    (request) => requestUrl(request),
+                                );
+                            },
+                            (outcome) => {
+                                this.pendingMeaningStatus = null;
+                                renderSemanticStatus(status, outcome);
+                                if (
+                                    outcome.status === "graded" &&
+                                    outcome.grade.verdict === "equivalent"
+                                )
+                                    this.response.setSuggested(ReviewResponse.Good);
+                            },
+                        );
+                        if (started) {
+                            status = result.createDiv({
+                                cls: "fs-typed-semantic",
+                                attr: { role: "status" },
+                            });
+                            renderSemanticStatus(status, null);
+                            this.pendingMeaningStatus = status;
+                        }
+                    };
+                }
                 suggestion = comparison.exact ? ReviewResponse.Good : ReviewResponse.Again;
             } else if (!(await renderBack())) {
                 return;
@@ -903,6 +982,7 @@ export default class CardContainer {
 
         this.announce(this.answerMessage(defaultResponse, defaultSchedule));
         if (settings.readAnswerAloud) this.readAloud();
+        if (this.semanticReveal.isCurrent(revealToken)) checkMeaning?.();
     }
 
     private answerMessage(defaultResponse: ReviewResponse, schedule: ScheduleState | null): string {

@@ -742,7 +742,7 @@ describe("AI cards", () => {
         const row = findRow(build().items, "Privacy");
         expect(row).toEqual({
             name: "Privacy",
-            desc: "A note's text is sent to the provider only when you run the command to make cards.",
+            desc: "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal.",
         });
     });
 });
