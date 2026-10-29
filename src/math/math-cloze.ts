@@ -148,7 +148,7 @@ const clozeOf = (clozes: MathCloze[], answer: string | undefined): MathCloze | u
 
 const placeholder = (hint: string): string => {
     const shown = hint.trim();
-    return shown === "" ? "[\\ldots]" : `[\\text{${shown}}]`;
+    return shown === "" ? "[\\ldots]" : `[${shown}]`;
 };
 
 const colored = (colour: string, body: string): string => `{\\color{${colour}}{${body}}}`;
