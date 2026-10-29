@@ -1,0 +1,32 @@
+{
+    "observed_at": "2026-10-15T11:43:12.038517+00:00",
+    "repository": "Almalkiid/flashcard-studio",
+    "sources": {
+        "repository": "https://api.github.com/repos/Almalkiid/flashcard-studio",
+        "releases": "https://api.github.com/repos/Almalkiid/flashcard-studio/releases",
+        "issues": "https://api.github.com/repos/Almalkiid/flashcard-studio/issues?state=all",
+        "obsidian_downloads": "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugin-stats.json"
+    },
+    "stars": 0,
+    "forks": 0,
+    "target_stars": 100,
+    "open_issues": 0,
+    "closed_issues": 0,
+    "release_main_js_downloads": 28,
+    "release_breakdown": [
+        {
+            "tag": "0.12.1",
+            "main_js_downloads": 24
+        },
+        {
+            "tag": "0.12.0",
+            "main_js_downloads": 4
+        }
+    ],
+    "obsidian_reported_downloads": 24,
+    "unique_installations": null,
+    "traffic_views": null,
+    "traffic_clones": null,
+    "traffic_status": "not requested; owner access required",
+    "errors": []
+}

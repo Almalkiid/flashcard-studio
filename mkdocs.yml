@@ -19,6 +19,7 @@ markdown_extensions:
           alternate_style: true
 nav:
     - Getting started: index.md
+    - First study session: first-session.md
     - Writing cards:
           - Basic and reversed: writing-cards.md
           - Cloze and math: cloze.md
