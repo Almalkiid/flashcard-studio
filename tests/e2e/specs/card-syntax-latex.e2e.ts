@@ -294,4 +294,37 @@ describe("card syntax: clozes in LaTeX math", function () {
         });
         expect(readNote()).toMatch(/\n\$\$\n<!--SR:![^!>]*![^!>]*-->\n$/);
     });
+
+    it("shows a hint with TeX in it as math, and a plain hint as text, without a math error", async function () {
+        await setSettings({
+            latexClozes: true,
+            atomicClozes: false,
+            dailyLimitsEnabled: false,
+            flashcardTags: [TAG],
+        });
+        await useNote(
+            `${TAG}\n\n$$\n\\cloze[1]{x^2}{x^{?}} + \\cloze[1]{y}{spaced hint} = z\n$$\n`,
+        );
+
+        await openReview();
+        const button = browser.$(".fs-view .fs-card-container .fs-show-answer-button");
+        await button.waitForClickable({ timeoutMsg: "the math cloze card was not shown" });
+
+        const frontState = () =>
+            browser.execute(() => {
+                const content = document.querySelector(".fs-view .fs-card-container .fs-content");
+                return {
+                    math: content?.querySelectorAll("mjx-container").length ?? 0,
+                    mathError: content?.querySelector("mjx-merror") !== null,
+                    red: content?.innerHTML.includes("color: red") ?? true,
+                    html: content?.innerHTML.slice(0, 400) ?? "no content",
+                };
+            });
+        await browser.waitUntil(async () => (await frontState()).math > 0, {
+            timeoutMsg: `the math of the card front was never rendered: ${JSON.stringify(await frontState())}`,
+        });
+        const front = await frontState();
+        expect(front.mathError).toBe(false);
+        expect(front.red).toBe(false);
+    });
 });

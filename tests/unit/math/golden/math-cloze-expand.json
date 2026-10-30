@@ -367,7 +367,7 @@
    "settingOn": {
     "ok": [
      {
-      "front": "${\\color{#2196f3}{[\\text{a\\b}]}}$",
+      "front": "${\\color{#2196f3}{[a\\b]}}$",
       "back": "${\\color{#2196f3}{p}}$"
      }
     ]
@@ -378,7 +378,7 @@
    "inputsOn": {
     "ok": [
      {
-      "front": "${\\color{#2196f3}{[\\text{a\\b}]}}$",
+      "front": "${\\color{#2196f3}{[a\\b]}}$",
       "back": "${\\color{#2196f3}{p}}$"
      }
     ]
