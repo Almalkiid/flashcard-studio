@@ -146,9 +146,13 @@ const clozeOf = (clozes: MathCloze[], answer: string | undefined): MathCloze | u
     return index === null || index === undefined ? undefined : clozes[Number(index)];
 };
 
+/** A hint with an unescaped `^` or `_`, or a command such as `\frac`, is TeX; anything else is plain text. */
+const isTex = (hint: string): boolean => /(^|[^\\])(\\\\)*[_^]|\\[A-Za-z]/.test(hint);
+
 const placeholder = (hint: string): string => {
     const shown = hint.trim();
-    return shown === "" ? "[\\ldots]" : `[\\text{${shown}}]`;
+    if (shown === "") return "[\\ldots]";
+    return isTex(shown) ? `[${shown}]` : `[\\text{${shown}}]`;
 };
 
 const colored = (colour: string, body: string): string => `{\\color{${colour}}{${body}}}`;
