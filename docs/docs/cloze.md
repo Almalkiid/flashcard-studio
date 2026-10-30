@@ -22,7 +22,7 @@ $$
 $$
 ```
 
-The hint is optional. Use `\cloze[1]{answer}{hint}` to put deletions with the same sequence number on one card. When math clozes are enabled, normal cloze patterns are ignored inside math, so LaTeX braces stay ordinary math.
+The hint is optional. A hint is shown as plain text, unless it contains TeX: a `^`, a `_` or a command such as `\frac`. Then it is shown as math, like `\cloze{x^2}{x^{?}}`, so put any words in it inside `\text{…}`. Use `\cloze[1]{answer}{hint}` to put deletions with the same sequence number on one card. When math clozes are enabled, normal cloze patterns are ignored inside math, so LaTeX braces stay ordinary math.
 
 ## More accepted and rejected forms
 
