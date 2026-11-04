@@ -10,6 +10,6 @@ Configure the provider in **Settings → AI cards**:
 - **OpenAI** accepts an exact model name.
 - **Compatible server** accepts an OpenAI-compatible URL, such as `http://localhost:11434/v1` for Ollama.
 
-Select or create an API key in Obsidian's secret storage. The key is not kept in the plugin settings file. A local server usually needs no key. When you run generation, the selected note or selection and your instructions go to the configured provider. If you enable **Check meaning with AI** under the typed-answer settings, revealing a non-matching, non-empty typed answer on a basic or reversed text card also sends the question, expected answer and typed answer to that provider. This optional check needs AI set up, is off by default, and never submits a rating.
+Select or create an API key in Obsidian's secret storage. The key is not kept in the plugin settings file. A local server usually needs no key. When you run generation, the selected note or selection and your instructions go to the configured provider. If you enable **Check meaning with AI** under the typed-answer settings, revealing a non-matching, non-empty typed answer on a basic or reversed text card also sends the question, expected answer and typed answer to that provider. This optional check needs AI set up, is off by default, and never submits a rating. In an exam set up with **AI checks typed answers**, the same three are sent for each typed answer that does not match exactly, when you submit.
 
 ![AI card preview](../media/screenshots/ai-preview-light-desktop.png)

@@ -75,6 +75,17 @@ export function aiUsesInsecureHttp(settings: AiSettings): boolean {
     return host !== undefined && !["localhost", "127.0.0.1"].includes(host.toLowerCase());
 }
 
+/** Who requests go to, for the person: "Anthropic", "OpenAI", or the host of a compatible server. */
+export function aiProviderLabel(settings: AiSettings): string {
+    if (settings.provider === "anthropic") return t("AI_PROVIDER_ANTHROPIC");
+    if (settings.provider === "openai") return t("AI_PROVIDER_OPENAI");
+    try {
+        return new URL(settings.baseUrl.trim()).host;
+    } catch {
+        return t("AI_PROVIDER_COMPATIBLE");
+    }
+}
+
 /* eslint-disable camelcase -- the providers' request bodies use snake_case names */
 export function buildAiRequest(
     settings: AiSettings,

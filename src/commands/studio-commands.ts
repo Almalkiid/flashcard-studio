@@ -36,10 +36,16 @@ export function registerStudioCommands(plugin: FlashcardStudioPlugin): void {
     };
 
     /** A command on the active note: listed only while a markdown note is open and the plugin is ready. */
-    const noteAction = (id: string, name: string, run: (note: TFile) => unknown): void => {
+    const noteAction = (
+        id: string,
+        name: string,
+        run: (note: TFile) => unknown,
+        icon?: string,
+    ): void => {
         plugin.addCommand({
             id,
             name,
+            icon,
             checkCallback: (checking: boolean) => {
                 const note = activeNote();
                 if (note === null || !plugin.isInitialized) return false;
@@ -151,6 +157,12 @@ export function registerStudioCommands(plugin: FlashcardStudioPlugin): void {
     action("postpone-due-reviews", t("POSTPONE_REVIEWS"), () => openPostpone(plugin));
     action("export-revlog-csv", t("EXPORT_REVLOG_CSV"), () => exportRevlogCsv(plugin));
     action("fs-take-exam", t("DESKTOP_TAKE_EXAM"), () => ui().openExamSetup(), "clipboard-check");
+    noteAction(
+        "fs-take-exam-from-note",
+        t("EXAM_FROM_NOTE_CMD"),
+        (note) => ui().openExamFromNote(note),
+        "clipboard-check",
+    );
 
     // Anki import and export. The dialogs are loaded when a command runs, so that none of their code (nor sql.js and
     // ankipack behind them) is evaluated while the plugin starts.

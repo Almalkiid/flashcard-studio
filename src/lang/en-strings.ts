@@ -197,7 +197,7 @@ const en = {
     AI_MEANING_CHECKS_DISAGREE: "The meaning checks did not all agree.",
     AI_PRIVACY_LABEL: "Privacy",
     AI_PRIVACY_DESC:
-        "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal.",
+        "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal. In an exam with AI checks typed answers on, the same three are sent for each typed answer that does not match when you submit.",
     // Read aloud
     READ_ALOUD: "Read aloud",
     // End read aloud
@@ -804,6 +804,38 @@ const en = {
     EXAM_AVAILABLE_ONE: "1 question available",
     EXAM_AVAILABLE_FEWER_ONE: "Only 1 question is available: the exam will be shorter.",
     EXAM_SEE_RESULTS: "See results",
+    EXAM_FROM_NOTE_CMD: "Take an exam from this note",
+    EXAM_NOTE_NO_CARDS:
+        "This note has no cards an exam can ask. Cloze cards and suspended cards are never asked.",
+    EXAM_SOURCE: "Cards from",
+    EXAM_NOTES: "Notes",
+    EXAM_ADD_NOTE: "Add note",
+    EXAM_PICK_NOTE: "Choose a note with cards to ask",
+    EXAM_REMOVE_NOTE: "Remove ${name}",
+    EXAM_NOTE_QUESTIONS: "${count} questions",
+    EXAM_NOTE_QUESTIONS_ONE: "1 question",
+    EXAM_NONE_NOTES_EMPTY: "Add a note to take the exam from.",
+    EXAM_NONE_CHOICE_NOTES:
+        "There are no multiple choice cards in these notes. Choose All cards, or write a task list with one checked item under a question.",
+    EXAM_NONE_ALL_NOTES: "There are no cards to ask in these notes.",
+    EXAM_BY_NOTE: "By note",
+    EXAM_AI_CHECK: "AI checks typed answers",
+    EXAM_AI_CHECK_DESC:
+        "When you submit, each typed answer that does not match exactly is sent to ${provider} with its question and expected answer. An answer with the same meaning counts as right.",
+    EXAM_AI_CHECKING_TITLE: "Checking your typed answers",
+    EXAM_AI_CHECKING_PROGRESS: "${done} of ${total} checked",
+    EXAM_AI_CHECKING_SENT:
+        "Only the question, the expected answer and your typed answer are sent to ${provider}.",
+    EXAM_AI_SKIP: "Show results now",
+    EXAM_AI_SKIPPED: "The checks stopped before this answer.",
+    EXAM_AI_COUNTED_RIGHT: "counted as right",
+    EXAM_AI_ACCEPTED: "Accepted by AI",
+    EXAM_AI_ACCEPTED_COUNT: "${count} typed answers counted right by AI",
+    EXAM_AI_ACCEPTED_COUNT_ONE: "1 typed answer counted right by AI",
+    EXAM_AI_NOT_CHECKED:
+        "${count} typed answers could not be checked by AI and are marked by exact match",
+    EXAM_AI_NOT_CHECKED_ONE:
+        "1 typed answer could not be checked by AI and is marked by exact match",
     DECK_TITLE_COLUMN: "Title",
     ALL_DECKS: "All Decks",
     HIDDEN_BY_LIMIT: "${count} hidden by today's limit",

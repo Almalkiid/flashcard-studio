@@ -1,5 +1,6 @@
 import { App, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 
+import { meaningChecker } from "src/ai/ai-access";
 import { NotePickerModal } from "src/ai/note-picker-modal";
 import { openGenerateCards } from "src/ai/open-generate-cards";
 import { Card } from "src/data/data-structures/card/flashcard";
@@ -1029,6 +1030,8 @@ export default class ContentManager {
             save: (result) => saveExamResult(this.app, result),
             resume: start.resume,
             ...persistenceFor(this.plugin),
+            // Used only by an exam set up with AI checks
+            ai: meaningChecker(this.app, () => this.settings),
             // The results stay on screen until the session has cards to show
             onStudyMissed: (ids) => {
                 void this._startCustomStudy({ type: "cards", ids }, true, () => this._closeExam());
