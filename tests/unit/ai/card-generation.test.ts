@@ -4,6 +4,7 @@ import {
     capCards,
     checkCard,
     formatGeneratedCard,
+    formatGeneratedCards,
     freeFlashcardsNotePath,
     insertFlashcardsSection,
     linesToOptions,
@@ -659,6 +660,64 @@ describe("appendProblem", () => {
         const block = cards.map((c) => formatGeneratedCard(c, s)).join("\n\n");
         expect(parse(block, parserOptionsFromSettings(s)).length).toBeLessThan(3);
         expect(appendProblem(cards, s)).not.toBeNull();
+    });
+});
+
+// With an end marker and no start marker, a multi-line or cloze card goes on over a blank line, up to the next marker
+describe("writing cards with an end marker set", () => {
+    const s = { ...DEFAULT_SETTINGS, multilineCardEndMarker: "%%end%%" };
+    const note = "# Title\n\n## Flashcards\n\nOld::card\n\n## Next\n\nOther text, not a card.\n";
+    const texts = (text: string) => parse(text, parserOptionsFromSettings(s)).map((p) => p.text);
+
+    test("a multi-line or cloze card is closed with the marker, a one-line card needs none", () => {
+        expect(formatGeneratedCard({ kind: "basic", front: "Q", back: "A" }, s)).toBe("Q::A");
+        expect(formatGeneratedCard({ kind: "basic", front: "Q", back: "A\nB" }, s)).toBe(
+            "Q\n?\nA\nB\n%%end%%",
+        );
+        expect(
+            formatGeneratedCard({ kind: "cloze", front: "The {{answer}} is here", back: "" }, s),
+        ).toBe("The ==answer== is here\n%%end%%");
+    });
+
+    test("an appended card does not take in the section after the Flashcards one (reviewer's reproduction)", () => {
+        const cards = [
+            { kind: "basic" as const, front: "Line one\nline two", back: "Answer" },
+            { kind: "cloze" as const, front: "The {{answer}} is here", back: "" },
+            { kind: "reversed" as const, front: "Q", back: "A\nB" },
+            {
+                kind: "choice" as const,
+                front: "Pick",
+                back: "",
+                options: [
+                    { text: "a", correct: true },
+                    { text: "b", correct: false },
+                ],
+            },
+            { kind: "basic" as const, front: "Q2", back: "A2" },
+        ];
+        for (const one of cards) {
+            expect(writeProblem(one, s)).toBeNull();
+            expect(appendProblem([one], s)).toBeNull();
+            const written = insertFlashcardsSection(note, formatGeneratedCards([one], s), null);
+            expect(texts(written)).toEqual(["Old::card", texts(formatGeneratedCards([one], s))[0]]);
+            expect(written.endsWith("\n\n## Next\n\nOther text, not a card.\n")).toBe(true);
+        }
+        // All of them in one block: each card is its own, and the next section is nobody's
+        expect(appendProblem(cards, s)).toBeNull();
+        expect(texts(insertFlashcardsSection(note, formatGeneratedCards(cards, s), null))).toEqual([
+            "Old::card",
+            "Line one\nline two\n?\nAnswer",
+            "The ==answer== is here",
+            "Q\n??\nA\nB",
+            "Pick\n?\n- [x] a\n- [ ] b",
+            "Q2::A2",
+        ]);
+    });
+
+    test("a card with a line that is the marker is still refused", () => {
+        expect(
+            writeProblem({ kind: "basic", front: "Q", back: "A\n%%end%%\nB" }, s),
+        ).not.toBeNull();
     });
 });
 

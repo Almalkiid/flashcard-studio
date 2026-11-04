@@ -37,6 +37,7 @@ type SyntaxSettings = Pick<
     | "singleLineReversedCardSeparator"
     | "multilineCardSeparator"
     | "multilineReversedCardSeparator"
+    | "multilineCardEndMarker"
     | "clozePatterns"
 >;
 
@@ -275,9 +276,27 @@ function clozeEnds(patterns: string[]): [string, string] {
 
 /**
  * A card in the note's syntax. Text that would break the syntax is avoided: blank lines (they end a card), a
- * separator inside the text, and a single-line form for anything that needs two lines.
+ * separator inside the text, and a single-line form for anything that needs two lines. With an end marker set, a
+ * card that needs it is closed with it (see closeCard).
  */
 export function formatGeneratedCard(card: GeneratedCard, s: SyntaxSettings): string {
+    return closeCard(card, cardText(card, s), s);
+}
+
+/**
+ * The card's text with the end marker on a line after it, when one is set and the card is a multi-line or a cloze
+ * card. Such a card then goes on over blank lines up to a marker: without one of its own, it would take in whatever
+ * follows it in the note, such as the next section.
+ */
+function closeCard(card: GeneratedCard, text: string, s: SyntaxSettings): string {
+    const marker = s.multilineCardEndMarker;
+    return marker !== "" && (card.kind === "cloze" || text.includes("\n"))
+        ? `${text}\n${marker}`
+        : text;
+}
+
+/** The card in the note's syntax, without an end marker: the text the parser reads as the card. */
+function cardText(card: GeneratedCard, s: SyntaxSettings): string {
     const front = tidy(card.front);
     const back = tidy(card.back);
 
@@ -333,11 +352,12 @@ const plainAnswers: IClozeFormatter = {
 };
 
 /**
- * Whether the text of a card, read by the real parser and expanded the way the review screen does, is the card that
- * was meant: one question, of the type its form has, with the sides (or the cloze text) that were written.
+ * Whether the text of a card, read by the real parser (closed with the end marker, as it is written) and expanded the
+ * way the review screen does, is the card that was meant: one question, of the type its form has, with the sides (or
+ * the cloze text) that were written.
  */
 function readsBackAsCard(card: GeneratedCard, text: string, settings: StudioSettings): boolean {
-    const parsed = parse(text, parserOptionsFromSettings(settings));
+    const parsed = parse(closeCard(card, text, settings), parserOptionsFromSettings(settings));
     if (parsed.length !== 1 || parsed[0].text !== text) return false;
     const { cardType } = parsed[0];
     const front = tidy(card.front);
@@ -448,7 +468,7 @@ function explainWhy(card: GeneratedCard, text: string, settings: StudioSettings)
  * only `?`, a code fence that is never closed, a line that starts an HTML comment.
  */
 export function writeProblem(card: GeneratedCard, settings: StudioSettings): string | null {
-    const text = formatGeneratedCard(card, settings);
+    const text = cardText(card, settings);
     return readsBackAsCard(card, text, settings) ? null : explainWhy(card, text, settings);
 }
 
@@ -484,8 +504,11 @@ export function appendProblem(
         if (message !== null) return { index, message };
     }
 
-    const texts = cards.map((card) => formatGeneratedCard(card, settings));
-    const parsed = parse(texts.join("\n\n"), parserOptionsFromSettings(settings));
+    const texts = cards.map((card) => cardText(card, settings));
+    const parsed = parse(
+        formatGeneratedCards(cards, settings),
+        parserOptionsFromSettings(settings),
+    );
     if (parsed.length === texts.length && parsed.every((card, i) => card.text === texts[i])) {
         return null;
     }
