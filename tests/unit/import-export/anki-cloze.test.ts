@@ -51,6 +51,21 @@ describe("convertAnkiClozes", () => {
         expect(convertAnkiClozes("x {{c1::}} y")).toBe("x  y");
     });
 
+    test("labels an overlapping cloze up to its own highest number", () => {
+        expect(convertAnkiClozes("{{c1::A}} {{c1,3::B}}")).toBe("{{a;;A}} {{asa;;B}}");
+        expect(convertAnkiClozes("{{c1,500::x}}")).toBe(`{{a${"s".repeat(498)}a;;x}}`);
+    });
+
+    test("leaves text with a cloze number no note has, so a crafted file cannot make the import hang", () => {
+        expect(convertAnkiClozes("{{c501::x}}")).toBeNull();
+        expect(convertAnkiClozes("{{c1,501::x}}")).toBeNull();
+        expect(convertAnkiClozes("{{c1::{{c501::x}}}}")).toBeNull();
+        expect(convertAnkiClozes("{{c99999999999999999999::x}}")).toBeNull();
+        const start = Date.now();
+        expect(convertAnkiClozes("{{c1,1000000::x}}".repeat(100))).toBeNull();
+        expect(Date.now() - start).toBeLessThan(1000);
+    });
+
     test("the converted text is read as a cloze card by the parser, the original is not", () => {
         const options = {
             singleLineCardSeparator: "::",
