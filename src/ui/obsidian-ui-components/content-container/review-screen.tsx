@@ -787,6 +787,8 @@ export default class ContentManager {
             if (this.queueSeq === null) return;
             this.cardPane.invalidateMeaningCheck();
             this.cardPane.hideAnswerToast();
+            // The answer about to be taken back: the queue takes the last record of the history this screen shares
+            const undoing = this.undoHistory.peek();
             const result: UndoResult = await this.queueSeq.undoLastAnswer();
             // The undone answer is no longer in the log, so the side panel reads it again
             this.panelLog = null;
@@ -809,8 +811,12 @@ export default class ContentManager {
                     }
                     return;
                 case UndoResult.Requeued:
-                    this.sessionAnswers.pop();
-                    this.cardPane.setSessionAnswers(this.sessionAnswers);
+                    // A Reset (rating 0) was not counted among the session's answers (see _processReview), so taking
+                    // one back leaves them as they are
+                    if (undoing?.entry.r !== 0) {
+                        this.sessionAnswers.pop();
+                        this.cardPane.setSessionAnswers(this.sessionAnswers);
+                    }
                     this._cancelResume();
                     await this._advance();
                     // Undoing from the summary brings the card back where the deck list was drawn over it; a review

@@ -338,3 +338,39 @@ describe("a session started from the waiting screen", () => {
         expect(cardPane.setSessionAnswers).toHaveBeenLastCalledWith([ReviewResponse.Again]);
     });
 });
+
+describe("undo", () => {
+    // The bug: a Reset is not one of the session's answers (the progress bar and the side panel leave it out), but
+    // undoing it took the last answer off them all the same: here the Good of the first card, which still stands.
+    test("taking back a Reset leaves the session's answers as they are", async () => {
+        const { cm, note, cardPane } = await setUp(
+            `#flashcards QA::A <!--SR:${DUE_REVIEW}-->\n\n#flashcards QB::B <!--SR:${DUE_REVIEW}-->\n`,
+        );
+        await cm.open();
+        await cm._showAnswer();
+        await cm._processReview(ReviewResponse.Good);
+        await cm._showAnswer();
+        await cm._processReview(ReviewResponse.Reset);
+        expect(note.log.entries.map((entry) => entry.r)).toEqual([3, 0]);
+
+        await cm.cardActions.undo();
+
+        expect(note.log.entries.map((entry) => entry.r)).toEqual([3]);
+        expect(cardPane.setSessionAnswers).toHaveBeenLastCalledWith([ReviewResponse.Good]);
+    });
+
+    test("taking back an answer takes it off the session's answers", async () => {
+        const { cm, cardPane } = await setUp(
+            `#flashcards QA::A <!--SR:${DUE_REVIEW}-->\n\n#flashcards QB::B <!--SR:${DUE_REVIEW}-->\n`,
+        );
+        await cm.open();
+        await cm._showAnswer();
+        await cm._processReview(ReviewResponse.Good);
+        await cm._showAnswer();
+        await cm._processReview(ReviewResponse.Hard);
+
+        await cm.cardActions.undo();
+
+        expect(cardPane.setSessionAnswers).toHaveBeenLastCalledWith([ReviewResponse.Good]);
+    });
+});

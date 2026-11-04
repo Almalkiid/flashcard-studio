@@ -37,6 +37,11 @@ export class UndoHistory<T> {
         return this.records.pop();
     }
 
+    /** The record `pop` would take next, left where it is. */
+    peek(): T | undefined {
+        return this.records[this.records.length - 1];
+    }
+
     clear(): void {
         this.records.splice(0);
     }
