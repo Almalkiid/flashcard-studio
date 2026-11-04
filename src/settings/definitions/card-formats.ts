@@ -138,7 +138,7 @@ function clozePatternsPage(ctx: SettingsContext): SettingDefinitionPage {
     return {
         type: "page",
         name: "Cloze patterns",
-        desc: "Write answer where the hidden text goes, and hint where an optional hint goes.",
+        desc: "Write answer where the hidden text goes, [123;;] where the cloze number goes, and [;;hint] where an optional hint goes.",
         displayValue: () => {
             const count = distinctEntries(ctx.settings.clozePatterns).length;
             if (count === 0) return "None";

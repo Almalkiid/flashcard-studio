@@ -17,12 +17,14 @@ import { trapTab } from "src/exam/exam-dom";
 import { ExamDraft } from "src/exam/exam-draft";
 import { renderDraftRows } from "src/exam/exam-resume";
 import { t } from "src/lang/translate";
+import { daysAgo } from "src/stats/day-keys";
 import { deckMatches } from "src/stats/scope";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { readableDeckName } from "src/ui/design/deck-identity";
 import { markFocusVisible } from "src/ui/focus-visible";
 import { topLevelDecks } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
 import { formatDate, formatDuration } from "src/ui/statistics-view/format";
+import { currentDayKeyFn } from "src/ui/statistics-view/stats-data";
 
 const MIN_COUNT = 1;
 const MAX_COUNT = 500;
@@ -43,7 +45,7 @@ interface DeckRow {
 }
 
 function whenText(ms: number): string {
-    const days = Math.floor((Date.now() - ms) / 86_400_000);
+    const days = daysAgo(ms, Date.now(), currentDayKeyFn());
     if (days <= 0) return t("DESKTOP_WHEN_TODAY");
     if (days === 1) return t("DESKTOP_WHEN_YESTERDAY");
     return formatDate(ms);
@@ -235,12 +237,12 @@ export class ExamSetupModal extends Modal {
     /** `Exam · CIA` for the decks chosen, or `Exam` for all of them. */
     private defaultTitle(): string {
         const top = this.rows.filter((row) => row.depth === 0);
+        // Worked out once: it costs a pass over the chosen decks for each of them
+        const selected = new Set(this.selectedDecks());
         const names =
-            this.selectedDecks().length === 0
+            selected.size === 0
                 ? top.map((row) => row.name)
-                : this.rows
-                      .filter((row) => this.selectedDecks().includes(row.path))
-                      .map((row) => row.name);
+                : this.rows.filter((row) => selected.has(row.path)).map((row) => row.name);
         return names.length === 0
             ? t("EXAM_DEFAULT_TITLE_ALL")
             : t("EXAM_DEFAULT_TITLE", { decks: joinDeckNames(names) });

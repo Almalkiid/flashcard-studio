@@ -169,21 +169,35 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
     const isClozeLine = (at: number) =>
         clozecrafter.isClozeNote(textOnlyLines[at]) ||
         (options.latexClozes === true && containsMathCloze(lines[at]));
-    const paragraphFirst = (at: number) => {
-        while (at > 0 && !endsParagraph(lines[at - 1])) at--;
-        return at;
-    };
-    const paragraphLast = (at: number) => {
-        while (at + 1 < lines.length && !endsParagraph(lines[at + 1])) at++;
-        return at;
+    // What atomic clozes need to know of the paragraph around a line, worked out for every line in one pass the first
+    // time it is asked for: reading the paragraph again for each of its cloze lines is quadratic in a long list.
+    // `last` is the last line of the line's paragraph, `openBefore` the line of a display math block that is still
+    // open above it in its paragraph (-1 for none)
+    let paragraphs: { last: number[]; openBefore: number[] } | null = null;
+    const paragraphInfo = () => {
+        if (paragraphs !== null) return paragraphs;
+        const last = new Array<number>(lines.length);
+        for (let line = lines.length - 1; line >= 0; line--) {
+            last[line] =
+                line + 1 < lines.length && !endsParagraph(lines[line + 1]) ? last[line + 1] : line;
+        }
+        const openBefore = new Array<number>(lines.length);
+        for (let line = 0; line < lines.length; line++) {
+            let opener = -1;
+            if (line > 0 && !endsParagraph(lines[line - 1])) {
+                opener = openBefore[line - 1];
+                for (let count = countDisplayMathDelimiters(lines[line - 1]); count > 0; count--)
+                    opener = opener === -1 ? line - 1 : -1;
+            }
+            openBefore[line] = opener;
+        }
+        paragraphs = { last, openBefore };
+        return paragraphs;
     };
     const atomicRange = (at: number): [number, number] | null => {
-        const end = paragraphLast(at);
-        let opener = -1;
-        for (let line = paragraphFirst(at); line < at; line++) {
-            for (let count = countDisplayMathDelimiters(lines[line]); count > 0; count--)
-                opener = opener === -1 ? line : -1;
-        }
+        const { last, openBefore } = paragraphInfo();
+        const end = last[at];
+        let opener = openBefore[at];
         const start = opener === -1 ? at : opener;
         for (let count = countDisplayMathDelimiters(lines[at]); count > 0; count--)
             opener = opener === -1 ? at : -1;
@@ -198,32 +212,49 @@ export function parse(text: string, options: ParserOptions): ParsedQuestionInfo[
                 if (countDisplayMathDelimiters(lines[line]) % 2 === 1) return line;
         return last;
     };
+    // Whether a line keeps the paragraph it is in one card: a multi-line separator, or a schedule comment that is not
+    // the atomic cloze's above it (no cloze there, or more entries than it has cards). It depends on the line only
+    const keepsParagraph = (line: number) => {
+        const trimmed = lines[line].trim();
+        if (
+            trimmed === options.multilineCardSeparator ||
+            trimmed === options.multilineReversedCardSeparator
+        )
+            return true;
+        if (!lines[line].startsWith("<!--SR:")) return false;
+        const first = atomicCardStart(line - 1);
+        const cardsInAtomic =
+            createClozeNote(
+                lines.slice(first, line).join("\n"),
+                options.clozePatterns,
+                options.latexClozes === true,
+                { asking: () => "", showingAnswer: () => "", hiding: () => "" },
+            ).note?.numCards ?? 0;
+        return (
+            !lines.slice(first, line).some((_value, at) => isClozeLine(first + at)) ||
+            cardsInAtomic < parseCommentMeta(lines[line]).length
+        );
+    };
+    // For a line, the first line from it to the end of its paragraph that keeps the paragraph one card (-1 for none).
+    // Every cloze line of a paragraph asks about the lines below it, so each line is looked at once and remembered
+    const keeperFrom = new Map<number, number>();
     const mustStayParagraph = (end: number) => {
-        const last = paragraphLast(end);
-        for (let line = end + 1; line <= last; line++) {
-            const trimmed = lines[line].trim();
-            if (
-                trimmed === options.multilineCardSeparator ||
-                trimmed === options.multilineReversedCardSeparator
-            )
-                return true;
-            if (lines[line].startsWith("<!--SR:")) {
-                const first = atomicCardStart(line - 1);
-                const cardsInAtomic =
-                    createClozeNote(
-                        lines.slice(first, line).join("\n"),
-                        options.clozePatterns,
-                        options.latexClozes === true,
-                        { asking: () => "", showingAnswer: () => "", hiding: () => "" },
-                    ).note?.numCards ?? 0;
-                if (
-                    !lines.slice(first, line).some((_value, at) => isClozeLine(first + at)) ||
-                    cardsInAtomic < parseCommentMeta(lines[line]).length
-                )
-                    return true;
+        const seen: number[] = [];
+        let keeper = -1;
+        for (let line = end + 1; line < lines.length && !endsParagraph(lines[line]); line++) {
+            const known = keeperFrom.get(line);
+            if (known !== undefined) {
+                keeper = known;
+                break;
+            }
+            seen.push(line);
+            if (keepsParagraph(line)) {
+                keeper = line;
+                break;
             }
         }
-        return false;
+        for (const line of seen) keeperFrom.set(line, keeper);
+        return keeper !== -1;
     };
 
     for (let index = 0; index < lines.length; index++) {

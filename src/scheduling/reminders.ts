@@ -115,15 +115,17 @@ export class ReminderManager {
         const newAllowed = limits.remainingNew() > 0;
         const reviewsAllowed = limits.remainingReviews() > 0;
         const cards = new Set(deck.getFlattenedReviewItemArray(ReviewItemState.AnyItem, true));
+        // Learning cards, and cards already paid for today, are never held back (as in the review session)
         return [...cards].filter(
             (card) =>
-                (!card.isNew && !isReviewCard(card.scheduleInfo)) ||
+                (!card.isNew &&
+                    (!isReviewCard(card.scheduleInfo) || limits.countedToday(card.meta.id))) ||
                 (card.isNew ? newAllowed : reviewsAllowed),
         ).length;
     }
 
     private async todayLimits(): Promise<DailyLimits> {
-        const dayStartMs = globalDateProvider.today.valueOf();
+        const dayStartMs = globalDateProvider.studyDayStartMs;
         const nowMs = globalDateProvider.now.valueOf();
         const entries = await this.dataManager.reviewLog.readMonths(
             monthsCovering(dayStartMs, nowMs),

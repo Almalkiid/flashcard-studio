@@ -73,6 +73,27 @@ describe("weakAreas", () => {
         expect(deck.due).toEqual(1);
     });
 
+    test("an SM-2 card is not due before its date's study day has begun", () => {
+        // 02:00 on the 30th with a 04:00 boundary is still the 29th's study day
+        const fourAm = makeDayKeyFn(4 * 3600 * 1000);
+        const now = new Date(2026, 8, 30, 2).getTime();
+        const sm2 = (id: string, day: number) =>
+            statsCard({
+                id,
+                decks: ["Deck"],
+                isFsrs: false,
+                dueMs: new Date(2026, 8, day).getTime(),
+            });
+        const cards = [
+            sm2("today", 29),
+            sm2("tomorrow", 30),
+            statsCard({ id: "fsrs", decks: ["Deck"], dueMs: now - 3600 * 1000 }),
+        ];
+        const entries = answers("Deck", 10, 7);
+        const [deck] = weakAreas(entries, cards, TODAY, fourAm, now).decks;
+        expect(deck.due).toEqual(2);
+    });
+
     test("has nothing to rank without answers", () => {
         expect(weakAreas([], [], TODAY, dayKeyOf, NOW)).toEqual({
             decks: [],

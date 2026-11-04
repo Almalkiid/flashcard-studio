@@ -2,6 +2,62 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [Unreleased]
+
+### Fixed
+
+**Studying and scheduling**
+
+- Daily limits count from your start of day, not from midnight. With a 04:00 start, cards studied at 01:00 no longer use up the next day's limit. The reminders and custom study's "forgotten in the last days" count the same way.
+- With SM-2, a new card answered Again no longer uses a review from the daily review limit, and is no longer dropped from the session when the review limit is reached. With the "Any card from any deck" order it now comes back before the session ends.
+- Undo with "Bury sibling cards" on puts the siblings back in the session.
+- FSRS load balancing keeps Hard before Good and Good before Easy; they could get the same day.
+- The FSRS optimizer leaves out cards whose history does not start with their first answer, such as cards carried over from the Spaced Repetition plugin. They made the first intervals of new cards far too long.
+- Settings that sync in from another device while Obsidian starts are applied. A synced settings change no longer makes new SM-2 cards ignore the ease of their note.
+
+**Review screen**
+
+- Closing a review while it reloads (after **Review mistakes**, or an undo that reloads) no longer leaves a hidden session that takes the keys of later reviews.
+- Starting a session from the waiting screen no longer leaves the new card unanswerable.
+- After editing a multiple choice card on its answer side, the answer key and explanation shown are the edited ones.
+- Undoing a reset no longer removes another answer from the session's progress and counts.
+- The status bar counts a card that is in two decks once.
+
+**Editing cards and notes**
+
+- The edit dialog keeps the indentation of the answer, so code blocks and nested lists survive a save, and **Save** without a change writes nothing.
+- The edit dialog no longer saves line breaks that the note would read as another card. It says why instead.
+- Saving an image occlusion after an empty card-metadata callout no longer deletes or changes text further down the note.
+- With folders as decks, answering a card keeps the tag in front of its question.
+- Deleting scheduling data with its tags removes only those tags: deleting `#review` no longer also removes `#reviewed`.
+
+**Settings**
+
+- A cloze pattern the plugin cannot read, such as `{{answer}}`, is refused with a message saying what it needs. One saved before is dropped when the settings load, so the vault scan no longer fails on every start.
+- Importing settings from Spaced Repetition keeps its hidden file-menu items, its random card order and its old cloze switches.
+
+**Statistics and exams**
+
+- With a start of day other than midnight, the forecast no longer shows SM-2 cards a day early.
+- Closing Statistics while it loads no longer leaves its charts running.
+- Closing the FSRS optimizer while it loads no longer freezes Obsidian for the whole optimization.
+- The exam setup no longer slows down with every click when there are many decks.
+- **Last exam** on the home shows the newest exam when two end in the same minute, and "today" and "yesterday" in the exam lists follow the day, not 24 hours.
+- A double click on **Apply** in custom study raises the limit once.
+
+**Import and AI**
+
+- Importing a package with thousands of media files is much faster.
+- With the single-line style, a basic note whose front ends with `:` is no longer turned into a reversed pair.
+- Anki decks whose names differ only in symbols, such as C, C++ and C#, stay separate decks.
+- A note with a cloze number above 500 is skipped instead of freezing the import.
+- Long lists of atomic clozes are read quickly again: 2,000 lines took 17 seconds.
+- With an end marker and no start marker, generated multi-line and cloze cards are written with the end marker, so they no longer take in the next section of the note.
+
+### Security
+
+- Updated `minimatch` to 11 for [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249).
+
 ## [0.13.0]
 
 ### Added

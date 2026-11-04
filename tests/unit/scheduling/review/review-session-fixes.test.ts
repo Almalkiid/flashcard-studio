@@ -3,6 +3,7 @@ import { Notice } from "obsidian";
 import { State } from "ts-fsrs";
 
 import { t } from "src/lang/translate";
+import { countToday } from "src/scheduling/daily-limits";
 import { FlashcardReviewMode } from "src/scheduling/review/review-mode";
 import { removalConfirmation } from "src/scheduling/review/review-session";
 import { FsrsState } from "src/scheduling/schedule/fsrs-state";
@@ -177,6 +178,54 @@ describe("D2 #4: daily limits", () => {
         expect(c.reviewSession.hasCurrentCard).toBe(false);
     });
 
+    test("an SM-2 new card answered Again comes back today although the review allowance is spent", async () => {
+        const c = await open("#flashcards A::a\n#flashcards B::b\n", {
+            ...SM2,
+            limits: { newCardsPerDay: 5, reviewsPerDay: 0 },
+        });
+        await c.reviewSession.processReview(ReviewResponse.Again);
+        expect(c.front).toBe("B");
+        await c.reviewSession.processReview(ReviewResponse.Good);
+        expect(c.front).toBe("A");
+
+        // A later session today reads the limits from the log, and shows it too
+        const later = await open(c.text, {
+            ...SM2,
+            limits: {
+                newCardsPerDay: 5,
+                reviewsPerDay: 0,
+                counts: countToday(c.log.entries, globalDateProvider.studyDayStartMs),
+            },
+        });
+        expect(later.front).toBe("A");
+        expect(later.reviewSession.getDeckStats(later.topicPath)).toMatchObject({
+            dueCount: 1,
+            dueHiddenByLimitCount: 0,
+        });
+    });
+
+    test("the repeat of an SM-2 new card answered Again spends no review", async () => {
+        const c = await open("#flashcards A::a\n#flashcards B::b\n", {
+            ...SM2,
+            limits: { newCardsPerDay: 5, reviewsPerDay: 10 },
+        });
+        await c.reviewSession.processReview(ReviewResponse.Again); // A
+        await c.reviewSession.processReview(ReviewResponse.Good); // B
+        expect(c.front).toBe("A");
+        await c.reviewSession.processReview(ReviewResponse.Good);
+        expect(c.log.entries.map((entry) => [entry.r, entry.k, entry.n])).toEqual([
+            [1, 0, 1],
+            [3, 0, 1],
+            [3, 1, undefined],
+        ]);
+        expect(c.limits.remainingNew()).toBe(3);
+        expect(c.limits.remainingReviews()).toBe(10);
+        expect(countToday(c.log.entries, globalDateProvider.studyDayStartMs)).toMatchObject({
+            newDone: 2,
+            reviewsDone: 0,
+        });
+    });
+
     test("an FSRS card answered after a Reset spends the new-card allowance", async () => {
         const c = await open(
             "#flashcards Q1::A1 <!--SR:!fsrs,2023-09-02T00:00:00.000Z,4,4.5,5.2,2,3,0,0,2023-08-29T00:00:00.000Z-->\n",
@@ -318,6 +367,30 @@ describe("D5b: undo takes the answer's buried siblings back off the buried-cards
         expect(write).toHaveBeenCalledTimes(2);
     });
 
+    test.each([
+        ["SM-2 Good (the card leaves the session)", SchedulerKind.SM2, ReviewResponse.Good],
+        ["SM-2 Again (the card goes to the back)", SchedulerKind.SM2, ReviewResponse.Again],
+        ["FSRS Good (the card waits for its step)", SchedulerKind.FSRS, ReviewResponse.Good],
+        ["FSRS Again (the card waits for its step)", SchedulerKind.FSRS, ReviewResponse.Again],
+    ])(
+        "after %s and undo, the siblings are back in the session where they were",
+        async (_name, algorithm, response) => {
+            const c = await open(
+                "#flashcards This single ==question== turns into ==3 separate== ==cards==\n\n#flashcards Q1::A1\n",
+                { algorithm, settings: { burySiblingCards: true } },
+            );
+            const before = c.queue();
+            expect(before).toHaveLength(4);
+            await c.reviewSession.processReview(response);
+            expect(c.queue()).not.toContain(before[1]);
+
+            expect(await c.reviewSession.undoLastAnswer()).toBe(UndoResult.Requeued);
+            expect(c.buriedCards.list).toEqual([]);
+            expect(c.queue()).toEqual(before);
+            expect(c.reviewSession.currentCard).toBe(before[0]);
+        },
+    );
+
     test("a question already on the list before the answer stays on it", async () => {
         const c = await open(
             "#flashcards This single ==question== turns into ==3 separate== ==cards==\n\n#flashcards Q1::A1\n",
@@ -330,6 +403,8 @@ describe("D5b: undo takes the answer's buried siblings back off the buried-cards
         await c.reviewSession.processReview(ReviewResponse.Good); // the same cloze again, its question already listed
         expect(await c.reviewSession.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.buriedCards.list).toHaveLength(1);
+        // The siblings were out of the session before this answer, so they stay out
+        expect(c.queue()).toEqual([c.reviewSession.currentCard]);
     });
 });
 

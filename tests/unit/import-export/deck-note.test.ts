@@ -3,7 +3,8 @@ import {
     appendToDeckNote,
     deckLevels,
     deckNotePath,
-    deckTag,
+    deckTagOfNote,
+    deckTags,
     formatDeckNote,
     joinPath,
     sanitizeFileName,
@@ -94,16 +95,113 @@ describe("tags", () => {
         expect(ankiTagToObsidianTag(tag)).toBe(expected);
     });
 
-    test("deckTag makes the deck's path a tag path", () => {
-        expect(deckTag("#flashcards", "CIA Part 1::Unit 01 (Gemini)")).toBe(
-            "#flashcards/CIA-Part-1/Unit-01-Gemini",
+    test("deckTags makes each deck's path a tag path", () => {
+        const tags = deckTags("#flashcards", ["CIA Part 1::Unit 01 (Gemini)", "", "Spanish"]);
+        expect(Object.fromEntries(tags)).toEqual({
+            "CIA Part 1::Unit 01 (Gemini)": "#flashcards/CIA-Part-1/Unit-01-Gemini",
+            "": "#flashcards",
+            Spanish: "#flashcards/Spanish",
+        });
+        expect(deckTags("#cards", ["A::B"]).get("A::B")).toBe("#cards/A/B");
+    });
+
+    test("deckTags keeps apart decks whose names differ only in what a tag cannot have", () => {
+        const decks = ["C++", "C#", "C", "Spanish 1", "Spanish-1", "Math::+", "Math", "📚"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks))).toEqual({
+            // A name that is a tag as it is keeps it, the others get a number
+            C: "#flashcards/C",
+            "C#": "#flashcards/C-2",
+            "C++": "#flashcards/C-3",
+            "Spanish-1": "#flashcards/Spanish-1",
+            "Spanish 1": "#flashcards/Spanish-1-2",
+            // A level with nothing a tag can have is not left out, which would put it in its parent
+            Math: "#flashcards/Math",
+            "Math::+": "#flashcards/Math/_",
+            "📚": "#flashcards/_",
+        });
+    });
+
+    test("deckTags numbers many decks that give the same tag each with the next free number", () => {
+        // "C+", "C++", ... all give the tag C, and an existing deck note already has the tag the second of them would get
+        const decks = ["C", ...Array.from({ length: 2000 }, (_, i) => "C" + "+".repeat(i + 1))];
+        const tags = deckTags("#flashcards", decks, new Map([["Old", "#flashcards/C-3"]]));
+        expect(tags.get("C")).toBe("#flashcards/C");
+        expect(tags.get("C+")).toBe("#flashcards/C-2");
+        expect(tags.get("C++")).toBe("#flashcards/C-4");
+        // Each deck has a tag of its own, and the numbers run on from 2 with only the existing note's 3 left out
+        const numbers = decks
+            .slice(1)
+            .map((deck) => Number(tags.get(deck)?.slice("#flashcards/C-".length)));
+        expect(new Set(numbers).size).toBe(2000);
+        expect([...numbers].sort((a, b) => a - b)).toEqual([
+            2,
+            ...Array.from({ length: 1999 }, (_, i) => i + 4),
+        ]);
+    });
+
+    test("deckTags gives the subdecks of a renamed level the same new name", () => {
+        const decks = ["Lang::C++::Basics", "Lang::C::Basics", "Lang::C++", "Lang :: C"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks))).toEqual({
+            "Lang::C::Basics": "#flashcards/Lang/C/Basics",
+            "Lang :: C": "#flashcards/Lang/C",
+            "Lang::C++": "#flashcards/Lang/C-2",
+            "Lang::C++::Basics": "#flashcards/Lang/C-2/Basics",
+        });
+    });
+
+    test("deckTags keeps the tags on existing deck notes and gives them to no other deck", () => {
+        const existing = new Map([
+            ["C", "#flashcards/C"],
+            ["C++", "#flashcards/C-2"],
+        ]);
+        expect(Object.fromEntries(deckTags("#flashcards", ["C", "C#", "C++"], existing))).toEqual({
+            C: "#flashcards/C",
+            "C++": "#flashcards/C-2",
+            "C#": "#flashcards/C-3",
+        });
+    });
+
+    test("deckTags keeps the tags of an existing deck note's parents for them", () => {
+        const existing = new Map([["Lang::C++::Basics", "#flashcards/Lang/C/Basics"]]);
+        const decks = ["Lang::C#", "Lang::C++::Basics", "Lang::C++::Advanced"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks, existing))).toEqual({
+            "Lang::C#": "#flashcards/Lang/C-2",
+            "Lang::C++::Basics": "#flashcards/Lang/C/Basics",
+            "Lang::C++::Advanced": "#flashcards/Lang/C/Advanced",
+        });
+    });
+
+    test("deckTags keeps a tag changed to another depth for its deck only", () => {
+        const existing = new Map([
+            ["C", "#flashcards/Programming/C"],
+            ["Other", "#notes/Other"],
+        ]);
+        const decks = ["C", "C::Basics", "Programming::C", "Other"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks, existing))).toEqual({
+            C: "#flashcards/Programming/C",
+            "C::Basics": "#flashcards/Programming/C/Basics",
+            "Programming::C": "#flashcards/Programming/C-2",
+            // Not a tag under the flashcard tag
+            Other: "#flashcards/Other",
+        });
+    });
+
+    test("deckTagOfNote reads the deck tag from a deck note's tag line", () => {
+        expect(deckTagOfNote("#flashcards/C-2 #a #b\n\nq\n?\na\n", "#flashcards")).toBe(
+            "#flashcards/C-2",
         );
-        expect(deckTag("#flashcards", "")).toBe("#flashcards");
-        expect(deckTag("#cards", "A::B")).toBe("#cards/A/B");
+        expect(deckTagOfNote("#flashcards/Spanish/Verbs", "#flashcards")).toBe(
+            "#flashcards/Spanish/Verbs",
+        );
+        expect(deckTagOfNote("#cards/C\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("#flashcardsX/C\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("#flashcards\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("q\n?\na\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("", "#flashcards")).toBeNull();
     });
 
     test("tagLine puts the deck tag first, then the Anki tags", () => {
-        expect(tagLine("#flashcards", "Spanish", ["a", "b/c"])).toBe("#flashcards/Spanish #a #b/c");
+        expect(tagLine("#flashcards/Spanish", ["a", "b/c"])).toBe("#flashcards/Spanish #a #b/c");
     });
 });
 

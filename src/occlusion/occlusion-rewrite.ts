@@ -99,13 +99,19 @@ export function replaceOcclusionBlock(
     const close = closingFenceLine(lines, fenceLine);
     if (close === -1) return noteText;
 
-    // The schedule after a block is a comment line, or the metadata callout up to its comment, as the parser reads it
+    // The schedule after a block is a comment line, or the metadata callout up to its comment, as the parser reads it.
+    // The callout ends at its first line that is not quoted, such as a blank line: a comment further down belongs to
+    // something else, and the lines up to it are not the block's to rewrite or remove.
     let commentLine = -1;
     if (close + 1 < lines.length) {
         if (lines[close + 1].startsWith("<!--SR:")) {
             commentLine = close + 1;
         } else if (lines[close + 1].startsWith(CARD_METADATA_CALLOUT)) {
-            for (let i = close + 1; i < lines.length && commentLine === -1; i++) {
+            for (
+                let i = close + 1;
+                i < lines.length && lines[i].startsWith(">") && commentLine === -1;
+                i++
+            ) {
                 if (lines[i].includes("<!--SR:")) commentLine = i;
             }
         }

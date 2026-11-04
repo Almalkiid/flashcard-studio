@@ -8,6 +8,7 @@ import {
 } from "src/exam/exam";
 import {
     examFileName,
+    examFileNameMs,
     examFilePath,
     EXAMS_FOLDER,
     formatExamFile,
@@ -93,6 +94,20 @@ describe("examFileName", () => {
 
     test("the exams go in the Exams folder of Flashcard Studio", () => {
         expect(EXAMS_FOLDER).toBe("Flashcard Studio/Exams");
+    });
+});
+
+describe("examFileNameMs", () => {
+    test("is the date and time a name starts with, as if it were UTC", () => {
+        expect(examFileNameMs("2026-09-30 1405 exam.md")).toBe(Date.UTC(2026, 8, 30, 14, 5));
+        expect(examFileNameMs("2026-09-30 1405 exam 2.md")).toBe(Date.UTC(2026, 8, 30, 14, 5));
+        expect(examFileNameMs("2026-01-02 0304 midterm.md")).toBe(Date.UTC(2026, 0, 2, 3, 4));
+    });
+
+    test("is null for a name that does not start with them", () => {
+        expect(examFileNameMs("notes.md")).toBeNull();
+        expect(examFileNameMs("2026-09-30 exam.md")).toBeNull();
+        expect(examFileNameMs("2026-09-30 14055 exam.md")).toBeNull();
     });
 });
 

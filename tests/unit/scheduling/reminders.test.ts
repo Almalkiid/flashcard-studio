@@ -7,6 +7,7 @@ import { DEFAULT_DATA } from "src/data/stored-data";
 import { ReminderManager } from "src/scheduling/reminders";
 import { FsrsState } from "src/scheduling/schedule/fsrs-state";
 import { Sm2State } from "src/scheduling/schedule/sm2-state";
+import { globalDateProvider } from "src/utils/clock";
 import { moment } from "src/utils/moment-en";
 
 type ReminderSettings = Pick<
@@ -356,6 +357,50 @@ describe("ReminderManager", () => {
         await flush();
 
         expect(uiManager.notifyReviewReminder).not.toHaveBeenCalled();
+    });
+
+    test("still counts an SM-2 card introduced today and answered Again after the review allowance is spent", async () => {
+        const failed = dueCard();
+        failed.meta.id = "x";
+        const { manager, uiManager } = setup({
+            deck: deckWith(failed),
+            entries: [{ t: Date.now(), c: "x", r: 1, k: 0, n: 1 }],
+            settings: {
+                enableReviewReminders: true,
+                reviewReminderCheckOnStartup: true,
+                dailyLimitsEnabled: true,
+                reviewsPerDay: 0,
+            },
+        });
+
+        manager.restartReviewReminders();
+        await flush();
+
+        expect(uiManager.notifyReviewReminder).toHaveBeenCalledTimes(1);
+    });
+
+    test("an answer given before the day boundary belongs to the study day before", async () => {
+        jest.setSystemTime(new Date("2026-10-12T10:00:00Z"));
+        globalDateProvider.setDayBoundary({ hour: 4, minute: 0, second: 0 });
+        try {
+            const { manager, uiManager } = setup({
+                deck: deckWith(new Card()),
+                entries: [{ t: Date.parse("2026-10-12T01:00:00Z"), r: 3, k: 0, n: 1 }],
+                settings: {
+                    enableReviewReminders: true,
+                    reviewReminderCheckOnStartup: true,
+                    dailyLimitsEnabled: true,
+                    newCardsPerDay: 1,
+                },
+            });
+
+            manager.restartReviewReminders();
+            await flush();
+
+            expect(uiManager.notifyReviewReminder).toHaveBeenCalledTimes(1);
+        } finally {
+            globalDateProvider.setDayBoundary(null);
+        }
     });
 
     test("still counts learning cards after the review allowance is spent", async () => {

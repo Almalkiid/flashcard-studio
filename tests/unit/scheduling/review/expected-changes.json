@@ -2600,14 +2600,22 @@
                     "This single <span style='color:#2196f3'>[...]</span> turns into 3 separate cards",
                     "new"
                 ],
+                [
+                    "This single question turns into <span style='color:#2196f3'>[...]</span> cards",
+                    "new"
+                ],
+                [
+                    "This single question turns into 3 separate <span style='color:#2196f3'>[...]</span>",
+                    "new"
+                ],
                 ["Q1", "new"]
             ],
             "deckStats": {
                 "(all)": {
                     "totalCount": 4,
                     "dueCount": 0,
-                    "newCount": 2,
-                    "cardsInQueueCount": 2,
+                    "newCount": 4,
+                    "cardsInQueueCount": 4,
                     "dueCardsInQueueOfThisDeckCount": 0,
                     "newCardsInQueueOfThisDeckCount": 0,
                     "cardsInQueueOfThisDeckCount": 0,

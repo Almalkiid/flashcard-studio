@@ -5,6 +5,7 @@ import { t } from "src/lang/translate";
 import type { DeckStats, IReviewSession } from "src/scheduling/review/review-session";
 import { ReviewItemState } from "src/scheduling/schedule/review-item";
 import type { Heatmap } from "src/stats/activity";
+import { daysAgo } from "src/stats/day-keys";
 import { hiddenByLimitText, withHiddenNote } from "src/ui/deck-counts";
 import { createDeckTile, readableDeckName } from "src/ui/design/deck-identity";
 import {
@@ -28,6 +29,7 @@ import {
     formatWeekdayShort,
     reviewsLabel,
 } from "src/ui/statistics-view/format";
+import { currentDayKeyFn } from "src/ui/statistics-view/stats-data";
 
 /** The last exam taken, for the home's "Last exam" card. Comes from the exams feature. */
 export interface LastExamSummary {
@@ -226,7 +228,7 @@ function renderGoal(
 }
 
 function whenText(endedMs: number): string {
-    const days = Math.floor((Date.now() - endedMs) / 86_400_000);
+    const days = daysAgo(endedMs, Date.now(), currentDayKeyFn());
     if (days <= 0) return t("DESKTOP_WHEN_TODAY");
     if (days === 1) return t("DESKTOP_WHEN_YESTERDAY");
     return formatDate(endedMs);

@@ -51,3 +51,9 @@ test("the imported settings are brought up to date like saved ones: an unusable 
     await importLegacySettings(plugin);
     expect(typeof settings.scheduleDataVaultLocation).toBe("string");
 });
+
+test("file menu items turned off in the original plugin stay off after the import", async () => {
+    const { plugin, settings } = pluginWith({ settings: { disableFileMenuReviewOptions: true } });
+    expect(await importLegacySettings(plugin)).toBe(1);
+    expect(settings.showFileMenuReviewOptions).toBe(false);
+});

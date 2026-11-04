@@ -1,7 +1,8 @@
 /**
  * Removes tags from a note's frontmatter `tags` value, which may be missing, a single string ("a, b" or "a b")
- * or a list. A tag is removed when it starts with one of `tagsToDelete` (with or without the leading `#`), so
- * nested tags like `flashcards/cia` go with `#flashcards`.
+ * or a list. A tag is removed when it is one of `tagsToDelete` (with or without the leading `#`) or nested under it,
+ * so `flashcards/cia` goes with `#flashcards`, but a longer tag that starts the same (`flashcards-extra`) stays, as it
+ * does in the body of the note.
  *
  * @returns The remaining tags, or undefined when the note had no tags.
  */
@@ -19,8 +20,9 @@ export function withoutFrontmatterTags(
     } else {
         return undefined;
     }
-    const prefixes = tagsToDelete.map((tag) => tag.replace(/^#/, ""));
-    return tags.filter(
-        (tag) => !prefixes.some((prefix) => tag.replace(/^#/, "").startsWith(prefix)),
-    );
+    const removed = tagsToDelete.map((tag) => tag.replace(/^#/, ""));
+    return tags.filter((tag) => {
+        const bare = tag.replace(/^#/, "");
+        return !removed.some((name) => bare === name || bare.startsWith(`${name}/`));
+    });
 }

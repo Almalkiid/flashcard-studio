@@ -301,8 +301,14 @@ export default class ContentManager {
 
     /** Goes into the cards of a deck. */
     private async _enterDeck(deck: Deck): Promise<void> {
+        // A review closed while its cards were loading has nowhere to be drawn
+        if (this.isClosed) return;
         const sessionState = this._freshSession(deck);
         if (sessionState === null) return;
+        // A session started from the waiting screen replaces it: its timer must not redraw the card later, and the card
+        // keys work again
+        this._cancelResume();
+        this.waiting = false;
         this.sessionState = sessionState;
         this.sessionStartMs = Date.now();
         this.sessionAnswers = [];
@@ -346,6 +352,8 @@ export default class ContentManager {
 
     /** Shows the next card of the session, or what comes when there is none: the waiting screen, the summary, the decks. */
     private async _advance(): Promise<void> {
+        // Closed while the answer (or the skip, the undo) was being saved: there is no screen to move on
+        if (this.isClosed) return;
         const reviewSession = this.queueSeq;
         if (this.sessionState === null || reviewSession === null) {
             await this._gotoDeckList(true);
@@ -779,6 +787,8 @@ export default class ContentManager {
             if (this.queueSeq === null) return;
             this.cardPane.invalidateMeaningCheck();
             this.cardPane.hideAnswerToast();
+            // The answer about to be taken back: the queue takes the last record of the history this screen shares
+            const undoing = this.undoHistory.peek();
             const result: UndoResult = await this.queueSeq.undoLastAnswer();
             // The undone answer is no longer in the log, so the side panel reads it again
             this.panelLog = null;
@@ -792,6 +802,8 @@ export default class ContentManager {
                 case UndoResult.NeedsReload:
                     // The answer came from a session that has since ended; start a fresh one on the same deck
                     this.queueSeq = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
+                    // A review closed while the cards were loading has nowhere to be drawn
+                    if (this.isClosed) return;
                     if (this.sessionState === null) {
                         await this._gotoDeckList();
                     } else {
@@ -799,12 +811,17 @@ export default class ContentManager {
                     }
                     return;
                 case UndoResult.Requeued:
-                    this.sessionAnswers.pop();
-                    this.cardPane.setSessionAnswers(this.sessionAnswers);
+                    // A Reset (rating 0) was not counted among the session's answers (see _processReview), so taking
+                    // one back leaves them as they are
+                    if (undoing?.entry.r !== 0) {
+                        this.sessionAnswers.pop();
+                        this.cardPane.setSessionAnswers(this.sessionAnswers);
+                    }
                     this._cancelResume();
                     await this._advance();
-                    // Undoing from the summary brings the card back where the deck list was drawn over it
-                    if (this.sessionState !== null) {
+                    // Undoing from the summary brings the card back where the deck list was drawn over it; a review
+                    // closed while the answer was being taken back stays closed
+                    if (this.sessionState !== null && !this.isClosed) {
                         this.deckPane.closeList();
                         await this.cardPane.openSession(this.sessionState, this.settings);
                     }
@@ -917,6 +934,8 @@ export default class ContentManager {
         this.reviewMode = customStudyMode(spec);
         this.reviewQueueLoader.setReviewMode(this.reviewMode);
         const reviewSession = await this.reviewQueueLoader.loadReviewQueue(this.undoHistory);
+        // A review closed while the cards were loading has nowhere to be drawn
+        if (this.isClosed) return false;
 
         const tree = reviewSession.originalRoot;
         const found = tree.getDistinctReviewItemCount(ReviewItemState.AnyItem, true);
@@ -990,6 +1009,7 @@ export default class ContentManager {
         if (desktop === null || this.isClosed) return;
         this._closeExam();
         this._cancelResume();
+        this.waiting = false;
         this.deckPane.closeList();
         this.cardPane.closeSession();
         this.sessionStartMs = 0;

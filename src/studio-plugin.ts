@@ -57,6 +57,8 @@ export default class FlashcardStudioPlugin extends Plugin {
     private _nextNoteReviewHandler: NextNoteReviewHandler | null = null;
     private _reminderManager: ReminderManager | null = null;
     private unloaded = false;
+    /** Set when data.json was read again before the plugin was ready: the effects are redone once it is. */
+    private settingsReloadedBeforeReady = false;
 
     get dataManager(): DataManager {
         return needed(this._dataManager, "data is not loaded yet.");
@@ -163,6 +165,12 @@ export default class FlashcardStudioPlugin extends Plugin {
             window.clearTimeout(slow);
         }
 
+        // Settings read from disk during the start-up may have come after the scan set things up from the old ones
+        if (this.settingsReloadedBeforeReady) {
+            this.settingsReloadedBeforeReady = false;
+            await this.redoSettingsEffects();
+        }
+
         try {
             await showWelcomeOnFirstRun(this);
             // An exam that was started and not finished is offered for resuming, as the clock is still running
@@ -175,16 +183,27 @@ export default class FlashcardStudioPlugin extends Plugin {
     /**
      * Obsidian calls this when data.json was changed by a sync service or another program. The settings are read
      * again into the object everything shares, their effects are redone (scheduler, reminders, MathJax macro, parser
-     * flags) and the vault is scanned again, as the cards depend on them. Before the first scan only the reading is
-     * needed: the scan will use what was read.
+     * flags) and the vault is scanned again, as the cards depend on them. Before the plugin is ready only the reading
+     * is done, and the rest once it is: the start-up may already have set up the scheduler, the start of day and the
+     * hotkeys from the old settings.
      */
     async onExternalSettingsChange(): Promise<void> {
         if (this._dataManager === null) return;
         try {
             await this._dataManager.reloadSettings();
-            if (!this.isInitialized) return;
+        } catch (error) {
+            console.error("Flashcard Studio: could not apply the settings changed on disk", error);
+            return;
+        }
+        if (this.isInitialized) await this.redoSettingsEffects();
+        else this.settingsReloadedBeforeReady = true;
+    }
+
+    /** Redoes the effects of the settings that were read again, then brings the decks up to date with them. */
+    private async redoSettingsEffects(): Promise<void> {
+        try {
             reapplySettings(this);
-            await this._dataManager.sync();
+            await this.dataManager.sync();
         } catch (error) {
             console.error("Flashcard Studio: could not apply the settings changed on disk", error);
         }

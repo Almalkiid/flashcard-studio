@@ -8,6 +8,12 @@ export interface TodayCounts {
      * however often it is answered (D2 #4: an SM-2 card answered Again stays due and would count again).
      */
     reviewed?: Map<string, number>;
+    /**
+     * The cards introduced today, each with the time of its first answer as a new card. Answering such a card again
+     * today is a learning step and spends no review, also when its schedule is a review one (D2 #4: an SM-2 card
+     * answered Again on its first answer stays due today).
+     */
+    introduced?: Map<string, number>;
 }
 
 export interface DailyLimitSettings {
@@ -34,21 +40,35 @@ function countsAsReview(entry: ReviewLogEntry): boolean {
 
 /**
  * Counts the new cards introduced and the reviews done since the start of today, from the review log of every
- * device. Learning and relearning steps, cram answers and manual resets do not count, as in Anki.
+ * device. Learning and relearning steps, cram answers and manual resets do not count, as in Anki; nor does a review
+ * answer to a card introduced earlier today.
  */
 export function countToday(entries: ReviewLogEntry[], dayStartMs: number): TodayCounts {
-    const counts: TodayCounts = { newDone: 0, reviewsDone: 0, reviewed: new Map() };
-    for (const entry of entries) {
-        if (entry.t < dayStartMs) continue;
-        if (countsAsNew(entry)) counts.newDone++;
-        else if (countsAsReview(entry)) {
-            const counted = counts.reviewed.get(entry.c);
-            // The logs of several devices are not in time order: the earliest answer is the one that counted
-            if (counted !== undefined) counts.reviewed.set(entry.c, Math.min(counted, entry.t));
-            else {
-                counts.reviewsDone++;
-                if (entry.c) counts.reviewed.set(entry.c, entry.t);
-            }
+    const counts: TodayCounts = {
+        newDone: 0,
+        reviewsDone: 0,
+        reviewed: new Map(),
+        introduced: new Map(),
+    };
+    // The new cards come first: the logs of several devices are not in time order, and a review answer given after
+    // the card was introduced today is one of its learning steps, which is free
+    const today = entries.filter((entry) => entry.t >= dayStartMs);
+    for (const entry of today) {
+        if (!countsAsNew(entry)) continue;
+        counts.newDone++;
+        const earlier = counts.introduced.get(entry.c);
+        if (entry.c) counts.introduced.set(entry.c, Math.min(earlier ?? entry.t, entry.t));
+    }
+    for (const entry of today) {
+        if (!countsAsReview(entry)) continue;
+        const introduced = counts.introduced.get(entry.c);
+        if (introduced !== undefined && introduced <= entry.t) continue;
+        const counted = counts.reviewed.get(entry.c);
+        // The logs of several devices are not in time order: the earliest answer is the one that counted
+        if (counted !== undefined) counts.reviewed.set(entry.c, Math.min(counted, entry.t));
+        else {
+            counts.reviewsDone++;
+            if (entry.c) counts.reviewed.set(entry.c, entry.t);
         }
     }
     return counts;
@@ -77,6 +97,7 @@ export class DailyLimits {
     private counts: TodayCounts;
     private readonly extra: ExtraAllowance;
     private readonly reviewed: Map<string, number>;
+    private readonly introduced: Map<string, number>;
 
     constructor(
         settings: DailyLimitSettings,
@@ -86,12 +107,16 @@ export class DailyLimits {
         this.settings = settings;
         this.counts = { newDone: counts.newDone, reviewsDone: counts.reviewsDone };
         this.reviewed = new Map(counts.reviewed);
+        this.introduced = new Map(counts.introduced);
         this.extra = { ...extra };
     }
 
-    /** Whether the card has already spent a review today; answering it again costs nothing. */
+    /**
+     * Whether the card has already been paid for today, by a review or by its introduction as a new card; answering it
+     * again costs nothing.
+     */
     countedToday(cardId: string | null): boolean {
-        return !!cardId && this.reviewed.has(cardId);
+        return !!cardId && (this.reviewed.has(cardId) || this.introduced.has(cardId));
     }
 
     remainingNew(): number {
@@ -111,8 +136,10 @@ export class DailyLimits {
     }
 
     record(entry: ReviewLogEntry): void {
-        if (countsAsNew(entry)) this.counts.newDone++;
-        else if (countsAsReview(entry) && !this.countedToday(entry.c)) {
+        if (countsAsNew(entry)) {
+            this.counts.newDone++;
+            if (entry.c && !this.introduced.has(entry.c)) this.introduced.set(entry.c, entry.t);
+        } else if (countsAsReview(entry) && !this.countedToday(entry.c)) {
             this.counts.reviewsDone++;
             if (entry.c) this.reviewed.set(entry.c, entry.t);
         }
@@ -120,8 +147,10 @@ export class DailyLimits {
 
     /** Takes back an answer that was undone; a repeat that did not count gives nothing back. */
     unrecord(entry: ReviewLogEntry): void {
-        if (countsAsNew(entry)) this.counts.newDone = Math.max(0, this.counts.newDone - 1);
-        else if (countsAsReview(entry) && (!entry.c || this.reviewed.get(entry.c) === entry.t)) {
+        if (countsAsNew(entry)) {
+            this.counts.newDone = Math.max(0, this.counts.newDone - 1);
+            if (this.introduced.get(entry.c) === entry.t) this.introduced.delete(entry.c);
+        } else if (countsAsReview(entry) && (!entry.c || this.reviewed.get(entry.c) === entry.t)) {
             this.counts.reviewsDone = Math.max(0, this.counts.reviewsDone - 1);
             this.reviewed.delete(entry.c);
         }

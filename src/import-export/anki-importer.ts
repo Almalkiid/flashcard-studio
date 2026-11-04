@@ -9,6 +9,8 @@ import {
     ankiTagToObsidianTag,
     appendToDeckNote,
     deckNotePath,
+    deckTagOfNote,
+    deckTags,
     formatDeckNote,
     ImportedCard,
     joinPath,
@@ -166,10 +168,15 @@ export async function importNotes(
 
     // Notes that came in before, and notes repeated in this batch, are left out
     const knownGuids = new Set<string>();
+    // The deck tags on the notes there, by path
+    const noteTags = new Map<string, string>();
     const existingNotes = await host.listNotes(options.targetFolder);
     for (const [index, path] of existingNotes.entries()) {
         progress("scanning", index, existingNotes.length);
-        for (const guid of findGuids(await host.readText(path))) knownGuids.add(guid);
+        const text = await host.readText(path);
+        for (const guid of findGuids(text)) knownGuids.add(guid);
+        const tag = deckTagOfNote(text, context.flashcardTag);
+        if (tag !== null) noteTags.set(path, tag);
     }
     const fresh: AnkiNote[] = [];
     for (const note of notes) {
@@ -250,6 +257,16 @@ export async function importNotes(
         if (index % 50 === 49) await yieldToUi();
     }
 
+    // A deck of the batch that has a note keeps the tag on it, and a new deck note gets a tag none of those has. The
+    // numbers are given over every deck of the batch, not only those with new notes, so that a deck note made again
+    // gets the tag it had. Decks that are not in the batch, from another package in the same folder, are not seen.
+    const batchDecks = Array.from(new Set(notes.map((note) => note.deck)));
+    const existingTags = new Map<string, string>();
+    for (const deckName of batchDecks) {
+        const tag = noteTags.get(deckNotePath(options.targetFolder, deckName));
+        if (tag !== undefined) existingTags.set(deckName, tag);
+    }
+    const tagOfDeck = deckTags(context.flashcardTag, batchDecks, existingTags);
     let written = 0;
     for (const [deckName, deck] of Array.from(decks).sort(([a], [b]) => a.localeCompare(b))) {
         progress("writing", written++, decks.size);
@@ -261,7 +278,7 @@ export async function importNotes(
             await host.ensureFolder(path.slice(0, path.lastIndexOf("/")));
             await host.createText(
                 path,
-                formatDeckNote(tagLine(context.flashcardTag, deckName, tags), deck.cards),
+                formatDeckNote(tagLine(tagOfDeck.get(deckName), tags), deck.cards),
             );
         }
         result.notePaths.push(path);
