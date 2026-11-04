@@ -70,6 +70,15 @@ export function diffDays(fromKey: string, toKey: string): number {
     return Math.round((utcTimeOf(toKey) - utcTimeOf(fromKey)) / MS_PER_DAY);
 }
 
+/**
+ * How many study days the day of `thenMs` is before the day of `nowMs`: 0 for the same day, 1 for the day before,
+ * negative for a later day. Counted by day, not by 24 hours, so last night is yesterday even when it is less than a
+ * day ago.
+ */
+export function daysAgo(thenMs: number, nowMs: number, dayKeyOf: DayKeyFn): number {
+    return diffDays(dayKeyOf(thenMs), dayKeyOf(nowMs));
+}
+
 /** 0 for Sunday to 6 for Saturday. */
 export function weekdayOf(key: string): number {
     return new Date(utcTimeOf(key)).getUTCDay();

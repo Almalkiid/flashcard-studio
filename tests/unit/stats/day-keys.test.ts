@@ -2,6 +2,7 @@ import {
     addDays,
     boundaryToMs,
     dayKeyRange,
+    daysAgo,
     diffDays,
     makeDayKeyFn,
     weekdayOf,
@@ -75,6 +76,22 @@ describe("day key arithmetic", () => {
         expect(diffDays("2026-09-30", "2026-09-29")).toEqual(-1);
         expect(diffDays("2025-12-31", "2026-01-01")).toEqual(1);
         expect(diffDays("2026-09-29", "2026-09-29")).toEqual(0);
+    });
+
+    test("daysAgo counts study days, not periods of 24 hours", () => {
+        const now = at("2026-11-04T09:00:00Z");
+        const midnight = makeDayKeyFn(0);
+        expect(daysAgo(at("2026-11-04T00:30:00Z"), now, midnight)).toEqual(0);
+        // Last night is yesterday, though it is only 10 hours ago
+        expect(daysAgo(at("2026-11-03T23:00:00Z"), now, midnight)).toEqual(1);
+        // And the night before is two days ago, though it is only 34 hours ago
+        expect(daysAgo(at("2026-11-02T23:00:00Z"), now, midnight)).toEqual(2);
+        expect(daysAgo(at("2026-11-04T10:00:00Z"), now, midnight)).toEqual(0);
+        expect(daysAgo(at("2026-11-05T10:00:00Z"), now, midnight)).toEqual(-1);
+        // With a day that starts at 04:00, 23:00 is still today at 01:00
+        const fourAm = makeDayKeyFn(4 * HOUR);
+        expect(daysAgo(at("2026-11-03T23:00:00Z"), at("2026-11-04T01:00:00Z"), fourAm)).toEqual(0);
+        expect(daysAgo(at("2026-11-03T23:00:00Z"), now, fourAm)).toEqual(1);
     });
 
     test("weekdayOf returns 0 for Sunday", () => {

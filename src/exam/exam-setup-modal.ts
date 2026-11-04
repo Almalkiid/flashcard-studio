@@ -17,12 +17,14 @@ import { trapTab } from "src/exam/exam-dom";
 import { ExamDraft } from "src/exam/exam-draft";
 import { renderDraftRows } from "src/exam/exam-resume";
 import { t } from "src/lang/translate";
+import { daysAgo } from "src/stats/day-keys";
 import { deckMatches } from "src/stats/scope";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { readableDeckName } from "src/ui/design/deck-identity";
 import { markFocusVisible } from "src/ui/focus-visible";
 import { topLevelDecks } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-data";
 import { formatDate, formatDuration } from "src/ui/statistics-view/format";
+import { currentDayKeyFn } from "src/ui/statistics-view/stats-data";
 
 const MIN_COUNT = 1;
 const MAX_COUNT = 500;
@@ -43,7 +45,7 @@ interface DeckRow {
 }
 
 function whenText(ms: number): string {
-    const days = Math.floor((Date.now() - ms) / 86_400_000);
+    const days = daysAgo(ms, Date.now(), currentDayKeyFn());
     if (days <= 0) return t("DESKTOP_WHEN_TODAY");
     if (days === 1) return t("DESKTOP_WHEN_YESTERDAY");
     return formatDate(ms);
