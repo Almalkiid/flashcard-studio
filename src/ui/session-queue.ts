@@ -24,7 +24,7 @@ import {
 import { ActiveScheduler } from "src/scheduling/schedule/scheduler-kind";
 import { UndoHistory } from "src/scheduling/undo-history";
 import type FlashcardStudioPlugin from "src/studio-plugin";
-import { globalDateProvider } from "src/utils/clock";
+import { globalDateProvider, studyDayStartOn } from "src/utils/clock";
 
 /** The enum member called `name`, or `fallback` when the settings hold a name the enum does not have. */
 function member<E extends Record<string, string | number>>(
@@ -151,7 +151,8 @@ export class ReviewQueueLoader {
      */
     private async loadDailyLimits(): Promise<DailyLimits> {
         const settings: StudioSettings = this.plugin.dataManager.data.settings;
-        const dayStartMs: number = globalDateProvider.today.valueOf();
+        // From the day boundary, not from midnight: an answer before the boundary belongs to the study day before
+        const dayStartMs: number = globalDateProvider.studyDayStartMs;
         const nowMs: number = globalDateProvider.now.valueOf();
         let entries: ReviewLogEntry[] = [];
         try {
@@ -185,13 +186,13 @@ export class ReviewQueueLoader {
         };
         if (spec.type !== "forgotten") return context;
 
-        // "The last N days" counts today as the first day
+        // "The last N days" counts today as the first day, and each day starts at the day boundary
         const sinceMs: number =
             spec.sinceMs ??
-            globalDateProvider.today
-                .clone()
-                .subtract(Math.max(1, spec.days) - 1, "d")
-                .valueOf();
+            studyDayStartOn(
+                globalDateProvider.today.clone().subtract(Math.max(1, spec.days) - 1, "d"),
+                globalDateProvider.getDayBoundary(),
+            ).valueOf();
         try {
             const entries = await this.plugin.dataManager.reviewLog.readMonths(
                 monthsBetween(sinceMs, nowMs),

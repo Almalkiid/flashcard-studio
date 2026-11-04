@@ -123,7 +123,7 @@ export class ReminderManager {
     }
 
     private async todayLimits(): Promise<DailyLimits> {
-        const dayStartMs = globalDateProvider.today.valueOf();
+        const dayStartMs = globalDateProvider.studyDayStartMs;
         const nowMs = globalDateProvider.now.valueOf();
         const entries = await this.dataManager.reviewLog.readMonths(
             monthsCovering(dayStartMs, nowMs),
