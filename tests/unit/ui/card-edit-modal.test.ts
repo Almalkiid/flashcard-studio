@@ -125,6 +125,40 @@ describe("saving the edit dialog", () => {
         );
     });
 
+    // A card with no schedule yet is written as it is: a line break left at its end put a blank line in the note, and
+    // moved its block id to a line of its own
+    test.each([
+        { type: CardType.SingleLineBasic, text: "Q::A", field: 1, edit: "B\n", saved: "Q::B" },
+        {
+            type: CardType.MultiLineBasic,
+            text: "Q\n?\nA",
+            field: 1,
+            edit: "B\n  \n",
+            saved: "Q\n?\nB",
+        },
+        {
+            type: CardType.Cloze,
+            text: "A ==b== c",
+            field: 0,
+            edit: "A ==b== d\n",
+            saved: "A ==b== d",
+        },
+    ])("line breaks typed at the end of $text are not saved", async (edit) => {
+        const { result, fields, save } = openEditor(edit.type, edit.text);
+        fields[edit.field].value = edit.edit;
+        save();
+        await expect(result).resolves.toBe(edit.saved);
+    });
+
+    test("only taking away the line break a tagged card with a schedule ends in is not a change", async () => {
+        // The text of `#flashcards Q::A` with its schedule comment on the next line
+        const { result, fields, save } = openEditor(CardType.SingleLineBasic, "Q::A\n");
+        expect(fields[1].value).toBe("A\n");
+        fields[1].value = "A";
+        save();
+        await expect(result).rejects.toBeInstanceOf(EditCancelled);
+    });
+
     // The parser would read these back as another card, or none, and the schedule comment would be on the wrong line
     test.each([
         {

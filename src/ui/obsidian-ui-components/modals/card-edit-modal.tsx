@@ -14,6 +14,16 @@ import {
 import StudioButton from "src/ui/studio-button";
 import { TextDirection } from "src/utils/text";
 
+/**
+ * The text without the line breaks and blank lines at its end. A card with no schedule yet is written as it is: they
+ * would put a blank line in the note after it, and move its block id to a line of its own. The text of a tagged card
+ * with a schedule ends in a line break as well, which the note writer drops before the comment: taking it away is not
+ * a change.
+ */
+function withoutTrailingLineBreaks(text: string): string {
+    return text.replace(/(?:\n[ \t]*)+$/, "");
+}
+
 /** What the dialog rejects with when it is closed without saving. */
 export class EditCancelled extends Error {
     constructor() {
@@ -142,16 +152,17 @@ export class FlashcardEditModal extends Modal {
 
     private save(): void {
         if (this.settled || !this.isComplete()) return;
-        const text =
+        const text = withoutTrailingLineBreaks(
             this.sides === null
                 ? this.frontField.value
                 : joinCardText(
                       this.type,
                       { ...this.sides, front: this.frontField.value, back: this.backField.value },
                       this.settings,
-                  );
+                  ),
+        );
         // Unchanged, it is closed as cancelled, so the note is not written
-        if (text === this.text) {
+        if (text === withoutTrailingLineBreaks(this.text)) {
             this.close();
             return;
         }
