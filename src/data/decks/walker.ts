@@ -414,6 +414,9 @@ export class DeckWalker implements IDeckWalker {
         deck.deleteCardFromThisDeck(card, false);
         deck.listOf(card.reviewItemState).push(card);
         this.current = null;
+        // The list it went to may have no entry in `heads` (it was empty), so they are collected again; the keys are
+        // kept, so the order stays the same
+        this.heads = null;
     }
 
     /**
