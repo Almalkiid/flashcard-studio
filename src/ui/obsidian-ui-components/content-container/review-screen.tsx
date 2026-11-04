@@ -305,6 +305,10 @@ export default class ContentManager {
         if (this.isClosed) return;
         const sessionState = this._freshSession(deck);
         if (sessionState === null) return;
+        // A session started from the waiting screen replaces it: its timer must not redraw the card later, and the card
+        // keys work again
+        this._cancelResume();
+        this.waiting = false;
         this.sessionState = sessionState;
         this.sessionStartMs = Date.now();
         this.sessionAnswers = [];
@@ -999,6 +1003,7 @@ export default class ContentManager {
         if (desktop === null || this.isClosed) return;
         this._closeExam();
         this._cancelResume();
+        this.waiting = false;
         this.deckPane.closeList();
         this.cardPane.closeSession();
         this.sessionStartMs = 0;
