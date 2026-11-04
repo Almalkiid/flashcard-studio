@@ -82,8 +82,8 @@ export function joinCardText(type: CardType, sides: CardSides, settings: StudioS
     return sides.front + lead + (sides.between ?? separator) + trail + sides.back;
 }
 
-/** Stands for the schedule comment that is written after the text of a card that was answered. */
-const SCHEDULE_COMMENT_STAND_IN = "<!--SR:!2000-01-01,1,250-->";
+/** Stands for the schedule of one card in the comment that is written after a question that was answered. */
+const SCHEDULE_STAND_IN = "!2000-01-01,1,250";
 
 /**
  * Whether the note parser reads `text`, with a schedule comment on the line after it, back as one question of `type`
@@ -99,10 +99,13 @@ export function readsBackAsOneQuestion(
     // With card regions on, a multi-line card or a cloze is only found inside a region
     const start = settings.multilineCardStartMarker;
     const inRegion = start !== "" && (isMultiLine(type) || type === CardType.Cloze);
+    // The comment has a schedule for each card of the question. With atomic clozes the parser counts them: a paragraph
+    // stays one question when its comment has more than the clozes of its last line
+    const cardCount = CardFrontBackUtil.expand(type, text, settings).length || 1;
     const lines = [
         ...(inRegion ? [start] : []),
         ...text.trimEnd().split("\n"),
-        SCHEDULE_COMMENT_STAND_IN,
+        `<!--SR:${SCHEDULE_STAND_IN.repeat(cardCount)}-->`,
     ];
     const questions = parse(lines.join("\n"), parserOptionsFromSettings(settings));
     return (

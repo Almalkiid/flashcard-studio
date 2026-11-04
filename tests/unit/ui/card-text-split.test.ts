@@ -137,6 +137,15 @@ describe("an edited text is checked against the note parser", () => {
         expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\n", settings)).toBe(true);
     });
 
+    // With atomic clozes a paragraph stays one question when its schedule comment has more cards than its last line.
+    // A stand-in comment with one schedule split a two-cloze question the note reads back whole.
+    test("with atomic clozes a cloze question over two lines reads back with a schedule for each card", () => {
+        const atomic = { ...settings, atomicClozes: true };
+        expect(readsBackAsOneQuestion(CardType.Cloze, "A ==x==\nB ==y==", atomic)).toBe(true);
+        expect(readsBackAsOneQuestion(CardType.Cloze, "A ==x== B ==y==", atomic)).toBe(true);
+        expect(readsBackAsOneQuestion(CardType.Cloze, "A ==x==\n\nB ==y==", atomic)).toBe(false);
+    });
+
     test("with an end marker a multi-line answer can have blank lines", () => {
         const marked = { ...settings, multilineCardEndMarker: "+++" };
         expect(readsBackAsOneQuestion(CardType.MultiLineBasic, "Q\n?\nA\n\nB", marked)).toBe(true);
