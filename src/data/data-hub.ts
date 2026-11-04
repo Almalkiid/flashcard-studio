@@ -41,6 +41,8 @@ export class DataManager {
     private scannedStamp: string | null = null;
     /** Counts the metadata cache's changes, so a scan that read a cache which was still catching up is repeated. */
     private cacheChanges = 0;
+    /** Counts the schedulers installed: a new one knows no note's ease until a scan teaches it. */
+    private schedulerChanges = 0;
 
     constructor(
         private readonly plugin: FlashcardStudioPlugin,
@@ -99,6 +101,7 @@ export class DataManager {
         ActiveScheduler.instance = useFsrs
             ? new FsrsCardScheduler(settings)
             : new Sm2Scheduler(settings);
+        this.schedulerChanges++;
         DataStoreAlgorithm.instance = new Sm2NoteStore(settings);
         DataStore.instance = new NotesDataStore(settings, new NoteDataFileModifier(this.plugin));
     }
@@ -216,13 +219,18 @@ export class DataManager {
     }
 
     /**
-     * What a scan depends on, as text: every note's path, change time and size, the metadata cache's change count and
-     * the settings. Null when a note has no change time to go by, as then nothing says it did not change.
+     * What a scan depends on, as text: every note's path, change time and size, the metadata cache's change count, the
+     * scheduler it taught and the settings. Null when a note has no change time to go by, as then nothing says it did
+     * not change.
      */
     private scanStamp(notes: TFile[]): string | null {
         if (notes.some((note) => !note.stat)) return null;
         const perNote = notes.map(({ path, stat }) => `${path}|${stat.mtime}|${stat.size}`);
-        const header = [String(this.cacheChanges), JSON.stringify(this.settingsManager.settings)];
+        const header = [
+            String(this.cacheChanges),
+            String(this.schedulerChanges),
+            JSON.stringify(this.settingsManager.settings),
+        ];
         return [...header, ...perNote].join("\n");
     }
 
