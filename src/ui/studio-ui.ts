@@ -101,8 +101,9 @@ export class UIManager {
     public updateStatusBar(): void {
         const { dataManager } = this.plugin;
         const core = dataManager.isVaultIndexLoaded() ? dataManager.vaultIndex : null;
-        const todo = core?.remainingRoot;
-        const countOf = (state: ReviewItemState) => todo?.getReviewItemCount(state, true) ?? 0;
+        // A card in several decks is in each of their lists, but it is one card to review
+        const cardsDue =
+            core?.remainingRoot?.getDistinctReviewItemCount(ReviewItemState.AnyItem, true) ?? 0;
         const {
             showStatusBar,
             showCardStatusBarItem,
@@ -114,7 +115,7 @@ export class UIManager {
             showCards: showCardStatusBarItem,
             showNotes: showNoteStatusBarItem,
             showUpdate: showUpdateAvailableStatusBarItem,
-            cardsDue: countOf(ReviewItemState.NewItem) + countOf(ReviewItemState.DueItem),
+            cardsDue,
             notesDue: core?.noteReviewQueue.dueNotesCount ?? 0,
         });
     }
