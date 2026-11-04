@@ -359,6 +359,26 @@ describe("ReminderManager", () => {
         expect(uiManager.notifyReviewReminder).not.toHaveBeenCalled();
     });
 
+    test("still counts an SM-2 card introduced today and answered Again after the review allowance is spent", async () => {
+        const failed = dueCard();
+        failed.meta.id = "x";
+        const { manager, uiManager } = setup({
+            deck: deckWith(failed),
+            entries: [{ t: Date.now(), c: "x", r: 1, k: 0, n: 1 }],
+            settings: {
+                enableReviewReminders: true,
+                reviewReminderCheckOnStartup: true,
+                dailyLimitsEnabled: true,
+                reviewsPerDay: 0,
+            },
+        });
+
+        manager.restartReviewReminders();
+        await flush();
+
+        expect(uiManager.notifyReviewReminder).toHaveBeenCalledTimes(1);
+    });
+
     test("an answer given before the day boundary belongs to the study day before", async () => {
         jest.setSystemTime(new Date("2026-10-12T10:00:00Z"));
         globalDateProvider.setDayBoundary({ hour: 4, minute: 0, second: 0 });

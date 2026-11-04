@@ -3,6 +3,7 @@ import { Notice } from "obsidian";
 import { State } from "ts-fsrs";
 
 import { t } from "src/lang/translate";
+import { countToday } from "src/scheduling/daily-limits";
 import { FlashcardReviewMode } from "src/scheduling/review/review-mode";
 import { removalConfirmation } from "src/scheduling/review/review-session";
 import { FsrsState } from "src/scheduling/schedule/fsrs-state";
@@ -175,6 +176,54 @@ describe("D2 #4: daily limits", () => {
         expect(c.front).toBe("Q1");
         await c.reviewSession.processReview(ReviewResponse.Good);
         expect(c.reviewSession.hasCurrentCard).toBe(false);
+    });
+
+    test("an SM-2 new card answered Again comes back today although the review allowance is spent", async () => {
+        const c = await open("#flashcards A::a\n#flashcards B::b\n", {
+            ...SM2,
+            limits: { newCardsPerDay: 5, reviewsPerDay: 0 },
+        });
+        await c.reviewSession.processReview(ReviewResponse.Again);
+        expect(c.front).toBe("B");
+        await c.reviewSession.processReview(ReviewResponse.Good);
+        expect(c.front).toBe("A");
+
+        // A later session today reads the limits from the log, and shows it too
+        const later = await open(c.text, {
+            ...SM2,
+            limits: {
+                newCardsPerDay: 5,
+                reviewsPerDay: 0,
+                counts: countToday(c.log.entries, globalDateProvider.studyDayStartMs),
+            },
+        });
+        expect(later.front).toBe("A");
+        expect(later.reviewSession.getDeckStats(later.topicPath)).toMatchObject({
+            dueCount: 1,
+            dueHiddenByLimitCount: 0,
+        });
+    });
+
+    test("the repeat of an SM-2 new card answered Again spends no review", async () => {
+        const c = await open("#flashcards A::a\n#flashcards B::b\n", {
+            ...SM2,
+            limits: { newCardsPerDay: 5, reviewsPerDay: 10 },
+        });
+        await c.reviewSession.processReview(ReviewResponse.Again); // A
+        await c.reviewSession.processReview(ReviewResponse.Good); // B
+        expect(c.front).toBe("A");
+        await c.reviewSession.processReview(ReviewResponse.Good);
+        expect(c.log.entries.map((entry) => [entry.r, entry.k, entry.n])).toEqual([
+            [1, 0, 1],
+            [3, 0, 1],
+            [3, 1, undefined],
+        ]);
+        expect(c.limits.remainingNew()).toBe(3);
+        expect(c.limits.remainingReviews()).toBe(10);
+        expect(countToday(c.log.entries, globalDateProvider.studyDayStartMs)).toMatchObject({
+            newDone: 2,
+            reviewsDone: 0,
+        });
     });
 
     test("an FSRS card answered after a Reset spends the new-card allowance", async () => {

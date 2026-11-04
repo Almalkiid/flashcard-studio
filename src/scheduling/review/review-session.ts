@@ -718,7 +718,8 @@ export class ReviewSession implements IReviewSession {
 
     /**
      * A review card spends the review allowance, unless it already did today (an SM-2 card answered Again stays due).
-     * New, learning and relearning cards never do (D2 #4).
+     * New, learning and relearning cards never do (D2 #4), nor does a card introduced today whose schedule is a review
+     * one (an SM-2 new card answered Again: its repeats are learning steps).
      */
     private isLimitedByReviewAllowance(card: Card): boolean {
         return isReviewCard(card.scheduleInfo) && !this.dailyLimits.countedToday(card.meta.id);

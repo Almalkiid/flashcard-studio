@@ -14,7 +14,7 @@ describe("countToday", () => {
             entry({ t: DAY_START - 1, k: 0, n: 1 }), // yesterday
             entry({ t: DAY_START + 1, k: 0, n: 1 }), // new today
             entry({ t: DAY_START + 2, r: 1, k: 0 }), // a learning step, not a new card
-            entry({ t: DAY_START + 3, k: 1 }), // review
+            entry({ t: DAY_START + 3, c: "b", k: 1 }), // review
             entry({ t: DAY_START + 4, r: 0, k: 4 }), // manual reset, ignored
             entry({ t: DAY_START + 5, k: 3 }), // cram, ignored
             entry({ t: DAY_START + 6, k: 2 }), // relearning step, not counted as a review
@@ -34,6 +34,22 @@ describe("countToday", () => {
             ["x", DAY_START + 5],
             ["y", DAY_START + 7],
         ]);
+    });
+    test("a review answer to a card introduced earlier today is a learning step, in whatever order the logs come", () => {
+        const entries = [
+            entry({ t: DAY_START + 5, c: "x", k: 1 }), // the repeat of x, from another device's log
+            entry({ t: DAY_START + 1, c: "x", r: 1, k: 0, n: 1 }), // x is introduced and answered Again
+            entry({ t: DAY_START + 2, c: "z", k: 1 }), // z is reviewed, then reset and introduced again
+            entry({ t: DAY_START + 4, c: "z", k: 0, n: 1 }),
+            entry({ t: DAY_START + 6, c: "z", k: 1 }),
+        ];
+        const counts = countToday(entries, DAY_START);
+        expect(counts).toMatchObject({ newDone: 2, reviewsDone: 1 });
+        expect([...counts.introduced]).toEqual([
+            ["x", DAY_START + 1],
+            ["z", DAY_START + 4],
+        ]);
+        expect([...counts.reviewed]).toEqual([["z", DAY_START + 2]]);
     });
 });
 
@@ -59,7 +75,7 @@ describe("DailyLimits", () => {
         expect(limits.remainingReviews()).toBe(1);
 
         const newAnswer = entry({ k: 0, n: 1 });
-        const review = entry({ k: 1 });
+        const review = entry({ c: "b", k: 1 });
         limits.record(newAnswer);
         limits.record(review);
         expect(limits.remainingNew()).toBe(0);
@@ -90,6 +106,38 @@ describe("DailyLimits", () => {
         limits.unrecord(first);
         expect(limits.remainingReviews()).toBe(2);
         expect(limits.countedToday("x")).toBe(false);
+    });
+
+    test("a card introduced today spends no review when it is answered again (D2 #4)", () => {
+        const limits = new DailyLimits(
+            { dailyLimitsEnabled: true, newCardsPerDay: 5, reviewsPerDay: 1 },
+            { newDone: 0, reviewsDone: 0 },
+        );
+        // An SM-2 new card answered Again: its schedule is a review one, due today
+        const introduced = entry({ t: DAY_START + 1, c: "x", r: 1, k: 0, n: 1 });
+        const repeat = entry({ t: DAY_START + 2, c: "x", k: 1 });
+        expect(limits.countedToday("x")).toBe(false);
+        limits.record(introduced);
+        expect(limits.countedToday("x")).toBe(true);
+        limits.record(repeat);
+        expect(limits.remainingReviews()).toBe(1);
+
+        // Undoing the repeat gives nothing back; undoing the introduction forgets the card
+        limits.unrecord(repeat);
+        expect(limits.remainingReviews()).toBe(1);
+        expect(limits.countedToday("x")).toBe(true);
+        limits.unrecord(introduced);
+        expect(limits.remainingNew()).toBe(5);
+        expect(limits.countedToday("x")).toBe(false);
+
+        // A later session reads the same from the log
+        const fromLog = new DailyLimits(
+            { dailyLimitsEnabled: true, newCardsPerDay: 5, reviewsPerDay: 1 },
+            countToday([introduced, repeat], DAY_START),
+        );
+        expect(fromLog.countedToday("x")).toBe(true);
+        expect(fromLog.remainingNew()).toBe(4);
+        expect(fromLog.remainingReviews()).toBe(1);
     });
 
     test("cards counted earlier today, from the log, are known", () => {
