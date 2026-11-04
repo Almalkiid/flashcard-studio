@@ -396,6 +396,67 @@ describe("iterator operations (walker-ops.json)", () => {
         expect(it.nextReviewItem() && it.currentReviewItem.front).toBe("A1");
     });
 
+    test("moveCurrentReviewItemToEndOfList, any card from any deck: a new card that is now due comes back from the due list", () => {
+        const cards = ["Q1", "Q2", "Q3"].map((front) => makeCard(front, ["#flashcards"]));
+        const root = treeOf(...cards);
+        const it = new DeckWalker(
+            {
+                pickOrder: PickOrder.EveryCardRandomDeckAndCard,
+                deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+                daySalt: "2023-09-06",
+            },
+            root,
+        );
+        it.setIteratorTopicPath(TopicPath.emptyPath);
+        expect(it.nextReviewItem()).toBe(true);
+        const failed = it.currentReviewItem;
+        // Answered Again: due today, and its deck had no due list until now
+        failed.scheduleInfo = { isDue: () => true } as never;
+        it.moveCurrentReviewItemToEndOfList();
+        expect(root.getDeck(tag("#flashcards")).dueReviewItems).toEqual([failed]);
+
+        const seen = [];
+        while (it.nextReviewItem()) seen.push(it.currentReviewItem);
+        // The old code never offered it again: the walk ended with the card still in the due list
+        expect(seen).toHaveLength(3);
+        expect(new Set(seen)).toEqual(new Set(cards));
+        expect(root.getDeck(tag("#flashcards")).dueReviewItems).toEqual([]);
+    });
+
+    test("moveCurrentReviewItemToEndOfList, any card from any deck: also into a list that was emptied, and the shuffle stays", () => {
+        const fronts = ["D1", "N1", "N2", "N3", "N4", "N5"];
+        const deckOf = () =>
+            treeOf(...fronts.map((f) => makeCard(f, ["#flashcards"], f === "D1" ? "due" : "new")));
+        const order = {
+            pickOrder: PickOrder.EveryCardRandomDeckAndCard,
+            deckOrder: DeckOrder.PrevDeckComplete_Sequential,
+            daySalt: "2023-09-06",
+        };
+        const plain = walk(new DeckWalker(order, deckOf()), TopicPath.emptyPath).map((s) => s.card);
+        // The due list is emptied (D1 shown and gone) before a new card is answered
+        const failedAt = plain.indexOf("D1") + 1;
+        expect(failedAt).toBeLessThan(plain.length);
+
+        const root = deckOf();
+        const it = new DeckWalker(order, root);
+        it.setIteratorTopicPath(TopicPath.emptyPath);
+        const seen: string[] = [];
+        for (let i = 0; i <= failedAt; i++) {
+            it.nextReviewItem();
+            seen.push(it.currentReviewItem.front);
+        }
+        it.currentReviewItem.scheduleInfo = { isDue: () => true } as never;
+        it.moveCurrentReviewItemToEndOfList();
+        while (it.nextReviewItem()) seen.push(it.currentReviewItem.front);
+
+        const failed = plain[failedAt];
+        expect(seen.filter((front) => front === failed)).toEqual([failed, failed]);
+        // The other cards keep the order of the day
+        expect(seen.filter((front) => front !== failed)).toEqual(
+            plain.filter((front) => front !== failed),
+        );
+    });
+
     test("only the copy in the deck being walked moves", () => {
         const { root } = fixture();
         const it = seqIterator(root);
