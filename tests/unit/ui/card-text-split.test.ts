@@ -24,7 +24,16 @@ const MULTI_LINE = [
     ["Front\n\n?\n\nBack\n\nmore", CardType.MultiLineBasic],
     ["A??\n??\nB??", CardType.MultiLineReversed],
     ["What?\n  ?  \nanswer\n?\nnot a separator", CardType.MultiLineBasic],
+    // Indentation is markdown: an indented code block, a card nested in a list
+    ["How to print?\n?\n    print('hi')\n    more", CardType.MultiLineBasic],
+    ["- Capital of France\n  ?\n  Paris", CardType.MultiLineBasic],
+    ["- Main topic\n  ?\n  - sub a\n    - sub b", CardType.MultiLineBasic],
+    ["Front\n  \n\t?\n \n\tBack", CardType.MultiLineBasic],
 ] as const;
+
+/** A side of a multi-line card as the parser reads it, without the blank lines next to the separator. */
+const withoutBlankLinesAfter = (front: string) => front.replace(/(?:\n[ \t]*)+$/, "");
+const withoutBlankLinesBefore = (back: string) => back.replace(/^(?:[ \t]*\n)+/, "");
 
 describe("the edit dialog cuts a card where the parser does", () => {
     test.each([...SINGLE_LINE, ...MULTI_LINE])(
@@ -34,24 +43,35 @@ describe("the edit dialog cuts a card where the parser does", () => {
             expect(sides).not.toBeNull();
             const [parsed] = CardFrontBackUtil.expand(type, text, settings);
             const multi = type === CardType.MultiLineBasic || type === CardType.MultiLineReversed;
-            expect(sides?.front).toBe(multi ? parsed.front.trimEnd() : parsed.front);
-            expect(sides?.back).toBe(multi ? parsed.back.trimStart() : parsed.back);
+            expect(sides?.front).toBe(multi ? withoutBlankLinesAfter(parsed.front) : parsed.front);
+            expect(sides?.back).toBe(multi ? withoutBlankLinesBefore(parsed.back) : parsed.back);
         },
     );
 
-    test.each([...SINGLE_LINE, ...MULTI_LINE])(
-        "%j is saved as a card with the same two sides",
-        (text, type) => {
-            const sides = splitCardText(type, text, settings);
-            const saved = joinCardText(type, sides, settings);
-            // The text may differ in blank lines around a multi-line separator, but the parser reads the same card
-            const [before] = CardFrontBackUtil.expand(type, text, settings);
-            const [after] = CardFrontBackUtil.expand(type, saved, settings);
-            expect(after.front.trim()).toBe(before.front.trim());
-            expect(after.back.trim()).toBe(before.back.trim());
-            expect(splitCardText(type, saved, settings)).toEqual(sides);
-        },
-    );
+    // Saving without a change rewrote the note: the first answer line and the separator line lost their indentation,
+    // which broke an indented code block and moved a card nested in a list out of its list item
+    test.each([...SINGLE_LINE, ...MULTI_LINE])("%j is saved byte for byte", (text, type) => {
+        const sides = splitCardText(type, text, settings);
+        const saved = joinCardText(type, sides, settings);
+        expect(saved).toBe(text);
+        expect(splitCardText(type, saved, settings)).toEqual(sides);
+    });
+
+    test("an edited side keeps the indentation of the other side and of the separator line", () => {
+        const text = "- Capital of France\n  ?\n  Paris";
+        const sides = splitCardText(CardType.MultiLineBasic, text, settings);
+        expect(sides).toEqual({ front: "- Capital of France", back: "  Paris", between: "  ?" });
+        const edited = { ...sides, front: "- Capital of Italy" };
+        expect(joinCardText(CardType.MultiLineBasic, edited, settings)).toBe(
+            "- Capital of Italy\n  ?\n  Paris",
+        );
+    });
+
+    test("an indented code block answer keeps its first line in the code block", () => {
+        const text = "How to print?\n?\n    print('hi')\n    more";
+        const sides = splitCardText(CardType.MultiLineBasic, text, settings);
+        expect(sides?.back).toBe("    print('hi')\n    more");
+    });
 
     test("a single-line card is saved byte for byte", () => {
         const text = "std::vector::push";
@@ -67,7 +87,7 @@ describe("the edit dialog cuts a card where the parser does", () => {
         expect([oldFront, oldBack]).toEqual(["Is it", "\n"]);
 
         const sides = splitCardText(CardType.MultiLineBasic, text, settings);
-        expect(sides).toEqual({ front: "Is it?", back: "Yes" });
+        expect(sides).toEqual({ front: "Is it?", back: "Yes", between: "?" });
         expect(joinCardText(CardType.MultiLineBasic, sides, settings)).toBe(text);
     });
 

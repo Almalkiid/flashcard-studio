@@ -35,7 +35,10 @@ export class FlashcardEditModal extends Modal {
     private resolvePromise!: (text: string) => void;
     private rejectPromise!: (reason?: unknown) => void;
 
-    /** Opens the dialog. Resolves with the new text of the question when saved, rejects with `EditCancelled` otherwise. */
+    /**
+     * Opens the dialog. Resolves with the new text of the question when saved, rejects with `EditCancelled` otherwise,
+     * also when it is saved without a change: there is then nothing to write to the note.
+     */
     public static Prompt(
         app: App,
         settings: StudioSettings,
@@ -138,16 +141,19 @@ export class FlashcardEditModal extends Modal {
 
     private save(): void {
         if (this.settled || !this.isComplete()) return;
-        this.settled = true;
         const text =
             this.sides === null
                 ? this.frontField.value
                 : joinCardText(
                       this.type,
-                      { front: this.frontField.value, back: this.backField.value },
+                      { ...this.sides, front: this.frontField.value, back: this.backField.value },
                       this.settings,
                   );
-        this.resolvePromise(text);
+        // Unchanged, it is closed as cancelled, so the note is not written
+        if (text !== this.text) {
+            this.settled = true;
+            this.resolvePromise(text);
+        }
         this.close();
     }
 }
