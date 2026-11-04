@@ -29,6 +29,21 @@ describe("delete scheduling data writes only the notes it changes", () => {
         expect(files.frontmatter.get("b.md")).toEqual({ tags: ["keep"] });
     });
 
+    test("a frontmatter tag that only starts like a removed one stays, and alone does not open the note", async () => {
+        const files = new Files(
+            { "a.md": "x\n", "b.md": "y\n" },
+            {
+                "a.md": { tags: ["reviewed", "audit"] },
+                "b.md": { tags: ["review", "reviewed", "project"] },
+            },
+        );
+        const edit = jest.spyOn(files.fileManager, "processFrontMatter");
+        await files.modifier.deleteAllSchedulingDataInNotes(true, ["#review"]);
+        expect(edit.mock.calls.map(([file]) => (file as { path: string }).path)).toEqual(["b.md"]);
+        expect(files.frontmatter.get("a.md")).toEqual({ tags: ["reviewed", "audit"] });
+        expect(files.frontmatter.get("b.md")).toEqual({ tags: ["reviewed", "project"] });
+    });
+
     test("only the note with a comment is written, with tags asked for or not", async () => {
         const files = new Files({
             "a.md": "plain\n",
