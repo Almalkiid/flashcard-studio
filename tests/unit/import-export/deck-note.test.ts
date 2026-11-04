@@ -3,6 +3,7 @@ import {
     appendToDeckNote,
     deckLevels,
     deckNotePath,
+    deckTagOfNote,
     deckTags,
     formatDeckNote,
     joinPath,
@@ -128,6 +129,57 @@ describe("tags", () => {
             "Lang::C++": "#flashcards/Lang/C-2",
             "Lang::C++::Basics": "#flashcards/Lang/C-2/Basics",
         });
+    });
+
+    test("deckTags keeps the tags on existing deck notes and gives them to no other deck", () => {
+        const existing = new Map([
+            ["C", "#flashcards/C"],
+            ["C++", "#flashcards/C-2"],
+        ]);
+        expect(Object.fromEntries(deckTags("#flashcards", ["C", "C#", "C++"], existing))).toEqual({
+            C: "#flashcards/C",
+            "C++": "#flashcards/C-2",
+            "C#": "#flashcards/C-3",
+        });
+    });
+
+    test("deckTags keeps the tags of an existing deck note's parents for them", () => {
+        const existing = new Map([["Lang::C++::Basics", "#flashcards/Lang/C/Basics"]]);
+        const decks = ["Lang::C#", "Lang::C++::Basics", "Lang::C++::Advanced"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks, existing))).toEqual({
+            "Lang::C#": "#flashcards/Lang/C-2",
+            "Lang::C++::Basics": "#flashcards/Lang/C/Basics",
+            "Lang::C++::Advanced": "#flashcards/Lang/C/Advanced",
+        });
+    });
+
+    test("deckTags keeps a tag changed to another depth for its deck only", () => {
+        const existing = new Map([
+            ["C", "#flashcards/Programming/C"],
+            ["Other", "#notes/Other"],
+        ]);
+        const decks = ["C", "C::Basics", "Programming::C", "Other"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks, existing))).toEqual({
+            C: "#flashcards/Programming/C",
+            "C::Basics": "#flashcards/Programming/C/Basics",
+            "Programming::C": "#flashcards/Programming/C-2",
+            // Not a tag under the flashcard tag
+            Other: "#flashcards/Other",
+        });
+    });
+
+    test("deckTagOfNote reads the deck tag from a deck note's tag line", () => {
+        expect(deckTagOfNote("#flashcards/C-2 #a #b\n\nq\n?\na\n", "#flashcards")).toBe(
+            "#flashcards/C-2",
+        );
+        expect(deckTagOfNote("#flashcards/Spanish/Verbs", "#flashcards")).toBe(
+            "#flashcards/Spanish/Verbs",
+        );
+        expect(deckTagOfNote("#cards/C\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("#flashcardsX/C\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("#flashcards\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("q\n?\na\n", "#flashcards")).toBeNull();
+        expect(deckTagOfNote("", "#flashcards")).toBeNull();
     });
 
     test("tagLine puts the deck tag first, then the Anki tags", () => {

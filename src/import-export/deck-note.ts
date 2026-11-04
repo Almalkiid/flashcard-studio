@@ -98,24 +98,59 @@ function compareLevels(a: string[], b: string[]): number {
  * Decks whose names differ only in characters a tag cannot have would get the same tag, and so become one deck. A
  * level whose tag another deck already has gets a number instead: `C`, `C#` and `C++` are `#flashcards/C`,
  * `#flashcards/C-2` and `#flashcards/C-3`.
+ *
+ * `existing` has the tag on the note of each deck that an earlier import made a note for. Such a deck keeps it, its
+ * parents keep the levels of it above the deck, so that a new subdeck follows them, and no other deck gets one of
+ * these tags.
  */
-export function deckTags(flashcardTag: string, decks: string[]): Map<string, string> {
-    // The deck, its levels joined with `::`, that each tag is for
+export function deckTags(
+    flashcardTag: string,
+    decks: string[],
+    existing: ReadonlyMap<string, string> = new Map(),
+): Map<string, string> {
+    // Each tag and the deck, its levels joined with `::`, that it is for, both ways round
     const owners = new Map<string, string>();
+    const ownTags = new Map<string, string>();
+    const claim = (owner: string, tag: string): void => {
+        if (owners.has(tag) || ownTags.has(owner)) return;
+        owners.set(tag, owner);
+        ownTags.set(owner, tag);
+    };
+    const ownerAt = (levels: string[], index: number): string =>
+        levels.slice(0, index + 1).join(ANKI_DECK_SEPARATOR);
+    const byLevels = (names: Iterable<string>) =>
+        Array.from(new Set(names), (deck) => ({ deck, levels: deckLevels(deck) })).sort((a, b) =>
+            compareLevels(a.levels, b.levels),
+        );
+
+    for (const { deck, levels } of byLevels(existing.keys())) {
+        const tag = existing.get(deck);
+        if (levels.length === 0 || !tag.startsWith(`${flashcardTag}/`)) continue;
+        const tagLevels = tag.slice(flashcardTag.length + 1).split("/");
+        if (tagLevels.length === levels.length) {
+            levels.forEach((_, index) =>
+                claim(
+                    ownerAt(levels, index),
+                    [flashcardTag, ...tagLevels.slice(0, index + 1)].join("/"),
+                ),
+            );
+        } else {
+            // A tag changed to one of another depth says nothing about the parents' tags
+            claim(ownerAt(levels, levels.length - 1), tag);
+        }
+    }
+
     const tags = new Map<string, string>();
-    const sorted = Array.from(new Set(decks), (deck) => ({ deck, levels: deckLevels(deck) })).sort(
-        (a, b) => compareLevels(a.levels, b.levels),
-    );
-    for (const { deck, levels } of sorted) {
+    for (const { deck, levels } of byLevels(decks)) {
         let tag = flashcardTag;
         levels.forEach((level, index) => {
-            const owner = levels.slice(0, index + 1).join(ANKI_DECK_SEPARATOR);
+            const owner = ownerAt(levels, index);
             const base = `${tag}/${tagLevel(level)}`;
-            tag = base;
+            tag = ownTags.get(owner) ?? base;
             for (let number = 2; (owners.get(tag) ?? owner) !== owner; number++) {
                 tag = `${base}-${number}`;
             }
-            owners.set(tag, owner);
+            claim(owner, tag);
         });
         tags.set(deck, tag);
     }
@@ -153,4 +188,11 @@ export function appendToDeckNote(existing: string, cards: ImportedCard[], tags: 
 /** The tag line of a new deck note: the deck's tag (see `deckTags`), then the Anki tags of its notes. */
 export function tagLine(deckTag: string, tags: string[]): string {
     return [deckTag, ...tags.map((tag) => `#${tag}`)].join(" ");
+}
+
+/** The deck tag at the start of a deck note's tag line, or null when its first line does not start with one. */
+export function deckTagOfNote(text: string, flashcardTag: string): string | null {
+    const end = text.indexOf("\n");
+    const first = (end < 0 ? text : text.slice(0, end)).trim().split(/\s+/)[0];
+    return first.startsWith(`${flashcardTag}/`) ? first : null;
 }
