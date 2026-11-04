@@ -1,7 +1,7 @@
 import { get_fuzz_range as getFuzzRange } from "ts-fsrs";
 
 import { DueDateHistogram } from "src/scheduling/due-histogram";
-import { pickFsrsBalancedInterval } from "src/scheduling/fsrs/load-balance";
+import { FsrsLoadBalanceOptions, pickFsrsBalancedInterval } from "src/scheduling/fsrs/load-balance";
 import { moment } from "src/utils/moment-en";
 
 const NOW = moment("2023-09-06T00:00:00.000Z");
@@ -14,7 +14,7 @@ const BASE = {
     easyDays: [] as number[],
 };
 
-function picks(overrides: Partial<typeof BASE> = {}, count = 1000): number[] {
+function picks(overrides: Partial<FsrsLoadBalanceOptions> = {}, count = 1000): number[] {
     return Array.from({ length: count }, (_, index) =>
         pickFsrsBalancedInterval({ ...BASE, ...overrides, seed: `card-${index}` }),
     );
@@ -45,4 +45,19 @@ test("every pick stays in ts-fsrs's fuzz window", () => {
         expect(interval).toBeGreaterThanOrEqual(minimumInterval);
         expect(interval).toBeLessThanOrEqual(maximumInterval);
     }
+});
+
+test("a minimum interval cuts the window, and is the pick when the whole window lies below it", () => {
+    const { max_ivl: maximumInterval } = getFuzzRange(40, 10, 36525);
+    for (const interval of picks({ minimumInterval: 41 }, 200)) {
+        expect(interval).toBeGreaterThanOrEqual(41);
+        expect(interval).toBeLessThanOrEqual(maximumInterval);
+    }
+    expect(picks({ minimumInterval: maximumInterval + 3 }, 20)).toEqual(
+        Array(20).fill(maximumInterval + 3),
+    );
+    // Below the fuzzed range, too
+    expect(
+        pickFsrsBalancedInterval({ ...BASE, targetInterval: 2, seed: "s", minimumInterval: 3 }),
+    ).toBe(3);
 });
