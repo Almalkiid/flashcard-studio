@@ -21,7 +21,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 - **More ways to answer.** Multiple choice cards from a plain checklist, typed answers that show which letters were wrong, and cards read aloud with your device's voices.
 - **Know where you are weak.** The statistics rank your decks by how well you remembered them in the last 30 days, against your target, and the home screen puts the weakest one first with one tap to study it.
 - **Fix mistakes while they are fresh.** At the end of a session, **Review mistakes** goes over exactly the cards you missed.
-- **Practise like the real thing.** Exams with a timer from your multiple choice cards, or all your cards, with a question map, a score against your pass mark and the score of each deck, progress that survives closing the tab, and one tap to study what you missed.
+- **Practise like the real thing.** Exams with a timer from your multiple choice cards, or all your cards, from decks or the notes you choose, with a question map, a score against your pass mark and the score of each deck, progress that survives closing the tab, and one tap to study what you missed.
 - **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
 - **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI or a local model), look them over, and add only the ones you want.
@@ -166,11 +166,15 @@ On a computer, Flashcard Studio opens as a full tab with a sidebar, in place of 
 
 Run **Flashcard Studio: Take an exam** from the command palette, press **Take an exam** on the home screen, or choose **Exams** in the desktop sidebar. Choose the decks, the number of questions, a time limit (or none) and which cards to ask: **Multiple choice only**, or **All cards**, where a card with a short plain answer is typed and any other card is one you mark yourself after looking at the answer. An image occlusion card is typed too when the label of its mask is short plain text. Two presets fill it in: **Quick check** (20 questions, no limit) and **CIA simulation** (125 questions, 150 minutes). Cloze cards and suspended cards are never asked, and an exam never changes the schedule of a card.
 
+To be asked about particular notes rather than whole decks, switch **Cards from** to **Notes** and choose **Add note**: the search lists the notes that have cards an exam can ask, and each chosen note shows how many questions it can give. Or run **Flashcard Studio: Take an exam from this note**, or choose **Take an exam from this note** in a note's file menu, to open the setup with that note chosen. A note with nothing to ask says so. Retake, the setup that starts from your last exam, and a resumed exam keep the notes.
+
 The exam shows one question at a time, with "12 / 125" and the time left at the top. The time turns orange under five minutes, and the exam is submitted when it reaches zero. Flag a question to come back to it. The question map, beside the question on a desktop and a sheet from the bottom on a phone, shows what is answered and what is flagged, and jumps to any question. Press 1 to 9 to choose an option, the left and right arrows to move, F to flag and Enter to go on; the keys are read by where they are on the keyboard, so they work on an Arabic or an AZERTY layout, and they only work while the exam is the pane you are in. **Submit** asks first, and says how many questions are unanswered or flagged.
 
 Your progress is saved as you go: after every answer, flag and move, and when you pause typing, and only when something changed. If you close the tab, or quit Obsidian, the exam is still there. Obsidian offers to **Resume exam** when it starts, and **Exams** lists it first. A timed exam keeps its deadline: time passes while it is closed, as in a real exam, and one that ran out is submitted as you left it. **Discard** (two presses) or **Leave** in the exam throws it away. An exam is resumed on the device that started it.
 
-The results show your score against the pass mark, the time taken, the score of each deck, and every question with your answer, the right one and the explanation. The pass mark is 75% until you change it in **Settings, Exams**. The CIA reports a scaled score, so this is a practice target, not the official pass mark. **Study the ones I missed** starts a review of exactly those cards, and a question left unanswered counts as missed.
+The results show your score against the pass mark, the time taken, the score of each deck (of each note, for an exam from several notes), and every question with your answer, the right one and the explanation. The pass mark is 75% until you change it in **Settings, Exams**. The CIA reports a scaled score, so this is a practice target, not the official pass mark. **Study the ones I missed** starts a review of exactly those cards, and a question left unanswered counts as missed.
+
+When AI is set up for card generation, the setup also offers **AI checks typed answers** (with **All cards**). When you submit, each typed answer that does not match exactly gets the same check as **Check meaning with AI** in a review: its question, the expected answer and what you typed are sent to your provider, and nothing else; with the option off nothing is sent. An answer with the same meaning counts as right in the score. A different meaning, an AI that cannot decide, or a check that fails or takes longer than 10 seconds leaves it wrong. The progress shows while it checks, and **Show results now** stops waiting. The results and the exam's file show the AI's verdict and reason for every answer it checked. The label of an image occlusion card is never sent.
 
 Each exam is saved as one plain file in `Flashcard Studio/Exams/`, for example `2026-09-30 1405 exam.md`: a summary table, and one JSON line for each question. The setup lists your last five exams and starts from the last one, so a retake is one press of **Start exam**.
 
@@ -221,11 +225,12 @@ Or open [Flashcard Studio in the community directory](https://community.obsidian
 
 ## Network use
 
-Flashcard Studio works offline. It makes a network request only in three cases:
+Flashcard Studio works offline. It makes a network request only in four cases:
 
 - You turn on **Show update available status bar item** in the settings (it is off by default). Flashcard Studio then asks GitHub for the latest release of this repository, at most once a day while the status bar item is shown, and compares its version number with yours. The request carries no information about you or your notes.
 - You run **Generate cards with AI**, which sends the note or selection you chose, and your extra instructions, to the provider you set up in the settings. Nothing is sent until you choose **Generate**.
 - You turn on **Check meaning with AI** in the typed-answer settings (it is off by default). Then, when you reveal a typed answer on a basic or reversed card that does not match exactly, the question, the expected answer and your typed answer are sent to that same provider. Nothing else from the note is sent.
+- You turn on **AI checks typed answers** when you set up an exam (it is off by default). Then, when you submit it, each typed answer that does not match exactly is sent with its question and expected answer to that same provider. Nothing else from the note is sent.
 
 ## Compatibility and credits
 

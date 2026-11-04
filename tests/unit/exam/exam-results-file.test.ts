@@ -5,6 +5,7 @@ import {
     ExamSetup,
     pickExamQuestions,
     scoreExam,
+    summarizeExam,
 } from "src/exam/exam";
 import {
     examFileName,
@@ -162,6 +163,69 @@ describe("formatExamFile", () => {
         const first = questionLines.find((line) => line.includes("charter.png"));
         expect(first).toBeDefined();
         expect(first).not.toContain("\n");
+    });
+});
+
+describe("exams from notes, and files written before them", () => {
+    /** A file as version 0.13.0 wrote it: no notes, no AI checks. */
+    const FILE_0_13_0 = [
+        "# Exam · CIA",
+        "",
+        "| Score | 100% (1 of 1) |",
+        "|---|---|",
+        "| Result | Passed (pass mark 75%) |",
+        "| Time taken | 1 min |",
+        "| Finished | 2026-09-30 14:07 |",
+        "| Cards | All cards |",
+        "",
+        "| Deck | Right |",
+        "|---|---|",
+        "| CIA/Part2 | 1 of 1 |",
+        "",
+        "```fs-exam",
+        '{"kind":"exam","setup":{"decks":["CIA"],"count":20,"minutes":null,"filter":"all","passPercent":75,"title":"Exam · CIA","shuffleOptions":true},"startedMs":1790776800000,"endedMs":1790776860000}',
+        '{"q":{"cardId":"c3","deck":"CIA/Part2","kind":"typed","front":"What does CAE stand for?","back":"Chief Audit Executive","choice":null,"order":[],"sourcePath":"","typedTarget":"Chief Audit Executive"},"a":{"chosen":[],"typed":"chief audit executive","selfRight":null,"flagged":false,"ms":5000},"right":true}',
+        "```",
+        "",
+    ].join("\n");
+
+    test("a file written by 0.13.0 reads as it always did", () => {
+        const result = parseExamFile(FILE_0_13_0);
+        expect(result).not.toBeNull();
+        expect(result?.setup).toStrictEqual({
+            decks: ["CIA"],
+            count: 20,
+            minutes: null,
+            filter: "all",
+            passPercent: 75,
+            title: "Exam · CIA",
+            shuffleOptions: true,
+        });
+        expect(result).toMatchObject({ right: 1, total: 1, percent: 100, passed: true });
+        expect(Object.keys(result?.items[0] ?? {}).sort()).toEqual(["a", "q", "right"]);
+    });
+
+    test("an exam from notes keeps its notes, lists them literally and scores each note", () => {
+        const result = makeResult();
+        const notes = ["Bio/[Cell]_1.md", "Bio/DNA|x.md"];
+        const items = result.items.map((item, index) => ({
+            ...item,
+            q: { ...item.q, sourcePath: notes[index % 2] },
+        }));
+        const fromNotes = summarizeExam(
+            { ...result.setup, decks: [], notes },
+            items,
+            result.startedMs,
+            result.endedMs,
+        );
+        const text = formatExamFile(fromNotes);
+        const summary = text.slice(0, text.indexOf("```fs-exam"));
+        expect(summary).toContain("| Notes | Bio/\\[Cell\\]\\_1.md, Bio/DNA\\|x.md |");
+        expect(summary).toMatch(/^\| Bio\/\\\[Cell\\\]\\_1\.md \| \d of 2 \|$/m);
+        expect(summary).not.toContain("| Deck | Right |");
+        // Never a link to a note: it would count as one in note review
+        expect(summary).not.toContain("[[");
+        expect(parseExamFile(text)).toEqual(fromNotes);
     });
 });
 

@@ -1,8 +1,10 @@
 import "src/exam/exam.css";
 import { Component, ItemView, Notice, setIcon } from "obsidian";
 
+import type { MeaningChecker } from "src/ai/ai-access";
 import {
     emptyAnswer,
+    ExamAiCheck,
     ExamAnswer,
     examEndMs,
     examKeyAction,
@@ -16,6 +18,7 @@ import {
     remainingMs,
     scoreExam,
 } from "src/exam/exam";
+import { aiCheckIndexes, aiCheckInput, applyAiChecks, runAiChecks } from "src/exam/exam-ai-check";
 import { isEditable, trapTab } from "src/exam/exam-dom";
 import { ExamDraft, makeDraft, newDraftId } from "src/exam/exam-draft";
 import { markExamGone, markExamLive } from "src/exam/exam-draft-store";
@@ -31,6 +34,7 @@ import { t } from "src/lang/translate";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { renderChoiceTiles } from "src/ui/obsidian-ui-components/content-container/card-container/choice-view";
 import { renderTypedInput } from "src/ui/obsidian-ui-components/content-container/card-container/typed-answer-view";
+import { formatDateTimeShort } from "src/ui/statistics-view/format";
 
 /** The timer turns orange when this little time is left. */
 const LOW_TIME_MS = 5 * 60_000;
@@ -57,6 +61,8 @@ export interface ExamRunOptions {
     persist?: (draft: ExamDraft) => void;
     /** Forgets the saved progress: the exam was submitted or the person left it for good. */
     discard?: (id: string) => void;
+    /** The AI meaning check, for an exam set up with `aiCheck`. Without both, nothing is sent. */
+    ai?: MeaningChecker;
 }
 
 interface DialogAction {
@@ -85,7 +91,11 @@ export class ExamRunner {
     private readonly revealed = new Set<number>();
 
     private current: number;
-    private phase: "running" | "results" = "running";
+    /** Taking the exam, waiting for the AI's checks of the typed answers once it is submitted, or the results. */
+    private phase: "running" | "checking" | "results" = "running";
+    /** Stops the AI's checks: "Show results now", or the exam taken off the screen. */
+    private aiAbort: AbortController | null = null;
+    private destroyed = false;
     private readonly startedMs: number;
     /** Names the exam among the saved ones. */
     private readonly id: string;
@@ -181,6 +191,9 @@ export class ExamRunner {
      * it can be taken up again. Leaving for good is `requestLeave`.
      */
     destroy(): void {
+        // Closed while the AI checks the answers: the exam was submitted, and is saved with the checks done so far
+        this.destroyed = true;
+        this.aiAbort?.abort();
         this.stopTimer();
         // What was typed in the last moment is saved with it
         if (this.typingSaveId !== null) this.persist();
@@ -688,15 +701,15 @@ export class ExamRunner {
 
     /**
      * Marks the exam, saves it and shows the results. Time running out submits it as it is, and the exam ends at its
-     * deadline, not at the moment a device that slept wakes up.
+     * deadline, not at the moment a device that slept wakes up. For an exam set up with AI checks, the typed answers
+     * that do not match exactly go to the AI first; the clock is stopped before, so the checks never add to the time.
      */
     private finish(timeUp: boolean): void {
         if (this.phase !== "running") return;
         this.stopTimer();
-        this.cancelTypingSave();
         this.closeDialog();
         this.noteTimeSpent();
-        const result = scoreExam(
+        const exact = scoreExam(
             this.setup,
             this.questions,
             this.answers,
@@ -704,9 +717,110 @@ export class ExamRunner {
             examEndMs(this.setup, this.startedMs, Date.now()),
             this.opts.ignoreAccents,
         );
-        this.phase = "results";
         if (timeUp) new Notice(t("EXAM_TIME_UP"));
 
+        const plan = aiCheckIndexes(exact);
+        const ai = this.opts.ai;
+        if (plan.length === 0 || ai === undefined) {
+            this.showResults(exact);
+            return;
+        }
+        // The checks can take a while: the draft gets the last letters typed first, so quitting now loses nothing
+        this.persist();
+        if (!ai.usable()) {
+            // Set up when the exam started, not now: nothing is sent, and every answer keeps its exact mark
+            const setup: ExamAiCheck = { verdict: "unavailable", reason: "setup" };
+            this.showResults(applyAiChecks(exact, new Map(plan.map((index) => [index, setup]))));
+            return;
+        }
+        void this.checkThenShow(exact, plan, ai);
+    }
+
+    /** Asks the AI about the answers in `plan`, showing how far it is, then shows the results with its checks. */
+    private async checkThenShow(
+        exact: ExamResult,
+        plan: number[],
+        ai: MeaningChecker,
+    ): Promise<void> {
+        this.phase = "checking";
+        const abort = new AbortController();
+        this.aiAbort = abort;
+        const progress = this.renderChecking(exact, plan.length, ai.provider(), () =>
+            abort.abort(),
+        );
+        const checks = await runAiChecks(
+            plan.map((index) => aiCheckInput(exact.items[index])),
+            (input) => ai.check(input),
+            { signal: abort.signal, onProgress: progress },
+        );
+        this.aiAbort = null;
+        const marked = applyAiChecks(exact, new Map(plan.map((index, i) => [index, checks[i]])));
+        // Taken off the screen while checking: the exam was submitted, so it is saved with the checks that were done
+        if (this.destroyed) {
+            void this.saveResult(marked);
+            return;
+        }
+        this.showResults(marked);
+    }
+
+    /**
+     * While the AI checks the typed answers: how many it has done, who they were sent to, and a button to see the
+     * results without waiting. Returns what to call as checks come back.
+     */
+    private renderChecking(
+        exact: ExamResult,
+        total: number,
+        provider: string,
+        skip: () => void,
+    ): (done: number) => void {
+        const root = this.root;
+        root.empty();
+        root.addClass("is-results");
+        root.removeClass("is-map-open");
+        const bar = root.createDiv({ cls: "fs-exam-bar is-results" });
+        const heading = bar
+            .createDiv({ cls: "fs-exam-bar-side" })
+            .createDiv({ cls: "fs-exam-heading" });
+        heading.createDiv({ cls: "fs-exam-title", text: this.setup.title });
+        heading.createDiv({ cls: "fs-exam-when", text: formatDateTimeShort(exact.endedMs) });
+
+        const page = root
+            .createDiv({ cls: "fs-exam-results-scroll" })
+            .createDiv({ cls: "fs-exam-results" });
+        const card = page.createDiv({ cls: "fs-card fs-exam-checking" });
+        setIcon(card.createSpan({ cls: "fs-exam-checking-icon" }), "sparkles");
+        card.createDiv({ cls: "fs-exam-checking-title", text: t("EXAM_AI_CHECKING_TITLE") });
+        const status = card.createDiv({
+            cls: "fs-exam-checking-progress",
+            attr: { role: "status", "aria-live": "polite" },
+        });
+        const fill = card
+            .createDiv({ cls: "fs-exam-checking-track" })
+            .createDiv({ cls: "fs-exam-checking-fill" });
+        card.createDiv({
+            cls: "fs-exam-checking-note",
+            text: t("EXAM_AI_CHECKING_SENT", { provider }),
+        });
+        const button = card.createEl("button", {
+            cls: "fs-exam-ghost fs-exam-checking-skip",
+            text: t("EXAM_AI_SKIP"),
+            attr: { type: "button" },
+        });
+        button.addEventListener("click", skip);
+        button.focus();
+
+        const show = (done: number) => {
+            status.setText(t("EXAM_AI_CHECKING_PROGRESS", { done, total }));
+            fill.setCssProps({ "--fs-progress": String(total === 0 ? 0 : done / total) });
+        };
+        show(0);
+        return show;
+    }
+
+    /** The results on screen, and the file written. */
+    private showResults(result: ExamResult): void {
+        this.phase = "results";
+        this.cancelTypingSave();
         this.root.empty();
         this.root.addClass("is-results");
         this.root.removeClass("is-map-open");

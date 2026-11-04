@@ -1,6 +1,6 @@
 import { setIcon } from "obsidian";
 
-import type { SemanticOutcome } from "src/ai/typed-answer-grading";
+import { meaningUnavailableText, type SemanticOutcome } from "src/ai/typed-answer-grading";
 import { t } from "src/lang/translate";
 import { DiffPart, TypedComparison } from "src/scheduling/typed-answer";
 import { TextDirection } from "src/utils/text";
@@ -71,13 +71,9 @@ export function renderSemanticStatus(el: HTMLElement, outcome: SemanticOutcome |
         return;
     }
     if (outcome.status === "unavailable") {
-        const reasons = {
-            setup: t("AI_MEANING_SETUP"),
-            timeout: t("AI_MEANING_TIMEOUT"),
-            provider: t("AI_MEANING_PROVIDER"),
-            format: t("AI_MEANING_FORMAT"),
-        };
-        el.textContent = t("AI_MEANING_UNAVAILABLE", { reason: reasons[outcome.reason] });
+        el.textContent = t("AI_MEANING_UNAVAILABLE", {
+            reason: meaningUnavailableText(outcome.reason),
+        });
         return;
     }
     const labels = {

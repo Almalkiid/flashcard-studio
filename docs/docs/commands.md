@@ -21,6 +21,7 @@ Commands are available from Obsidian’s command palette. Commands which operate
 | Import Anki deck                                               | Opens the `.apkg`, `.colpkg`, or text import dialog.                 | Always                      |
 | Export cards to Anki                                           | Opens export after synchronising the deck hierarchy.                 | Plugin initialised          |
 | Take an exam                                                   | Opens exam setup.                                                    | Plugin initialised          |
+| Take an exam from this note                                    | Opens exam setup with the active note chosen.                        | Active Markdown note        |
 | Generate cards with AI                                         | Generates from the active note or selected editor text.              | Active Markdown editor      |
 | Show the welcome guide                                         | Reopens onboarding.                                                  | Always                      |
 | Create a sample deck                                           | Creates the example deck.                                            | Plugin initialised          |

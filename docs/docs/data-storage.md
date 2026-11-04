@@ -29,7 +29,7 @@ The plugin also reads `tags` from Obsidian frontmatter. Use `#flashcards` or `#r
 ## Review logs, exams, and `data.json`
 
 - **Review log:** `Flashcard Studio/Review log/` by default. Each device writes one Markdown file per month; each answer is one JSON line, avoiding multiple devices writing the same log.
-- **Completed exams:** `Flashcard Studio/Exams/`, one Markdown file per exam with a summary and JSON lines for questions.
+- **Completed exams:** `Flashcard Studio/Exams/`, one Markdown file per exam with a summary and JSON lines for questions, with the AI's verdict and reason for each typed answer it checked.
 - **Exam drafts:** plugin storage under `exam-drafts/`, separated by device, until submitted or discarded.
 - **`data.json`:** plugin settings, including scheduler, display, card-format, reminders, source, and AI-provider choices. It stores the selected secret name, not the API key itself.
 
