@@ -235,12 +235,12 @@ export class ExamSetupModal extends Modal {
     /** `Exam · CIA` for the decks chosen, or `Exam` for all of them. */
     private defaultTitle(): string {
         const top = this.rows.filter((row) => row.depth === 0);
+        // Worked out once: it costs a pass over the chosen decks for each of them
+        const selected = new Set(this.selectedDecks());
         const names =
-            this.selectedDecks().length === 0
+            selected.size === 0
                 ? top.map((row) => row.name)
-                : this.rows
-                      .filter((row) => this.selectedDecks().includes(row.path))
-                      .map((row) => row.name);
+                : this.rows.filter((row) => selected.has(row.path)).map((row) => row.name);
         return names.length === 0
             ? t("EXAM_DEFAULT_TITLE_ALL")
             : t("EXAM_DEFAULT_TITLE", { decks: joinDeckNames(names) });
