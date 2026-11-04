@@ -1,4 +1,6 @@
 import {
+    ExamAiCheck,
+    ExamAiUnavailable,
     ExamAnswer,
     examBreakdown,
     ExamCardFilter,
@@ -8,6 +10,7 @@ import {
     ExamResult,
     ExamSetup,
     examTypedTarget,
+    plainExcerpt,
     summarizeExam,
 } from "src/exam/exam";
 
@@ -119,6 +122,52 @@ function breakdownLines(r: ExamResult): string[] {
     ];
 }
 
+/** The AI's verdict on an answer, and why it gave none, as the file says them. */
+const FILE_VERDICTS: Record<ExamAiCheck["verdict"], string> = {
+    equivalent: "Same meaning, counted right",
+    incorrect: "Different meaning",
+    uncertain: "Could not decide",
+    unavailable: "Not checked",
+};
+const FILE_UNAVAILABLE: Record<ExamAiUnavailable, string> = {
+    setup: "AI is not set up",
+    timeout: "Took longer than 10 seconds",
+    provider: "The provider could not complete the check",
+    format: "The reply was incomplete or invalid",
+    skipped: "Stopped before this answer",
+};
+
+/**
+ * The answers the AI checked, to read without the JSON: the question, the answer, the verdict and the AI's reason.
+ * Every cell is literal, so nothing the model wrote can become a link, HTML or markup in the file.
+ */
+function aiCheckLines(r: ExamResult): string[] {
+    const checked = r.items.flatMap((item, index) =>
+        item.ai === undefined ? [] : [{ item, index, ai: item.ai }],
+    );
+    if (checked.length === 0) return [];
+    return [
+        "## AI checks",
+        "",
+        "| Question | Your answer | AI | Reason |",
+        "|---|---|---|---|",
+        ...checked.map(({ item, index, ai }) => {
+            const question = literalCell(`${index + 1}. ${plainExcerpt(item.q.front, 80)}`);
+            const reason = ai.verdict === "unavailable" ? FILE_UNAVAILABLE[ai.reason] : ai.reason;
+            return `| ${question} | ${literalCell(item.a.typed)} | ${FILE_VERDICTS[ai.verdict]} | ${literalCell(reason)} |`;
+        }),
+        "",
+    ];
+}
+
+/** `2 of 5 counted right`: the answers the AI accepted, of the ones it was asked about. */
+function aiSummaryLines(r: ExamResult): string[] {
+    const checked = r.items.filter((item) => item.ai !== undefined);
+    if (checked.length === 0) return [];
+    const accepted = checked.filter((item) => item.ai?.verdict === "equivalent").length;
+    return [`| AI checks | ${accepted} of ${checked.length} counted right |`];
+}
+
 /**
  * The text of an exam's file. It has no front matter, so it stays a plain note.
  */
@@ -135,9 +184,11 @@ export function formatExamFile(r: ExamResult): string {
         `| Finished | ${dateText(r.endedMs)} ${clockText(r.endedMs).replace(/^(\d{2})/, "$1:")} |`,
         `| Cards | ${r.setup.filter === "choice-only" ? "Multiple choice only" : "All cards"} |`,
         ...(notes.length > 0 ? [`| Notes | ${notes.map(literalCell).join(", ")} |`] : []),
+        ...aiSummaryLines(r),
         "",
         ...breakdownLines(r),
         "",
+        ...aiCheckLines(r),
         BLOCK_START,
         JSON.stringify({
             kind: "exam",
@@ -145,7 +196,14 @@ export function formatExamFile(r: ExamResult): string {
             startedMs: r.startedMs,
             endedMs: r.endedMs,
         }),
-        ...r.items.map((item) => JSON.stringify({ q: item.q, a: item.a, right: item.right })),
+        // The mark already counts an answer the AI accepted, so the score stored is the score shown
+        ...r.items.map((item) =>
+            JSON.stringify(
+                item.ai === undefined
+                    ? { q: item.q, a: item.a, right: item.right }
+                    : { q: item.q, a: item.a, right: item.right, ai: item.ai },
+            ),
+        ),
         BLOCK_END,
         "",
     ];
@@ -185,7 +243,8 @@ const KINDS: ExamQuestionKind[] = ["choice", "typed", "self"];
 
 export function readSetup(value: unknown): ExamSetup | null {
     if (!isObject(value)) return null;
-    const { decks, count, minutes, filter, passPercent, title, shuffleOptions, notes } = value;
+    const { decks, count, minutes, filter, passPercent, title, shuffleOptions, notes, aiCheck } =
+        value;
     if (!Array.isArray(decks) || !decks.every((deck) => typeof deck === "string")) return null;
     if (!isFiniteNumber(count)) return null;
     if (!isNullableNumber(minutes)) return null;
@@ -208,6 +267,10 @@ export function readSetup(value: unknown): ExamSetup | null {
         if (!Array.isArray(notes) || !notes.every((note) => typeof note === "string")) return null;
         // An empty list is an exam from decks, as before
         if (notes.length > 0) setup.notes = notes;
+    }
+    if (aiCheck !== undefined) {
+        if (typeof aiCheck !== "boolean") return null;
+        setup.aiCheck = aiCheck;
     }
     return setup;
 }
@@ -280,7 +343,27 @@ function readItem(line: string): ExamItem | null {
     const right = value.right;
     if (q === null || a === null) return null;
     if (!isNullableBoolean(right)) return null;
-    return { q, a, right };
+    if (value.ai === undefined) return { q, a, right };
+    const ai = readAiCheck(value.ai);
+    if (ai === null) return null;
+    return { q, a, right, ai };
+}
+
+const VERDICTS = ["equivalent", "incorrect", "uncertain"] as const;
+const UNAVAILABLE: ExamAiUnavailable[] = ["setup", "timeout", "provider", "format", "skipped"];
+
+/** The AI's check of an answer: exactly a verdict and a reason, the reason one of the codes when there is no verdict. */
+function readAiCheck(value: unknown): ExamAiCheck | null {
+    if (!isObject(value) || Object.keys(value).length !== 2) return null;
+    const { verdict, reason } = value;
+    if (typeof reason !== "string") return null;
+    if (verdict === "unavailable") {
+        return UNAVAILABLE.includes(reason as ExamAiUnavailable)
+            ? { verdict, reason: reason as ExamAiUnavailable }
+            : null;
+    }
+    const known = VERDICTS.find((candidate) => candidate === verdict);
+    return known === undefined ? null : { verdict: known, reason };
 }
 
 /**

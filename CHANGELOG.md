@@ -7,6 +7,7 @@ All notable changes to Flashcard Studio are listed here. Versions follow [semant
 ### Added
 
 - **Take an exam from chosen notes.** The exam setup can take its cards from **Notes** instead of decks, with **Add note** to search the notes that have cards to ask. **Take an exam from this note**, in the command palette and in a note's file menu, opens the setup with that note chosen. Retake, the last exam's setup and a resumed exam keep the notes. ([#6](https://github.com/Almalkiid/flashcard-studio/issues/6))
+- **AI checks typed answers in exams.** When AI is set up for card generation, the exam setup offers to check typed answers that do not match exactly with the same meaning check as **Check meaning with AI**, when you submit. One with the same meaning counts as right; the results and the exam's file show the AI's verdict and reason for each answer it checked. Only the question, the expected answer and your typed answer are sent, and nothing is sent unless you turn it on. ([#6](https://github.com/Almalkiid/flashcard-studio/issues/6))
 
 ### Fixed
 

@@ -3,6 +3,7 @@ import { getAllTags, Modal, Notice, requestUrl, setIcon, TFile } from "obsidian"
 
 import {
     AiError,
+    aiProviderLabel,
     AiSettings,
     aiSetupProblem,
     aiUsesInsecureHttp,
@@ -150,14 +151,7 @@ export class GenerateCardsModal extends Modal {
     // MARK: form
 
     private providerLabel(): string {
-        const settings = this.settings;
-        if (settings.aiProvider === "anthropic") return t("AI_PROVIDER_ANTHROPIC");
-        if (settings.aiProvider === "openai") return t("AI_PROVIDER_OPENAI");
-        try {
-            return new URL(settings.aiBaseUrl.trim()).host;
-        } catch {
-            return t("AI_PROVIDER_COMPATIBLE");
-        }
+        return aiProviderLabel(this.aiSettings());
     }
 
     private renderForm(): void {

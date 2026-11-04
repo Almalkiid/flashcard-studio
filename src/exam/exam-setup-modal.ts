@@ -1,6 +1,8 @@
 import "src/exam/exam.css";
 import { Modal, setIcon, setTooltip } from "obsidian";
 
+import { aiSettingsOf, MeaningChecker, meaningChecker } from "src/ai/ai-access";
+import { aiUsesInsecureHttp } from "src/ai/ai-provider";
 import { NotePickerModal } from "src/ai/note-picker-modal";
 import { Deck } from "src/data/decks/deck";
 import {
@@ -111,6 +113,11 @@ export class ExamSetupModal extends Modal {
     private title = "";
     private titleEdited = false;
     private passPercent: number;
+    /** The AI set up for card generation, which can check typed answers when the exam is submitted. */
+    private readonly ai: MeaningChecker;
+    /** Whether that AI can be used: worked out once, when the dialog opens. Without it the option is not offered. */
+    private readonly aiUsable: boolean;
+    private aiCheck: boolean;
 
     private presetButtons: { id: string; el: HTMLElement }[] = [];
     private sourceButtons = new Map<ExamSource, HTMLElement>();
@@ -128,6 +135,8 @@ export class ExamSetupModal extends Modal {
     private statusEl: HTMLElement | null = null;
     private startButton: HTMLButtonElement | null = null;
     private filterRadios = new Map<ExamCardFilter, HTMLInputElement>();
+    private aiOption: HTMLElement | null = null;
+    private aiBox: HTMLInputElement | null = null;
 
     /**
      * @param recent - The last exams, newest first. The newest one is what the form starts from, so a retake is one
@@ -161,6 +170,9 @@ export class ExamSetupModal extends Modal {
         const last = recent[0]?.setup;
         const settings = plugin.dataManager.data.settings;
         this.passPercent = settings.examPassPercent;
+        this.ai = meaningChecker(plugin.app, () => plugin.dataManager.data.settings);
+        this.aiUsable = this.ai.usable();
+        this.aiCheck = last?.aiCheck === true;
         if (last === undefined) {
             this.count = EXAM_PRESETS[0].count;
             this.minutes = EXAM_PRESETS[0].minutes;
@@ -247,7 +259,17 @@ export class ExamSetupModal extends Modal {
             title: this.title,
             shuffleOptions: this.plugin.dataManager.data.settings.shuffleChoices,
             ...(fromNotes ? { notes: [...this.notes] } : {}),
+            // Written only when on, so an exam without it is saved as it always was
+            ...(this.aiCheckOn() ? { aiCheck: true } : {}),
         };
+    }
+
+    /**
+     * Whether the typed answers go to the AI when the exam is submitted: chosen, and possible. Multiple choice only has
+     * no typed answers, and an AI that is not set up is not offered.
+     */
+    private aiCheckOn(): boolean {
+        return this.aiUsable && this.filter === "all" && this.aiCheck;
     }
 
     /** The questions each note can give with a kind of cards. */
@@ -664,6 +686,37 @@ export class ExamSetupModal extends Modal {
             });
             this.filterRadios.set(value, radio);
         }
+        if (this.aiUsable) this.renderAiOption(field);
+    }
+
+    /**
+     * "AI checks typed answers", with All cards: what is sent and to whom, said before anything is. Only offered when
+     * the AI set up for card generation can be used.
+     */
+    private renderAiOption(field: HTMLElement): void {
+        const option = field.createDiv({ cls: "fs-exam-ai-option" });
+        this.aiOption = option;
+        const chip = option.createEl("label", { cls: "fs-exam-chip fs-exam-ai-chip" });
+        const box = chip.createEl("input", { attr: { type: "checkbox" } });
+        this.aiBox = box;
+        markFocusVisible(chip, box);
+        setIcon(chip.createSpan({ cls: "fs-exam-chip-tick" }), "check");
+        chip.createSpan({ text: t("EXAM_AI_CHECK") });
+        box.addEventListener("change", () => {
+            this.aiCheck = box.checked;
+            this.refresh();
+        });
+        const settings = aiSettingsOf(this.plugin.dataManager.data.settings);
+        option.createDiv({
+            cls: "fs-exam-ai-desc",
+            text: t("EXAM_AI_CHECK_DESC", { provider: this.ai.provider() }),
+        });
+        if (aiUsesInsecureHttp(settings)) {
+            option.createDiv({
+                cls: "fs-exam-ai-desc is-warning",
+                text: t("AI_WARN_INSECURE_URL"),
+            });
+        }
     }
 
     private renderTitleAndPass(parent: HTMLElement): void {
@@ -776,6 +829,11 @@ export class ExamSetupModal extends Modal {
         for (const [value, radio] of this.filterRadios) {
             radio.checked = value === this.filter;
             radio.parentElement?.toggleClass("is-checked", radio.checked);
+        }
+        this.aiOption?.toggleClass("fs-is-hidden", this.filter !== "all");
+        if (this.aiBox) {
+            this.aiBox.checked = this.aiCheck;
+            this.aiBox.parentElement?.toggleClass("is-checked", this.aiCheck);
         }
         this.drawNotes();
 

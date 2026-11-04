@@ -1374,6 +1374,126 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     }
 }
 
+/* Accepted by AI and flagged, side by side in one cell of the row */
+.fs-exam-item-marks {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fs-exam-item-ai {
+    display: flex;
+    color: var(--fs-accent);
+
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* What the AI said about a typed answer */
+.fs-exam-ai {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--fs-radius-md);
+    background-color: var(--fs-surface-2);
+    color: var(--fs-text-2);
+    font-size: 14px;
+    line-height: 1.45;
+
+    &.is-equivalent {
+        background-color: var(--fs-green-soft);
+        color: var(--fs-green);
+    }
+
+    &.is-incorrect {
+        background-color: var(--fs-red-soft);
+        color: var(--fs-red);
+    }
+}
+
+.fs-exam-ai-icon {
+    display: flex;
+    flex: none;
+    padding-top: 2px;
+
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.fs-exam-ai-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.fs-exam-ai-verdict {
+    font-weight: 650;
+}
+
+.fs-exam-ai-reason {
+    color: var(--fs-text);
+}
+
+/* While the AI checks the typed answers, before the results */
+.fs-exam-checking.fs-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 24px;
+    border-radius: var(--fs-radius-lg);
+    text-align: center;
+}
+
+.fs-exam-checking-icon {
+    display: flex;
+    color: var(--fs-accent);
+
+    & svg {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+.fs-exam-checking-title {
+    font-size: var(--fs-headline);
+    font-weight: 700;
+    color: var(--fs-text);
+}
+
+.fs-exam-checking-progress {
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--fs-text-2);
+}
+
+.fs-exam-checking-track {
+    width: min(320px, 100%);
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: var(--fs-surface-2);
+}
+
+.fs-exam-checking-fill {
+    width: calc(var(--fs-progress, 0) * 100%);
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--fs-accent);
+    transition: width 220ms ease;
+}
+
+.fs-exam-checking-note {
+    max-width: 440px;
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--fs-text-3);
+}
+
 .fs-exam-item-chevron {
     display: flex;
     color: var(--fs-text-3);
@@ -2210,6 +2330,29 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     color: var(--fs-text-2);
 }
 
+/* AI checks typed answers: the chip, then what is sent and to whom */
+.fs-exam-ai-option {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.fs-studio .fs-exam-ai-option .fs-exam-chip {
+    align-self: flex-start;
+    margin-inline-start: 0;
+}
+
+.fs-exam-ai-desc {
+    font-size: var(--fs-caption);
+    line-height: 1.4;
+    color: var(--fs-text-2);
+
+    &.is-warning {
+        color: var(--fs-amber);
+    }
+}
+
 .fs-studio input.fs-exam-text {
     box-sizing: border-box;
     width: 100%;
@@ -2451,6 +2594,7 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
 
 @media (prefers-reduced-motion: reduce) {
     .fs-exam-progress-fill,
+    .fs-exam-checking-fill,
     .fs-exam-item-chevron,
     .fs-exam-map,
     .fs-exam-scrim,

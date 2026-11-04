@@ -1,3 +1,4 @@
+import type { SemanticOutcome, SemanticVerdict } from "src/ai/typed-answer-grading";
 import {
     isChoiceCorrect,
     MultipleChoice,
@@ -36,6 +37,11 @@ export interface ExamSetup {
      * decks; an exam from notes has no decks (`[]`), so a card counts wherever it is filed.
      */
     notes?: string[];
+    /**
+     * When the exam is submitted, typed answers that do not match exactly are checked for their meaning by the AI set
+     * up for card generation, and one with the same meaning counts as right. Absent means no: nothing is sent.
+     */
+    aiCheck?: boolean;
 }
 
 export const EXAM_PRESETS: { id: "quick" | "cia"; count: number; minutes: number | null }[] = [
@@ -245,11 +251,29 @@ export function isRight(q: ExamQuestion, a: ExamAnswer, ignoreAccents: boolean):
     }
 }
 
+/** Why the AI gave no verdict: the review's reasons, and `skipped` for a check stopped before it was sent or answered. */
+export type ExamAiUnavailable =
+    Extract<SemanticOutcome, { status: "unavailable" }>["reason"] | "skipped";
+
+/** What the AI said about a typed answer that did not match exactly. */
+export type ExamAiCheck =
+    | {
+          verdict: SemanticVerdict;
+          /** One line, at most 200 characters, as the review shows it. */
+          reason: string;
+      }
+    | { verdict: "unavailable"; reason: ExamAiUnavailable };
+
 export interface ExamItem {
     q: ExamQuestion;
     a: ExamAnswer;
-    /** True or false, or null for a question left unanswered. */
+    /** True or false, or null for a question left unanswered. True also for an answer the AI found to mean the same. */
     right: boolean | null;
+    /**
+     * The AI's check of a typed answer that did not match exactly, when the exam asked for one. Absent otherwise. It
+     * belongs to the marked exam: the AI is asked after the exam is submitted, so a draft never has one.
+     */
+    ai?: ExamAiCheck;
 }
 
 export interface ExamResult {
