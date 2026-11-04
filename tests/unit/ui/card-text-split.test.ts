@@ -152,6 +152,56 @@ describe("an edited text is checked against the note parser", () => {
         expect(readsBackAsOneQuestion(CardType.MultiLineBasic, "Q\n?\nA\n\nB", marked)).toBe(true);
     });
 
+    // The comment is checked where the note gets it: on the card's last line, or in a metadata callout after the card
+    test.each([
+        ["on the same line", { cardCommentOnSameLine: true }],
+        ["in a metadata callout", { useCalloutsForSchedulingComments: true }],
+        [
+            "in a metadata callout, with atomic clozes",
+            { useCalloutsForSchedulingComments: true, atomicClozes: true },
+        ],
+        [
+            "on the same line, with atomic clozes",
+            { cardCommentOnSameLine: true, atomicClozes: true },
+        ],
+    ] as const)("with the schedule comment %s the same texts read back", (_name, placement) => {
+        const placed = { ...settings, ...placement };
+        for (const [text, type] of [
+            ...SINGLE_LINE,
+            ["Is it?\n?\nYes", CardType.MultiLineBasic],
+            ["Code?\n?\n```\nx = 1\n```", CardType.MultiLineBasic],
+            ["Some ==text== and ==more==", CardType.Cloze],
+            ["> [!question] Title\n> The answer", CardType.Callout],
+        ] as const) {
+            expect(readsBackAsOneQuestion(type, text, placed)).toBe(true);
+        }
+        expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\nB", placed)).toBe(false);
+        expect(readsBackAsOneQuestion(CardType.MultiLineBasic, "Q\n?\nA\n\nB", placed)).toBe(false);
+        expect(readsBackAsOneQuestion(CardType.Cloze, "Some ==text==\n\nmore", placed)).toBe(false);
+    });
+
+    // With atomic clozes the parser keeps a paragraph whole only for a comment on the line after it. On the last line or
+    // in a metadata callout the note splits a cloze over two lines into a question per line, which a check with the
+    // comment always on the line after the text did not see
+    test("with atomic clozes a cloze over two lines reads back whole only with the comment on the line after it", () => {
+        const twoLines = "A ==x==\nB ==y==";
+        const atomic = { ...settings, atomicClozes: true };
+        expect(readsBackAsOneQuestion(CardType.Cloze, twoLines, atomic)).toBe(true);
+        for (const placement of [
+            { cardCommentOnSameLine: true },
+            { useCalloutsForSchedulingComments: true },
+        ]) {
+            expect(
+                readsBackAsOneQuestion(CardType.Cloze, twoLines, { ...atomic, ...placement }),
+            ).toBe(false);
+        }
+    });
+
+    test("a card that already has a metadata callout gets its comment after the callout's last line", () => {
+        const text = "Q::A\n> [!sr|card-metadata] \n>";
+        expect(readsBackAsOneQuestion(CardType.SingleLineBasic, text, settings)).toBe(true);
+    });
+
     test("with card regions the card is read inside a region, where blank lines are kept", () => {
         const regions = {
             ...settings,
