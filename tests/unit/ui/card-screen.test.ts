@@ -1,5 +1,7 @@
 import { CardType } from "src/data/data-structures/card/question";
 import { DEFAULT_SETTINGS, StudioSettings } from "src/data/settings-model";
+import { FlashcardReviewMode } from "src/scheduling/review/review-mode";
+import { ReviewResponse } from "src/scheduling/schedule/review-item";
 import CardContainer from "src/ui/obsidian-ui-components/content-container/card-container/card-screen";
 import {
     CardState,
@@ -113,6 +115,8 @@ beforeAll(() => {
         },
     });
     Object.assign(window, { activeWindow: window, activeDocument: document });
+    // jsdom does not scroll
+    Object.assign(Element.prototype, { scrollIntoView: (): void => undefined });
 });
 
 const containers: CardContainer[] = [];
@@ -134,6 +138,7 @@ const settings: StudioSettings = {
     showContextInCards: false,
     readQuestionAloud: false,
     readAnswerAloud: false,
+    shuffleChoices: false,
 };
 
 function setUp() {
@@ -172,7 +177,8 @@ function setUp() {
     containers.push(container);
     const view = parent.querySelector<HTMLElement>(".fs-card-container");
     if (view === null) throw new Error("no card view");
-    return { container, view, onReveal, onAnswer };
+    const { response } = container as never as { response: { setSuggested: jest.Mock } };
+    return { container, view, onReveal, onAnswer, response };
 }
 
 /** A session on one card, as the review screen hands it to the card screen. */
@@ -252,5 +258,38 @@ describe("CardContainer.openSession", () => {
         expect(view.textContent).toContain("Capital of Italy?");
         pressSpace();
         expect(onReveal).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("CardContainer.drawBack", () => {
+    const textsOf = (view: HTMLElement, selector: string): string[] =>
+        Array.from(view.querySelectorAll(selector)).map((el) => el.textContent ?? "");
+
+    // The bug: the answer side drawn again after an edit (Edit on the answer side) kept the multiple choice state of
+    // the front, with the answers and the explanation as they were before the edit. It marked the old answer right,
+    // showed the old explanation and suggested a rating from the old answer key.
+    test("after an edit, a multiple choice card shows the edited answer key and explanation", async () => {
+        const { container, view, response } = setUp();
+        const session = sessionOn(
+            "Capital of France?",
+            "- [x] Paris\n- [ ] Lyon\n\nOld explanation",
+        );
+        await container.openSession(session, settings);
+        view.querySelector<HTMLElement>(".fs-choices .fs-choice")?.click();
+        session.cardData.cardState = CardState.Back;
+        await container.drawBack(session, FlashcardReviewMode.Review, settings, () => null);
+        expect(textsOf(view, ".fs-choice.is-correct .fs-choice-text")).toEqual(["Paris"]);
+
+        // Saved from the editor: the card's text changes in place, and the answer side is drawn again
+        const card = session.cardData.currentCard;
+        if (card === null) throw new Error("no card");
+        card.back = "- [ ] Paris\n- [x] Lyon\n\nNew explanation";
+        await container.drawBack(session, FlashcardReviewMode.Review, settings, () => null);
+
+        expect(textsOf(view, ".fs-choice.is-correct .fs-choice-text")).toEqual(["Lyon"]);
+        // The option chosen on the front stays chosen, and is now the wrong one
+        expect(textsOf(view, ".fs-choice.is-wrong .fs-choice-text")).toEqual(["Paris"]);
+        expect(textsOf(view, ".fs-choice-explanation-text")).toEqual(["New explanation"]);
+        expect(response.setSuggested).toHaveBeenLastCalledWith(ReviewResponse.Again);
     });
 });
