@@ -133,7 +133,8 @@ describe("an edited text is checked against the note parser", () => {
         expect(readsBackAsOneQuestion(type, text, settings)).toBe(false);
     });
 
-    test("a trailing line break is dropped before the schedule comment, as the note writer does", () => {
+    // The dialog drops line breaks typed at the end; this one is the text of a tagged card with its schedule comment
+    test("the line break before the schedule comment of a tagged card reads back", () => {
         expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\n", settings)).toBe(true);
     });
 

@@ -89,7 +89,8 @@ const SCHEDULE_STAND_IN = "!2000-01-01,1,250";
  * Whether the note parser reads `text`, with a schedule comment on the line after it, back as one question of `type`
  * that takes all of it and the comment. A text that it does not (a line break in a single-line card, a blank line in a
  * multi-line card or a cloze) would be written to the note as another card, or as none, and the schedule comment would
- * end up on the wrong lines.
+ * end up on the wrong lines. White space at the end of `text` is left out: the text of a tagged card with a schedule
+ * ends in the line break before its comment.
  */
 export function readsBackAsOneQuestion(
     type: CardType,
