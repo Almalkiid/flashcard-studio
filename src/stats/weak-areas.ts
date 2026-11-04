@@ -1,5 +1,6 @@
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { trueRetention } from "src/stats/answers";
+import { makeDueKeyFn } from "src/stats/cards";
 import { addDays, DayKeyFn } from "src/stats/day-keys";
 import { StatsCard } from "src/stats/types";
 
@@ -66,6 +67,14 @@ export function weakAreas(
         slippingByDeck.set(miss.deck, (slippingByDeck.get(miss.deck) ?? 0) + 1);
     }
 
+    // An FSRS card is due from its due time; an SM-2 card from the start of its due date's study day
+    const dueKeyOf = makeDueKeyFn(dayKeyOf);
+    const isDueNow = (card: StatsCard): boolean => {
+        if (card.isFsrs) return card.dueMs !== null && card.dueMs <= nowMs;
+        const dueKey = dueKeyOf(card);
+        return dueKey !== null && dueKey <= todayKey;
+    };
+
     const decks: DeckWeakness[] = [];
     for (const [deck, deckEntries] of byDeck) {
         const last30 = trueRetention(deckEntries, todayKey, dayKeyOf).find(
@@ -82,8 +91,7 @@ export function weakAreas(
                     card.decks.includes(deck) &&
                     card.state !== "new" &&
                     !card.suspended &&
-                    card.dueMs !== null &&
-                    card.dueMs <= nowMs,
+                    isDueNow(card),
             ).length,
             slipping: slippingByDeck.get(deck) ?? 0,
         });

@@ -1,6 +1,6 @@
 import { default_w as DEFAULT_WEIGHTS, forgetting_curve as forgettingCurve } from "ts-fsrs";
 
-import { DayKeyFn, diffDays, MS_PER_DAY } from "src/stats/day-keys";
+import { DayKeyFn, diffDays, makeDayKeyFn, MS_PER_DAY } from "src/stats/day-keys";
 import { MATURE_INTERVAL_DAYS, StatsCard } from "src/stats/types";
 
 /**
@@ -59,6 +59,22 @@ export interface ForecastOptions {
 }
 
 /**
+ * Builds the mapping from a card to the study day it falls due on. An FSRS due is an instant, on the study day it falls
+ * in. An SM-2 due is a calendar date, kept as its local midnight, and the card is due once that date's study day has
+ * begun (`Sm2State.isDue`), so it is the date itself: through `dayKeyOf`, a midnight before the day boundary would fall
+ * on the day before.
+ *
+ * @returns The day key, or null for a card without a due time.
+ */
+export function makeDueKeyFn(dayKeyOf: DayKeyFn): (card: StatsCard) => string | null {
+    const dateKeyOf = makeDayKeyFn(0);
+    return (card) => {
+        if (card.dueMs === null) return null;
+        return card.isFsrs ? dayKeyOf(card.dueMs) : dateKeyOf(card.dueMs);
+    };
+}
+
+/**
  * How many reviews will be due on each coming day, if nothing is answered before then. New and suspended cards are
  * not counted; buried cards are, because they come back.
  */
@@ -69,10 +85,13 @@ export function forecast(cards: StatsCard[], options: ForecastOptions): Forecast
         beyond: 0,
         total: 0,
     };
+    const dueKeyOf = makeDueKeyFn(options.dayKeyOf);
     for (const card of cards) {
-        if (card.state === "new" || card.suspended || card.dueMs === null) continue;
+        if (card.state === "new" || card.suspended) continue;
+        const dueKey = dueKeyOf(card);
+        if (dueKey === null) continue;
         result.total++;
-        const offset = diffDays(options.todayKey, options.dayKeyOf(card.dueMs));
+        const offset = diffDays(options.todayKey, dueKey);
         if (offset < 0) {
             if (card.state === "review") result.overdue++;
             else result.days[0]++;
