@@ -112,6 +112,8 @@ export default class CardContainer {
     // The waiting screen shows no card: the card keys have nothing to act on
     private waiting = false;
     private keyDocument: Document | null = null;
+    // Goes up with every close, so an opening still drawing its first card can tell that the screen was closed meanwhile
+    private closeCount = 0;
     // Whether the last thing the person did was press a key, which decides where the focus goes after the answer
     private usedKeyboard = false;
 
@@ -242,8 +244,11 @@ export default class CardContainer {
      */
     public async openSession(session: SessionData, settings: StudioSettings): Promise<void> {
         if (!this.view.hasClass(HIDDEN)) return;
+        const closeCount = this.closeCount;
         // Drawn while hidden, so the screen never flashes the card that was there last
         await this.drawCardFront(session, settings);
+        // Closed while the card was drawn (the review was closed, or left for the decks): it stays hidden, without keys
+        if (this.closeCount !== closeCount) return;
         this.view.removeClass(HIDDEN);
         this.keyDocument = activeDocument;
         this.keyDocument.addEventListener("keydown", this.keydownHandler);
@@ -264,7 +269,9 @@ export default class CardContainer {
     }
 
     public closeSession(): void {
-        if (this.view.hasClass(HIDDEN)) return;
+        this.closeCount++;
+        // A hidden screen is closed already, unless it is drawing the first card of a session being opened
+        if (this.view.hasClass(HIDDEN) && this.cardState === CardState.Closed) return;
         this.stopWaitingClock();
         this.cardState = CardState.Closed;
         this.waiting = false;
@@ -613,7 +620,8 @@ export default class CardContainer {
 
     /**
      * The state of the multiple choice card that is up, or null when it is an ordinary card. A cloze card is never
-     * multiple choice. With `reuse`, the state of this card's front is kept (its order of options and the choice).
+     * multiple choice. With `reuse`, the state of this card's front is kept (its order of options and the choice), with
+     * what the card says now: an edit may have changed the right answers, the lead or the explanation.
      */
     private choiceFor(
         session: SessionData,
@@ -634,6 +642,7 @@ export default class CardContainer {
             current.mc.options.length === mc.options.length &&
             current.mc.options.every((option, i) => option.text === mc.options[i].text)
         ) {
+            current.mc = mc;
             return current;
         }
         return createChoiceState(card, mc, settings.shuffleChoices);

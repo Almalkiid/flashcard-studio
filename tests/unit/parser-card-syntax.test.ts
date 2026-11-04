@@ -5,6 +5,7 @@
  */
 import { parse, ParsedQuestionInfo, ParserOptions } from "src/cards/parse";
 import { CardType } from "src/data/data-structures/card/question";
+import * as mathCloze from "src/math/math-cloze";
 import { createClozeNote } from "src/math/math-cloze";
 
 const base: ParserOptions = {
@@ -397,6 +398,40 @@ describe("atomic clozes", () => {
                 [CardType.Cloze, "new ==c==", 4, 4],
                 [CardType.Cloze, "new ==d==", 5, 5],
             ]);
+        });
+    });
+
+    describe("a long list of reviewed clozes", () => {
+        const items = 1000;
+        const text = Array.from(
+            { length: items },
+            (_value, index) => `- word${index} ==meaning${index}==\n<!--SR:!2026-11-05,3,250-->`,
+        ).join("\n");
+
+        afterEach(() => jest.restoreAllMocks());
+
+        test("reads each schedule comment once, not once for every cloze line above it", () => {
+            const read = jest.spyOn(mathCloze, "createClozeNote");
+            const cards = parseT(text, atomic);
+
+            expect(cards).toHaveLength(items);
+            expect(cards[items - 1]).toEqual([
+                CardType.Cloze,
+                `- word${items - 1} ==meaning${items - 1}==\n<!--SR:!2026-11-05,3,250-->`,
+                2 * items - 2,
+                2 * items - 1,
+            ]);
+            expect(read.mock.calls.length).toBeLessThanOrEqual(items);
+        });
+
+        test("is parsed in linear time", () => {
+            // Quadratic, it took seconds; with room to spare for a slow machine
+            const samples = Array.from({ length: 3 }, () => {
+                const started = performance.now();
+                parse(text, atomic);
+                return performance.now() - started;
+            });
+            expect(Math.min(...samples)).toBeLessThan(300);
         });
     });
 

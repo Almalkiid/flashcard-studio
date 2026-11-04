@@ -18,6 +18,13 @@ type Piece = string | ClozeSpan;
 
 const CLOZE_START = /^\{\{c(\d+(?:,\d+)*)::/;
 
+/**
+ * The highest cloze number a note can have and be imported. A note makes a card for each number up to its highest, and
+ * an overlapping cloze has a letter for each, so a crafted number in a shared file would make the import hang. Real
+ * notes stay far below this.
+ */
+const MAX_CLOZE_NUMBER = 500;
+
 /** True when the text has an Anki cloze deletion. */
 export function hasAnkiCloze(text: string): boolean {
     return /\{\{c\d+(?:,\d+)*::/.test(text);
@@ -75,6 +82,16 @@ function splitClozes(text: string): Piece[] | null {
     return open.length === 0 ? pieces : null;
 }
 
+/** An overlapping cloze's label: a letter for each card up to the last that asks it, `a` where asked, `s` where shown. */
+function overlappingLabel(ids: number[]): string {
+    const letters: string[] = [];
+    for (const id of ids) {
+        while (letters.length < id) letters.push("s");
+        if (id > 0) letters[id - 1] = "a";
+    }
+    return letters.join("");
+}
+
 /**
  * Rewrites the Anki clozes of a text as curly-bracket clozes.
  *
@@ -83,8 +100,8 @@ function splitClozes(text: string): Piece[] | null {
  * by card, whether it is asked (`a`) or shown (`s`): `{{as;;answer}}`. Text inside a nested cloze is split into
  * separate clozes, so a card can show several blanks where Anki shows one.
  *
- * @returns The converted text, or null when the text has no cloze or its braces do not balance, so that it is left as
- * it is.
+ * @returns The converted text, or null when the text has no cloze, its braces do not balance or a cloze number is
+ * above 500, so that it is left as it is.
  */
 export function convertAnkiClozes(text: string): string | null {
     if (!hasAnkiCloze(text)) return null;
@@ -92,21 +109,15 @@ export function convertAnkiClozes(text: string): string | null {
     if (pieces === null) return null;
 
     const spans = pieces.filter((piece): piece is ClozeSpan => typeof piece !== "string");
+    if (spans.some((span) => span.ids.some((id) => id > MAX_CLOZE_NUMBER))) return null;
     const simple = spans.every((span) => span.ids.length === 1);
-    const cards = Math.max(...spans.flatMap((span) => span.ids));
 
     return pieces
         .map((piece) => {
             if (typeof piece === "string") return piece;
             if (piece.text === "") return "";
             const hint = piece.hint === "" ? "" : `;;${piece.hint}`;
-            const label = simple
-                ? String(piece.ids[0])
-                : Array.from({ length: cards }, (_, index) =>
-                      piece.ids.includes(index + 1) ? "a" : "s",
-                  )
-                      .join("")
-                      .replace(/s+$/, "");
+            const label = simple ? String(piece.ids[0]) : overlappingLabel(piece.ids);
             return `{{${label};;${piece.text}${hint}}}`;
         })
         .join("");

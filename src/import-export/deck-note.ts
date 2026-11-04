@@ -65,17 +65,102 @@ export function ankiTagToObsidianTag(tag: string): string | null {
     return /^[\d/]+$/.test(joined) ? `_${joined}` : joined;
 }
 
-/** The deck's tag, for example `#flashcards/Spanish/Verbs`, which is what makes the deck without folders as decks. */
-export function deckTag(flashcardTag: string, deck: string): string {
-    const levels = deckLevels(deck)
-        .map((level) =>
-            level
-                .replace(/[^\p{L}\p{N}_-]+/gu, "-")
-                .replace(/-{2,}/g, "-")
-                .replace(/^-+|-+$/g, ""),
-        )
-        .filter((level) => level !== "");
-    return [flashcardTag, ...levels].join("/");
+/** A deck level as a tag level: characters a tag cannot have become `-`, and a level with nothing else is `_`. */
+function tagLevel(level: string): string {
+    const cleaned = level
+        .replace(/[^\p{L}\p{N}_-]+/gu, "-")
+        .replace(/-{2,}/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return cleaned === "" ? "_" : cleaned;
+}
+
+/**
+ * Orders decks level by level, so that a deck comes after its parent. Of levels that make the same tag level, the one
+ * that is a tag level as it is comes first, so that it keeps it.
+ */
+function compareLevels(a: string[], b: string[]): number {
+    const key = (level: string): string[] => {
+        const tag = tagLevel(level);
+        return [tag, level === tag ? "0" : "1", level];
+    };
+    for (let index = 0; index < Math.min(a.length, b.length); index++) {
+        const [left, right] = [key(a[index]), key(b[index])];
+        const differs = left.findIndex((part, at) => part !== right[at]);
+        if (differs >= 0) return left[differs] < right[differs] ? -1 : 1;
+    }
+    return a.length - b.length;
+}
+
+/**
+ * The tags of the decks of one import, by deck name. A deck's tag is its path as a tag path under the flashcard tag,
+ * for example `#flashcards/Spanish/Verbs`, which is what makes the deck without folders as decks.
+ *
+ * Decks whose names differ only in characters a tag cannot have would get the same tag, and so become one deck. A
+ * level whose tag another deck already has gets a number instead: `C`, `C#` and `C++` are `#flashcards/C`,
+ * `#flashcards/C-2` and `#flashcards/C-3`.
+ *
+ * `existing` has the tag on the note of each deck that an earlier import made a note for. Such a deck keeps it, its
+ * parents keep the levels of it above the deck, so that a new subdeck follows them, and no other deck gets one of
+ * these tags.
+ */
+export function deckTags(
+    flashcardTag: string,
+    decks: string[],
+    existing: ReadonlyMap<string, string> = new Map(),
+): Map<string, string> {
+    // Each tag and the deck, its levels joined with `::`, that it is for, both ways round
+    const owners = new Map<string, string>();
+    const ownTags = new Map<string, string>();
+    const claim = (owner: string, tag: string): void => {
+        if (owners.has(tag) || ownTags.has(owner)) return;
+        owners.set(tag, owner);
+        ownTags.set(owner, tag);
+    };
+    const ownerAt = (levels: string[], index: number): string =>
+        levels.slice(0, index + 1).join(ANKI_DECK_SEPARATOR);
+    const byLevels = (names: Iterable<string>) =>
+        Array.from(new Set(names), (deck) => ({ deck, levels: deckLevels(deck) })).sort((a, b) =>
+            compareLevels(a.levels, b.levels),
+        );
+
+    for (const { deck, levels } of byLevels(existing.keys())) {
+        const tag = existing.get(deck);
+        if (levels.length === 0 || !tag.startsWith(`${flashcardTag}/`)) continue;
+        const tagLevels = tag.slice(flashcardTag.length + 1).split("/");
+        if (tagLevels.length === levels.length) {
+            levels.forEach((_, index) =>
+                claim(
+                    ownerAt(levels, index),
+                    [flashcardTag, ...tagLevels.slice(0, index + 1)].join("/"),
+                ),
+            );
+        } else {
+            // A tag changed to one of another depth says nothing about the parents' tags
+            claim(ownerAt(levels, levels.length - 1), tag);
+        }
+    }
+
+    const tags = new Map<string, string>();
+    // The number to try next after each tag that is taken. A tag once taken stays taken, so the numbers below it are
+    // never free again, and many decks whose names give the same tag are each numbered without counting up from 2
+    const nextNumber = new Map<string, number>();
+    for (const { deck, levels } of byLevels(decks)) {
+        let tag = flashcardTag;
+        levels.forEach((level, index) => {
+            const owner = ownerAt(levels, index);
+            const base = `${tag}/${tagLevel(level)}`;
+            tag = ownTags.get(owner) ?? base;
+            if ((owners.get(tag) ?? owner) !== owner) {
+                let number = nextNumber.get(base) ?? 2;
+                do tag = `${base}-${number++}`;
+                while ((owners.get(tag) ?? owner) !== owner);
+                nextNumber.set(base, number);
+            }
+            claim(owner, tag);
+        });
+        tags.set(deck, tag);
+    }
+    return tags;
 }
 
 export interface ImportedCard {
@@ -106,7 +191,14 @@ export function appendToDeckNote(existing: string, cards: ImportedCard[], tags: 
     return `${lines.join("\n")}\n\n${cards.map(formatCard).join("\n\n")}\n`;
 }
 
-/** The tag line of a new deck note: the deck's tag, then the Anki tags of its notes. */
-export function tagLine(flashcardTag: string, deck: string, tags: string[]): string {
-    return [deckTag(flashcardTag, deck), ...tags.map((tag) => `#${tag}`)].join(" ");
+/** The tag line of a new deck note: the deck's tag (see `deckTags`), then the Anki tags of its notes. */
+export function tagLine(deckTag: string, tags: string[]): string {
+    return [deckTag, ...tags.map((tag) => `#${tag}`)].join(" ");
+}
+
+/** The deck tag at the start of a deck note's tag line, or null when its first line does not start with one. */
+export function deckTagOfNote(text: string, flashcardTag: string): string | null {
+    const end = text.indexOf("\n");
+    const first = (end < 0 ? text : text.slice(0, end)).trim().split(/\s+/)[0];
+    return first.startsWith(`${flashcardTag}/`) ? first : null;
 }

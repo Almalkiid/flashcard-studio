@@ -14,8 +14,9 @@ const at = (iso: string): number => new Date(iso).getTime();
 const numberOf = (year: number, month: number, day: number): number =>
     Date.UTC(year, month - 1, day) / DAY;
 
-function entry(t: number): ReviewLogEntry {
-    return { t, c: "aaaaaa", r: 3, k: 1, ivl: 1, li: 1, ms: 1000, dk: "CIA", f: "n.md" };
+/** A review; the first answer of a card is a learning answer, or the optimizer leaves the card out. */
+function entry(t: number, k: ReviewLogEntry["k"] = 1): ReviewLogEntry {
+    return { t, c: "aaaaaa", r: 3, k, ivl: 1, li: 1, ms: 1000, dk: "CIA", f: "n.md" };
 }
 
 test("the environment really is New York, with daylight saving", () => {
@@ -48,7 +49,7 @@ describe("dayNumber with a day that starts at 04:00", () => {
 describe("buildCardHistories across a clock change, with a day that starts at 04:00", () => {
     test("04:10 after the clocks went forward is the next day", () => {
         const entries = [
-            entry(at("2026-03-07T22:00:00-05:00")),
+            entry(at("2026-03-07T22:00:00-05:00"), 0),
             entry(at("2026-03-08T04:10:00-04:00")),
         ];
         const [history] = buildCardHistories(entries, { dayStartOffsetMs: 4 * HOUR });
@@ -57,7 +58,7 @@ describe("buildCardHistories across a clock change, with a day that starts at 04
 
     test("03:30 after the clocks went back is still the day before", () => {
         const entries = [
-            entry(at("2026-10-31T22:00:00-04:00")),
+            entry(at("2026-10-31T22:00:00-04:00"), 0),
             entry(at("2026-11-01T03:30:00-05:00")),
         ];
         const [history] = buildCardHistories(entries, { dayStartOffsetMs: 4 * HOUR });
@@ -66,7 +67,7 @@ describe("buildCardHistories across a clock change, with a day that starts at 04
 
     test("04:10 after the clocks went back is the next day", () => {
         const entries = [
-            entry(at("2026-10-31T22:00:00-04:00")),
+            entry(at("2026-10-31T22:00:00-04:00"), 0),
             entry(at("2026-11-01T04:10:00-05:00")),
         ];
         const [history] = buildCardHistories(entries, { dayStartOffsetMs: 4 * HOUR });

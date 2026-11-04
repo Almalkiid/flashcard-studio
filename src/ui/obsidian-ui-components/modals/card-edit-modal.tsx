@@ -1,5 +1,5 @@
 import "src/ui/obsidian-ui-components/modals/card-edit-modal.css";
-import { App, Modal } from "obsidian";
+import { App, Modal, Notice } from "obsidian";
 
 import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType } from "src/data/data-structures/card/question";
@@ -8,10 +8,21 @@ import { t } from "src/lang/translate";
 import {
     CardSides,
     joinCardText,
+    readsBackAsOneQuestion,
     splitCardText,
 } from "src/ui/obsidian-ui-components/modals/card-text-split";
 import StudioButton from "src/ui/studio-button";
 import { TextDirection } from "src/utils/text";
+
+/**
+ * The text without the line breaks and blank lines at its end. A card with no schedule yet is written as it is: they
+ * would put a blank line in the note after it, and move its block id to a line of its own. The text of a tagged card
+ * with a schedule ends in a line break as well, which the note writer drops before the comment: taking it away is not
+ * a change.
+ */
+function withoutTrailingLineBreaks(text: string): string {
+    return text.replace(/(?:\n[ \t]*)+$/, "");
+}
 
 /** What the dialog rejects with when it is closed without saving. */
 export class EditCancelled extends Error {
@@ -35,7 +46,10 @@ export class FlashcardEditModal extends Modal {
     private resolvePromise!: (text: string) => void;
     private rejectPromise!: (reason?: unknown) => void;
 
-    /** Opens the dialog. Resolves with the new text of the question when saved, rejects with `EditCancelled` otherwise. */
+    /**
+     * Opens the dialog. Resolves with the new text of the question when saved, rejects with `EditCancelled` otherwise,
+     * also when it is saved without a change: there is then nothing to write to the note.
+     */
     public static Prompt(
         app: App,
         settings: StudioSettings,
@@ -138,16 +152,39 @@ export class FlashcardEditModal extends Modal {
 
     private save(): void {
         if (this.settled || !this.isComplete()) return;
-        this.settled = true;
-        const text =
+        const text = withoutTrailingLineBreaks(
             this.sides === null
                 ? this.frontField.value
                 : joinCardText(
                       this.type,
-                      { front: this.frontField.value, back: this.backField.value },
+                      { ...this.sides, front: this.frontField.value, back: this.backField.value },
                       this.settings,
-                  );
+                  ),
+        );
+        // Unchanged, it is closed as cancelled, so the note is not written
+        if (text === withoutTrailingLineBreaks(this.text)) {
+            this.close();
+            return;
+        }
+        // The dialog stays open, so the text can be put right
+        if (!this.readsBack(text)) {
+            new Notice(t("EDIT_NOT_READ_BACK"));
+            return;
+        }
+        this.settled = true;
         this.resolvePromise(text);
         this.close();
+    }
+
+    /**
+     * Whether the note will read the new text back as this card, with its schedule comment. A card that this check does
+     * not read back as it is now (a form it does not know) is not held to it.
+     */
+    private readsBack(text: string): boolean {
+        const { type, settings } = this;
+        return (
+            readsBackAsOneQuestion(type, text, settings) ||
+            !readsBackAsOneQuestion(type, this.text, settings)
+        );
     }
 }

@@ -67,6 +67,8 @@ export class StatisticsView extends ItemView {
     private host: ChartHost | null = null;
     private loadedAt = 0;
     private loading = false;
+    // A load that ends after the view closed must not draw: its charts would never be destroyed
+    private closed = false;
 
     private rootEl: HTMLElement | null = null;
     private bodyEl: HTMLElement | null = null;
@@ -111,6 +113,7 @@ export class StatisticsView extends ItemView {
     }
 
     onClose(): Promise<void> {
+        this.closed = true;
         this.host?.destroyAll();
         this.host = null;
         return Promise.resolve();
@@ -171,9 +174,11 @@ export class StatisticsView extends ItemView {
         this.loading = true;
         this.rootEl?.addClass("is-loading");
         try {
-            this.inputs = await loadStatsInputs(this.plugin);
+            const inputs = await loadStatsInputs(this.plugin);
+            if (this.closed) return;
+            this.inputs = inputs;
             this.loadedAt = Date.now();
-            this.fillDeckOptions(this.inputs.decks);
+            this.fillDeckOptions(inputs.decks);
             this.render();
         } catch (error) {
             console.error("Flashcard Studio: could not load the statistics", error);
@@ -250,7 +255,7 @@ export class StatisticsView extends ItemView {
     private render(): void {
         const body = this.bodyEl;
         const root = this.rootEl;
-        if (body === null || root === null || this.inputs === null) return;
+        if (this.closed || body === null || root === null || this.inputs === null) return;
 
         this.host?.destroyAll();
         body.empty();

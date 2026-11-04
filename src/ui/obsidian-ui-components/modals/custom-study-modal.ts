@@ -150,6 +150,8 @@ export class CustomStudyModal extends Modal {
                 .onClick(async () => {
                     const count = read();
                     if (count === null) return;
+                    // A second click while the limit is saved would raise it again
+                    button.setDisabled(true);
                     await this.raiseLimit(kind, count);
                 }),
         );

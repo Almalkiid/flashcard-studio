@@ -54,9 +54,43 @@ function protectSeparator(text: string, separator: string): string {
         .join("\n");
 }
 
+/** Protects both single-line separators, the basic and the reversed one. */
+function protectSeparators(text: string, separators: CardSeparators): string {
+    return protectSeparator(
+        protectSeparator(text, separators.singleLine),
+        separators.singleLineReversed,
+    );
+}
+
 /** A `#word` at the very start of a card is read as the card's deck. */
 function protectLeadingTag(text: string): string {
     return /^\s*#[^\s#]/.test(text) ? text.replace("#", "\\#") : text;
+}
+
+/**
+ * `front` and `back` on one line with the single-line separator, or null when the parser would not read that line
+ * back as the same card. The separator and the text next to it can make another separator: `Capital of France:` and
+ * `Paris` with `::` give `Capital of France:::Paris`, which the parser reads as a reversed card cut at `:::`.
+ */
+function singleLineCard(
+    front: string,
+    back: string,
+    reversed: boolean,
+    separators: CardSeparators,
+): string | null {
+    const separator = reversed ? separators.singleLineReversed : separators.singleLine;
+    const other = reversed ? separators.singleLine : separators.singleLineReversed;
+    const line = `${front}${separator}${back}`;
+    // The parser looks for the longer separator first, for the basic one first when they are as long
+    const otherFirst =
+        other.length > separator.length || (other.length === separator.length && reversed);
+    const readBack =
+        separator !== "" &&
+        !line.includes("\n") &&
+        line.indexOf(separator) === front.length &&
+        !insideInlineCode(line, front.length, separator.length) &&
+        !(otherFirst && other !== "" && line.includes(other));
+    return readBack ? line : null;
 }
 
 /**
@@ -80,7 +114,7 @@ export function buildCard(
         const converted = convertAnkiClozes(filled[0]);
         if (converted === null) return { skipped: "invalid-cloze" };
         const extra = filled.slice(1).filter((field) => field !== "");
-        const text = [protectSeparator(converted, separators.singleLine), ...extra].join(
+        const text = [protectSeparators(converted, separators), ...extra].join(
             `\n${BLANK_LINE_IN_CARD}\n`,
         );
         return { markdown: text, clozeNeedsCurlyPattern: true };
@@ -99,19 +133,13 @@ export function buildCard(
     const reversed = kind === "reversed";
     const oneLine =
         style === "single" &&
-        !front.includes("\n") &&
-        !back.includes("\n") &&
         !front.includes(separators.singleLine) &&
-        !back.includes(separators.singleLine);
-    if (oneLine) {
-        const separator = reversed ? separators.singleLineReversed : separators.singleLine;
-        return {
-            markdown: `${protectLeadingTag(front)}${separator}${back}`,
-            clozeNeedsCurlyPattern: false,
-        };
-    }
+        !back.includes(separators.singleLine)
+            ? singleLineCard(protectLeadingTag(front), back, reversed, separators)
+            : null;
+    if (oneLine !== null) return { markdown: oneLine, clozeNeedsCurlyPattern: false };
 
     const separator = reversed ? separators.multiLineReversed : separators.multiLine;
-    const safeFront = protectLeadingTag(protectSeparator(front, separators.singleLine));
+    const safeFront = protectLeadingTag(protectSeparators(front, separators));
     return { markdown: `${safeFront}\n${separator}\n${back}`, clozeNeedsCurlyPattern: false };
 }

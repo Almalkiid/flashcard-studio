@@ -45,6 +45,24 @@ describe.each(providers)("%s provider", (_name, make) => {
         expect(provider.todayEndMs).toBe(local("2023-09-07 00:00").valueOf());
     });
 
+    test("with a midnight boundary the study day starts at midnight", () => {
+        const provider = make("2023-09-06 13:45");
+        expect(provider.studyDayStartMs).toBe(local("2023-09-06 00:00").valueOf());
+    });
+
+    test("after a 04:00 boundary the study day started at 04:00, not at midnight", () => {
+        const provider = make("2023-09-07 10:00");
+        provider.setDayBoundary(FOUR_AM);
+        expect(provider.studyDayStartMs).toBe(local("2023-09-07 04:00").valueOf());
+        expect(provider.today.valueOf()).toBe(local("2023-09-07 00:00").valueOf());
+    });
+
+    test("before a 04:00 boundary the study day started at 04:00 yesterday", () => {
+        const provider = make("2023-09-07 01:00");
+        provider.setDayBoundary(FOUR_AM);
+        expect(provider.studyDayStartMs).toBe(local("2023-09-06 04:00").valueOf());
+    });
+
     test("changing the boundary is seen at once", () => {
         const provider = make("2023-09-07 01:00");
         expect(provider.todayEndMs).toBe(local("2023-09-08 00:00").valueOf());
@@ -64,6 +82,7 @@ describe("the live provider", () => {
 
         jest.setSystemTime(local("2023-09-07 04:00").toDate());
         expect(provider.todayEndMs).toBe(local("2023-09-08 00:00").valueOf());
+        expect(provider.studyDayStartMs).toBe(local("2023-09-07 04:00").valueOf());
 
         jest.setSystemTime(local("2023-09-08 03:00").toDate());
         expect(provider.todayEndMs).toBe(local("2023-09-08 00:00").valueOf());

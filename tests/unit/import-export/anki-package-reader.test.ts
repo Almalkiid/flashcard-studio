@@ -1,6 +1,8 @@
 /**
  * @jest-environment node
  */
+import { Deck, Note, Package } from "ankipack";
+import * as fflate from "fflate";
 import { zipSync } from "fflate";
 import type { SqlJsStatic } from "sql.js";
 
@@ -8,7 +10,19 @@ import { openAnkiPackage } from "src/import-export/anki-package-reader";
 import { AnkiImportError } from "src/import-export/anki-types";
 import { loadSql } from "src/import-export/sql-loader";
 
-import { AUDIO_BYTES, buildSyntheticApkg, IMAGE_BYTES, toLegacyLayout } from "./helpers/build-apkg";
+import {
+    AUDIO_BYTES,
+    buildSyntheticApkg,
+    IMAGE_BYTES,
+    NOTE_TYPES,
+    toLegacyLayout,
+} from "./helpers/build-apkg";
+
+// fflate as it is, with unzipSync replaceable to watch what it does
+jest.mock("fflate", () => {
+    const actual = jest.requireActual<typeof fflate>("fflate");
+    return { ...actual, unzipSync: jest.fn(actual.unzipSync) };
+});
 
 let SQL: SqlJsStatic;
 let modern: Uint8Array;
@@ -59,6 +73,46 @@ describe.each([
         expect(pack.readMedia("cat.png")).toEqual(IMAGE_BYTES);
         expect(pack.readMedia("meow.mp3")).toEqual(AUDIO_BYTES);
         expect(pack.readMedia("missing.png")).toBeNull();
+    });
+});
+
+describe.each([
+    ["current layout", (bytes: Uint8Array) => bytes],
+    ["old layout", toLegacyLayout],
+])("openAnkiPackage with many media files, %s", (_name, layout) => {
+    const count = 200;
+    const mediaBytes = (index: number) => new Uint8Array([index % 256, Math.floor(index / 256), 7]);
+
+    test("takes each file out without going through every file of the archive again", async () => {
+        const deck = new Deck({ name: "Audio" });
+        deck.addNote(new Note({ notetype: NOTE_TYPES.basic, fields: ["a", "b"], guid: "g" }));
+        const built = new Package();
+        built.addDeck(deck);
+        for (let index = 0; index < count; index++) {
+            built.addMedia(`word_${index}.mp3`, mediaBytes(index));
+        }
+        const pack = await openAnkiPackage(layout(await built.toUint8Array(SQL)), SQL);
+        expect(pack.mediaNames).toHaveLength(count);
+
+        // Counts the archive entries unzipSync looks at, which is all of them on every call
+        let entriesSeen = 0;
+        const { unzipSync } = jest.requireActual<typeof fflate>("fflate");
+        jest.mocked(fflate.unzipSync).mockImplementation((data, options) =>
+            unzipSync(data, {
+                filter: (file) => {
+                    entriesSeen++;
+                    return options?.filter?.(file) ?? true;
+                },
+            }),
+        );
+        try {
+            for (let index = 0; index < count; index++) {
+                expect(pack.readMedia(`word_${index}.mp3`)).toEqual(mediaBytes(index));
+            }
+        } finally {
+            jest.mocked(fflate.unzipSync).mockImplementation(unzipSync);
+        }
+        expect(entriesSeen).toBeLessThanOrEqual(count);
     });
 });
 

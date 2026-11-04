@@ -91,6 +91,25 @@ describe("forecast", () => {
         expect(result.days).toEqual([1, 0, 0]);
     });
 
+    test("an SM-2 card is due on its date's study day, whatever the day boundary", () => {
+        // An SM-2 due is a calendar date, kept as its local midnight; the review screen offers the card from the
+        // start of that date's study day, so a 04:00 boundary must not move it to the day before
+        const sm2 = (year: number, month: number, day: number) =>
+            statsCard({
+                isFsrs: false,
+                stability: 0,
+                difficulty: 0,
+                dueMs: new Date(year, month - 1, day).getTime(),
+            });
+        const cards = [sm2(2026, 9, 28), sm2(2026, 9, 29), sm2(2026, 9, 30), sm2(2026, 10, 2)];
+        const expected = { overdue: 1, days: [1, 1, 0], beyond: 1, total: 4 };
+        const options = { todayKey: TODAY, days: 3 };
+        expect(forecast(cards, { ...options, dayKeyOf: dayKey })).toEqual(expected);
+        expect(forecast(cards, { ...options, dayKeyOf: makeDayKeyFn(4 * 3600 * 1000) })).toEqual(
+            expected,
+        );
+    });
+
     test("empty input gives empty days", () => {
         expect(forecast([], { todayKey: TODAY, dayKeyOf: dayKey, days: 3 })).toEqual({
             overdue: 0,

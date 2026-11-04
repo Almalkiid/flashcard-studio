@@ -1,3 +1,5 @@
+import { ClozeCrafter } from "clozecraft";
+
 import type { AiProviderId } from "src/ai/ai-provider";
 import { StorageType } from "src/data/data-store/store";
 import { t } from "src/lang/translate";
@@ -282,11 +284,26 @@ export function cloneDefaultSettings(): StudioSettings {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as StudioSettings;
 }
 
-const CLOZE_FORMS: readonly [flag: keyof StudioSettings, pattern: string][] = [
+/** The three old cloze switches and the pattern each one stands for. */
+export const CLOZE_FORMS: readonly [flag: keyof StudioSettings, pattern: string][] = [
     ["convertHighlightsToClozes", "==[123;;]answer[;;hint]=="],
     ["convertBoldTextToClozes", "**[123;;]answer[;;hint]**"],
     ["convertCurlyBracketsToClozes", "{{[123;;]answer[;;hint]}}"],
 ];
+
+/**
+ * Whether the cloze reader can read the pattern. Besides the word answer it needs a number part such as `[123;;]` and
+ * a hint part such as `[;;hint]`, and it throws on a pattern without them, which stops every scan of the vault.
+ */
+export function isReadableClozePattern(pattern: string): boolean {
+    try {
+        // Asking about some text also builds every expression the pattern reads with
+        new ClozeCrafter([pattern]).isClozeNote("");
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 const isMissing = (value: unknown): boolean => value === null || value === undefined;
 
@@ -332,6 +349,12 @@ export function upgradeSettings(settings: StudioSettings): void {
         settings.clozePatterns = CLOZE_FORMS.every(([flag]) => isMissing(settings[flag]))
             ? [...DEFAULT_SETTINGS.clozePatterns]
             : CLOZE_FORMS.filter(([flag]) => settings[flag]).map(([, pattern]) => pattern);
+    }
+    // A pattern the cloze reader can't read would stop every scan
+    if (Array.isArray(settings.clozePatterns)) {
+        settings.clozePatterns = settings.clozePatterns.filter(
+            (pattern) => typeof pattern === "string" && isReadableClozePattern(pattern),
+        );
     }
 
     // The file menu switch was inverted; someone who had turned the items off keeps them off

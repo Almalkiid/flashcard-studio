@@ -15,6 +15,11 @@ export interface IDateProvider {
     /** Local midnight of the current study day (the day before until the day boundary has passed). */
     get today(): Moment;
     /**
+     * The instant the current study day started: the day boundary on the date `today` names, or `today` itself when
+     * there is none. Answers given from then on were given today. Kept until the study day turns, like `todayEndMs`.
+     */
+    get studyDayStartMs(): number;
+    /**
      * The end of the date `today` names: the first instant of the next calendar date. Something due on a calendar date
      * (an SM-2 card) is due when its date starts before this. Kept until the study day turns, so it costs no moment.
      */
@@ -35,6 +40,15 @@ function studyDayStart(now: Moment, boundary: IDayBoundary | null): Moment {
     return now.clone().startOf("day");
 }
 
+/**
+ * The instant the study day named by `date`'s calendar date begins: the day boundary on that date (where the clocks
+ * skip that time, the first instant after the gap), or the date's first instant when there is no boundary.
+ */
+export function studyDayStartOn(date: Moment, boundary: IDayBoundary | null): Moment {
+    const start = date.clone().startOf("day");
+    return boundary === null ? start : start.set(boundary);
+}
+
 abstract class DayBoundaryProvider implements IDateProvider {
     private dayBoundary: IDayBoundary | null = null;
     /** `todayEndMs` and the study day it holds for: from `fromMs` up to, not including, `untilMs`. */
@@ -50,20 +64,28 @@ abstract class DayBoundaryProvider implements IDateProvider {
         return studyDayStart(this.now, this.dayBoundary);
     }
 
+    get studyDayStartMs(): number {
+        return this.currentStudyDay().fromMs;
+    }
+
     get todayEndMs(): number {
+        return this.currentStudyDay().endMs;
+    }
+
+    /** The study day `now` falls in, worked out again only once it has turned. */
+    private currentStudyDay(): { fromMs: number; untilMs: number; endMs: number } {
         const nowMs = this.nowMs;
         const known = this.todayEnd;
-        if (known !== null && nowMs >= known.fromMs && nowMs < known.untilMs) return known.endMs;
+        if (known !== null && nowMs >= known.fromMs && nowMs < known.untilMs) return known;
 
         const today = studyDayStart(moment(nowMs), this.dayBoundary);
         const next = today.clone().add(1, "day").startOf("day");
-        const boundary = this.dayBoundary;
         this.todayEnd = {
-            fromMs: boundary === null ? today.valueOf() : today.clone().set(boundary).valueOf(),
-            untilMs: boundary === null ? next.valueOf() : next.clone().set(boundary).valueOf(),
+            fromMs: studyDayStartOn(today, this.dayBoundary).valueOf(),
+            untilMs: studyDayStartOn(next, this.dayBoundary).valueOf(),
             endMs: next.valueOf(),
         };
-        return this.todayEnd.endMs;
+        return this.todayEnd;
     }
 
     getDayBoundary(): IDayBoundary | null {

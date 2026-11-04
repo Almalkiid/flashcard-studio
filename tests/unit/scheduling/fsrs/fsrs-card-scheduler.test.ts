@@ -243,6 +243,64 @@ describe("a last review in the future never throws (decision D5a)", () => {
     });
 });
 
+describe("load balancing keeps Hard < Good < Easy, as ts-fsrs does after fuzzing", () => {
+    const BALANCED = { ...DEFAULT_SETTINGS, fsrsLoadBalance: true };
+
+    /** A review card due now, last reviewed `elapsed` days ago. */
+    const reviewCardWith = (stability: number, difficulty: number, elapsed: number): FsrsState => {
+        const now = iso(DEFAULT_CLOCK);
+        return new FsrsState(
+            now.clone(),
+            elapsed,
+            difficulty,
+            stability,
+            State.Review,
+            3,
+            0,
+            0,
+            now.clone().subtract(elapsed, "days"),
+        );
+    };
+
+    const intervals = (card: FsrsState, busy: CardDueDateHistogram): number[] => {
+        const algorithm = new FsrsCardScheduler(BALANCED);
+        return [ReviewResponse.Hard, ReviewResponse.Good, ReviewResponse.Easy].map(
+            (button) => algorithm.cardCalcUpdatedSchedule(button, card, busy).interval,
+        );
+    };
+
+    test("Hard and Good whose windows overlap on the only quiet days still differ", () => {
+        // Unbalanced, Hard is 8 days and Good 11: their windows (6-10 and 9-13) share days 9 and 10, the quiet ones
+        const counts: Record<number, number> = {};
+        for (let day = 0; day <= 40; day++) counts[day] = day === 9 || day === 10 ? 0 : 30;
+        const [hard, good, easy] = intervals(
+            reviewCardWith(3, 5, 3),
+            new CardDueDateHistogram(counts),
+        );
+        expect(hard).toBeLessThan(good);
+        expect(good).toBeLessThan(easy);
+        expect(hard).toBeGreaterThanOrEqual(9);
+        expect(hard).toBeLessThanOrEqual(10);
+    });
+
+    test("over many short-interval cards and busy days, no two grades share a day", () => {
+        let seed = 7;
+        const random = (): number => {
+            seed = (seed * 1_103_515_245 + 12_345) % 2_147_483_648;
+            return seed / 2_147_483_648;
+        };
+        for (let index = 0; index < 300; index++) {
+            const stability = 1 + random() * 6;
+            const elapsed = Math.max(1, Math.round(stability * (0.5 + random())));
+            const counts: Record<number, number> = {};
+            for (let day = 0; day <= 60; day++) counts[day] = Math.floor(random() * 30);
+            const card = reviewCardWith(stability, 1 + random() * 9, elapsed);
+            const [hard, good, easy] = intervals(card, new CardDueDateHistogram(counts));
+            expect([index, hard < good && good < easy]).toEqual([index, true]);
+        }
+    });
+});
+
 describe("ts-fsrs 5.4.2 limits the default weights to the number of relearning steps", () => {
     // A review card answered the same day it was last reviewed, so ts-fsrs uses w[17] and w[18] for its new stability
     const SAME_DAY_CARD =

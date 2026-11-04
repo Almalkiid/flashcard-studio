@@ -49,6 +49,18 @@ describe("buildCard", () => {
         );
     });
 
+    test("writes a note on several lines when the separator and the text next to it make another separator", () => {
+        // `Capital of France:` + `::` + `Paris` would read as `:::`, a reversed card
+        expect(card("basic", ["Capital of France:", "Paris"], "single")).toBe(
+            "Capital of France:\n?\nParis",
+        );
+        expect(card("basic", ["Define", ":)"], "single")).toBe("Define\n?\n:)");
+        // `::::` would be cut after the first three colons, moving one to the back
+        expect(card("reversed", ["Translate:", "hola"], "single")).toBe("Translate:\n??\nhola");
+        // A back that starts with a colon is fine after the reversed separator, which is cut first
+        expect(card("reversed", ["Smile", ":)"], "single")).toBe("Smile::::)");
+    });
+
     test("protects a front that starts like a tag", () => {
         expect(card("basic", ["#1 rule", "Answer"], "multi")).toBe("\\#1 rule\n?\nAnswer");
     });
@@ -74,8 +86,11 @@ describe("buildCard", () => {
         });
     });
 
-    test("skips a cloze note with unbalanced braces", () => {
+    test("skips a cloze note with unbalanced braces or a cloze number no note has", () => {
         expect(buildCard("cloze", ["{{c1::open"], "multi")).toEqual({ skipped: "invalid-cloze" });
+        expect(buildCard("cloze", ["{{c1,1000::x}}"], "multi")).toEqual({
+            skipped: "invalid-cloze",
+        });
     });
 
     test("honours custom separators", () => {
@@ -90,6 +105,16 @@ describe("buildCard", () => {
             "a=&#62;x\n---\nb",
         );
         expect(markdown(buildCard("reversed", ["a", "b"], "multi", separators))).toBe("a\n----\nb");
+        // `a<` + `=>` is the reversed separator `<=>`
+        expect(markdown(buildCard("basic", ["a<", "b"], "single", separators))).toBe("a<\n---\nb");
+        // A longer reversed separator that does not contain the basic one is protected as well
+        const apart = { ...separators, singleLineReversed: "<<>>" };
+        expect(markdown(buildCard("basic", ["a<<>>x", "b"], "single", apart))).toBe(
+            "a<&#60;>>x\n---\nb",
+        );
+        expect(markdown(buildCard("basic", ["a<<>>x", "b"], "multi", apart))).toBe(
+            "a<&#60;>>x\n---\nb",
+        );
         // A one character separator is replaced whole
         const oneChar = { ...separators, singleLine: "=" };
         expect(markdown(buildCard("basic", ["a=x", "b"], "single", oneChar))).toBe(
@@ -143,6 +168,34 @@ describe("what buildCard writes is read back by the plugin's parser", () => {
         const { type, sides } = roundTrip("basic", ["std::vector", "A"], "single");
         expect(type).toBe(CardType.MultiLineBasic);
         expect(sides[0].back).toBe("A");
+    });
+
+    test.each([
+        ["basic", ["Capital of France:", "Paris"], CardType.MultiLineBasic],
+        ["basic", ["Define", ":)"], CardType.MultiLineBasic],
+        ["reversed", ["Translate:", "hola"], CardType.MultiLineReversed],
+        ["reversed", ["Smile", ":)"], CardType.SingleLineReversed],
+    ] as const)("single-line style, %s %p", (kind, fields, type) => {
+        const { type: read, sides } = roundTrip(kind, [...fields], "single");
+        expect(read).toBe(type);
+        expect(sides[0]).toEqual({ front: fields[0], back: fields[1] });
+        expect(sides).toHaveLength(kind === "reversed" ? 2 : 1);
+    });
+
+    test("a front with a reversed separator that does not contain the basic one is still one card", () => {
+        const separators = {
+            singleLine: "=>",
+            singleLineReversed: "<<>>",
+            multiLine: "?",
+            multiLineReversed: "??",
+        };
+        const text = markdown(buildCard("basic", ["a<<>>x", "b"], "multi", separators));
+        const cards = parse(text, {
+            ...options,
+            singleLineCardSeparator: separators.singleLine,
+            singleLineReversedCardSeparator: separators.singleLineReversed,
+        });
+        expect(cards.map((parsed) => parsed.cardType)).toEqual([CardType.MultiLineBasic]);
     });
 
     test("a card with a paragraph break stays one card", () => {
