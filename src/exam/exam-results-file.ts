@@ -1,5 +1,6 @@
 import {
     ExamAnswer,
+    examBreakdown,
     ExamCardFilter,
     ExamItem,
     ExamQuestion,
@@ -86,10 +87,44 @@ function cell(text: string): string {
 }
 
 /**
+ * A table cell that shows its text as it is: on one line, and every character Markdown or Obsidian would read as
+ * something (a link, an embed, a tag, HTML, math, a comment, emphasis) escaped. A note path is written this way, never
+ * as a link: links from the exam files would count as links to the notes, which note review weighs.
+ */
+export function literalCell(text: string): string {
+    return text
+        .replace(/\s*\r?\n\s*/g, " ")
+        .trim()
+        .replace(/[\\`*_[\]<>#|!$=~^%]/g, "\\$&");
+}
+
+/** The rows under the summary: by deck as always, or by note for an exam from several notes. */
+function breakdownLines(r: ExamResult): string[] {
+    const breakdown = examBreakdown(r);
+    if (breakdown.by === "note") {
+        return [
+            "| Note | Right |",
+            "|---|---|",
+            ...breakdown.rows.map(
+                (row) => `| ${literalCell(row.key) || "-"} | ${row.right} of ${row.total} |`,
+            ),
+        ];
+    }
+    return [
+        "| Deck | Right |",
+        "|---|---|",
+        ...breakdown.rows.map(
+            (row) => `| ${cell(row.key || "-")} | ${row.right} of ${row.total} |`,
+        ),
+    ];
+}
+
+/**
  * The text of an exam's file. It has no front matter, so it stays a plain note.
  */
 export function formatExamFile(r: ExamResult): string {
     const title = r.setup.title.replace(/\s*\r?\n\s*/g, " ").trim();
+    const notes = r.setup.notes ?? [];
     const lines: string[] = [
         `# ${title}`,
         "",
@@ -99,10 +134,9 @@ export function formatExamFile(r: ExamResult): string {
         `| Time taken | ${durationText(r.endedMs - r.startedMs)} |`,
         `| Finished | ${dateText(r.endedMs)} ${clockText(r.endedMs).replace(/^(\d{2})/, "$1:")} |`,
         `| Cards | ${r.setup.filter === "choice-only" ? "Multiple choice only" : "All cards"} |`,
+        ...(notes.length > 0 ? [`| Notes | ${notes.map(literalCell).join(", ")} |`] : []),
         "",
-        "| Deck | Right |",
-        "|---|---|",
-        ...r.perDeck.map((row) => `| ${cell(row.deck || "-")} | ${row.right} of ${row.total} |`),
+        ...breakdownLines(r),
         "",
         BLOCK_START,
         JSON.stringify({
@@ -151,7 +185,7 @@ const KINDS: ExamQuestionKind[] = ["choice", "typed", "self"];
 
 export function readSetup(value: unknown): ExamSetup | null {
     if (!isObject(value)) return null;
-    const { decks, count, minutes, filter, passPercent, title, shuffleOptions } = value;
+    const { decks, count, minutes, filter, passPercent, title, shuffleOptions, notes } = value;
     if (!Array.isArray(decks) || !decks.every((deck) => typeof deck === "string")) return null;
     if (!isFiniteNumber(count)) return null;
     if (!isNullableNumber(minutes)) return null;
@@ -169,6 +203,11 @@ export function readSetup(value: unknown): ExamSetup | null {
     if (shuffleOptions !== undefined) {
         if (typeof shuffleOptions !== "boolean") return null;
         setup.shuffleOptions = shuffleOptions;
+    }
+    if (notes !== undefined) {
+        if (!Array.isArray(notes) || !notes.every((note) => typeof note === "string")) return null;
+        // An empty list is an exam from decks, as before
+        if (notes.length > 0) setup.notes = notes;
     }
     return setup;
 }

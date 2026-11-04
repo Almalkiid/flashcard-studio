@@ -1754,9 +1754,16 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
 
 .fs-exam-field-head {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
     gap: 12px;
+}
+
+/* Decks or notes: the switch sits by its label, the All decks link stays at the end */
+.fs-exam-source {
+    align-self: center;
+    margin-inline-end: auto;
 }
 
 .fs-exam-two {
@@ -1949,6 +1956,75 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
 
 .fs-studio .fs-exam-link.is-active {
     color: var(--fs-text-3);
+}
+
+/* The notes: the ones chosen, in the deck list's box, and a button to add one */
+.fs-exam-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fs-exam-note-line {
+    display: flex;
+    align-items: center;
+    padding: 9px 8px 9px 14px;
+    gap: 12px;
+
+    & + & {
+        border-top: solid 1px var(--fs-border);
+    }
+}
+
+.fs-exam-note-icon {
+    display: flex;
+    flex: none;
+    color: var(--fs-text-3);
+
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.fs-exam-note-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--fs-body);
+    font-weight: 550;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs-exam-note-folder {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--fs-caption);
+    color: var(--fs-text-3);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs-exam-note-count {
+    flex: none;
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    color: var(--fs-text-3);
+}
+
+.fs-studio .fs-exam-ghost.fs-exam-add-note {
+    align-self: flex-start;
+}
+
+.fs-exam-add-note-icon {
+    display: inline-flex;
+
+    & svg {
+        width: 18px;
+        height: 18px;
+    }
 }
 
 /* Number of questions and minutes: a field with minus and plus */
@@ -2366,6 +2442,10 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     .fs-exam-actions.is-setup {
         flex-direction: column-reverse;
         align-items: stretch;
+    }
+
+    .fs-exam-note-folder {
+        display: none;
     }
 }
 

@@ -4,6 +4,7 @@ import {
     ExamCardInput,
     examEndMs,
     examKeyAction,
+    examNoteCounts,
     ExamQuestion,
     ExamSetup,
     examSummary,
@@ -207,6 +208,40 @@ describe("pickExamQuestions", () => {
         );
         expect(ids(picked)).toEqual(["d1"]);
         expect(picked[0].deck).toBe("CIA/Part1");
+    });
+
+    test("an exam from notes asks only the cards of those notes, wherever they are filed", () => {
+        const notes = [
+            card({ id: "n1", deck: "CIA/Part1", back: CHOICE_BACK, sourcePath: "Bio/Cell.md" }),
+            card({ id: "n2", deck: "Law", sourcePath: "Bio/DNA.md" }),
+            card({ id: "n3", deck: "CIA/Part2", sourcePath: "Bio/Genes.md" }),
+            // The same card in a second deck is still one question
+            card({ id: "n1", deck: "Law", back: CHOICE_BACK, sourcePath: "Bio/Cell.md" }),
+            // A card in no note is never in an exam from notes
+            card({ id: "n4", deck: "Law" }),
+            card({ id: "n5", deck: "Law", sourcePath: "Bio/Cell.md", suspended: true }),
+        ];
+        const fromNotes: ExamSetup = {
+            ...SETUP,
+            decks: [],
+            notes: ["Bio/Cell.md", "Bio/DNA.md"],
+        };
+        expect(ids(pickExamQuestions(notes, fromNotes, ZERO)).sort()).toEqual(["n1", "n2"]);
+        expect(
+            ids(pickExamQuestions(notes, { ...fromNotes, filter: "choice-only" }, ZERO)),
+        ).toEqual(["n1"]);
+        // No notes listed is an exam from decks, exactly as without the field
+        expect(pickExamQuestions(notes, { ...SETUP, notes: [] }, ZERO)).toEqual(
+            pickExamQuestions(notes, SETUP, ZERO),
+        );
+        expect(examNoteCounts(notes, "all")).toEqual(
+            new Map([
+                ["Bio/Cell.md", 1],
+                ["Bio/DNA.md", 1],
+                ["Bio/Genes.md", 1],
+            ]),
+        );
+        expect(examNoteCounts(notes, "choice-only")).toEqual(new Map([["Bio/Cell.md", 1]]));
     });
 });
 
