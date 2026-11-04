@@ -742,7 +742,7 @@ describe("AI cards", () => {
         const row = findRow(build().items, "Privacy");
         expect(row).toEqual({
             name: "Privacy",
-            desc: "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal.",
+            desc: "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal. In an exam with AI checks typed answers on, the same three are sent for each typed answer that does not match when you submit.",
         });
     });
 });

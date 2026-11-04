@@ -8,6 +8,7 @@ import {
     noteName,
     plainExcerpt,
 } from "src/exam/exam";
+import { aiCheckText } from "src/exam/exam-ai-check";
 import {
     choiceContext,
     deckLabel,
@@ -142,6 +143,26 @@ function renderHero(page: HTMLElement, result: ExamResult): void {
         cls: "fs-exam-hero-sub",
         text: t("EXAM_PASS_LINE", { percent: result.setup.passPercent }),
     });
+    const accepted = result.items.filter((item) => item.ai?.verdict === "equivalent").length;
+    if (accepted > 0) {
+        text.createDiv({
+            cls: "fs-exam-hero-sub",
+            text:
+                accepted === 1
+                    ? t("EXAM_AI_ACCEPTED_COUNT_ONE")
+                    : t("EXAM_AI_ACCEPTED_COUNT", { count: accepted }),
+        });
+    }
+    const unchecked = result.items.filter((item) => item.ai?.verdict === "unavailable").length;
+    if (unchecked > 0) {
+        text.createDiv({
+            cls: "fs-exam-hero-sub",
+            text:
+                unchecked === 1
+                    ? t("EXAM_AI_NOT_CHECKED_ONE")
+                    : t("EXAM_AI_NOT_CHECKED", { count: unchecked }),
+        });
+    }
 
     const stats = hero.createDiv({ cls: "fs-exam-stats" });
     stat(stats, "clock", t("EXAM_TIME_TAKEN"), formatDuration(result.endedMs - result.startedMs));
@@ -297,7 +318,21 @@ function renderItem(
             plainExcerpt(occlusionQuestionOf(item.q.front) ?? item.q.front) ||
             t("EXAM_PICTURE_QUESTION"),
     }).setAttribute("dir", "auto");
-    if (item.a.flagged) setIcon(head.createSpan({ cls: "fs-exam-item-flag" }), "flag");
+    const accepted = item.ai?.verdict === "equivalent";
+    if (accepted || item.a.flagged) {
+        // One cell of the row for both marks, so the row keeps its columns
+        const marks = head.createSpan({ cls: "fs-exam-item-marks" });
+        if (accepted) {
+            setIcon(
+                marks.createSpan({
+                    cls: "fs-exam-item-ai",
+                    attr: { role: "img", "aria-label": t("EXAM_AI_ACCEPTED") },
+                }),
+                "sparkles",
+            );
+        }
+        if (item.a.flagged) setIcon(marks.createSpan({ cls: "fs-exam-item-flag" }), "flag");
+    }
     setIcon(head.createSpan({ cls: "fs-exam-item-chevron" }), "chevron-down");
 
     const body = row.createDiv({ cls: "fs-exam-item-body" });
@@ -312,6 +347,18 @@ function renderItem(
     };
     head.addEventListener("click", () => toggle(!row.hasClass("is-open")));
     if (open) toggle(true);
+}
+
+/** What the AI said about a typed answer. The model's words are set as text, never read as Markdown or HTML. */
+function renderAiCheck(body: HTMLElement, item: ExamItem): void {
+    if (item.ai === undefined) return;
+    const { verdict, reason } = aiCheckText(item.ai);
+    const box = body.createDiv({ cls: `fs-exam-ai is-${item.ai.verdict}` });
+    setIcon(box.createSpan({ cls: "fs-exam-ai-icon" }), "sparkles");
+    const text = box.createDiv({ cls: "fs-exam-ai-text" });
+    text.createDiv({ cls: "fs-exam-ai-verdict", text: verdict });
+    if (reason !== "")
+        text.createDiv({ cls: "fs-exam-ai-reason", text: reason, attr: { dir: "auto" } });
 }
 
 async function fillItem(
@@ -361,6 +408,7 @@ async function fillItem(
         }
         block.createDiv({ cls: "fs-label", text: t("EXAM_YOUR_ANSWER") });
         renderTypedResult(block, compareTypedAnswer(answer.typed, target, opts.ignoreAccents));
+        if (item.ai !== undefined) renderAiCheck(body, item);
         return;
     }
 

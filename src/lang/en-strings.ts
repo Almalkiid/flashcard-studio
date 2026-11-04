@@ -197,7 +197,7 @@ const en = {
     AI_MEANING_CHECKS_DISAGREE: "The meaning checks did not all agree.",
     AI_PRIVACY_LABEL: "Privacy",
     AI_PRIVACY_DESC:
-        "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal.",
+        "Note text is sent when you generate cards. If Check meaning with AI is on, the question, expected answer and typed answer are also sent on reveal. In an exam with AI checks typed answers on, the same three are sent for each typed answer that does not match when you submit.",
     // Read aloud
     READ_ALOUD: "Read aloud",
     // End read aloud
@@ -819,6 +819,23 @@ const en = {
         "There are no multiple choice cards in these notes. Choose All cards, or write a task list with one checked item under a question.",
     EXAM_NONE_ALL_NOTES: "There are no cards to ask in these notes.",
     EXAM_BY_NOTE: "By note",
+    EXAM_AI_CHECK: "AI checks typed answers",
+    EXAM_AI_CHECK_DESC:
+        "When you submit, each typed answer that does not match exactly is sent to ${provider} with its question and expected answer. An answer with the same meaning counts as right.",
+    EXAM_AI_CHECKING_TITLE: "Checking your typed answers",
+    EXAM_AI_CHECKING_PROGRESS: "${done} of ${total} checked",
+    EXAM_AI_CHECKING_SENT:
+        "Only the question, the expected answer and your typed answer are sent to ${provider}.",
+    EXAM_AI_SKIP: "Show results now",
+    EXAM_AI_SKIPPED: "The checks stopped before this answer.",
+    EXAM_AI_COUNTED_RIGHT: "counted as right",
+    EXAM_AI_ACCEPTED: "Accepted by AI",
+    EXAM_AI_ACCEPTED_COUNT: "${count} typed answers counted right by AI",
+    EXAM_AI_ACCEPTED_COUNT_ONE: "1 typed answer counted right by AI",
+    EXAM_AI_NOT_CHECKED:
+        "${count} typed answers could not be checked by AI and are marked by exact match",
+    EXAM_AI_NOT_CHECKED_ONE:
+        "1 typed answer could not be checked by AI and is marked by exact match",
     DECK_TITLE_COLUMN: "Title",
     ALL_DECKS: "All Decks",
     HIDDEN_BY_LIMIT: "${count} hidden by today's limit",

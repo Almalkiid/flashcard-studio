@@ -1,5 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
+import { meaningChecker } from "src/ai/ai-access";
 import { STUDIO_TAB_VIEW } from "src/data/formats";
 import { ExamStart } from "src/exam/exam";
 import { persistenceFor } from "src/exam/exam-draft-store";
@@ -58,6 +59,8 @@ export class ExamView extends ItemView {
             onStudyMissed: (ids) => void this.plugin.uiManager.studyMissed(ids),
             resume: exam.resume,
             ...persistenceFor(this.plugin),
+            // Used only by an exam set up with AI checks
+            ai: meaningChecker(this.app, () => this.plugin.dataManager.data.settings),
             onClose: () => this.leaf.detach(),
         });
         this.runner.start();

@@ -174,6 +174,8 @@ Your progress is saved as you go: after every answer, flag and move, and when yo
 
 The results show your score against the pass mark, the time taken, the score of each deck (of each note, for an exam from several notes), and every question with your answer, the right one and the explanation. The pass mark is 75% until you change it in **Settings, Exams**. The CIA reports a scaled score, so this is a practice target, not the official pass mark. **Study the ones I missed** starts a review of exactly those cards, and a question left unanswered counts as missed.
 
+When AI is set up for card generation, the setup also offers **AI checks typed answers** (with **All cards**). When you submit, each typed answer that does not match exactly gets the same check as **Check meaning with AI** in a review: its question, the expected answer and what you typed are sent to your provider, and nothing else; with the option off nothing is sent. An answer with the same meaning counts as right in the score. A different meaning, an AI that cannot decide, or a check that fails or takes longer than 10 seconds leaves it wrong. The progress shows while it checks, and **Show results now** stops waiting. The results and the exam's file show the AI's verdict and reason for every answer it checked. The label of an image occlusion card is never sent.
+
 Each exam is saved as one plain file in `Flashcard Studio/Exams/`, for example `2026-09-30 1405 exam.md`: a summary table, and one JSON line for each question. The setup lists your last five exams and starts from the last one, so a retake is one press of **Start exam**.
 
 ## Compared with Spaced Repetition
@@ -223,11 +225,12 @@ Or open [Flashcard Studio in the community directory](https://community.obsidian
 
 ## Network use
 
-Flashcard Studio works offline. It makes a network request only in three cases:
+Flashcard Studio works offline. It makes a network request only in four cases:
 
 - You turn on **Show update available status bar item** in the settings (it is off by default). Flashcard Studio then asks GitHub for the latest release of this repository, at most once a day while the status bar item is shown, and compares its version number with yours. The request carries no information about you or your notes.
 - You run **Generate cards with AI**, which sends the note or selection you chose, and your extra instructions, to the provider you set up in the settings. Nothing is sent until you choose **Generate**.
 - You turn on **Check meaning with AI** in the typed-answer settings (it is off by default). Then, when you reveal a typed answer on a basic or reversed card that does not match exactly, the question, the expected answer and your typed answer are sent to that same provider. Nothing else from the note is sent.
+- You turn on **AI checks typed answers** when you set up an exam (it is off by default). Then, when you submit it, each typed answer that does not match exactly is sent with its question and expected answer to that same provider. Nothing else from the note is sent.
 
 ## Compatibility and credits
 
