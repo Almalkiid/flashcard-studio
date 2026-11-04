@@ -10,6 +10,7 @@ import {
     NoteKind,
 } from "src/import-export/anki-types";
 import { protoNumber, protoString, readProtoFields } from "src/import-export/protobuf-lite";
+import { readZipDirectory, readZipEntry, ZipEntry } from "src/import-export/zip-directory";
 import { t } from "src/lang/translate";
 import { escapeRegex } from "src/utils/text";
 
@@ -93,13 +94,15 @@ function toImportError(error: unknown): AnkiImportError {
  *
  * Only the collection database and the media index are unpacked. The media files stay compressed inside the archive
  * and come out one at a time through `readMedia`, so a package with hundreds of megabytes of media does not have to
- * fit in memory twice, which matters on a phone.
+ * fit in memory twice, which matters on a phone. Where each file is in the archive is read once, so that taking out
+ * one does not go through all the others.
  *
  * The database is read by ankipack. Its own reader unpacks every media file up front, so it is handed a copy of the
  * archive that holds only the collection.
  */
 export async function openAnkiPackage(bytes: Uint8Array, SQL: SqlJsStatic): Promise<AnkiPackage> {
     let core: Record<string, Uint8Array>;
+    let files: Map<string, ZipEntry>;
     try {
         core = unzipSync(bytes, {
             filter: (file) =>
@@ -107,6 +110,7 @@ export async function openAnkiPackage(bytes: Uint8Array, SQL: SqlJsStatic): Prom
                 file.name === "media" ||
                 file.name.startsWith("collection."),
         });
+        files = readZipDirectory(bytes);
     } catch {
         throw new AnkiImportError(t("ANKI_IMPORT_ERR_NOT_A_PACKAGE"), "not-a-package");
     }
@@ -185,9 +189,9 @@ export async function openAnkiPackage(bytes: Uint8Array, SQL: SqlJsStatic): Prom
         mediaNames: Array.from(mediaKeys.keys()),
         readMedia(name: string): Uint8Array | null {
             const key = mediaKeys.get(name);
-            if (key === undefined) return null;
-            const stored = unzipSync(bytes, { filter: (file) => file.name === key })[key];
-            if (stored === undefined) return null;
+            const entry = key === undefined ? undefined : files.get(key);
+            if (entry === undefined) return null;
+            const stored = readZipEntry(bytes, entry);
             return modernLayout && isZstd(stored) ? decompress(stored) : stored;
         },
     };
