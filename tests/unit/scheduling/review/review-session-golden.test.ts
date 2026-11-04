@@ -60,7 +60,7 @@ const CHANGED: Record<string, { from: number; rule: string }> = {
     },
     "sm2/undo-restores-buried-cards-and-histogram": {
         from: 2,
-        rule: "D5b undo takes the question off the list",
+        rule: "D5b undo takes the question off the list, and its siblings come back to the queue",
     },
     "fsrs/sm2-card-early-small-interval-throws": {
         from: 0,

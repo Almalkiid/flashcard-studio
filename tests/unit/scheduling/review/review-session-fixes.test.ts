@@ -367,6 +367,30 @@ describe("D5b: undo takes the answer's buried siblings back off the buried-cards
         expect(write).toHaveBeenCalledTimes(2);
     });
 
+    test.each([
+        ["SM-2 Good (the card leaves the session)", SchedulerKind.SM2, ReviewResponse.Good],
+        ["SM-2 Again (the card goes to the back)", SchedulerKind.SM2, ReviewResponse.Again],
+        ["FSRS Good (the card waits for its step)", SchedulerKind.FSRS, ReviewResponse.Good],
+        ["FSRS Again (the card waits for its step)", SchedulerKind.FSRS, ReviewResponse.Again],
+    ])(
+        "after %s and undo, the siblings are back in the session where they were",
+        async (_name, algorithm, response) => {
+            const c = await open(
+                "#flashcards This single ==question== turns into ==3 separate== ==cards==\n\n#flashcards Q1::A1\n",
+                { algorithm, settings: { burySiblingCards: true } },
+            );
+            const before = c.queue();
+            expect(before).toHaveLength(4);
+            await c.reviewSession.processReview(response);
+            expect(c.queue()).not.toContain(before[1]);
+
+            expect(await c.reviewSession.undoLastAnswer()).toBe(UndoResult.Requeued);
+            expect(c.buriedCards.list).toEqual([]);
+            expect(c.queue()).toEqual(before);
+            expect(c.reviewSession.currentCard).toBe(before[0]);
+        },
+    );
+
     test("a question already on the list before the answer stays on it", async () => {
         const c = await open(
             "#flashcards This single ==question== turns into ==3 separate== ==cards==\n\n#flashcards Q1::A1\n",
@@ -379,6 +403,8 @@ describe("D5b: undo takes the answer's buried siblings back off the buried-cards
         await c.reviewSession.processReview(ReviewResponse.Good); // the same cloze again, its question already listed
         expect(await c.reviewSession.undoLastAnswer()).toBe(UndoResult.Requeued);
         expect(c.buriedCards.list).toHaveLength(1);
+        // The siblings were out of the session before this answer, so they stay out
+        expect(c.queue()).toEqual([c.reviewSession.currentCard]);
     });
 });
 
