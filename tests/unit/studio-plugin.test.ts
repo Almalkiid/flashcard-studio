@@ -233,7 +233,7 @@ describe("settings changed on disk by another device", () => {
         expect(mockRun.order).toEqual(["reloadSettings", "effects", "sync"]);
     });
 
-    test("before the first scan only the settings are read: the scan will use them", async () => {
+    test("before the plugin is ready only the settings are read; their effects are redone once it is", async () => {
         const plugin = newPlugin();
         await plugin.onload();
         mockRun.order = [];
@@ -241,6 +241,65 @@ describe("settings changed on disk by another device", () => {
         await plugin.onExternalSettingsChange();
 
         expect(mockRun.order).toEqual(["reloadSettings"]);
+
+        mockRun.layoutReady?.();
+        await tick();
+
+        expect(plugin.isInitialized).toBe(true);
+        expect(mockRun.order).toEqual([
+            "reloadSettings",
+            "loadData",
+            "initVaultIndex",
+            "uiLayoutReady",
+            "sync",
+            "effects",
+            "sync",
+        ]);
+    });
+
+    // The bug: a change read while the first scan ran was never applied, so the scheduler the scan had built (and the
+    // start of day, the hotkeys) kept the old settings until a restart
+    test("settings read while the first scan runs have their effects redone when it is done", async () => {
+        let finish: () => void = () => undefined;
+        mockRun.sync = () =>
+            new Promise<void>((resolve) => {
+                finish = resolve;
+            });
+        const plugin = newPlugin();
+        await plugin.onload();
+        mockRun.layoutReady?.();
+        await tick();
+        mockRun.order = [];
+
+        await plugin.onExternalSettingsChange();
+        expect(mockRun.order).toEqual(["reloadSettings"]);
+        mockRun.sync = () => Promise.resolve();
+        finish();
+        await tick();
+
+        expect(plugin.isInitialized).toBe(true);
+        expect(mockRun.order).toEqual(["reloadSettings", "effects", "sync"]);
+
+        // A later change is applied at once, as usual
+        mockRun.order = [];
+        await plugin.onExternalSettingsChange();
+        expect(mockRun.order).toEqual(["reloadSettings", "effects", "sync"]);
+    });
+
+    test("a failure to redo them when the plugin gets ready is logged, and the plugin is ready", async () => {
+        const plugin = newPlugin();
+        await plugin.onload();
+        await plugin.onExternalSettingsChange();
+        let syncs = 0;
+        mockRun.sync = () =>
+            ++syncs === 1 ? Promise.resolve() : Promise.reject(new Error("scan failed"));
+
+        mockRun.layoutReady?.();
+        await tick();
+
+        expect(plugin.isInitialized).toBe(true);
+        expect(console.error).toHaveBeenCalled();
+        expect(noticeTexts()).toEqual([]);
     });
 
     test("a plugin that never loaded does nothing", async () => {
