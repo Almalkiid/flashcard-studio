@@ -132,10 +132,10 @@ describe("buildCardHistories", () => {
 
     test("a deck filter takes the deck and its subdecks, and judges a card by its latest answer", () => {
         const entries = [
-            entry({ t: D0, c: "aaaaaa", dk: "CIA/Part1/Risk" }),
-            entry({ t: D0, c: "bbbbbb", dk: "CIA/Part2" }),
-            entry({ t: D0, c: "cccccc", dk: "CIAX" }),
-            entry({ t: D0, c: "dddddd", dk: "Other" }),
+            entry({ t: D0, c: "aaaaaa", k: 0, dk: "CIA/Part1/Risk" }),
+            entry({ t: D0, c: "bbbbbb", k: 0, dk: "CIA/Part2" }),
+            entry({ t: D0, c: "cccccc", k: 0, dk: "CIAX" }),
+            entry({ t: D0, c: "dddddd", k: 0, dk: "Other" }),
             entry({ t: D0 + DAY, c: "dddddd", dk: "CIA/Part1" }),
         ];
         const ids = (deck: string) =>
@@ -143,6 +143,43 @@ describe("buildCardHistories", () => {
         expect(ids("CIA/Part1")).toEqual(["aaaaaa", "dddddd"]);
         expect(ids("#CIA")).toEqual(["aaaaaa", "bbbbbb", "dddddd"]);
         expect(ids("")).toHaveLength(4);
+    });
+
+    test("skips a card whose log starts with a review or relearning answer, unless it was reset", () => {
+        // Carried over from the Spaced Repetition plugin: its first logged answer is not its first exposure
+        const migrated = [
+            entry({ t: D0, c: "aaaaaa", r: 3, k: 1 }),
+            entry({ t: D0 + 30 * DAY, c: "aaaaaa", r: 3, k: 1 }),
+        ];
+        const relearning = [
+            entry({ t: D0, c: "bbbbbb", r: 3, k: 2 }),
+            entry({ t: D0 + 3 * DAY, c: "bbbbbb", r: 3, k: 1 }),
+        ];
+        // Cram and manual entries before the first learning answer do not count as its start
+        const learnt = [
+            entry({ t: D0 - DAY, c: "cccccc", r: 3, k: 3 }),
+            entry({ t: D0, c: "cccccc", r: 3, k: 0, n: 1 }),
+            entry({ t: D0 + 3 * DAY, c: "cccccc", r: 3, k: 1 }),
+        ];
+        // A reset starts the card again from nothing, whatever kind its next answer is logged as (SM-2 logs a review)
+        const reset = [
+            entry({ t: D0, c: "dddddd", r: 3, k: 1 }),
+            entry({ t: D0 + DAY, c: "dddddd", r: 0, k: 4 }),
+            entry({ t: D0 + 2 * DAY, c: "dddddd", r: 3, k: 1 }),
+            entry({ t: D0 + 5 * DAY, c: "dddddd", r: 3, k: 1 }),
+        ];
+        const histories = buildCardHistories([...migrated, ...relearning, ...learnt, ...reset], {
+            dayStartOffsetMs: 0,
+        });
+        expect(histories.map((history) => history.cardId)).toEqual(["cccccc", "dddddd"]);
+        expect(histories[0].reviews.map((review) => [review.rating, review.deltaT])).toEqual([
+            [3, 0],
+            [3, 3],
+        ]);
+        expect(histories[1].reviews.map((review) => [review.rating, review.deltaT])).toEqual([
+            [3, 0],
+            [3, 3],
+        ]);
     });
 
     test("skips answers without a card id", () => {
