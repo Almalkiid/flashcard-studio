@@ -4,9 +4,11 @@ import { Menu, Notice, Platform, TAbstractFile, TFile } from "obsidian";
 import { DataStore } from "src/data/data-store/store";
 import { STUDIO_TAB_VIEW } from "src/data/formats";
 import { SettingsManager } from "src/data/stored-data";
-import { ExamStart } from "src/exam/exam";
+import { examNoteCounts, ExamStart } from "src/exam/exam";
+import { collectExamCards } from "src/exam/exam-cards";
 import { unfinishedExams } from "src/exam/exam-draft-store";
 import { cardsChangedText } from "src/exam/exam-render";
+import { isInExamsFolder } from "src/exam/exam-results-file";
 import { ExamResumeModal } from "src/exam/exam-resume";
 import { ExamSetupModal } from "src/exam/exam-setup-modal";
 import { readExamResults } from "src/exam/exam-store";
@@ -233,6 +235,23 @@ export class UIManager {
             }
         }
 
+        // Any note but the plugin's own history files. Whether it has cards to ask is found out on the click: finding
+        // out while the menu opens would cost a pass over every card
+        if (
+            !isInExamsFolder(file.path) &&
+            !this.plugin.dataManager.isInReviewLogFolder(file.path)
+        ) {
+            menu.addItem((item) =>
+                item
+                    .setTitle(t("EXAM_FROM_NOTE_CMD"))
+                    .setIcon("clipboard-check")
+                    .setSection(section)
+                    .onClick(() => {
+                        if (this.plugin.ensureReady()) void this.openExamFromNote(file);
+                    }),
+            );
+        }
+
         if (settings.showDeleteButtonInFileMenu) {
             const erasers = [
                 {
@@ -285,17 +304,34 @@ export class UIManager {
      * Opens the exam setup. `onStart` gets the exam when the person chooses Start; by default it is taken in the
      * Studio's desktop shell when that is open, and in a tab of its own otherwise.
      */
-    public async openExamSetup(onStart?: (start: ExamStart) => void): Promise<void> {
+    public async openExamSetup(
+        onStart?: (start: ExamStart) => void,
+        notePath?: string,
+    ): Promise<void> {
         const { plugin } = this;
         if (!plugin.isInitialized) return;
         // The decks and cards listed are the ones of the last sync, so make sure they are up to date
         await plugin.dataManager.sync();
+        // Opened for a note: say so at once when it has nothing an exam can ask, rather than open a setup that cannot
+        // start
+        if (notePath !== undefined) {
+            const cards = collectExamCards(plugin.dataManager.vaultIndex.reviewableRoot);
+            if (!examNoteCounts(cards, "all").has(notePath)) {
+                new Notice(t("EXAM_NOTE_NO_CARDS"));
+                return;
+            }
+        }
         const [recent, unfinished] = await Promise.all([
             readExamResults(plugin.app, 5),
             unfinishedExams(plugin),
         ]);
         const begin = onStart ?? ((start: ExamStart) => void this.startExam(start));
-        new ExamSetupModal(plugin, recent, unfinished, begin).open();
+        new ExamSetupModal(plugin, recent, unfinished, begin, notePath).open();
+    }
+
+    /** "Take an exam from this note": the exam setup, with the note chosen and the cards taken from notes. */
+    public openExamFromNote(note: TFile): Promise<void> {
+        return this.openExamSetup(undefined, note.path);
     }
 
     /**

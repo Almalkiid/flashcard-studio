@@ -31,6 +31,11 @@ export interface ExamSetup {
     title: string;
     /** Show each multiple choice question's options in a random order. Absent means yes. */
     shuffleOptions?: boolean;
+    /**
+     * The notes the exam takes its cards from, as vault paths (`Biology/Cell.md`). Absent (or empty) for an exam from
+     * decks; an exam from notes has no decks (`[]`), so a card counts wherever it is filed.
+     */
+    notes?: string[];
 }
 
 export const EXAM_PRESETS: { id: "quick" | "cia"; count: number; minutes: number | null }[] = [
@@ -124,11 +129,21 @@ function kindOf(
     return target !== null ? { kind: "typed", target } : { kind: "self", target: null };
 }
 
+/** How an exam asks a card, or null when it cannot: suspended and cloze cards never, others as the filter allows. */
+function askable(
+    card: ExamCardInput,
+    filter: ExamCardFilter,
+): { kind: ExamQuestionKind; target: string | null } | null {
+    if (card.suspended || card.isCloze) return null;
+    return kindOf(card.back, filter);
+}
+
 /**
  * The questions of an exam: suspended cards and cloze cards are left out, and so are the cards outside the chosen
- * decks. With `choice-only` only multiple choice cards are asked; with `all` the others are typed when their answer
- * is short plain text and self-marked otherwise. The cards are shuffled and the first `count` taken (fewer when there
- * are not that many). A card that sits in several chosen decks is asked once, under the first.
+ * decks and, when the setup names notes, the cards outside them. With `choice-only` only multiple choice cards are
+ * asked; with `all` the others are typed when their answer is short plain text and self-marked otherwise. The cards
+ * are shuffled and the first `count` taken (fewer when there are not that many). A card that sits in several chosen
+ * decks is asked once, under the first.
  */
 export function pickExamQuestions(
     cards: ExamCardInput[],
@@ -136,13 +151,14 @@ export function pickExamQuestions(
     random: () => number,
 ): ExamQuestion[] {
     const scopes = setup.decks.length === 0 ? [""] : setup.decks;
+    const notes = setup.notes !== undefined && setup.notes.length > 0 ? new Set(setup.notes) : null;
     const seen = new Set<string>();
     const eligible: { card: ExamCardInput; kind: ExamQuestionKind; target: string | null }[] = [];
     for (const card of cards) {
-        if (card.suspended || card.isCloze) continue;
+        if (notes !== null && !notes.has(card.sourcePath ?? "")) continue;
         if (!scopes.some((scope) => deckMatches(scope, card.deck))) continue;
         if (seen.has(card.id)) continue;
-        const found = kindOf(card.back, setup.filter);
+        const found = askable(card, setup.filter);
         if (found === null) continue;
         seen.add(card.id);
         eligible.push({ card, kind: found.kind, target: found.target });
@@ -169,6 +185,31 @@ export function pickExamQuestions(
                 typedTarget: target,
             };
         });
+}
+
+/** `Cell` for `Biology/Cell.md`: the file name without its folder and its `.md`. */
+export function noteName(path: string): string {
+    return path.slice(path.lastIndexOf("/") + 1).replace(/\.md$/i, "");
+}
+
+/**
+ * How many questions each note can give with the kind of cards chosen: the cards an exam can ask (not suspended, not
+ * cloze, multiple choice only with `choice-only`), each card once however many decks it is in. Cards in no note are
+ * left out. Keyed by the note's path.
+ */
+export function examNoteCounts(
+    cards: ExamCardInput[],
+    filter: ExamCardFilter,
+): Map<string, number> {
+    const seen = new Set<string>();
+    const counts = new Map<string, number>();
+    for (const card of cards) {
+        const path = card.sourcePath ?? "";
+        if (path === "" || seen.has(card.id) || askable(card, filter) === null) continue;
+        seen.add(card.id);
+        counts.set(path, (counts.get(path) ?? 0) + 1);
+    }
+    return counts;
 }
 
 /** Whether the question has an answer: an option chosen, text typed, or a self mark. */
@@ -277,6 +318,39 @@ export function scoreExam(
         return { q, a, right: isRight(q, a, ignoreAccents) };
     });
     return summarizeExam(setup, items, startedMs, endedMs);
+}
+
+/**
+ * The breakdown under the score: by note for an exam from several notes, by deck otherwise (the cards of one note can
+ * be in several decks, and a single row of the note would only repeat the score). Notes come in the order they are
+ * first asked.
+ */
+export function examBreakdown(result: ExamResult): {
+    by: "deck" | "note";
+    rows: { key: string; right: number; total: number }[];
+} {
+    if ((result.setup.notes?.length ?? 0) < 2) {
+        return {
+            by: "deck",
+            rows: result.perDeck.map((row) => ({
+                key: row.deck,
+                right: row.right,
+                total: row.total,
+            })),
+        };
+    }
+    const notes = new Map<string, { key: string; right: number; total: number }>();
+    for (const item of result.items) {
+        const key = item.q.sourcePath ?? "";
+        let row = notes.get(key);
+        if (row === undefined) {
+            row = { key, right: 0, total: 0 };
+            notes.set(key, row);
+        }
+        row.total++;
+        if (item.right === true) row.right++;
+    }
+    return { by: "note", rows: [...notes.values()] };
 }
 
 /** The cards not answered right (an unanswered question is one), once each, in the order they were asked. */

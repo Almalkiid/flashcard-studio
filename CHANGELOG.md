@@ -4,6 +4,10 @@ All notable changes to Flashcard Studio are listed here. Versions follow [semant
 
 ## [Unreleased]
 
+### Added
+
+- **Take an exam from chosen notes.** The exam setup can take its cards from **Notes** instead of decks, with **Add note** to search the notes that have cards to ask. **Take an exam from this note**, in the command palette and in a note's file menu, opens the setup with that note chosen. Retake, the last exam's setup and a resumed exam keep the notes. ([#6](https://github.com/Almalkiid/flashcard-studio/issues/6))
+
 ### Fixed
 
 **Studying and scheduling**

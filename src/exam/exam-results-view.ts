@@ -1,6 +1,13 @@
-import { setIcon } from "obsidian";
+import { setIcon, setTooltip } from "obsidian";
 
-import { ExamItem, ExamResult, missedCardIds, plainExcerpt } from "src/exam/exam";
+import {
+    examBreakdown,
+    ExamItem,
+    ExamResult,
+    missedCardIds,
+    noteName,
+    plainExcerpt,
+} from "src/exam/exam";
 import {
     choiceContext,
     deckLabel,
@@ -53,7 +60,7 @@ export function renderExamResults(
     const page = scroll.createDiv({ cls: "fs-exam-results" });
 
     renderHero(page, result);
-    renderDecks(page, result);
+    renderBreakdown(page, result);
     const saved = renderActions(page, result, opts);
     renderReview(page, result, opts);
 
@@ -152,15 +159,24 @@ function renderHero(page: HTMLElement, result: ExamResult): void {
     );
 }
 
-function renderDecks(page: HTMLElement, result: ExamResult): void {
-    if (result.perDeck.length === 0) return;
+/** The score of each deck, or of each note for an exam from several notes. */
+function renderBreakdown(page: HTMLElement, result: ExamResult): void {
+    const { by, rows } = examBreakdown(result);
+    if (rows.length === 0) return;
     const card = page.createDiv({ cls: "fs-card fs-exam-decks" });
-    card.createDiv({ cls: "fs-label", text: t("EXAM_BY_DECK") });
+    card.createDiv({
+        cls: "fs-label",
+        text: by === "note" ? t("EXAM_BY_NOTE") : t("EXAM_BY_DECK"),
+    });
     const pass = result.setup.passPercent;
-    for (const row of result.perDeck) {
+    for (const row of rows) {
         const percent = row.total === 0 ? 0 : Math.round((row.right / row.total) * 100);
         const line = card.createDiv({ cls: "fs-exam-deck-row" });
-        line.createDiv({ cls: "fs-exam-deck-name", text: deckLabel(row.deck) });
+        const name = line.createDiv({
+            cls: "fs-exam-deck-name",
+            text: by === "note" ? noteName(row.key) : deckLabel(row.key),
+        });
+        if (by === "note") setTooltip(name, row.key);
         const track = line.createDiv({
             cls: "fs-exam-deck-bar",
             attr: { role: "img", "aria-label": `${percent}%` },
