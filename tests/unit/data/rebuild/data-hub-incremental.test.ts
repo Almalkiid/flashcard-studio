@@ -1,6 +1,8 @@
 import { TopicPath } from "src/data/decks/topic-path";
+import { VaultIndex } from "src/data/vault-core";
 import { FlashcardReviewMode } from "src/scheduling/review/review-mode";
 import { ReviewItemState } from "src/scheduling/schedule/review-item";
+import { ActiveScheduler } from "src/scheduling/schedule/scheduler-kind";
 import { setupStaticDateProvider20230906 } from "src/utils/clock";
 
 import { FakePlugin } from "./fake-plugin";
@@ -95,6 +97,41 @@ describe("sync reads the notes only when something changed", () => {
         await manager.sync();
         expect(processFile).toHaveBeenCalledTimes(6);
         expect(fake.registered).toHaveLength(1);
+    });
+
+    const easeOfA = () => ActiveScheduler.getInstance().noteStats().getEaseByPath("a.md");
+
+    // The bug: data.json read again from disk installs a new scheduler with an empty note ease list, and the next sync,
+    // with no note changed, did not read the notes, so the new scheduler never learnt their eases
+    test("a new scheduler makes the next sync read the notes again, so it learns the notes' eases", async () => {
+        const { fake, manager, processFile } = await started();
+        await manager.sync();
+        const ease = easeOfA();
+        expect(ease).not.toBeNull();
+
+        manager.setupDataStoreAndAlgorithmInstances(fake.settings);
+        expect(easeOfA()).toBeNull();
+        await manager.sync();
+        expect(processFile).toHaveBeenCalledTimes(6);
+        expect(easeOfA()).toBe(ease);
+        await manager.sync();
+        expect(processFile).toHaveBeenCalledTimes(6);
+    });
+
+    test("a scheduler installed while the notes are read gets them all on the next sync", async () => {
+        const { fake, manager, core, processFile } = await started();
+        processFile.mockImplementation(async (note) => {
+            if (note.path === "b.md") manager.setupDataStoreAndAlgorithmInstances(fake.settings);
+            return VaultIndex.prototype.processFile.call(core, note);
+        });
+        await manager.sync();
+        expect(easeOfA()).toBeNull();
+
+        processFile.mockRestore();
+        const again = jest.spyOn(core, "processFile");
+        await manager.sync();
+        expect(again).toHaveBeenCalledTimes(3);
+        expect(easeOfA()).not.toBeNull();
     });
 
     test("a note that tells no change time is always read again", async () => {
