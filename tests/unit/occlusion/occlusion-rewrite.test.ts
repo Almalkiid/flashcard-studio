@@ -103,6 +103,32 @@ describe("replaceOcclusionBlock", () => {
         );
     });
 
+    test("a metadata callout without a comment ends at the blank line, and the next card's comment is not the block's", () => {
+        const bare =
+            "#flashcards\n```image-occlusion\nimage: x.png\nmask: a rect 0 0 .5 .5 | A\nmask: b rect .5 .5 .5 .5 | B\n```\n> [!sr|card-metadata] \n>\n\nQ::A\n<!--SR:!2026-11-10,3,250-->\n\nParagraph text\n";
+        const after =
+            "```\n> [!sr|card-metadata] \n>\n\nQ::A\n<!--SR:!2026-11-10,3,250-->\n\nParagraph text\n";
+        // deleting a mask: nothing below the block is removed
+        expect(replaceOcclusionBlock(bare, 1, b, [1], E)).toBe(
+            "#flashcards\n```image-occlusion\nimage: x.png\nmode: hide-all\nmask: b rect 0.5000 0.5000 0.5000 0.5000 | B\n" +
+                after,
+        );
+        // keeping both masks: the other card's comment is not rewritten
+        const both: OcclusionBlock = {
+            ...b,
+            masks: [{ id: "a", shape: "rect", x: 0, y: 0, w: 0.5, h: 0.5, label: "A" }, b.masks[0]],
+        };
+        expect(replaceOcclusionBlock(bare, 1, both, [0, 1], E).endsWith(after)).toBe(true);
+        // a line that is not quoted ends the callout too
+        const unquoted =
+            "```image-occlusion\nimage: x.png\nmask: a rect 0 0 .5 .5 | A\n```\n> [!sr|card-metadata] \nQ::A\n<!--SR:!2026-11-10,3,250-->";
+        expect(
+            replaceOcclusionBlock(unquoted, 0, b, [null], E).endsWith(
+                "```\n> [!sr|card-metadata] \nQ::A\n<!--SR:!2026-11-10,3,250-->",
+            ),
+        ).toBe(true);
+    });
+
     test("a tilde block, Windows line endings and an indent are kept", () => {
         const crlf =
             "- item\r\n  ~~~image-occlusion\r\n  image: x.png\r\n  mask: a rect 0 0 .5 .5 | A\r\n  ~~~\r\n<!--SR:!fsrs,A-->\r\nend";
