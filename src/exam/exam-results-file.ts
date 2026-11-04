@@ -48,6 +48,17 @@ export function examFileName(endedMs: number): string {
 }
 
 /**
+ * The local date and time an exam's file name starts with (`2026-09-30 1405 exam 2.md`), counted as if it were UTC, so
+ * that two names can be compared in minutes. Null for a name that does not start with them.
+ */
+export function examFileNameMs(name: string): number | null {
+    const match = /^(\d{4})-(\d{2})-(\d{2}) (\d{2})(\d{2})\b/.exec(name);
+    if (match === null) return null;
+    const [year, month, day, hour, minute] = match.slice(1).map(Number);
+    return Date.UTC(year, month - 1, day, hour, minute);
+}
+
+/**
  * Where to save an exam: the exams folder and the file name, with ` 2`, ` 3` ... added when another exam ended in the
  * same minute and already has the name.
  */
