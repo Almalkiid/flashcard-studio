@@ -3,7 +3,7 @@ import {
     appendToDeckNote,
     deckLevels,
     deckNotePath,
-    deckTag,
+    deckTags,
     formatDeckNote,
     joinPath,
     sanitizeFileName,
@@ -94,16 +94,44 @@ describe("tags", () => {
         expect(ankiTagToObsidianTag(tag)).toBe(expected);
     });
 
-    test("deckTag makes the deck's path a tag path", () => {
-        expect(deckTag("#flashcards", "CIA Part 1::Unit 01 (Gemini)")).toBe(
-            "#flashcards/CIA-Part-1/Unit-01-Gemini",
-        );
-        expect(deckTag("#flashcards", "")).toBe("#flashcards");
-        expect(deckTag("#cards", "A::B")).toBe("#cards/A/B");
+    test("deckTags makes each deck's path a tag path", () => {
+        const tags = deckTags("#flashcards", ["CIA Part 1::Unit 01 (Gemini)", "", "Spanish"]);
+        expect(Object.fromEntries(tags)).toEqual({
+            "CIA Part 1::Unit 01 (Gemini)": "#flashcards/CIA-Part-1/Unit-01-Gemini",
+            "": "#flashcards",
+            Spanish: "#flashcards/Spanish",
+        });
+        expect(deckTags("#cards", ["A::B"]).get("A::B")).toBe("#cards/A/B");
+    });
+
+    test("deckTags keeps apart decks whose names differ only in what a tag cannot have", () => {
+        const decks = ["C++", "C#", "C", "Spanish 1", "Spanish-1", "Math::+", "Math", "📚"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks))).toEqual({
+            // A name that is a tag as it is keeps it, the others get a number
+            C: "#flashcards/C",
+            "C#": "#flashcards/C-2",
+            "C++": "#flashcards/C-3",
+            "Spanish-1": "#flashcards/Spanish-1",
+            "Spanish 1": "#flashcards/Spanish-1-2",
+            // A level with nothing a tag can have is not left out, which would put it in its parent
+            Math: "#flashcards/Math",
+            "Math::+": "#flashcards/Math/_",
+            "📚": "#flashcards/_",
+        });
+    });
+
+    test("deckTags gives the subdecks of a renamed level the same new name", () => {
+        const decks = ["Lang::C++::Basics", "Lang::C::Basics", "Lang::C++", "Lang :: C"];
+        expect(Object.fromEntries(deckTags("#flashcards", decks))).toEqual({
+            "Lang::C::Basics": "#flashcards/Lang/C/Basics",
+            "Lang :: C": "#flashcards/Lang/C",
+            "Lang::C++": "#flashcards/Lang/C-2",
+            "Lang::C++::Basics": "#flashcards/Lang/C-2/Basics",
+        });
     });
 
     test("tagLine puts the deck tag first, then the Anki tags", () => {
-        expect(tagLine("#flashcards", "Spanish", ["a", "b/c"])).toBe("#flashcards/Spanish #a #b/c");
+        expect(tagLine("#flashcards/Spanish", ["a", "b/c"])).toBe("#flashcards/Spanish #a #b/c");
     });
 });
 

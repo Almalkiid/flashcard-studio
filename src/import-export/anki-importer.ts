@@ -9,6 +9,7 @@ import {
     ankiTagToObsidianTag,
     appendToDeckNote,
     deckNotePath,
+    deckTags,
     formatDeckNote,
     ImportedCard,
     joinPath,
@@ -250,6 +251,11 @@ export async function importNotes(
         if (index % 50 === 49) await yieldToUi();
     }
 
+    // From every deck of the batch, so that a deck gets the same tag whichever decks have new notes
+    const tagOfDeck = deckTags(
+        context.flashcardTag,
+        notes.map((note) => note.deck),
+    );
     let written = 0;
     for (const [deckName, deck] of Array.from(decks).sort(([a], [b]) => a.localeCompare(b))) {
         progress("writing", written++, decks.size);
@@ -261,7 +267,7 @@ export async function importNotes(
             await host.ensureFolder(path.slice(0, path.lastIndexOf("/")));
             await host.createText(
                 path,
-                formatDeckNote(tagLine(context.flashcardTag, deckName, tags), deck.cards),
+                formatDeckNote(tagLine(tagOfDeck.get(deckName), tags), deck.cards),
             );
         }
         result.notePaths.push(path);
