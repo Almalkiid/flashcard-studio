@@ -282,7 +282,8 @@ export function cloneDefaultSettings(): StudioSettings {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as StudioSettings;
 }
 
-const CLOZE_FORMS: readonly [flag: keyof StudioSettings, pattern: string][] = [
+/** The three old cloze switches and the pattern each one stands for. */
+export const CLOZE_FORMS: readonly [flag: keyof StudioSettings, pattern: string][] = [
     ["convertHighlightsToClozes", "==[123;;]answer[;;hint]=="],
     ["convertBoldTextToClozes", "**[123;;]answer[;;hint]**"],
     ["convertCurlyBracketsToClozes", "{{[123;;]answer[;;hint]}}"],
