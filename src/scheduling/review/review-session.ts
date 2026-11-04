@@ -38,6 +38,13 @@ export interface IReviewLogSink {
     remove(entry: ReviewLogEntry): Promise<boolean>;
 }
 
+/** Where a card was in one list of the remaining tree. */
+export interface CardPlace {
+    card: Card;
+    list: Card[];
+    index: number;
+}
+
 /**
  * Everything needed to revert one answer.
  */
@@ -53,6 +60,11 @@ export interface UndoRecord {
     histogramIncrementKey: number | null;
     histogramDecrementKey: number | null;
     wasPostponed: boolean;
+    /**
+     * The other cards of the question that the answer took out of the session (burySiblingCards), and where they were.
+     * Each index is counted with the answered card and the siblings noted before it in the same list taken out.
+     */
+    takenSiblings: CardPlace[];
 }
 
 /** One review session over a deck hierarchy: which card is up, and what an answer, a skip or an edit does to it. */
@@ -380,6 +392,7 @@ export class ReviewSession implements IReviewSession {
 
         let requeue: Requeue = "immediate";
         let removeFromSession = false;
+        let record: UndoRecord | null = null;
         if (response !== ReviewResponse.Reset || oldSchedule !== null) {
             const prevMeta: CardMeta = cloneCardMeta(card.meta);
             const preAnswerText: string = question.questionText.original;
@@ -425,7 +438,7 @@ export class ReviewSession implements IReviewSession {
             await this.appendToReviewLog(entry);
             this.dailyLimits?.record(entry);
 
-            this.undoHistory.push({
+            record = {
                 owner: this,
                 card,
                 question,
@@ -437,7 +450,9 @@ export class ReviewSession implements IReviewSession {
                 histogramIncrementKey,
                 histogramDecrementKey,
                 wasPostponed,
-            });
+                takenSiblings: [],
+            };
+            this.undoHistory.push(record);
 
             if (leech) {
                 const lapses = (card.scheduleInfo as FsrsState).lapses;
@@ -449,46 +464,87 @@ export class ReviewSession implements IReviewSession {
             }
         }
 
-        await this.requeueAnsweredCard(response, requeue, removeFromSession);
+        const takenSiblings = await this.requeueAnsweredCard(response, requeue, removeFromSession);
+        if (record !== null) record.takenSiblings = takenSiblings;
     }
 
-    /** Where the answered card, still current, goes next; see `requeueOf`. */
+    /**
+     * Where the answered card, still current, goes next; see `requeueOf`.
+     *
+     * @returns The siblings taken out of the session with it, and where they were.
+     */
     private async requeueAnsweredCard(
         response: ReviewResponse,
         requeue: Requeue,
         removeFromSession: boolean,
-    ): Promise<void> {
+    ): Promise<CardPlace[]> {
         const card = this.currentCard;
         this.justAnswered = card;
+        let takenSiblings: CardPlace[] = [];
         if (removeFromSession) {
             // A leech that was just suspended: its siblings stay
             this.walker.deleteCurrentReviewItemFromAllDecks();
         } else if (requeue === "pending") {
             const dueUnix = card.scheduleInfo.dueDate ? card.scheduleInfo.dueDateAsUnix : NaN;
-            await this.removeAnsweredCard();
+            takenSiblings = await this.removeAnsweredCard();
             this.pending.push(card, dueUnix);
         } else if (requeue === "immediate" || response === ReviewResponse.Reset) {
             if (this.settings.burySiblingCards) {
                 await this.burySiblings(card.question);
-                for (const sibling of card.question.cards) {
-                    if (sibling !== card) this.remainingRoot.deleteCardFromAllDecks(sibling, false);
-                }
+                takenSiblings = this.takeOutSiblings(card, () => {
+                    for (const sibling of card.question.cards) {
+                        if (sibling !== card) {
+                            this.remainingRoot.deleteCardFromAllDecks(sibling, false);
+                        }
+                    }
+                });
             }
             this.sendCurrentCardToBack();
         } else {
-            await this.removeAnsweredCard();
+            takenSiblings = await this.removeAnsweredCard();
         }
         this.showAnotherThanJustAnswered();
+        return takenSiblings;
     }
 
-    /** Takes the current card out of the session; with `burySiblingCards`, its whole question, burying the siblings. */
-    private async removeAnsweredCard(): Promise<void> {
+    /**
+     * Takes the current card out of the session; with `burySiblingCards`, its whole question, burying the siblings.
+     *
+     * @returns The siblings taken out with it, and where they were.
+     */
+    private async removeAnsweredCard(): Promise<CardPlace[]> {
         if (this.settings.burySiblingCards) {
             await this.burySiblings(this.currentQuestion);
-            this.walker.deleteCurrentQuestionFromAllDecks();
-        } else {
-            this.walker.deleteCurrentReviewItemFromAllDecks();
+            return this.takeOutSiblings(this.currentCard, () =>
+                this.walker.deleteCurrentQuestionFromAllDecks(),
+            );
         }
+        this.walker.deleteCurrentReviewItemFromAllDecks();
+        return [];
+    }
+
+    /**
+     * Runs `remove`, which takes the other cards of `card`'s question out of the remaining tree, and returns where each
+     * one it took out was. The places are noted first, each counted as if `card` and the siblings noted before it in the
+     * same list were out, so that undo, putting them back in reverse order before `card`, gets the lists as they were.
+     */
+    private takeOutSiblings(card: Card, remove: () => void): CardPlace[] {
+        const siblings = card.question.cards.filter((sibling) => sibling !== card);
+        const places: CardPlace[] = [];
+        for (const deck of this.remainingRoot.toDeckArray()) {
+            for (const list of [deck.newReviewItems, deck.dueReviewItems]) {
+                if (!siblings.some((sibling) => list.includes(sibling))) continue;
+                const rest = list.filter((other) => other !== card);
+                for (const sibling of siblings) {
+                    const index = rest.indexOf(sibling);
+                    if (index < 0) continue;
+                    rest.splice(index, 1);
+                    places.push({ card: sibling, list, index });
+                }
+            }
+        }
+        remove();
+        return places.filter(({ card: sibling, list }) => !list.includes(sibling));
     }
 
     private sendCurrentCardToBack(): void {
@@ -656,6 +712,10 @@ export class ReviewSession implements IReviewSession {
         this.justAnswered = null;
         this.pending.removeWhere((waiting) => waiting === card);
         this.remainingRoot.deleteCardFromAllDecks(card, false);
+        // The siblings the answer took out go back where they were; one that is back already is left alone
+        for (const { card: sibling, list, index } of [...record.takenSiblings].reverse()) {
+            if (!list.includes(sibling)) list.splice(Math.min(index, list.length), 0, sibling);
+        }
         this.remainingRoot.prependReviewItem(question.topicPathList, card);
         if (!this.walker.setCurrentReviewItem(card, this.currentTopicPath)) {
             this.refreshCurrentDeck();
