@@ -61,6 +61,15 @@ const CHANGED: Record<string, Pick<Row, "output" | "reparse">> = {
             { type: 0, cards: [none] },
         ],
     },
+    // With folders as decks the tag in front of a question is not its deck, but it is the user's text: the rewrite keeps
+    // it (the golden run deleted it, and this note at the root then lost all its cards on the next load)
+    "w-tag-folder-deck": {
+        output: "#flashcards/x Q::A\n<!--SR:!2026-10-20,12,260,id=012345-->\nQ2::A2",
+        reparse: [
+            { type: 0, cards: [sm2("2026-10-20", "012345")] },
+            { type: 0, cards: [none] },
+        ],
+    },
     // fix 5: the line endings of the note stay as they are
     "w-crlf": {
         output: "#flashcards\r\nQ::A\r\n<!--SR:!2026-10-20,12,260,id=012345-->\r\nR::S\r\n",

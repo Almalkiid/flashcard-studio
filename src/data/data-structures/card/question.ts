@@ -43,6 +43,8 @@ export class QuestionText {
      * is none to keep.
      * @param actualQuestion - The question without its tag, schedule comment and block id.
      * @param obsidianBlockId - The `^id` at the end of the question, with the `^`; empty when there is none.
+     * @param keptTag - With folders as decks, the tag in front of the question with the white space around it, as
+     * written: it is not the deck and not part of the hash, but writing the question back keeps it. Empty otherwise.
      */
     constructor(
         public original: string,
@@ -50,6 +52,7 @@ export class QuestionText {
         public actualQuestion: string,
         public textDirection: TextDirection,
         public obsidianBlockId: string,
+        public keptTag: string = "",
     ) {
         this.textHash = cyrb53(this.formatTopicAndQuestion());
     }
@@ -63,23 +66,25 @@ export class QuestionText {
         textDirection: TextDirection,
         settings: StudioSettings,
     ): QuestionText {
-        const [tag, question, blockId] = QuestionText.splitText(original, settings);
-        return new QuestionText(original, tag, question, textDirection, blockId);
+        const [tag, question, blockId, keptTag] = QuestionText.splitText(original, settings);
+        return new QuestionText(original, tag, question, textDirection, blockId, keptTag);
     }
 
     /**
-     * Splits a question into its topic tag, the question and its block id. With folders as decks the tag is cut off
-     * but not kept, since the deck comes from the folder.
+     * Splits a question into its topic tag, the question, its block id and the tag kept as text. With folders as decks
+     * the tag is not the topic, since the deck comes from the folder; it is kept as it was written, with its white
+     * space, so that writing the question back does not take it out of the note.
      */
     static splitText(
         original: string,
         settings: StudioSettings,
-    ): [TopicPathWithWs | null, string, string] {
+    ): [TopicPathWithWs | null, string, string, string] {
         let text = withoutScheduleComments(original);
         // The text is cut off at its end only when no tag is split off. A question that follows its tag keeps the white
         // space behind it, which is part of the hash that is stored in the list of buried siblings.
 
         let topicPathWithWs: TopicPathWithWs | null = null;
+        let keptTag = "";
         const [preWs, rest] = stringTrimStart(text);
         const tag = TAG_AT_START.exec(rest)?.[0];
         if (tag !== undefined) {
@@ -90,6 +95,8 @@ export class QuestionText {
                     preWs,
                     postWs,
                 );
+            } else {
+                keptTag = preWs + tag + postWs;
             }
             text = question;
         } else {
@@ -97,7 +104,7 @@ export class QuestionText {
         }
 
         const [actualQuestion, blockId] = QuestionText.extractObsidianBlockId(text);
-        return [topicPathWithWs, actualQuestion, blockId];
+        return [topicPathWithWs, actualQuestion, blockId, keptTag];
     }
 
     /** The text without a `^id` at its end, and that id (empty when there is none). */
@@ -217,7 +224,7 @@ export class Question {
     formatForNote(settings: StudioSettings): string {
         const text = this.questionText;
         const blockId = text.obsidianBlockId ? " " + text.obsidianBlockId : "";
-        let result = text.formatTopicAndQuestion();
+        let result = text.keptTag + text.formatTopicAndQuestion();
 
         const hasSchedule = this.cards.some(
             (card) => card.hasSchedule || hasPersistentMeta(card.meta),

@@ -240,3 +240,48 @@ describe("removing card schedules", () => {
         expect(files.texts.get("n.md")).toBe("Q::A\r\nR::S\r\n");
     });
 });
+
+describe("with folders as decks, the tag in front of a question", () => {
+    const folders = settingsWith({ convertFoldersToDecks: true });
+
+    async function answered(text: string, folder: string[], file: string) {
+        setUp(folders);
+        const loaded = await load(text, folders, folder, file);
+        const { Sm2State } = await import("src/scheduling/schedule/sm2-state");
+        const { moment } = await import("src/utils/moment-en");
+        const schedule = (day: string) => new Sm2State(moment(day, "YYYY-MM-DD"), 12, 260);
+        return { ...loaded, schedule };
+    }
+
+    // The bug: the tag is not the deck in this mode, and the rewrite of the question left it out of the note
+    test("stays in the note when the question is written, and the deck is still the folder", async () => {
+        const { vault, note, schedule } = await answered(
+            "#flashcards\n\n#flashcards/sub Q1::A1\n",
+            ["deck"],
+            "deck/N.md",
+        );
+        const question = note.questionList[0];
+        expect(question.topicPathList.list.map((path) => path.path)).toEqual([["deck"]]);
+
+        question.cards[0].scheduleInfo = schedule("2026-11-01");
+        await write(question);
+        expect(vault.texts.get("deck/N.md")).toBe(
+            "#flashcards\n\n#flashcards/sub Q1::A1\n<!--SR:!2026-11-01,12,260,id=012345-->\n",
+        );
+        // The question took over the text it was written as, so the next write keeps the tag too
+        question.cards[0].scheduleInfo = schedule("2026-12-01");
+        await write(question);
+        expect(vault.texts.get("deck/N.md")).toBe(
+            "#flashcards\n\n#flashcards/sub Q1::A1\n<!--SR:!2026-12-01,12,260,id=012345-->\n",
+        );
+    });
+
+    test("a note at the root whose only tag is that one keeps its cards", async () => {
+        const { vault, note, schedule } = await answered("#flashcards/x Q::A\nQ2::A2", [], "N.md");
+        note.questionList[0].cards[0].scheduleInfo = schedule("2026-11-01");
+        await write(note.questionList[0]);
+        const output = vault.texts.get("N.md");
+        expect(output).toBe("#flashcards/x Q::A\n<!--SR:!2026-11-01,12,260,id=012345-->\nQ2::A2");
+        expect((await load(output, folders)).note.questionList).toHaveLength(2);
+    });
+});
