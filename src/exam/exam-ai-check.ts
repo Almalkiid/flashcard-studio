@@ -73,10 +73,10 @@ export function applyAiChecks(
 
 /**
  * Sends the checks, at most AI_CHECK_CONCURRENCY at once, and resolves with one check per input, in order. It never
- * waits longer than AI_CHECK_TOTAL_MS and resolves at once when `signal` aborts; inputs not answered by then are
- * `skipped`, and a reply that comes later is ignored. A "setup" outcome stops the rest at once with "setup";
- * AI_CHECK_FAILURES_TO_STOP failures in a row stop them with that failure's reason. A check that throws counts as
- * "provider".
+ * waits longer than AI_CHECK_TOTAL_MS, and resolves at once when `signal` aborts or AI_CHECK_FAILURES_TO_STOP checks in
+ * a row fail; inputs not answered by then are `skipped` (a failure's reason is only true of the check that had it),
+ * and a reply that comes later is ignored. A "setup" outcome stops the rest at once with "setup": nothing could be
+ * sent for them either. A check that throws counts as "provider".
  */
 export async function runAiChecks(
     inputs: SemanticGradeInput[],
@@ -124,9 +124,7 @@ export async function runAiChecks(
             opts.onProgress?.(++done);
             if (outcome.status === "graded") failures = 0;
             else if (outcome.reason === "setup") stop({ verdict: "unavailable", reason: "setup" });
-            else if (++failures >= AI_CHECK_FAILURES_TO_STOP) {
-                stop({ verdict: "unavailable", reason: outcome.reason });
-            }
+            else if (++failures >= AI_CHECK_FAILURES_TO_STOP) stop(skipped);
         }
     };
     const workers = Array.from(

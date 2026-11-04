@@ -12,7 +12,13 @@ import {
     pickExamQuestions,
     scoreExam,
 } from "src/exam/exam";
-import { aiCheckIndexes, aiCheckInput, applyAiChecks, runAiChecks } from "src/exam/exam-ai-check";
+import {
+    AI_CHECK_FAILURES_TO_STOP,
+    aiCheckIndexes,
+    aiCheckInput,
+    applyAiChecks,
+    runAiChecks,
+} from "src/exam/exam-ai-check";
 import { formatExamFile, parseExamFile } from "src/exam/exam-results-file";
 
 const CARDS: ExamCardInput[] = [
@@ -149,6 +155,41 @@ describe("AI checks of typed answers", () => {
         );
         expect(text).toContain("| The provider could not complete the check |");
         expect(parseExamFile(text)).toEqual(marked);
+    });
+
+    test("checks stopped by failures in a row leave the answers not sent skipped; a setup outcome, setup", async () => {
+        const inputs = ["a", "b", "c", "d", "e"].map((typed) => ({
+            question: "Q",
+            expected: "E",
+            typed,
+        }));
+        const slow = jest.fn(async () => ({
+            status: "unavailable" as const,
+            reason: "timeout" as const,
+        }));
+        const afterFailures = await runAiChecks(inputs, slow, {
+            signal: new AbortController().signal,
+            concurrency: 1,
+        });
+        expect(slow).toHaveBeenCalledTimes(AI_CHECK_FAILURES_TO_STOP);
+        expect(afterFailures.map((check) => check.reason)).toEqual([
+            "timeout",
+            "timeout",
+            "timeout",
+            "skipped",
+            "skipped",
+        ]);
+
+        const notSetUp = jest.fn(async () => ({
+            status: "unavailable" as const,
+            reason: "setup" as const,
+        }));
+        const afterSetup = await runAiChecks(inputs, notSetUp, {
+            signal: new AbortController().signal,
+            concurrency: 1,
+        });
+        expect(notSetUp).toHaveBeenCalledTimes(1);
+        expect(afterSetup.map((check) => check.reason)).toEqual(Array(5).fill("setup"));
     });
 
     test("nothing is sent for an exam set up without the option", () => {
