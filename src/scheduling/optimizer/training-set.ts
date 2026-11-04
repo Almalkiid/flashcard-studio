@@ -57,6 +57,9 @@ function isInDeck(deckOfCard: string, deck: string): boolean {
  *
  * - manual entries (`r` 0) and cram answers (`k` 3) are ignored, because they say nothing about memory;
  * - entries from before a reset are dropped, because a reset card starts again from nothing;
+ * - a card that was never reset and whose first kept answer is not a learning answer (`k` 0) is skipped: it was
+ *   learnt before the log began (a schedule carried over from the Spaced Repetition plugin), so that answer is not
+ *   its first exposure, and the optimizer would read it as one (Anki skips such cards too);
  * - only the first answer of each day is kept for a card, and `deltaT` counts whole days between kept answers.
  *
  * Entries of every device are merged by time. Cards without an id are skipped.
@@ -92,6 +95,7 @@ export function buildCardHistories(
         let previousDay: number | null = null;
         for (const entry of cardEntries.slice(lastReset + 1)) {
             if (entry.r === 0 || entry.k === 3 || entry.k === 4) continue;
+            if (previousDay === null && lastReset < 0 && entry.k !== 0) break;
             const day = dayOf(entry.t);
             if (day === previousDay) continue;
             reviews.push({
