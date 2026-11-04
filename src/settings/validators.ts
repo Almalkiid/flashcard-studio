@@ -1,3 +1,4 @@
+import { isReadableClozePattern } from "src/data/settings-model";
 import { t } from "src/lang/translate";
 import { parseFsrsSteps, parseFsrsWeights } from "src/scheduling/fsrs/fsrs-settings";
 import { parseStartOfDay } from "src/utils/start-of-day";
@@ -102,6 +103,8 @@ export function clozePatternError(value: string, existing: readonly string[]): s
     const listError = listEntryError(value, existing);
     if (listError !== undefined) return listError;
     if (!value.includes("answer")) return "A pattern needs the word answer where the answer goes.";
+    if (!isReadableClozePattern(value.trim()))
+        return "A pattern needs [123;;] where the cloze number goes and [;;hint] where the hint goes.";
     return undefined;
 }
 

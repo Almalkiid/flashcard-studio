@@ -120,6 +120,14 @@ describe("the fixes in upgradeSettings", () => {
         upgradeSettings(off);
         expect("showFileMenuReviewOptions" in off).toBe(false);
     });
+
+    test("cloze patterns the cloze reader can't read are dropped, because one stops every scan", () => {
+        const settings = {
+            clozePatterns: ["==[123;;]answer[;;hint]==", "{{answer}}", "==answer==", 7],
+        } as unknown as StudioSettings;
+        upgradeSettings(settings);
+        expect(settings.clozePatterns).toEqual(DEFAULT_CLOZE);
+    });
 });
 
 describe("SettingsUtil against the golden vectors", () => {
