@@ -17,6 +17,12 @@ export interface FsrsLoadBalanceOptions {
     easyDays: readonly number[];
     /** The answered card still occupies this bucket until its new schedule is saved. */
     currentDueUnix?: number;
+    /**
+     * The shortest interval allowed: a day more than the interval chosen for the grade below, so that Hard < Good <
+     * Easy stays true after balancing, as ts-fsrs and Anki keep it after fuzzing. The window starts there instead, and
+     * is only that day when the whole window lies below it.
+     */
+    minimumInterval?: number;
 }
 
 /** A small deterministic number in [0, 1), derived from the card's stable fuzz seed. */
@@ -33,13 +39,12 @@ function seedFraction(seed: string): number {
  * selected easy weekdays receive a small, nonzero multiplier. The histogram is read only.
  */
 export function pickFsrsBalancedInterval(options: FsrsLoadBalanceOptions): number {
-    if (options.targetInterval < 2.5) return Math.round(options.targetInterval);
+    const floor = options.minimumInterval ?? 0;
+    if (options.targetInterval < 2.5) return Math.max(Math.round(options.targetInterval), floor);
 
-    const { min_ivl: minimumInterval, max_ivl: maximumInterval } = getFuzzRange(
-        options.targetInterval,
-        options.elapsedDays,
-        options.maximumInterval,
-    );
+    const fuzz = getFuzzRange(options.targetInterval, options.elapsedDays, options.maximumInterval);
+    const minimumInterval = Math.max(fuzz.min_ivl, floor);
+    const maximumInterval = Math.max(fuzz.max_ivl, minimumInterval);
     if (minimumInterval === maximumInterval) return minimumInterval;
 
     const oldDay =

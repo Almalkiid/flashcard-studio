@@ -28,6 +28,13 @@ const GRADES: Partial<Record<ReviewResponse, Grade>> = {
     [ReviewResponse.Easy]: Rating.Easy,
 };
 
+/** The grade below each grade: ts-fsrs keeps an interval in days longer than the one below it (Hard < Good < Easy). */
+const GRADE_BELOW: Partial<Record<Grade, Grade>> = {
+    [Rating.Hard]: Rating.Again,
+    [Rating.Good]: Rating.Hard,
+    [Rating.Easy]: Rating.Good,
+};
+
 /** The ts-fsrs rating of an answer button; Reset is no rating. */
 export function reviewResponseToFsrsGrade(response: ReviewResponse): Grade {
     const grade = GRADES[response];
@@ -157,16 +164,27 @@ export class FsrsScheduler {
         const elapsedDays = shown.card.last_review
             ? Math.max(0, dateDiffInDays(TypeConvert.time(shown.card.last_review), now.toDate()))
             : 0;
-        const interval = pickFsrsBalancedInterval({
-            targetInterval: scheduled.scheduled_days,
-            elapsedDays,
-            maximumInterval: this.loadBalance.maximumInterval,
-            histogram,
-            now,
-            seed: FsrsScheduler.balanceSeed(shown.card, key),
-            easyDays: this.loadBalance.easyDays,
-            currentDueUnix,
-        });
+        const balance = this.loadBalance;
+        const balanced = (forGrade: Grade): number => {
+            const target = shown.answers[forGrade].card.scheduled_days;
+            // ts-fsrs keeps the grades that land on days in order, and so does balancing: a grade goes at least a day
+            // past where the grade below it was put
+            const below = GRADE_BELOW[forGrade];
+            const belowTarget = below === undefined ? 0 : shown.answers[below].card.scheduled_days;
+            return pickFsrsBalancedInterval({
+                targetInterval: target,
+                elapsedDays,
+                maximumInterval: balance.maximumInterval,
+                histogram,
+                now,
+                seed: FsrsScheduler.balanceSeed(shown.card, key),
+                easyDays: balance.easyDays,
+                currentDueUnix,
+                minimumInterval:
+                    belowTarget >= 1 && belowTarget < target ? balanced(below) + 1 : undefined,
+            });
+        };
+        const interval = balanced(grade);
         if (interval === scheduled.scheduled_days) return FsrsState.fromFsrsCard(scheduled);
         return FsrsState.fromFsrsCard({
             ...scheduled,
