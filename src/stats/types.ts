@@ -26,7 +26,8 @@ export type CardState = "new" | "learning" | "review" | "relearning";
  * @property {string | null} id - The card id, null while the card has never been written with metadata.
  * @property {string[]} decks - Every deck path the card is in; "" stands for the root deck.
  * @property {boolean} isFsrs - Whether the card carries FSRS memory state (stability and difficulty).
- * @property {number | null} dueMs - When the card is next due, null for new cards.
+ * @property {number | null} dueMs - When the card is next due, null for new cards. An SM-2 card is due on a calendar date,
+ *   kept as its local midnight (see `makeDueKeyFn`).
  * @property {number} intervalDays - The scheduled interval; 0 for new cards.
  * @property {number} stability - FSRS stability in days, 0 when unknown.
  * @property {number} difficulty - FSRS difficulty from 1 to 10, 0 when unknown.
