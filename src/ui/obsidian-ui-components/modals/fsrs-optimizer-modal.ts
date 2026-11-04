@@ -33,6 +33,8 @@ function percentChange(current: number, optimized: number): string {
 export class FsrsOptimizerModal extends Modal {
     private deck = "";
     private running = false;
+    // A run that finds the dialog closed after a wait stops: the optimizer would block the app for nothing
+    private closed = false;
 
     /**
      * @param apply - Stores the new weights; called when the user presses Apply.
@@ -46,12 +48,14 @@ export class FsrsOptimizerModal extends Modal {
     }
 
     onOpen(): void {
+        this.closed = false;
         this.modalEl.addClass("fs-optimizer-modal");
         this.setTitle(t("OPTIMIZER_TITLE"));
         this.renderForm();
     }
 
     onClose(): void {
+        this.closed = true;
         this.contentEl.empty();
     }
 
@@ -89,6 +93,7 @@ export class FsrsOptimizerModal extends Modal {
             const { settings } = dataManager.data;
             this.showMessage(t("OPTIMIZER_LOADING"));
             const entries = await dataManager.reviewLog.readAll();
+            if (this.closed) return;
             const boundary = DateUtil.strToDayBoundary(settings.startOfDay);
             const histories = buildCardHistories(entries, {
                 dayStartOffsetMs: boundary
@@ -112,6 +117,7 @@ export class FsrsOptimizerModal extends Modal {
 
             this.showMessage(t("OPTIMIZER_RUNNING"), "fs-optimizer-running");
             await letScreenPaint();
+            if (this.closed) return;
             const result = optimizeParameters(
                 histories,
                 current ?? defaultWeights,
