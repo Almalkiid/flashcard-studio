@@ -141,14 +141,20 @@ export function deckTags(
     }
 
     const tags = new Map<string, string>();
+    // The number to try next after each tag that is taken. A tag once taken stays taken, so the numbers below it are
+    // never free again, and many decks whose names give the same tag are each numbered without counting up from 2
+    const nextNumber = new Map<string, number>();
     for (const { deck, levels } of byLevels(decks)) {
         let tag = flashcardTag;
         levels.forEach((level, index) => {
             const owner = ownerAt(levels, index);
             const base = `${tag}/${tagLevel(level)}`;
             tag = ownTags.get(owner) ?? base;
-            for (let number = 2; (owners.get(tag) ?? owner) !== owner; number++) {
-                tag = `${base}-${number}`;
+            if ((owners.get(tag) ?? owner) !== owner) {
+                let number = nextNumber.get(base) ?? 2;
+                do tag = `${base}-${number++}`;
+                while ((owners.get(tag) ?? owner) !== owner);
+                nextNumber.set(base, number);
             }
             claim(owner, tag);
         });

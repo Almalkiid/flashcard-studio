@@ -121,6 +121,24 @@ describe("tags", () => {
         });
     });
 
+    test("deckTags numbers many decks that give the same tag each with the next free number", () => {
+        // "C+", "C++", ... all give the tag C, and an existing deck note already has the tag the second of them would get
+        const decks = ["C", ...Array.from({ length: 2000 }, (_, i) => "C" + "+".repeat(i + 1))];
+        const tags = deckTags("#flashcards", decks, new Map([["Old", "#flashcards/C-3"]]));
+        expect(tags.get("C")).toBe("#flashcards/C");
+        expect(tags.get("C+")).toBe("#flashcards/C-2");
+        expect(tags.get("C++")).toBe("#flashcards/C-4");
+        // Each deck has a tag of its own, and the numbers run on from 2 with only the existing note's 3 left out
+        const numbers = decks
+            .slice(1)
+            .map((deck) => Number(tags.get(deck)?.slice("#flashcards/C-".length)));
+        expect(new Set(numbers).size).toBe(2000);
+        expect([...numbers].sort((a, b) => a - b)).toEqual([
+            2,
+            ...Array.from({ length: 1999 }, (_, i) => i + 4),
+        ]);
+    });
+
     test("deckTags gives the subdecks of a renamed level the same new name", () => {
         const decks = ["Lang::C++::Basics", "Lang::C::Basics", "Lang::C++", "Lang :: C"];
         expect(Object.fromEntries(deckTags("#flashcards", decks))).toEqual({
