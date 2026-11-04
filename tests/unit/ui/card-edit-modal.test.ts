@@ -1,5 +1,8 @@
+import { Notice } from "obsidian";
+
 import { CardType } from "src/data/data-structures/card/question";
 import { cloneDefaultSettings, StudioSettings } from "src/data/settings-model";
+import { t } from "src/lang/translate";
 import {
     EditCancelled,
     FlashcardEditModal,
@@ -81,8 +84,20 @@ function openEditor(type: CardType, text: string) {
     const { contentEl } = opened[0];
     const fields = Array.from(contentEl.querySelectorAll("textarea"));
     const save = () => contentEl.querySelector<HTMLButtonElement>(".fs-save-button")?.click();
-    return { result, fields, save };
+    let settled = false;
+    result.then(
+        () => (settled = true),
+        () => (settled = true),
+    );
+    // The promise settles in a microtask after the dialog acts
+    const isSettled = async () => {
+        await Promise.resolve();
+        return settled;
+    };
+    return { result, fields, save, isSettled };
 }
+
+beforeEach(() => jest.mocked(Notice).mockClear());
 
 describe("saving the edit dialog", () => {
     test("a card saved without a change is not written to the note", async () => {
@@ -108,5 +123,64 @@ describe("saving the edit dialog", () => {
         await expect(result).resolves.toBe(
             "How to print in Python?\n  ?\n    print('hi')\n    more",
         );
+    });
+
+    // The parser would read these back as another card, or none, and the schedule comment would be on the wrong line
+    test.each([
+        {
+            name: "Enter at the end of the question",
+            type: CardType.SingleLineBasic,
+            text: "Capital of France::Paris",
+            field: 0,
+            refused: "Capital of France\n",
+            fixed: "Capital of Italy",
+            saved: "Capital of Italy::Paris",
+        },
+        {
+            name: "a second line in a single-line answer",
+            type: CardType.SingleLineBasic,
+            text: "Q::A",
+            field: 1,
+            refused: "A\nB",
+            fixed: "A B",
+            saved: "Q::A B",
+        },
+        {
+            name: "a paragraph break in a multi-line answer",
+            type: CardType.MultiLineBasic,
+            text: "Q\n?\nA",
+            field: 1,
+            refused: "A\n\nB",
+            fixed: "A\nB",
+            saved: "Q\n?\nA\nB",
+        },
+        {
+            name: "a paragraph break in a cloze",
+            type: CardType.Cloze,
+            text: "Some ==text== here",
+            field: 0,
+            refused: "Some ==text==\n\nhere",
+            fixed: "Some ==text==\nhere",
+            saved: "Some ==text==\nhere",
+        },
+    ])("$name is refused, and the dialog stays open", async (edit) => {
+        const { result, fields, save, isSettled } = openEditor(edit.type, edit.text);
+        fields[edit.field].value = edit.refused;
+        save();
+        expect(Notice).toHaveBeenCalledWith(t("EDIT_NOT_READ_BACK"));
+        expect(await isSettled()).toBe(false);
+
+        fields[edit.field].value = edit.fixed;
+        save();
+        await expect(result).resolves.toBe(edit.saved);
+    });
+
+    test("a card this check does not read back as it is now can still be edited", async () => {
+        // Not a card the parser finds under these settings: the check does not hold the edit to it
+        const { result, fields, save } = openEditor(CardType.MultiLineBasic, "Q\n\n?\n\nA");
+        fields[1].value = "A\n\nB";
+        save();
+        await expect(result).resolves.toBe("Q\n\n?\n\nA\n\nB");
+        expect(Notice).not.toHaveBeenCalled();
     });
 });

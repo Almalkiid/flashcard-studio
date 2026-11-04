@@ -1,4 +1,5 @@
 import { CardFrontBackUtil } from "src/cards/expand";
+import { parse, parserOptionsFromSettings } from "src/cards/parse";
 import { CardType } from "src/data/data-structures/card/question";
 import { StudioSettings } from "src/data/settings-model";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/text";
@@ -79,4 +80,35 @@ export function joinCardText(type: CardType, sides: CardSides, settings: StudioS
     const lead = sides.front === "" || sides.front.endsWith("\n") ? "" : "\n";
     const trail = sides.back === "" || sides.back.startsWith("\n") ? "" : "\n";
     return sides.front + lead + (sides.between ?? separator) + trail + sides.back;
+}
+
+/** Stands for the schedule comment that is written after the text of a card that was answered. */
+const SCHEDULE_COMMENT_STAND_IN = "<!--SR:!2000-01-01,1,250-->";
+
+/**
+ * Whether the note parser reads `text`, with a schedule comment on the line after it, back as one question of `type`
+ * that takes all of it and the comment. A text that it does not (a line break in a single-line card, a blank line in a
+ * multi-line card or a cloze) would be written to the note as another card, or as none, and the schedule comment would
+ * end up on the wrong lines.
+ */
+export function readsBackAsOneQuestion(
+    type: CardType,
+    text: string,
+    settings: StudioSettings,
+): boolean {
+    // With card regions on, a multi-line card or a cloze is only found inside a region
+    const start = settings.multilineCardStartMarker;
+    const inRegion = start !== "" && (isMultiLine(type) || type === CardType.Cloze);
+    const lines = [
+        ...(inRegion ? [start] : []),
+        ...text.trimEnd().split("\n"),
+        SCHEDULE_COMMENT_STAND_IN,
+    ];
+    const questions = parse(lines.join("\n"), parserOptionsFromSettings(settings));
+    return (
+        questions.length === 1 &&
+        questions[0].cardType === type &&
+        questions[0].firstLineNum === (inRegion ? 1 : 0) &&
+        questions[0].lastLineNum === lines.length - 1
+    );
 }

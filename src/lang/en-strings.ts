@@ -214,6 +214,8 @@ const en = {
         "Couldn't save this change: the note changed. Try again after it reloads.",
     EDIT_CHANGES_CARD_COUNT:
         "Not saved: this edit changes how many cards the question makes. Edit the note itself instead.",
+    EDIT_NOT_READ_BACK:
+        "Can't save: the note would not read this text as the same card. Check its line breaks and blank lines.",
     SUSPEND_CARD: "Suspend card",
     BURY_CARD: "Bury until tomorrow",
     FLAG_CARD: "Flag",

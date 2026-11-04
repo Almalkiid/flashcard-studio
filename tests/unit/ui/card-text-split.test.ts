@@ -1,7 +1,11 @@
 import { CardFrontBackUtil } from "src/cards/expand";
 import { CardType } from "src/data/data-structures/card/question";
 import { cloneDefaultSettings, StudioSettings } from "src/data/settings-model";
-import { joinCardText, splitCardText } from "src/ui/obsidian-ui-components/modals/card-text-split";
+import {
+    joinCardText,
+    readsBackAsOneQuestion,
+    splitCardText,
+} from "src/ui/obsidian-ui-components/modals/card-text-split";
 
 const settings: StudioSettings = cloneDefaultSettings();
 
@@ -98,5 +102,59 @@ describe("the edit dialog cuts a card where the parser does", () => {
         // A basic card whose separator was deleted from the note has nothing to cut at either
         expect(splitCardText(CardType.SingleLineBasic, "no separator here", settings)).toBeNull();
         expect(splitCardText(CardType.MultiLineBasic, "one\ntwo", settings)).toBeNull();
+    });
+});
+
+describe("an edited text is checked against the note parser", () => {
+    test.each([
+        ...SINGLE_LINE,
+        ...MULTI_LINE.filter(([text]) => !/\n\s*\n/.test(text)),
+        ["Some ==text== and ==more==", CardType.Cloze],
+        ["> [!question] Title\n> The answer", CardType.Callout],
+    ] as const)("%j reads back as one question", (text, type) => {
+        expect(readsBackAsOneQuestion(type, text, settings)).toBe(true);
+    });
+
+    // Each of these was written to the note, where the schedule comment then ended up on a line of no card or of
+    // another card: the card lost its schedule, or came back with an empty front
+    test.each([
+        [
+            "a line break before the separator",
+            "Capital of France\n::Paris",
+            CardType.SingleLineBasic,
+        ],
+        ["a second line in the answer", "Q::A\nB", CardType.SingleLineBasic],
+        ["a blank line in the answer", "Q\n?\nA\n\nB", CardType.MultiLineBasic],
+        ["a blank line in the question", "Q\n\nmore\n?\nA", CardType.MultiLineBasic],
+        ["a blank line in a cloze", "Some ==text==\n\nmore", CardType.Cloze],
+        ["an inline separator in the question", "Q :: x\n?\nA", CardType.MultiLineBasic],
+        ["a blank line in front of the card", "\nQ::A", CardType.SingleLineBasic],
+    ] as const)("%s does not", (_name, text, type) => {
+        expect(readsBackAsOneQuestion(type, text, settings)).toBe(false);
+    });
+
+    test("a trailing line break is dropped before the schedule comment, as the note writer does", () => {
+        expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\n", settings)).toBe(true);
+    });
+
+    test("with an end marker a multi-line answer can have blank lines", () => {
+        const marked = { ...settings, multilineCardEndMarker: "+++" };
+        expect(readsBackAsOneQuestion(CardType.MultiLineBasic, "Q\n?\nA\n\nB", marked)).toBe(true);
+    });
+
+    test("with card regions the card is read inside a region, where blank lines are kept", () => {
+        const regions = {
+            ...settings,
+            multilineCardStartMarker: "+++",
+            multilineCardEndMarker: "---",
+        };
+        for (const [text, type] of [
+            ["Q\n?\nA\n\nB", CardType.MultiLineBasic],
+            ["Some ==text==\n\nmore", CardType.Cloze],
+            ["Q::A", CardType.SingleLineBasic],
+        ] as const) {
+            expect(readsBackAsOneQuestion(type, text, regions)).toBe(true);
+        }
+        expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\nB", regions)).toBe(false);
     });
 });
