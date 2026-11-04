@@ -620,7 +620,8 @@ export default class CardContainer {
 
     /**
      * The state of the multiple choice card that is up, or null when it is an ordinary card. A cloze card is never
-     * multiple choice. With `reuse`, the state of this card's front is kept (its order of options and the choice).
+     * multiple choice. With `reuse`, the state of this card's front is kept (its order of options and the choice), with
+     * what the card says now: an edit may have changed the right answers, the lead or the explanation.
      */
     private choiceFor(
         session: SessionData,
@@ -641,6 +642,7 @@ export default class CardContainer {
             current.mc.options.length === mc.options.length &&
             current.mc.options.every((option, i) => option.text === mc.options[i].text)
         ) {
+            current.mc = mc;
             return current;
         }
         return createChoiceState(card, mc, settings.shuffleChoices);
