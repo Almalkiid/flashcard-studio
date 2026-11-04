@@ -146,6 +146,19 @@ describe("other text checks", () => {
         );
         expect(clozePatternError("==answer==", ["==answer=="])).toBe("Already in the list.");
     });
+    test("cloze patterns the cloze reader can't read are refused, because one stops every scan", () => {
+        const message =
+            "A pattern needs [123;;] where the cloze number goes and [;;hint] where the hint goes.";
+        for (const pattern of [
+            "{{answer}}",
+            "==answer==",
+            "**answer**",
+            "{{[123;;]answer}}",
+            "{{answer[;;hint]}}",
+        ])
+            expect([pattern, clozePatternError(pattern, [])]).toEqual([pattern, message]);
+        expect(clozePatternError("  **[123;;]answer[;;hint]**  ", [])).toBeUndefined();
+    });
     test("vault folder", () => {
         expect(normalizeVaultFolder(" /Logs//2026/ ", "Default")).toBe("Logs/2026");
         expect(normalizeVaultFolder("/", "Default")).toBe("Default");

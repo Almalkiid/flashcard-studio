@@ -334,7 +334,7 @@ describe("the cloze patterns page", () => {
         expect(page.type).toBe("page");
         expect(page.name).toBe("Cloze patterns");
         expect(page.desc).toBe(
-            "Write answer where the hidden text goes, and hint where an optional hint goes.",
+            "Write answer where the hidden text goes, [123;;] where the cloze number goes, and [;;hint] where an optional hint goes.",
         );
         expect(page.items).toHaveLength(1);
         expect(list.type).toBe("list");
@@ -450,15 +450,19 @@ describe("the cloze patterns list", () => {
         expect(opened.value.open).toHaveBeenCalledTimes(1);
     });
 
-    test("the prompt wants the word answer and no repeats, as the list stands then", () => {
+    test("the prompt wants a pattern the cloze reader can read and no repeats, as the list stands then", () => {
         const { settings, list } = build();
         list.addItem?.action(anElement);
         const { check } = promptMock.mock.calls[0][1];
         expect(check("")).toBe("Can't be empty.");
         expect(check("{{hidden}}")).toBe("A pattern needs the word answer where the answer goes.");
-        expect(check("{{answer}}")).toBeUndefined();
-        settings.clozePatterns.push("{{answer}}");
-        expect(check("{{answer}}")).toBe("Already in the list.");
+        expect(check("{{answer}}")).toBe(
+            "A pattern needs [123;;] where the cloze number goes and [;;hint] where the hint goes.",
+        );
+        const curly = "{{[123;;]answer[;;hint]}}";
+        expect(check(curly)).toBeUndefined();
+        settings.clozePatterns.push(curly);
+        expect(check(curly)).toBe("Already in the list.");
     });
 
     test("submitting adds the trimmed pattern, saves and rebuilds", async () => {
