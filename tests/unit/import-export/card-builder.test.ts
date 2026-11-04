@@ -86,8 +86,11 @@ describe("buildCard", () => {
         });
     });
 
-    test("skips a cloze note with unbalanced braces", () => {
+    test("skips a cloze note with unbalanced braces or a cloze number no note has", () => {
         expect(buildCard("cloze", ["{{c1::open"], "multi")).toEqual({ skipped: "invalid-cloze" });
+        expect(buildCard("cloze", ["{{c1,1000::x}}"], "multi")).toEqual({
+            skipped: "invalid-cloze",
+        });
     });
 
     test("honours custom separators", () => {
