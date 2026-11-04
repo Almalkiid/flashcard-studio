@@ -265,7 +265,7 @@ describe("importNotes edge cases", () => {
         expect(result.mediaFiles).toBe(1);
     });
 
-    test("gives decks whose names make the same tag different tags, the same on every import", async () => {
+    test("gives decks whose names make the same tag different tags, and a deck note made again its tag", async () => {
         const host = new FakeHost();
         const notes = ["C", "C++", "C#"].map((deck) => note([`about ${deck}`, "b"], { deck }));
         const result = await importNotes(notes, NO_MEDIA, options, context(host));
@@ -279,6 +279,26 @@ describe("importNotes edge cases", () => {
         host.texts.delete("Flashcards/Imported/C++/C++.md");
         await importNotes(notes, NO_MEDIA, options, context(host));
         expect(firstLine("Flashcards/Imported/C++/C++.md")).toBe("#flashcards/C-3");
+    });
+
+    test("does not give a new deck the tag of a deck that has a note from an earlier import", async () => {
+        const host = new FakeHost();
+        const firstLine = (path: string) => host.texts.get(path)?.split("\n")[0];
+        const first = ["C", "C++"].map((deck) => note([`about ${deck}`, "b"], { deck }));
+        await importNotes(first, NO_MEDIA, options, context(host));
+        expect(firstLine("Flashcards/Imported/C++/C++.md")).toBe("#flashcards/C-2");
+
+        // The collection again, with a new deck that comes before C++
+        const result = await importNotes(
+            [...first, note(["about C#", "b"], { deck: "C#" })],
+            NO_MEDIA,
+            options,
+            context(host),
+        );
+        expect(result).toMatchObject({ cards: 1, decks: 1, duplicates: 2 });
+        expect(firstLine("Flashcards/Imported/C/C.md")).toBe("#flashcards/C");
+        expect(firstLine("Flashcards/Imported/C++/C++.md")).toBe("#flashcards/C-2");
+        expect(firstLine("Flashcards/Imported/C-/C-.md")).toBe("#flashcards/C-3");
     });
 
     test("imports plain text as text when asked", async () => {
