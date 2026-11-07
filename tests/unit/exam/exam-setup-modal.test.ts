@@ -1,4 +1,12 @@
-import { ExamCardFilter, ExamCardInput, ExamResult, ExamSetup } from "src/exam/exam";
+import {
+    emptyAnswer,
+    ExamCardFilter,
+    ExamCardInput,
+    ExamResult,
+    ExamSetup,
+    pickExamQuestions,
+} from "src/exam/exam";
+import { ExamDraft, makeDraft } from "src/exam/exam-draft";
 import { ExamSetupModal, ExamSource, startingSource } from "src/exam/exam-setup-modal";
 
 /** A deck in the dialog's list, as the dialog keeps it. */
@@ -16,6 +24,8 @@ interface SetupInternals {
     checked: Set<string>;
     recent: ExamResult[];
     cards: ExamCardInput[];
+    drafts: ExamDraft[];
+    contentEl: HTMLElement;
     source: ExamSource;
     notes: string[];
     filter: ExamCardFilter;
@@ -28,6 +38,7 @@ interface SetupInternals {
     renderRecent(parent: HTMLElement): void;
     renderNotes(field: HTMLElement): void;
     refresh(): void;
+    onOpen(): void;
 }
 
 /** An element, made the way jsdom has it: the element helpers Obsidian adds are not there in a unit test. */
@@ -231,5 +242,60 @@ describe("a retake of an exam from notes", () => {
         expect(field.querySelector(".fs-exam-notes-gone")?.textContent).toBe(
             "These notes from the last exam are no longer available: Cell, DNA, Genes. They were renamed or deleted, or have no cards to ask.",
         );
+    });
+});
+
+describe("the exam setup with no cards in the vault", () => {
+    test("still offers the unfinished exams, which hold their own questions, before saying so", () => {
+        const setup: ExamSetup = {
+            decks: [],
+            count: 1,
+            minutes: null,
+            filter: "all",
+            passPercent: 75,
+            title: "Exam · Physics",
+        };
+        const card: ExamCardInput = {
+            id: "p1",
+            deck: "Physics",
+            front: "What is a newton?",
+            back: "A unit of force",
+            isCloze: false,
+            suspended: false,
+        };
+        const questions = pickExamQuestions([card], setup, () => 0);
+        const modal = Object.create(ExamSetupModal.prototype) as SetupInternals;
+        Object.assign(modal, {
+            contentEl: create("div"),
+            cards: [],
+            drafts: [
+                makeDraft(
+                    {
+                        setup,
+                        questions,
+                        answers: questions.map(emptyAnswer),
+                        current: 0,
+                        startedMs: Date.now(),
+                    },
+                    Date.now(),
+                ),
+            ],
+        });
+        modal.onOpen();
+
+        const content = modal.contentEl;
+        expect(content.querySelector(".fs-exam-draft-title")?.textContent).toBe("Exam · Physics");
+        expect(content.querySelector(".fs-exam-draft-resume")).not.toBeNull();
+        const empty = content.querySelector(".fs-exam-empty");
+        expect(empty?.textContent).toBe("There are no cards to make an exam from yet.");
+        // The unfinished exam comes first; only starting a new one is left out
+        const drafts = content.querySelector(".fs-exam-resume");
+        expect(
+            drafts !== null &&
+                empty !== null &&
+                drafts.compareDocumentPosition(empty) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+        expect(content.querySelector(".fs-exam-start")).toBeNull();
+        expect(content.querySelector(".fs-exam-presets")).toBeNull();
     });
 });
