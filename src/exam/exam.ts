@@ -42,6 +42,13 @@ export interface ExamSetup {
      * up for card generation, and one with the same meaning counts as right. Absent means no: nothing is sent.
      */
     aiCheck?: boolean;
+    /**
+     * With `aiCheck`: exactly where the setup said the answers go when the exam started (`aiProviderIdentity`:
+     * "anthropic", "openai", or "openai-compatible" with the server's address). When the AI set up at submit is
+     * another, or this is missing, nothing is sent: the person agreed to that provider, not to whatever the settings
+     * say later.
+     */
+    aiProvider?: string;
 }
 
 export const EXAM_PRESETS: { id: "quick" | "cia"; count: number; minutes: number | null }[] = [
@@ -251,9 +258,16 @@ export function isRight(q: ExamQuestion, a: ExamAnswer, ignoreAccents: boolean):
     }
 }
 
-/** Why the AI gave no verdict: the review's reasons, and `skipped` for a check stopped before it was sent or answered. */
+/**
+ * Why the AI gave no verdict: the review's reasons; `skipped` for a check never sent because the checks stopped first,
+ * `stopped` for one sent whose reply had not come when they stopped, and `changed` for every check of an exam whose AI
+ * is not, or cannot be shown to be, the one it started with (nothing is sent then).
+ */
 export type ExamAiUnavailable =
-    Extract<SemanticOutcome, { status: "unavailable" }>["reason"] | "skipped";
+    | Extract<SemanticOutcome, { status: "unavailable" }>["reason"]
+    | "skipped"
+    | "stopped"
+    | "changed";
 
 /** What the AI said about a typed answer that did not match exactly. */
 export type ExamAiCheck =

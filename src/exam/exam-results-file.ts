@@ -134,7 +134,9 @@ const FILE_UNAVAILABLE: Record<ExamAiUnavailable, string> = {
     timeout: "Took longer than 10 seconds",
     provider: "The provider could not complete the check",
     format: "The reply was incomplete or invalid",
-    skipped: "Stopped before this answer",
+    skipped: "Not sent: the checks stopped first",
+    stopped: "No verdict: the checks stopped before the AI answered",
+    changed: "Not sent: the AI provider could not be confirmed as the one the exam started with",
 };
 
 /**
@@ -243,8 +245,18 @@ const KINDS: ExamQuestionKind[] = ["choice", "typed", "self"];
 
 export function readSetup(value: unknown): ExamSetup | null {
     if (!isObject(value)) return null;
-    const { decks, count, minutes, filter, passPercent, title, shuffleOptions, notes, aiCheck } =
-        value;
+    const {
+        decks,
+        count,
+        minutes,
+        filter,
+        passPercent,
+        title,
+        shuffleOptions,
+        notes,
+        aiCheck,
+        aiProvider,
+    } = value;
     if (!Array.isArray(decks) || !decks.every((deck) => typeof deck === "string")) return null;
     if (!isFiniteNumber(count)) return null;
     if (!isNullableNumber(minutes)) return null;
@@ -271,6 +283,10 @@ export function readSetup(value: unknown): ExamSetup | null {
     if (aiCheck !== undefined) {
         if (typeof aiCheck !== "boolean") return null;
         setup.aiCheck = aiCheck;
+    }
+    if (aiProvider !== undefined) {
+        if (typeof aiProvider !== "string") return null;
+        setup.aiProvider = aiProvider;
     }
     return setup;
 }
@@ -350,7 +366,15 @@ function readItem(line: string): ExamItem | null {
 }
 
 const VERDICTS = ["equivalent", "incorrect", "uncertain"] as const;
-const UNAVAILABLE: ExamAiUnavailable[] = ["setup", "timeout", "provider", "format", "skipped"];
+const UNAVAILABLE: ExamAiUnavailable[] = [
+    "setup",
+    "timeout",
+    "provider",
+    "format",
+    "skipped",
+    "stopped",
+    "changed",
+];
 
 /** The AI's check of an answer: exactly a verdict and a reason, the reason one of the codes when there is no verdict. */
 function readAiCheck(value: unknown): ExamAiCheck | null {

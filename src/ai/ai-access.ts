@@ -1,12 +1,18 @@
 import { App, requestUrl } from "obsidian";
 
-import { aiProviderLabel, AiRequestFn, AiSettings, aiSetupProblem } from "src/ai/ai-provider";
+import {
+    aiProviderIdentity,
+    aiProviderLabel,
+    AiRequestFn,
+    AiSettings,
+    aiSetupProblem,
+} from "src/ai/ai-provider";
 import { gradeTypedAnswer, SemanticGradeInput, SemanticOutcome } from "src/ai/typed-answer-grading";
 import type { StudioSettings } from "src/data/settings-model";
 
 /*
  * The AI set up for card generation, for the other features that use it: its settings and its key, read each time they
- * are needed and never kept.
+ * are needed (or once for a batch of checks) and never stored.
  */
 
 /** The AI settings of the plugin's settings: the provider, model and server address. */
@@ -27,14 +33,49 @@ export function readAiKey(app: App, secretId: string): string {
     }
 }
 
-/** The review's meaning check (#4) as an exam uses it. Settings and key are read at each call, never kept. */
+/**
+ * The review's meaning check (#4) as an exam uses it. Settings and key are read at each call, and kept only by a
+ * snapshot, in memory, for one batch.
+ */
 export interface MeaningChecker {
     /** Whether a check can be sent now: nothing the provider needs is missing. */
     usable(): boolean;
-    /** Who the answers go to, for the privacy line: "Anthropic", "OpenAI" or the server's host. */
+    /** Who the answers go to, for the privacy line: "Anthropic", "OpenAI" or the server's host (with its port). */
     provider(): string;
+    /**
+     * Exactly where the answers go (`aiProviderIdentity`), kept with an exam that sends them so that nothing goes
+     * anywhere else at submit. Never shown.
+     */
+    identity(): string;
     /** `gradeTypedAnswer` with the plugin's settings and key: its prompt, guard vetoes and 10 s deadline. */
     check(input: SemanticGradeInput): Promise<SemanticOutcome>;
+    /**
+     * The same checker with the settings and key read once, now, and kept for every later call: a batch of checks
+     * goes to the one provider it was started with, whatever is changed in the settings while it runs.
+     */
+    snapshot(): MeaningChecker;
+}
+
+function checkerOf(
+    read: () => { ai: AiSettings; key: string },
+    request: AiRequestFn,
+): MeaningChecker {
+    return {
+        usable: () => {
+            const { ai, key } = read();
+            return aiSetupProblem(ai, key) === null;
+        },
+        provider: () => aiProviderLabel(read().ai),
+        identity: () => aiProviderIdentity(read().ai),
+        check: (input) => {
+            const { ai, key } = read();
+            return gradeTypedAnswer(input, ai, key, request);
+        },
+        snapshot: () => {
+            const now = read();
+            return checkerOf(() => now, request);
+        },
+    };
 }
 
 export function meaningChecker(
@@ -42,10 +83,8 @@ export function meaningChecker(
     settings: () => StudioSettings,
     request: AiRequestFn = (params) => requestUrl(params),
 ): MeaningChecker {
-    const key = () => readAiKey(app, settings().aiKeySecret);
-    return {
-        usable: () => aiSetupProblem(aiSettingsOf(settings()), key()) === null,
-        provider: () => aiProviderLabel(aiSettingsOf(settings())),
-        check: (input) => gradeTypedAnswer(input, aiSettingsOf(settings()), key(), request),
-    };
+    return checkerOf(() => {
+        const current = settings();
+        return { ai: aiSettingsOf(current), key: readAiKey(app, current.aiKeySecret) };
+    }, request);
 }
