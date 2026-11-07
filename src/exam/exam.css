@@ -2138,6 +2138,13 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
     align-self: flex-start;
 }
 
+/* The notes of the last exam that are not there any more */
+.fs-exam-notes-gone {
+    font-size: var(--fs-caption);
+    line-height: 1.4;
+    color: var(--fs-amber);
+}
+
 .fs-exam-add-note-icon {
     display: inline-flex;
 

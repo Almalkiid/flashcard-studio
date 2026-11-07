@@ -1,4 +1,6 @@
 import {
+    ExamAiCheck,
+    ExamAiUnavailable,
     ExamAnswer,
     ExamCardInput,
     ExamResult,
@@ -226,6 +228,50 @@ describe("exams from notes, and files written before them", () => {
         // Never a link to a note: it would count as one in note review
         expect(summary).not.toContain("[[");
         expect(parseExamFile(text)).toEqual(fromNotes);
+    });
+});
+
+describe("the AI checks that gave no verdict", () => {
+    test("keep why: stopped before sending, stopped while waiting, or another provider", () => {
+        const result = makeResult();
+        const unavailable = (reason: ExamAiUnavailable): ExamAiCheck => ({
+            verdict: "unavailable",
+            reason,
+        });
+        const checked = summarizeExam(
+            {
+                ...result.setup,
+                aiCheck: true,
+                aiProvider: "openai-compatible http://localhost:11434/v1",
+            },
+            result.items.map((item, index) => ({
+                ...item,
+                ai: unavailable((["skipped", "stopped", "changed", "timeout"] as const)[index]),
+            })),
+            result.startedMs,
+            result.endedMs,
+        );
+        const text = formatExamFile(checked);
+        expect(text).toContain("| Not sent: the checks stopped first |");
+        expect(text).toContain("| No verdict: the checks stopped before the AI answered |");
+        expect(text).toContain(
+            "| Not sent: the AI provider could not be confirmed as the one the exam started with |",
+        );
+        expect(parseExamFile(text)).toEqual(checked);
+
+        // A file written before these reasons, with the words it had then, reads as it did
+        const before = text
+            .replace("Not sent: the checks stopped first", "Stopped before this answer")
+            .replace(/,"aiProvider":"[^"]*"/, "")
+            .split("\n")
+            .filter((line) => !/"reason":"(stopped|changed)"/.test(line))
+            .join("\n");
+        expect(parseExamFile(before)?.items.map((item) => item.ai)).toEqual([
+            unavailable("skipped"),
+            unavailable("timeout"),
+        ]);
+        // A reason no version wrote is not an exam
+        expect(parseExamFile(text.replace('"reason":"stopped"', '"reason":"later"'))).toBeNull();
     });
 });
 

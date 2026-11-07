@@ -4,7 +4,6 @@ import { Component, ItemView, Notice, setIcon } from "obsidian";
 import type { MeaningChecker } from "src/ai/ai-access";
 import {
     emptyAnswer,
-    ExamAiCheck,
     ExamAnswer,
     examEndMs,
     examKeyAction,
@@ -18,7 +17,14 @@ import {
     remainingMs,
     scoreExam,
 } from "src/exam/exam";
-import { aiCheckIndexes, aiCheckInput, applyAiChecks, runAiChecks } from "src/exam/exam-ai-check";
+import {
+    aiCheckHold,
+    aiCheckIndexes,
+    aiCheckInput,
+    applyAiChecks,
+    runAiChecks,
+    withoutAiChecks,
+} from "src/exam/exam-ai-check";
 import { isEditable, trapTab } from "src/exam/exam-dom";
 import { ExamDraft, makeDraft, newDraftId } from "src/exam/exam-draft";
 import { markExamGone, markExamLive } from "src/exam/exam-draft-store";
@@ -61,7 +67,10 @@ export interface ExamRunOptions {
     persist?: (draft: ExamDraft) => void;
     /** Forgets the saved progress: the exam was submitted or the person left it for good. */
     discard?: (id: string) => void;
-    /** The AI meaning check, for an exam set up with `aiCheck`. Without both, nothing is sent. */
+    /**
+     * The AI meaning check, for an exam set up with `aiCheck`. Without both, nothing is sent, and nothing is sent either
+     * when it now points anywhere but where the setup kept (`aiProvider`).
+     */
     ai?: MeaningChecker;
 }
 
@@ -720,23 +729,30 @@ export class ExamRunner {
         if (timeUp) new Notice(t("EXAM_TIME_UP"));
 
         const plan = aiCheckIndexes(exact);
-        const ai = this.opts.ai;
-        if (plan.length === 0 || ai === undefined) {
+        const live = this.opts.ai;
+        if (plan.length === 0 || live === undefined) {
             this.showResults(exact);
             return;
         }
         // The checks can take a while: the draft gets the last letters typed first, so quitting now loses nothing
         this.persist();
-        if (!ai.usable()) {
-            // Set up when the exam started, not now: nothing is sent, and every answer keeps its exact mark
-            const setup: ExamAiCheck = { verdict: "unavailable", reason: "setup" };
-            this.showResults(applyAiChecks(exact, new Map(plan.map((index) => [index, setup]))));
+        // The settings and the key are read once, for the decision and for every check: a change made while the
+        // checks run cannot send the rest somewhere else
+        const ai = live.snapshot();
+        const hold = aiCheckHold(exact.setup, ai);
+        if (hold !== null) {
+            // Another provider than the one the exam started with, or none set up now: nothing is sent, and every
+            // answer keeps its exact mark
+            this.showResults(withoutAiChecks(exact, plan, hold));
             return;
         }
         void this.checkThenShow(exact, plan, ai);
     }
 
-    /** Asks the AI about the answers in `plan`, showing how far it is, then shows the results with its checks. */
+    /**
+     * Asks the AI about the answers in `plan`, showing how far it is, then shows the results with its checks. `ai` is
+     * the snapshot taken at submit, so every check goes to the provider shown.
+     */
     private async checkThenShow(
         exact: ExamResult,
         plan: number[],

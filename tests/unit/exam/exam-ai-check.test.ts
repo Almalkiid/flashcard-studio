@@ -14,11 +14,15 @@ import {
 } from "src/exam/exam";
 import {
     AI_CHECK_FAILURES_TO_STOP,
+    aiCheckHold,
     aiCheckIndexes,
     aiCheckInput,
+    aiCheckText,
     applyAiChecks,
     runAiChecks,
+    withoutAiChecks,
 } from "src/exam/exam-ai-check";
+import { draftText, makeDraft, readDraft } from "src/exam/exam-draft";
 import { formatExamFile, parseExamFile } from "src/exam/exam-results-file";
 
 const CARDS: ExamCardInput[] = [
@@ -190,6 +194,190 @@ describe("AI checks of typed answers", () => {
         });
         expect(notSetUp).toHaveBeenCalledTimes(1);
         expect(afterSetup.map((check) => check.reason)).toEqual(Array(5).fill("setup"));
+    });
+
+    test("an exam started with one provider sends nothing once another is set up, and says why", () => {
+        const settings = cloneDefaultSettings();
+        settings.aiProvider = "openai-compatible";
+        settings.aiModel = "llama3";
+        settings.aiBaseUrl = "http://localhost:11434/v1";
+        const app = { secretStorage: { getSecret: () => "sk-test" } } as unknown as App;
+        const checker = meaningChecker(app, () => settings, request);
+        // Where the setup said the answers go when the exam started, kept with it and with its draft
+        const setup: ExamSetup = { ...SETUP, aiProvider: checker.identity() };
+        expect(setup.aiProvider).toBe("openai-compatible http://localhost:11434/v1");
+        const questions = pickExamQuestions(CARDS, setup, () => 0);
+        const draft = makeDraft(
+            { setup, questions, answers: questions.map(emptyAnswer), current: 0, startedMs: 0 },
+            0,
+        );
+        expect(readDraft(JSON.parse(draftText(draft)))?.setup).toEqual(setup);
+        expect(aiCheckHold(setup, checker.snapshot())).toBeNull();
+
+        // Another server on the same computer is another provider; so is a provider with a name
+        settings.aiBaseUrl = "http://localhost:1234/v1";
+        expect(aiCheckHold(setup, checker.snapshot())).toBe("changed");
+        // The same host over plain http is not the https address the person agreed to
+        settings.aiBaseUrl = "https://llm.example.com/v1";
+        const secure: ExamSetup = { ...setup, aiProvider: checker.identity() };
+        expect(checker.provider()).toBe("llm.example.com");
+        settings.aiBaseUrl = "http://llm.example.com/v1";
+        expect(checker.provider()).toBe("llm.example.com");
+        expect(aiCheckHold(secure, checker.snapshot())).toBe("changed");
+        settings.aiProvider = "openai";
+        settings.aiKeySecret = "fs-ai-key";
+        const exact = examWith(setup);
+        const plan = aiCheckIndexes(exact);
+        const hold = aiCheckHold(exact.setup, checker.snapshot());
+        expect(hold).toBe("changed");
+        // An exam set up with the option but no provider recorded is not sent anywhere either
+        const { aiProvider: _, ...unnamed } = setup;
+        expect(aiCheckHold(unnamed, checker.snapshot())).toBe("changed");
+
+        const marked = withoutAiChecks(exact, plan, hold);
+        expect(request).not.toHaveBeenCalled();
+        // Every typed answer keeps its exact mark, with the reason shown and saved
+        expect(marked.items.map((item) => item.right)).toEqual(
+            exact.items.map((item) => item.right),
+        );
+        expect(marked.right).toBe(exact.right);
+        for (const index of plan) {
+            expect(marked.items[index].ai).toEqual({ verdict: "unavailable", reason: "changed" });
+        }
+        expect(aiCheckText({ verdict: "unavailable", reason: "changed" }).verdict).toBe(
+            "AI check unavailable — Not sent: the AI provider could not be confirmed as the one the exam started with.",
+        );
+        const text = formatExamFile(marked);
+        expect(text).toContain(
+            "| Not sent: the AI provider could not be confirmed as the one the exam started with |",
+        );
+        const read = parseExamFile(text);
+        expect(read).toEqual(marked);
+        expect(read?.setup.aiProvider).toBe("openai-compatible http://localhost:11434/v1");
+    });
+
+    test("every check of a batch goes to the provider and key read when the checks started", async () => {
+        const settings = cloneDefaultSettings();
+        settings.aiProvider = "openai-compatible";
+        settings.aiModel = "llama3";
+        settings.aiBaseUrl = "http://localhost:11434/v1";
+        settings.aiKeySecret = "fs-ai-key";
+        const getSecret = jest.fn(() => "local-key");
+        const app = { secretStorage: { getSecret } } as unknown as App;
+        const ai = meaningChecker(app, () => settings, request).snapshot();
+        expect(getSecret).toHaveBeenCalledTimes(1);
+
+        const inputs = ["chief audit executive", "the board of directors", "the auditors"].map(
+            (typed) => ({ question: "Q", expected: "E", typed }),
+        );
+        const checks = await runAiChecks(
+            inputs,
+            async (input) => {
+                const outcome = await ai.check(input);
+                // The settings change while the batch runs: the rest must not follow them
+                settings.aiProvider = "openai";
+                settings.aiBaseUrl = "";
+                settings.aiKeySecret = "other-key";
+                return outcome;
+            },
+            { signal: new AbortController().signal, concurrency: 1 },
+        );
+        expect(checks.map((check) => check.verdict)).toEqual([
+            "incorrect",
+            "equivalent",
+            "incorrect",
+        ]);
+        expect(request.mock.calls.map(([params]) => params.url)).toEqual(
+            Array(3).fill("http://localhost:11434/v1/chat/completions"),
+        );
+        for (const [params] of request.mock.calls) {
+            expect(params.headers?.Authorization).toBe("Bearer local-key");
+        }
+        expect(getSecret).toHaveBeenCalledTimes(1);
+        expect(ai.provider()).toBe("localhost:11434");
+        expect(ai.identity()).toBe("openai-compatible http://localhost:11434/v1");
+    });
+
+    test("when the checks stop, an answer sent and not answered is told apart from one never sent", async () => {
+        const inputs = ["a", "b", "c", "d", "e"].map((typed) => ({
+            question: "Q",
+            expected: "E",
+            typed,
+        }));
+        type Outcome = Awaited<ReturnType<Parameters<typeof runAiChecks>[1]>>;
+        const graded: Outcome = {
+            status: "graded",
+            grade: {
+                verdict: "equivalent",
+                reason: "Same.",
+                checks: {
+                    essentialFacts: "preserved",
+                    quantitiesAndUnits: "preserved",
+                    polarityAndConditions: "preserved",
+                    completeness: "complete",
+                },
+            },
+        };
+        const timeout: Outcome = { status: "unavailable", reason: "timeout" };
+        const reasons = (checks: { reason: string }[]) => checks.map((check) => check.reason);
+
+        // Show results now: "a" was answered, "b" and "c" are on their way, "d" and "e" were never sent
+        const replies = new Map<string, (outcome: Outcome) => void>();
+        const pending = jest.fn(
+            (input: { typed: string }) =>
+                new Promise<Outcome>((resolve) => replies.set(input.typed, resolve)),
+        );
+        const abort = new AbortController();
+        const onProgress = jest.fn();
+        const running = runAiChecks(inputs, pending, {
+            signal: abort.signal,
+            onProgress,
+            concurrency: 2,
+        });
+        replies.get("a")?.(graded);
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(pending).toHaveBeenCalledTimes(3);
+        abort.abort();
+        const shown = await running;
+        expect(reasons(shown)).toEqual(["Same.", "stopped", "stopped", "skipped", "skipped"]);
+        // A reply that comes after the stop changes nothing
+        replies.get("b")?.(graded);
+        await Promise.resolve();
+        expect(reasons(shown)).toEqual(["Same.", "stopped", "stopped", "skipped", "skipped"]);
+        expect(onProgress.mock.calls).toEqual([[1]]);
+        expect(pending).toHaveBeenCalledTimes(3);
+
+        // The overall time limit: both checks on their way are stopped, the last one was never sent
+        const never = jest.fn(() => new Promise<Outcome>(() => undefined));
+        const afterTime = await runAiChecks(inputs.slice(0, 3), never, {
+            signal: new AbortController().signal,
+            concurrency: 2,
+            totalMs: 20,
+        });
+        expect(reasons(afterTime)).toEqual(["stopped", "stopped", "skipped"]);
+
+        // Failures in a row: "b" is still on its way when the third failure stops the rest
+        const failing = jest.fn((input: { typed: string }) =>
+            input.typed === "b" ? new Promise<Outcome>(() => undefined) : Promise.resolve(timeout),
+        );
+        const afterFailures = await runAiChecks(inputs, failing, {
+            signal: new AbortController().signal,
+            concurrency: 2,
+        });
+        expect(reasons(afterFailures)).toEqual([
+            "timeout",
+            "stopped",
+            "timeout",
+            "timeout",
+            "skipped",
+        ]);
+        expect(aiCheckText(afterFailures[1]).verdict).toBe(
+            "AI check unavailable — No verdict: the checks stopped before the AI answered.",
+        );
+        expect(aiCheckText(afterFailures[4]).verdict).toBe(
+            "AI check unavailable — Not sent: the checks stopped first.",
+        );
     });
 
     test("nothing is sent for an exam set up without the option", () => {

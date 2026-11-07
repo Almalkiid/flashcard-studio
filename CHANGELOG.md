@@ -2,6 +2,16 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.14.1]
+
+### Fixed
+
+- With **AI checks typed answers**, an exam sends its typed answers only to the AI provider it started with. If another provider is set up before you submit, nothing is sent and every typed answer keeps its exact mark, with the reason in the results. An OpenAI-compatible server at another address is another provider, and so is `http://` instead of `https://` on the same host. The checks of one submit all go to the provider they started with, even if the settings change while they run. An exam started in 0.14.0 with AI checks did not keep its provider, so if you submit it after updating, its typed answers are not sent.
+- Retake, the last exam's setup and **Take an exam from this note** turn **AI checks typed answers** on only when the AI provider of the last exam is still the one set up.
+- A retake of an exam from notes stays on **Notes** when some or all of its notes were renamed, deleted or have nothing left to ask. The notes that are gone are named, and with none left **Start exam** waits for you to add a note instead of taking every deck.
+- The exam setup lists your unfinished exams even when there are no cards left to make a new exam from.
+- When AI checks stop (**Show results now**, the time limit, or failures in a row), an answer sent with no verdict back says so, and one never sent says it was not sent, instead of both saying the checks stopped before it.
+
 ## [0.14.0]
 
 ### Added
