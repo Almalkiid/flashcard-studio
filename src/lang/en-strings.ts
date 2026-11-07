@@ -815,6 +815,10 @@ const en = {
     EXAM_NOTE_QUESTIONS: "${count} questions",
     EXAM_NOTE_QUESTIONS_ONE: "1 question",
     EXAM_NONE_NOTES_EMPTY: "Add a note to take the exam from.",
+    EXAM_NOTE_GONE:
+        "${name}, from the last exam, is no longer available: it was renamed or deleted, or has no cards to ask.",
+    EXAM_NOTES_GONE:
+        "These notes from the last exam are no longer available: ${names}. They were renamed or deleted, or have no cards to ask.",
     EXAM_NONE_CHOICE_NOTES:
         "There are no multiple choice cards in these notes. Choose All cards, or write a task list with one checked item under a question.",
     EXAM_NONE_ALL_NOTES: "There are no cards to ask in these notes.",
