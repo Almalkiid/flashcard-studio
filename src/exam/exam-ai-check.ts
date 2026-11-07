@@ -1,9 +1,17 @@
+import type { MeaningChecker } from "src/ai/ai-access";
 import {
     meaningUnavailableText,
     SemanticGradeInput,
     SemanticOutcome,
 } from "src/ai/typed-answer-grading";
-import { ExamAiCheck, ExamItem, ExamResult, summarizeExam } from "src/exam/exam";
+import {
+    ExamAiCheck,
+    ExamAiUnavailable,
+    ExamItem,
+    ExamResult,
+    ExamSetup,
+    summarizeExam,
+} from "src/exam/exam";
 import { t } from "src/lang/translate";
 import { occlusionQuestionOf } from "src/occlusion/occlusion-view";
 
@@ -69,6 +77,30 @@ export function applyAiChecks(
         return { ...item, ai: check, right: item.right === true || check.verdict === "equivalent" };
     });
     return summarizeExam(result.setup, items, result.startedMs, result.endedMs);
+}
+
+/**
+ * Why none of an exam's typed answers may be sent, or null when they can go. `changed` when the AI they would go to is
+ * not the one the setup named when the exam started, or the setup named none: the person agreed to send them there,
+ * not wherever the settings point now. `setup` when that AI is no longer set up. Ask the snapshot the checks will use,
+ * so that what is decided here is where they go.
+ */
+export function aiCheckHold(
+    setup: ExamSetup,
+    ai: Pick<MeaningChecker, "usable" | "provider">,
+): "changed" | "setup" | null {
+    if (setup.aiProvider === undefined || ai.provider() !== setup.aiProvider) return "changed";
+    return ai.usable() ? null : "setup";
+}
+
+/** The result with each answer in `plan` not checked, for `reason`: nothing was sent, so each keeps its exact mark. */
+export function withoutAiChecks(
+    result: ExamResult,
+    plan: number[],
+    reason: ExamAiUnavailable,
+): ExamResult {
+    const check: ExamAiCheck = { verdict: "unavailable", reason };
+    return applyAiChecks(result, new Map(plan.map((index) => [index, check])));
 }
 
 /**
@@ -140,6 +172,13 @@ export async function runAiChecks(
     return checks.map((found) => found ?? halt ?? skipped);
 }
 
+/** Why a check has no verdict, as the person reads it. */
+function unavailableText(reason: ExamAiUnavailable): string {
+    if (reason === "skipped") return t("EXAM_AI_SKIPPED");
+    if (reason === "changed") return t("EXAM_AI_CHANGED");
+    return meaningUnavailableText(reason);
+}
+
 /** The two lines the results show for a check: the verdict, and the AI's reason ("" for none). Plain text. */
 export function aiCheckText(check: ExamAiCheck): { verdict: string; reason: string } {
     switch (check.verdict) {
@@ -154,12 +193,7 @@ export function aiCheckText(check: ExamAiCheck): { verdict: string; reason: stri
             return { verdict: t("AI_MEANING_UNCERTAIN"), reason: check.reason };
         case "unavailable":
             return {
-                verdict: t("AI_MEANING_UNAVAILABLE", {
-                    reason:
-                        check.reason === "skipped"
-                            ? t("EXAM_AI_SKIPPED")
-                            : meaningUnavailableText(check.reason),
-                }),
+                verdict: t("AI_MEANING_UNAVAILABLE", { reason: unavailableText(check.reason) }),
                 reason: "",
             };
     }
