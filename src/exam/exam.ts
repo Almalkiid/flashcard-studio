@@ -43,9 +43,10 @@ export interface ExamSetup {
      */
     aiCheck?: boolean;
     /**
-     * With `aiCheck`: who the setup said the answers go to when the exam started, as it named them ("Anthropic",
-     * "OpenAI", or the server's host and port). When the AI set up at submit is another, or this is missing, nothing
-     * is sent: the person agreed to that provider, not to whatever the settings say later.
+     * With `aiCheck`: exactly where the setup said the answers go when the exam started (`aiProviderIdentity`:
+     * "anthropic", "openai", or "openai-compatible" with the server's address). When the AI set up at submit is
+     * another, or this is missing, nothing is sent: the person agreed to that provider, not to whatever the settings
+     * say later.
      */
     aiProvider?: string;
 }
@@ -260,7 +261,7 @@ export function isRight(q: ExamQuestion, a: ExamAnswer, ignoreAccents: boolean):
 /**
  * Why the AI gave no verdict: the review's reasons; `skipped` for a check never sent because the checks stopped first,
  * `stopped` for one sent whose reply had not come when they stopped, and `changed` for every check of an exam whose AI
- * is not the one it started with (nothing is sent then).
+ * is not, or cannot be shown to be, the one it started with (nothing is sent then).
  */
 export type ExamAiUnavailable =
     | Extract<SemanticOutcome, { status: "unavailable" }>["reason"]

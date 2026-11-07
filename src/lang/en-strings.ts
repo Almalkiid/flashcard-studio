@@ -833,7 +833,8 @@ const en = {
     EXAM_AI_SKIP: "Show results now",
     EXAM_AI_SKIPPED: "Not sent: the checks stopped first.",
     EXAM_AI_STOPPED: "No verdict: the checks stopped before the AI answered.",
-    EXAM_AI_CHANGED: "Not sent: the AI provider changed after the exam started.",
+    EXAM_AI_CHANGED:
+        "Not sent: the AI provider could not be confirmed as the one the exam started with.",
     EXAM_AI_COUNTED_RIGHT: "counted as right",
     EXAM_AI_ACCEPTED: "Accepted by AI",
     EXAM_AI_ACCEPTED_COUNT: "${count} typed answers counted right by AI",

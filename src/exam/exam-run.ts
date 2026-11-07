@@ -69,7 +69,7 @@ export interface ExamRunOptions {
     discard?: (id: string) => void;
     /**
      * The AI meaning check, for an exam set up with `aiCheck`. Without both, nothing is sent, and nothing is sent either
-     * when it now points to another provider than the one the setup named (`aiProvider`).
+     * when it now points anywhere but where the setup kept (`aiProvider`).
      */
     ai?: MeaningChecker;
 }
