@@ -200,7 +200,8 @@ export class ExamSetupModal extends Modal {
         this.aiUsable = this.ai.usable();
         this.aiProviderName = this.ai.provider();
         this.aiProvider = this.ai.identity();
-        this.aiCheck = last?.aiCheck === true;
+        // The last exam's tick agreed to send to its provider, not to another one set up since
+        this.aiCheck = last?.aiCheck === true && last.aiProvider === this.aiProvider;
         if (last === undefined) {
             this.count = EXAM_PRESETS[0].count;
             this.minutes = EXAM_PRESETS[0].minutes;
