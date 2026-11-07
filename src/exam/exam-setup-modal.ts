@@ -50,7 +50,7 @@ interface DeckRow {
 }
 
 /** Where the exam takes its cards from: the decks ticked, or the notes chosen. */
-type ExamSource = "decks" | "notes";
+export type ExamSource = "decks" | "notes";
 
 function whenText(ms: number): string {
     const days = daysAgo(ms, Date.now(), currentDayKeyFn());
@@ -65,16 +65,33 @@ function questionsText(count: number): string {
 }
 
 /**
- * The notes the setup starts with: the note it was opened for, else the notes of the last exam that can still give
- * questions (a note renamed, deleted or emptied since is dropped). Empty means the setup starts from decks.
+ * Where the setup starts. Opened for a note: that note. After an exam from notes: the notes of that exam that can still
+ * give questions, and as `gone` the ones that cannot (renamed, deleted or emptied since). It stays an exam from notes
+ * when none are left, with nothing chosen, so Start waits for a note: an exam from notes never turns into one from
+ * every deck. Otherwise the setup starts from decks.
  */
-export function startingNotes(
+export function startingSource(
     last: ExamSetup | undefined,
     openedFor: string | undefined,
     askable: ReadonlyMap<string, number>,
-): string[] {
-    if (openedFor !== undefined) return [openedFor];
-    return (last?.notes ?? []).filter((path) => (askable.get(path) ?? 0) > 0);
+): { source: ExamSource; notes: string[]; gone: string[] } {
+    if (openedFor !== undefined) return { source: "notes", notes: [openedFor], gone: [] };
+    const lastNotes = last?.notes ?? [];
+    if (lastNotes.length === 0) return { source: "decks", notes: [], gone: [] };
+    const canAsk = (path: string) => (askable.get(path) ?? 0) > 0;
+    return {
+        source: "notes",
+        notes: lastNotes.filter(canAsk),
+        gone: lastNotes.filter((path) => !canAsk(path)),
+    };
+}
+
+/** What the setup says about the notes of the last exam that cannot give a question now, by name. */
+function goneText(paths: string[]): string {
+    const names = paths.map(noteName);
+    return names.length === 1
+        ? t("EXAM_NOTE_GONE", { name: names[0] })
+        : t("EXAM_NOTES_GONE", { names: names.join(", ") });
 }
 
 /** `Exam · Cell` for the notes chosen (`Exam · Cell, DNA, Genes +2` for more), or `Exam` before one is. */
@@ -101,6 +118,8 @@ export class ExamSetupModal extends Modal {
     private source: ExamSource = "decks";
     /** The notes chosen, in the order they were added. */
     private readonly notes: string[] = [];
+    /** The notes of the last exam that cannot give a question now, so the setup can say they were left out. */
+    private readonly goneNotes: string[] = [];
     /**
      * The questions each note can give, for each kind of cards: worked out once each, the cards do not change while the
      * dialog is open.
@@ -200,22 +219,17 @@ export class ExamSetupModal extends Modal {
             if (this.checked.size === 0) for (const row of this.rows) this.checked.add(row.path);
         }
 
-        const notes = startingNotes(last, openedFor, this.countsFor("all"));
-        if (notes.length > 0) {
-            this.source = "notes";
-            this.notes.push(...notes);
-        }
+        const start = startingSource(last, openedFor, this.countsFor("all"));
+        this.source = start.source;
+        this.notes.push(...start.notes);
+        this.goneNotes.push(...start.gone);
         // Opened for a note whose cards are not multiple choice: ask them, rather than open on "no questions"
         if (openedFor !== undefined && !this.countsFor(this.filter).has(openedFor)) {
             this.filter = "all";
         }
 
         const lastNotes = last?.notes ?? [];
-        if (
-            last === undefined ||
-            openedFor !== undefined ||
-            (lastNotes.length > 0 && this.source === "decks")
-        ) {
+        if (last === undefined || openedFor !== undefined) {
             // A custom title of another exam is not carried onto this one
             this.titleEdited = false;
         } else if (lastNotes.length > 0) {
@@ -514,13 +528,19 @@ export class ExamSetupModal extends Modal {
         }
     }
 
-    /** The notes chosen, each with the questions it can give and a button to take it out, and "Add note". */
+    /**
+     * The notes chosen, each with the questions it can give and a button to take it out, the notes of the last exam
+     * that are no longer there, and "Add note".
+     */
     private renderNotes(field: HTMLElement): void {
         this.notesBox = field.createDiv({ cls: "fs-exam-notes" });
         this.notesEl = this.notesBox.createDiv({
             cls: "fs-exam-decks-list is-notes",
             attr: { role: "list" },
         });
+        if (this.goneNotes.length > 0) {
+            this.notesBox.createDiv({ cls: "fs-exam-notes-gone", text: goneText(this.goneNotes) });
+        }
         this.addNoteButton = this.notesBox.createEl("button", {
             cls: "fs-exam-ghost fs-exam-add-note",
             attr: { type: "button" },
