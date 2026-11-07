@@ -1,3 +1,11 @@
+import type { App } from "obsidian";
+
+import { emptyCardMeta } from "src/data/card-meta";
+import { Card } from "src/data/data-structures/card/flashcard";
+import { CardType, Question } from "src/data/data-structures/card/question";
+import { Deck } from "src/data/decks/deck";
+import { TopicPath, TopicPathList } from "src/data/decks/topic-path";
+import { cloneDefaultSettings, StudioSettings } from "src/data/settings-model";
 import {
     emptyAnswer,
     ExamCardFilter,
@@ -5,9 +13,11 @@ import {
     ExamResult,
     ExamSetup,
     pickExamQuestions,
+    summarizeExam,
 } from "src/exam/exam";
 import { ExamDraft, makeDraft } from "src/exam/exam-draft";
 import { ExamSetupModal, ExamSource, startingSource } from "src/exam/exam-setup-modal";
+import type FlashcardStudioPlugin from "src/studio-plugin";
 
 /** A deck in the dialog's list, as the dialog keeps it. */
 interface Row {
@@ -35,10 +45,58 @@ interface SetupInternals {
     startButton: HTMLButtonElement | null;
     selectedDecks(): string[];
     defaultTitle(): string;
+    baseSetup(): ExamSetup;
     renderRecent(parent: HTMLElement): void;
     renderNotes(field: HTMLElement): void;
     refresh(): void;
     onOpen(): void;
+}
+
+/** A vault with one card in each note given, in the deck named by the note's folder. */
+function vaultOf(notes: string[]): Deck {
+    const tree = new Deck("root", null);
+    notes.forEach((path, index) => {
+        const question = {
+            topicPathList: new TopicPathList([new TopicPath([path.split("/")[0]])]),
+            questionType: CardType.MultiLineBasic,
+            note: { filePath: path },
+            questionText: { textHash: `h${index}` },
+        } as unknown as Question;
+        const meta = emptyCardMeta();
+        meta.id = `c${index}`;
+        const card = new Card({
+            question,
+            meta,
+            front: `Question ${index}?`,
+            back: `Answer ${index}`,
+            cardIdx: 0,
+        });
+        tree.appendReviewItem(question.topicPathList, card);
+    });
+    return tree;
+}
+
+/**
+ * The dialog made as the plugin makes it, for a plugin with only what the dialog reads: the notes with a card, the
+ * settings, the AI key, and the last exam's setup.
+ */
+function openedSetup(options: {
+    notes: string[];
+    last?: ExamSetup;
+    settings?: StudioSettings;
+    key?: string;
+}): SetupInternals {
+    const settings = options.settings ?? cloneDefaultSettings();
+    const app = { secretStorage: { getSecret: () => options.key ?? "" } } as unknown as App;
+    const plugin = {
+        app,
+        dataManager: {
+            vaultIndex: { reviewableRoot: vaultOf(options.notes) },
+            data: { settings },
+        },
+    } as unknown as FlashcardStudioPlugin;
+    const recent = options.last === undefined ? [] : [summarizeExam(options.last, [], 0, 60_000)];
+    return new ExamSetupModal(plugin, recent, [], () => undefined) as unknown as SetupInternals;
 }
 
 /** An element, made the way jsdom has it: the element helpers Obsidian adds are not there in a unit test. */
@@ -67,6 +125,7 @@ function rowsOf(paths: string[]): Row[] {
 
 // The element helpers Obsidian adds, as many of them as the dialog uses
 beforeAll(() => {
+    Object.assign(window, { activeWindow: window, activeDocument: document });
     function make(parent: HTMLElement, tag: string, options: DomElementInfo = {}): HTMLElement {
         const el = create(tag);
         if (typeof options.cls === "string") el.className = options.cls;
@@ -86,6 +145,15 @@ beforeAll(() => {
         },
         toggleClass(this: HTMLElement, cls: string, on: boolean): void {
             this.classList.toggle(cls, on);
+        },
+        addClass(this: HTMLElement, ...cls: string[]): void {
+            this.classList.add(...cls);
+        },
+        removeClass(this: HTMLElement, ...cls: string[]): void {
+            this.classList.remove(...cls);
+        },
+        setCssProps(this: HTMLElement, props: Record<string, string>): void {
+            for (const [name, value] of Object.entries(props)) this.style.setProperty(name, value);
         },
         empty(this: HTMLElement): void {
             this.replaceChildren();
@@ -201,45 +269,25 @@ describe("a retake of an exam from notes", () => {
     });
 
     test("whose notes are all gone stays on Notes with none chosen, and Start waits for a note", () => {
-        const start = startingSource(LAST, undefined, new Map([["Physics/Force.md", 3]]));
-        expect(start).toEqual({ source: "notes", notes: [], gone: LAST.notes });
-
-        // The vault still has cards in decks: they must not become the exam
-        const setup = setupWith(rowsOf(["Physics"]), ["Physics"]);
-        Object.assign(setup, {
-            cards: [
-                {
-                    id: "p1",
-                    deck: "Physics",
-                    front: "What is a newton?",
-                    back: "A unit of force",
-                    isCloze: false,
-                    suspended: false,
-                    sourcePath: "Physics/Force.md",
-                },
-            ],
-            source: start.source,
-            notes: start.notes,
-            goneNotes: start.gone,
-            filter: LAST.filter,
-            count: LAST.count,
-            presetButtons: [],
-            sourceButtons: new Map(),
-            deckBoxes: new Map(),
-            filterRadios: new Map(),
-            noteCounts: new Map(),
-            notesEl: null,
-            titleEdited: false,
-            statusEl: create("div"),
-            startButton: create("button") as HTMLButtonElement,
+        expect(startingSource(LAST, undefined, new Map([["Physics/Force.md", 3]]))).toEqual({
+            source: "notes",
+            notes: [],
+            gone: LAST.notes,
         });
-        const field = create("div");
-        setup.renderNotes(field);
-        setup.refresh();
+
+        // The vault still has a card in a deck: it must not become the exam
+        const setup = openedSetup({ notes: ["Physics/Force.md"], last: LAST });
+        expect(setup.cards.map((card) => card.deck)).toEqual(["Physics"]);
+        expect(setup.source).toBe("notes");
+        expect(setup.notes).toEqual([]);
+        expect(setup.goneNotes).toEqual(LAST.notes);
+        expect(setup.baseSetup()).toMatchObject({ decks: [], notes: [] });
+
+        setup.onOpen();
         expect(setup.startButton?.disabled).toBe(true);
         expect(setup.statusEl?.textContent).toBe("Add a note to take the exam from.");
         // The notes left out are named, so the person knows what went
-        expect(field.querySelector(".fs-exam-notes-gone")?.textContent).toBe(
+        expect(setup.contentEl.querySelector(".fs-exam-notes-gone")?.textContent).toBe(
             "These notes from the last exam are no longer available: Cell, DNA, Genes. They were renamed or deleted, or have no cards to ask.",
         );
     });
