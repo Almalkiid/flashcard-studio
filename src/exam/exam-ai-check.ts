@@ -106,9 +106,10 @@ export function withoutAiChecks(
 /**
  * Sends the checks, at most AI_CHECK_CONCURRENCY at once, and resolves with one check per input, in order. It never
  * waits longer than AI_CHECK_TOTAL_MS, and resolves at once when `signal` aborts or AI_CHECK_FAILURES_TO_STOP checks in
- * a row fail; inputs not answered by then are `skipped` (a failure's reason is only true of the check that had it),
- * and a reply that comes later is ignored. A "setup" outcome stops the rest at once with "setup": nothing could be
- * sent for them either. A check that throws counts as "provider".
+ * a row fail. Then an input never sent is `skipped`, and one sent whose reply has not come is `stopped` (a failure's
+ * reason is only true of the check that had it); a reply that comes later is ignored, so it never changes the score.
+ * A "setup" outcome stops the rest at once with "setup": nothing could be sent for them either. A check that throws
+ * counts as "provider".
  */
 export async function runAiChecks(
     inputs: SemanticGradeInput[],
@@ -121,29 +122,35 @@ export async function runAiChecks(
     },
 ): Promise<ExamAiCheck[]> {
     const skipped: ExamAiCheck = { verdict: "unavailable", reason: "skipped" };
+    const stopped: ExamAiCheck = { verdict: "unavailable", reason: "stopped" };
     const checks: (ExamAiCheck | null)[] = inputs.map((): ExamAiCheck | null => null);
+    // The inputs handed to `check`: once the checks stop, one of them without a verdict was sent and not answered
+    const sent = new Set<number>();
     let next = 0;
     let done = 0;
     let failures = 0;
-    // What the inputs not checked get, once the checks stop early
-    let halt: ExamAiCheck | null = null;
+    let stopping = false;
+    // What every input without a verdict gets when a "setup" outcome stops the checks, sent or not
+    let haltWith: ExamAiCheck | null = null;
     let wake = (): void => undefined;
     const halted = new Promise<void>((resolve) => {
         wake = resolve;
     });
-    const stop = (why: ExamAiCheck): void => {
-        if (halt !== null) return;
-        halt = why;
+    const stop = (why: ExamAiCheck | null = null): void => {
+        if (stopping) return;
+        stopping = true;
+        haltWith = why;
         wake();
     };
-    const onAbort = () => stop(skipped);
-    if (opts.signal.aborted) stop(skipped);
+    const onAbort = () => stop();
+    if (opts.signal.aborted) stop();
     else opts.signal.addEventListener("abort", onAbort, { once: true });
-    const timer = window.setTimeout(() => stop(skipped), opts.totalMs ?? AI_CHECK_TOTAL_MS);
+    const timer = window.setTimeout(() => stop(), opts.totalMs ?? AI_CHECK_TOTAL_MS);
 
     const worker = async (): Promise<void> => {
-        while (halt === null && next < inputs.length) {
+        while (!stopping && next < inputs.length) {
             const index = next++;
+            sent.add(index);
             let outcome: SemanticOutcome;
             try {
                 outcome = await check(inputs[index]);
@@ -151,12 +158,12 @@ export async function runAiChecks(
                 outcome = { status: "unavailable", reason: "provider" };
             }
             // Too late: the results are on their way without it
-            if (halt !== null) return;
+            if (stopping) return;
             checks[index] = examAiCheckOf(outcome);
             opts.onProgress?.(++done);
             if (outcome.status === "graded") failures = 0;
             else if (outcome.reason === "setup") stop({ verdict: "unavailable", reason: "setup" });
-            else if (++failures >= AI_CHECK_FAILURES_TO_STOP) stop(skipped);
+            else if (++failures >= AI_CHECK_FAILURES_TO_STOP) stop();
         }
     };
     const workers = Array.from(
@@ -169,12 +176,13 @@ export async function runAiChecks(
         window.clearTimeout(timer);
         opts.signal.removeEventListener("abort", onAbort);
     }
-    return checks.map((found) => found ?? halt ?? skipped);
+    return checks.map((found, index) => found ?? haltWith ?? (sent.has(index) ? stopped : skipped));
 }
 
 /** Why a check has no verdict, as the person reads it. */
 function unavailableText(reason: ExamAiUnavailable): string {
     if (reason === "skipped") return t("EXAM_AI_SKIPPED");
+    if (reason === "stopped") return t("EXAM_AI_STOPPED");
     if (reason === "changed") return t("EXAM_AI_CHANGED");
     return meaningUnavailableText(reason);
 }
