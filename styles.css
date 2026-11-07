@@ -2716,6 +2716,11 @@ body:not(.is-mobile) .fs-exam-view > .fs-exam {
 .fs-studio .fs-exam-ghost.fs-exam-add-note {
   align-self: flex-start;
 }
+.fs-exam-notes-gone {
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--fs-amber);
+}
 .fs-exam-add-note-icon {
   display: inline-flex;
   & svg {
