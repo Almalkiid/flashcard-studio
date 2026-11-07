@@ -42,6 +42,8 @@ interface SetupInternals {
     count: number;
     goneNotes: string[];
     statusEl: HTMLElement | null;
+    aiCheck: boolean;
+    aiBox: HTMLInputElement | null;
     startButton: HTMLButtonElement | null;
     selectedDecks(): string[];
     defaultTitle(): string;
@@ -345,5 +347,56 @@ describe("the exam setup with no cards in the vault", () => {
         ).toBeTruthy();
         expect(content.querySelector(".fs-exam-start")).toBeNull();
         expect(content.querySelector(".fs-exam-presets")).toBeNull();
+    });
+});
+
+describe("AI checks on the setup of the last exam", () => {
+    const LOCAL = "openai-compatible http://localhost:11434/v1";
+    const LAST: ExamSetup = {
+        decks: [],
+        count: 20,
+        minutes: null,
+        filter: "all",
+        passPercent: 75,
+        title: "Exam · Physics",
+        aiCheck: true,
+        aiProvider: LOCAL,
+    };
+
+    test("start unticked when another provider is set up than the last exam sent to", () => {
+        // The last exam was checked on this computer; Anthropic is set up now
+        const settings = cloneDefaultSettings();
+        settings.aiKeySecret = "fs-ai-key";
+        const setup = openedSetup({
+            notes: ["Physics/Force.md"],
+            last: LAST,
+            settings,
+            key: "sk-test",
+        });
+        expect(setup.aiCheck).toBe(false);
+        expect(setup.baseSetup().aiCheck).toBeUndefined();
+        expect(setup.baseSetup().aiProvider).toBeUndefined();
+        setup.onOpen();
+        // Offered, and said where to, but not agreed to for it
+        expect(setup.aiBox?.checked).toBe(false);
+        expect(setup.contentEl.querySelector(".fs-exam-ai-desc")?.textContent).toContain(
+            "Anthropic",
+        );
+    });
+
+    test("stay ticked for the same provider, which the exam keeps", () => {
+        const settings = cloneDefaultSettings();
+        settings.aiProvider = "openai-compatible";
+        settings.aiModel = "llama3";
+        settings.aiBaseUrl = "http://localhost:11434/v1/";
+        const setup = openedSetup({ notes: ["Physics/Force.md"], last: LAST, settings });
+        expect(setup.aiCheck).toBe(true);
+        expect(setup.baseSetup()).toMatchObject({ aiCheck: true, aiProvider: LOCAL });
+
+        // An exam from before the provider was kept agreed to no provider in particular
+        const { aiProvider: _, ...unnamed } = LAST;
+        expect(openedSetup({ notes: ["Physics/Force.md"], last: unnamed, settings }).aiCheck).toBe(
+            false,
+        );
     });
 });
