@@ -244,12 +244,13 @@ export class ExamSetupModal extends Modal {
     onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
+        // An unfinished exam holds its own questions, so it can be taken up again with no cards left to start a new one
+        this.renderDrafts(contentEl);
         if (this.cards.length === 0) {
             contentEl.createDiv({ cls: "fs-exam-empty", text: t("EXAM_NO_CARDS") });
             this.renderActions(contentEl);
             return;
         }
-        this.renderDrafts(contentEl);
         this.renderPresets(contentEl);
         this.renderSource(contentEl);
         this.renderCountAndTime(contentEl);
