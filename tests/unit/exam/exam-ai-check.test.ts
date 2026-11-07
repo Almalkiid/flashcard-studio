@@ -14,11 +14,15 @@ import {
 } from "src/exam/exam";
 import {
     AI_CHECK_FAILURES_TO_STOP,
+    aiCheckHold,
     aiCheckIndexes,
     aiCheckInput,
+    aiCheckText,
     applyAiChecks,
     runAiChecks,
+    withoutAiChecks,
 } from "src/exam/exam-ai-check";
+import { draftText, makeDraft, readDraft } from "src/exam/exam-draft";
 import { formatExamFile, parseExamFile } from "src/exam/exam-results-file";
 
 const CARDS: ExamCardInput[] = [
@@ -190,6 +194,98 @@ describe("AI checks of typed answers", () => {
         });
         expect(notSetUp).toHaveBeenCalledTimes(1);
         expect(afterSetup.map((check) => check.reason)).toEqual(Array(5).fill("setup"));
+    });
+
+    test("an exam started with one provider sends nothing once another is set up, and says why", () => {
+        const settings = cloneDefaultSettings();
+        settings.aiProvider = "openai-compatible";
+        settings.aiModel = "llama3";
+        settings.aiBaseUrl = "http://localhost:11434/v1";
+        const app = { secretStorage: { getSecret: () => "sk-test" } } as unknown as App;
+        const checker = meaningChecker(app, () => settings, request);
+        // What the setup showed when the exam started, kept with it and with its draft
+        const setup: ExamSetup = { ...SETUP, aiProvider: checker.provider() };
+        expect(setup.aiProvider).toBe("localhost:11434");
+        const questions = pickExamQuestions(CARDS, setup, () => 0);
+        const draft = makeDraft(
+            { setup, questions, answers: questions.map(emptyAnswer), current: 0, startedMs: 0 },
+            0,
+        );
+        expect(readDraft(JSON.parse(draftText(draft)))?.setup).toEqual(setup);
+        expect(aiCheckHold(setup, checker.snapshot())).toBeNull();
+
+        // Another server on the same computer is another provider; so is a provider with a name
+        settings.aiBaseUrl = "http://localhost:1234/v1";
+        expect(aiCheckHold(setup, checker.snapshot())).toBe("changed");
+        settings.aiProvider = "openai";
+        settings.aiKeySecret = "fs-ai-key";
+        const exact = examWith(setup);
+        const plan = aiCheckIndexes(exact);
+        const hold = aiCheckHold(exact.setup, checker.snapshot());
+        expect(hold).toBe("changed");
+        // An exam set up with the option but no provider recorded is not sent anywhere either
+        const { aiProvider: _, ...unnamed } = setup;
+        expect(aiCheckHold(unnamed, checker.snapshot())).toBe("changed");
+
+        const marked = withoutAiChecks(exact, plan, hold);
+        expect(request).not.toHaveBeenCalled();
+        // Every typed answer keeps its exact mark, with the reason shown and saved
+        expect(marked.items.map((item) => item.right)).toEqual(
+            exact.items.map((item) => item.right),
+        );
+        expect(marked.right).toBe(exact.right);
+        for (const index of plan) {
+            expect(marked.items[index].ai).toEqual({ verdict: "unavailable", reason: "changed" });
+        }
+        expect(aiCheckText({ verdict: "unavailable", reason: "changed" }).verdict).toBe(
+            "AI check unavailable — Not sent: the AI provider changed after the exam started.",
+        );
+        const text = formatExamFile(marked);
+        expect(text).toContain("| Not sent: the AI provider changed after the exam started |");
+        const read = parseExamFile(text);
+        expect(read).toEqual(marked);
+        expect(read?.setup.aiProvider).toBe("localhost:11434");
+    });
+
+    test("every check of a batch goes to the provider and key read when the checks started", async () => {
+        const settings = cloneDefaultSettings();
+        settings.aiProvider = "openai-compatible";
+        settings.aiModel = "llama3";
+        settings.aiBaseUrl = "http://localhost:11434/v1";
+        settings.aiKeySecret = "fs-ai-key";
+        const getSecret = jest.fn(() => "local-key");
+        const app = { secretStorage: { getSecret } } as unknown as App;
+        const ai = meaningChecker(app, () => settings, request).snapshot();
+        expect(getSecret).toHaveBeenCalledTimes(1);
+
+        const inputs = ["chief audit executive", "the board of directors", "the auditors"].map(
+            (typed) => ({ question: "Q", expected: "E", typed }),
+        );
+        const checks = await runAiChecks(
+            inputs,
+            async (input) => {
+                const outcome = await ai.check(input);
+                // The settings change while the batch runs: the rest must not follow them
+                settings.aiProvider = "openai";
+                settings.aiBaseUrl = "";
+                settings.aiKeySecret = "other-key";
+                return outcome;
+            },
+            { signal: new AbortController().signal, concurrency: 1 },
+        );
+        expect(checks.map((check) => check.verdict)).toEqual([
+            "incorrect",
+            "equivalent",
+            "incorrect",
+        ]);
+        expect(request.mock.calls.map(([params]) => params.url)).toEqual(
+            Array(3).fill("http://localhost:11434/v1/chat/completions"),
+        );
+        for (const [params] of request.mock.calls) {
+            expect(params.headers?.Authorization).toBe("Bearer local-key");
+        }
+        expect(getSecret).toHaveBeenCalledTimes(1);
+        expect(ai.provider()).toBe("localhost:11434");
     });
 
     test("nothing is sent for an exam set up without the option", () => {

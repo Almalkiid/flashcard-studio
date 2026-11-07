@@ -117,6 +117,11 @@ export class ExamSetupModal extends Modal {
     private readonly ai: MeaningChecker;
     /** Whether that AI can be used: worked out once, when the dialog opens. Without it the option is not offered. */
     private readonly aiUsable: boolean;
+    /**
+     * Who the typed answers go to, as the option names it: read once, with `aiUsable`, and kept with an exam that has
+     * the option, so that nothing is sent at submit if the provider has changed since.
+     */
+    private readonly aiProvider: string;
     private aiCheck: boolean;
 
     private presetButtons: { id: string; el: HTMLElement }[] = [];
@@ -172,6 +177,7 @@ export class ExamSetupModal extends Modal {
         this.passPercent = settings.examPassPercent;
         this.ai = meaningChecker(plugin.app, () => plugin.dataManager.data.settings);
         this.aiUsable = this.ai.usable();
+        this.aiProvider = this.ai.provider();
         this.aiCheck = last?.aiCheck === true;
         if (last === undefined) {
             this.count = EXAM_PRESETS[0].count;
@@ -260,7 +266,7 @@ export class ExamSetupModal extends Modal {
             shuffleOptions: this.plugin.dataManager.data.settings.shuffleChoices,
             ...(fromNotes ? { notes: [...this.notes] } : {}),
             // Written only when on, so an exam without it is saved as it always was
-            ...(this.aiCheckOn() ? { aiCheck: true } : {}),
+            ...(this.aiCheckOn() ? { aiCheck: true, aiProvider: this.aiProvider } : {}),
         };
     }
 
@@ -709,7 +715,7 @@ export class ExamSetupModal extends Modal {
         const settings = aiSettingsOf(this.plugin.dataManager.data.settings);
         option.createDiv({
             cls: "fs-exam-ai-desc",
-            text: t("EXAM_AI_CHECK_DESC", { provider: this.ai.provider() }),
+            text: t("EXAM_AI_CHECK_DESC", { provider: this.aiProvider }),
         });
         if (aiUsesInsecureHttp(settings)) {
             option.createDiv({
