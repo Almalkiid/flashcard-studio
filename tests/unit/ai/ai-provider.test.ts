@@ -4,6 +4,7 @@ import type { RequestUrlParam } from "obsidian";
 import {
     AiError,
     aiErrorFromStatus,
+    aiProviderIdentity,
     aiSetupProblem,
     aiUsesInsecureHttp,
     buildAiRequest,
@@ -399,5 +400,46 @@ describe("aiUsesInsecureHttp", () => {
         expect(
             aiUsesInsecureHttp({ provider: "openai", model: "m", baseUrl: "http://example.com" }),
         ).toBe(false);
+    });
+});
+
+describe("aiProviderIdentity", () => {
+    const compatible = (baseUrl: string) =>
+        aiProviderIdentity({ provider: "openai-compatible", model: "m", baseUrl });
+
+    test("tells apart addresses that the host alone does not", () => {
+        // The same host and default ports: plain http is another provider, and so is another route of a gateway
+        expect(compatible("https://llm.example.com/v1")).toBe(
+            "openai-compatible https://llm.example.com/v1",
+        );
+        expect(compatible("http://llm.example.com/v1")).not.toBe(
+            compatible("https://llm.example.com/v1"),
+        );
+        expect(compatible("https://gateway.example.com/v1/acct/gw/openai")).not.toBe(
+            compatible("https://gateway.example.com/v1/acct/gw/workers-ai"),
+        );
+        expect(compatible("http://localhost:11434/v1")).not.toBe(
+            compatible("http://localhost:1234/v1"),
+        );
+    });
+
+    test("is the same for addresses the request sends to the same place", () => {
+        expect(compatible(" HTTP://LocalHost:11434/v1/ ")).toBe(
+            compatible("http://localhost:11434/v1"),
+        );
+        expect(compatible("https://llm.example.com:443/v1")).toBe(
+            compatible("https://llm.example.com/v1"),
+        );
+    });
+
+    test("keeps no user name, password or query, and no translated name", () => {
+        expect(compatible("https://me:secret@llm.example.com/v1?key=abc")).toBe(
+            "openai-compatible https://llm.example.com/v1",
+        );
+        expect(aiProviderIdentity({ provider: "anthropic", model: "m", baseUrl: "" })).toBe(
+            "anthropic",
+        );
+        expect(aiProviderIdentity({ provider: "openai", model: "m", baseUrl: "x" })).toBe("openai");
+        expect(compatible("not an address")).toBe("openai-compatible");
     });
 });

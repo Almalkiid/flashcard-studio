@@ -81,15 +81,15 @@ export function applyAiChecks(
 
 /**
  * Why none of an exam's typed answers may be sent, or null when they can go. `changed` when the AI they would go to is
- * not the one the setup named when the exam started, or the setup named none: the person agreed to send them there,
- * not wherever the settings point now. `setup` when that AI is no longer set up. Ask the snapshot the checks will use,
- * so that what is decided here is where they go.
+ * not exactly the one the setup kept when the exam started, or the setup kept none (an exam started before it was
+ * kept): the person agreed to send them there, not wherever the settings point now. `setup` when that AI is no longer
+ * set up. Ask the snapshot the checks will use, so that what is decided here is where they go.
  */
 export function aiCheckHold(
     setup: ExamSetup,
-    ai: Pick<MeaningChecker, "usable" | "provider">,
+    ai: Pick<MeaningChecker, "usable" | "identity">,
 ): "changed" | "setup" | null {
-    if (setup.aiProvider === undefined || ai.provider() !== setup.aiProvider) return "changed";
+    if (setup.aiProvider === undefined || ai.identity() !== setup.aiProvider) return "changed";
     return ai.usable() ? null : "setup";
 }
 

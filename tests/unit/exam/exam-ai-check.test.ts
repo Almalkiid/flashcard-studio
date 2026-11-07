@@ -203,9 +203,9 @@ describe("AI checks of typed answers", () => {
         settings.aiBaseUrl = "http://localhost:11434/v1";
         const app = { secretStorage: { getSecret: () => "sk-test" } } as unknown as App;
         const checker = meaningChecker(app, () => settings, request);
-        // What the setup showed when the exam started, kept with it and with its draft
-        const setup: ExamSetup = { ...SETUP, aiProvider: checker.provider() };
-        expect(setup.aiProvider).toBe("localhost:11434");
+        // Where the setup said the answers go when the exam started, kept with it and with its draft
+        const setup: ExamSetup = { ...SETUP, aiProvider: checker.identity() };
+        expect(setup.aiProvider).toBe("openai-compatible http://localhost:11434/v1");
         const questions = pickExamQuestions(CARDS, setup, () => 0);
         const draft = makeDraft(
             { setup, questions, answers: questions.map(emptyAnswer), current: 0, startedMs: 0 },
@@ -217,6 +217,13 @@ describe("AI checks of typed answers", () => {
         // Another server on the same computer is another provider; so is a provider with a name
         settings.aiBaseUrl = "http://localhost:1234/v1";
         expect(aiCheckHold(setup, checker.snapshot())).toBe("changed");
+        // The same host over plain http is not the https address the person agreed to
+        settings.aiBaseUrl = "https://llm.example.com/v1";
+        const secure: ExamSetup = { ...setup, aiProvider: checker.identity() };
+        expect(checker.provider()).toBe("llm.example.com");
+        settings.aiBaseUrl = "http://llm.example.com/v1";
+        expect(checker.provider()).toBe("llm.example.com");
+        expect(aiCheckHold(secure, checker.snapshot())).toBe("changed");
         settings.aiProvider = "openai";
         settings.aiKeySecret = "fs-ai-key";
         const exact = examWith(setup);
@@ -238,13 +245,15 @@ describe("AI checks of typed answers", () => {
             expect(marked.items[index].ai).toEqual({ verdict: "unavailable", reason: "changed" });
         }
         expect(aiCheckText({ verdict: "unavailable", reason: "changed" }).verdict).toBe(
-            "AI check unavailable — Not sent: the AI provider changed after the exam started.",
+            "AI check unavailable — Not sent: the AI provider could not be confirmed as the one the exam started with.",
         );
         const text = formatExamFile(marked);
-        expect(text).toContain("| Not sent: the AI provider changed after the exam started |");
+        expect(text).toContain(
+            "| Not sent: the AI provider could not be confirmed as the one the exam started with |",
+        );
         const read = parseExamFile(text);
         expect(read).toEqual(marked);
-        expect(read?.setup.aiProvider).toBe("localhost:11434");
+        expect(read?.setup.aiProvider).toBe("openai-compatible http://localhost:11434/v1");
     });
 
     test("every check of a batch goes to the provider and key read when the checks started", async () => {
@@ -286,6 +295,7 @@ describe("AI checks of typed answers", () => {
         }
         expect(getSecret).toHaveBeenCalledTimes(1);
         expect(ai.provider()).toBe("localhost:11434");
+        expect(ai.identity()).toBe("openai-compatible http://localhost:11434/v1");
     });
 
     test("when the checks stop, an answer sent and not answered is told apart from one never sent", async () => {

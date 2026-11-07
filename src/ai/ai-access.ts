@@ -1,6 +1,12 @@
 import { App, requestUrl } from "obsidian";
 
-import { aiProviderLabel, AiRequestFn, AiSettings, aiSetupProblem } from "src/ai/ai-provider";
+import {
+    aiProviderIdentity,
+    aiProviderLabel,
+    AiRequestFn,
+    AiSettings,
+    aiSetupProblem,
+} from "src/ai/ai-provider";
 import { gradeTypedAnswer, SemanticGradeInput, SemanticOutcome } from "src/ai/typed-answer-grading";
 import type { StudioSettings } from "src/data/settings-model";
 
@@ -36,6 +42,11 @@ export interface MeaningChecker {
     usable(): boolean;
     /** Who the answers go to, for the privacy line: "Anthropic", "OpenAI" or the server's host (with its port). */
     provider(): string;
+    /**
+     * Exactly where the answers go (`aiProviderIdentity`), kept with an exam that sends them so that nothing goes
+     * anywhere else at submit. Never shown.
+     */
+    identity(): string;
     /** `gradeTypedAnswer` with the plugin's settings and key: its prompt, guard vetoes and 10 s deadline. */
     check(input: SemanticGradeInput): Promise<SemanticOutcome>;
     /**
@@ -55,6 +66,7 @@ function checkerOf(
             return aiSetupProblem(ai, key) === null;
         },
         provider: () => aiProviderLabel(read().ai),
+        identity: () => aiProviderIdentity(read().ai),
         check: (input) => {
             const { ai, key } = read();
             return gradeTypedAnswer(input, ai, key, request);

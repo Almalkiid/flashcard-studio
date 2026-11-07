@@ -136,7 +136,7 @@ const FILE_UNAVAILABLE: Record<ExamAiUnavailable, string> = {
     format: "The reply was incomplete or invalid",
     skipped: "Not sent: the checks stopped first",
     stopped: "No verdict: the checks stopped before the AI answered",
-    changed: "Not sent: the AI provider changed after the exam started",
+    changed: "Not sent: the AI provider could not be confirmed as the one the exam started with",
 };
 
 /**

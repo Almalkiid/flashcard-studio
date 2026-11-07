@@ -86,6 +86,24 @@ export function aiProviderLabel(settings: AiSettings): string {
     }
 }
 
+/**
+ * Exactly where requests go, to tell whether two settings send to the same place: the provider, and for a compatible
+ * server its scheme, host, port and path (`https://llm.example.com/v1` is not `http://llm.example.com/v1`, and the
+ * routes of a gateway differ by their path). Never shown or translated, and without a user name, a password, a query
+ * or the key.
+ */
+export function aiProviderIdentity(settings: AiSettings): string {
+    if (settings.provider !== "openai-compatible") return settings.provider;
+    try {
+        const url = new URL(settings.baseUrl.trim());
+        // The request drops trailing slashes too
+        return `${settings.provider} ${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+    } catch {
+        // No request can reach an address that cannot be read
+        return settings.provider;
+    }
+}
+
 /* eslint-disable camelcase -- the providers' request bodies use snake_case names */
 export function buildAiRequest(
     settings: AiSettings,
