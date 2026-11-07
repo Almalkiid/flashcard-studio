@@ -258,11 +258,15 @@ export function isRight(q: ExamQuestion, a: ExamAnswer, ignoreAccents: boolean):
 }
 
 /**
- * Why the AI gave no verdict: the review's reasons, `skipped` for a check stopped before it was sent or answered, and
- * `changed` for every check of an exam whose AI is not the one it started with (nothing is sent then).
+ * Why the AI gave no verdict: the review's reasons; `skipped` for a check never sent because the checks stopped first,
+ * `stopped` for one sent whose reply had not come when they stopped, and `changed` for every check of an exam whose AI
+ * is not the one it started with (nothing is sent then).
  */
 export type ExamAiUnavailable =
-    Extract<SemanticOutcome, { status: "unavailable" }>["reason"] | "skipped" | "changed";
+    | Extract<SemanticOutcome, { status: "unavailable" }>["reason"]
+    | "skipped"
+    | "stopped"
+    | "changed";
 
 /** What the AI said about a typed answer that did not match exactly. */
 export type ExamAiCheck =

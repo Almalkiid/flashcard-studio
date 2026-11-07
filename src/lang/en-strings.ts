@@ -831,7 +831,8 @@ const en = {
     EXAM_AI_CHECKING_SENT:
         "Only the question, the expected answer and your typed answer are sent to ${provider}.",
     EXAM_AI_SKIP: "Show results now",
-    EXAM_AI_SKIPPED: "The checks stopped before this answer.",
+    EXAM_AI_SKIPPED: "Not sent: the checks stopped first.",
+    EXAM_AI_STOPPED: "No verdict: the checks stopped before the AI answered.",
     EXAM_AI_CHANGED: "Not sent: the AI provider changed after the exam started.",
     EXAM_AI_COUNTED_RIGHT: "counted as right",
     EXAM_AI_ACCEPTED: "Accepted by AI",

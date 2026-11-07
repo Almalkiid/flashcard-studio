@@ -134,7 +134,8 @@ const FILE_UNAVAILABLE: Record<ExamAiUnavailable, string> = {
     timeout: "Took longer than 10 seconds",
     provider: "The provider could not complete the check",
     format: "The reply was incomplete or invalid",
-    skipped: "Stopped before this answer",
+    skipped: "Not sent: the checks stopped first",
+    stopped: "No verdict: the checks stopped before the AI answered",
     changed: "Not sent: the AI provider changed after the exam started",
 };
 
@@ -371,6 +372,7 @@ const UNAVAILABLE: ExamAiUnavailable[] = [
     "provider",
     "format",
     "skipped",
+    "stopped",
     "changed",
 ];
 

@@ -288,6 +288,88 @@ describe("AI checks of typed answers", () => {
         expect(ai.provider()).toBe("localhost:11434");
     });
 
+    test("when the checks stop, an answer sent and not answered is told apart from one never sent", async () => {
+        const inputs = ["a", "b", "c", "d", "e"].map((typed) => ({
+            question: "Q",
+            expected: "E",
+            typed,
+        }));
+        type Outcome = Awaited<ReturnType<Parameters<typeof runAiChecks>[1]>>;
+        const graded: Outcome = {
+            status: "graded",
+            grade: {
+                verdict: "equivalent",
+                reason: "Same.",
+                checks: {
+                    essentialFacts: "preserved",
+                    quantitiesAndUnits: "preserved",
+                    polarityAndConditions: "preserved",
+                    completeness: "complete",
+                },
+            },
+        };
+        const timeout: Outcome = { status: "unavailable", reason: "timeout" };
+        const reasons = (checks: { reason: string }[]) => checks.map((check) => check.reason);
+
+        // Show results now: "a" was answered, "b" and "c" are on their way, "d" and "e" were never sent
+        const replies = new Map<string, (outcome: Outcome) => void>();
+        const pending = jest.fn(
+            (input: { typed: string }) =>
+                new Promise<Outcome>((resolve) => replies.set(input.typed, resolve)),
+        );
+        const abort = new AbortController();
+        const onProgress = jest.fn();
+        const running = runAiChecks(inputs, pending, {
+            signal: abort.signal,
+            onProgress,
+            concurrency: 2,
+        });
+        replies.get("a")?.(graded);
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(pending).toHaveBeenCalledTimes(3);
+        abort.abort();
+        const shown = await running;
+        expect(reasons(shown)).toEqual(["Same.", "stopped", "stopped", "skipped", "skipped"]);
+        // A reply that comes after the stop changes nothing
+        replies.get("b")?.(graded);
+        await Promise.resolve();
+        expect(reasons(shown)).toEqual(["Same.", "stopped", "stopped", "skipped", "skipped"]);
+        expect(onProgress.mock.calls).toEqual([[1]]);
+        expect(pending).toHaveBeenCalledTimes(3);
+
+        // The overall time limit: both checks on their way are stopped, the last one was never sent
+        const never = jest.fn(() => new Promise<Outcome>(() => undefined));
+        const afterTime = await runAiChecks(inputs.slice(0, 3), never, {
+            signal: new AbortController().signal,
+            concurrency: 2,
+            totalMs: 20,
+        });
+        expect(reasons(afterTime)).toEqual(["stopped", "stopped", "skipped"]);
+
+        // Failures in a row: "b" is still on its way when the third failure stops the rest
+        const failing = jest.fn((input: { typed: string }) =>
+            input.typed === "b" ? new Promise<Outcome>(() => undefined) : Promise.resolve(timeout),
+        );
+        const afterFailures = await runAiChecks(inputs, failing, {
+            signal: new AbortController().signal,
+            concurrency: 2,
+        });
+        expect(reasons(afterFailures)).toEqual([
+            "timeout",
+            "stopped",
+            "timeout",
+            "timeout",
+            "skipped",
+        ]);
+        expect(aiCheckText(afterFailures[1]).verdict).toBe(
+            "AI check unavailable — No verdict: the checks stopped before the AI answered.",
+        );
+        expect(aiCheckText(afterFailures[4]).verdict).toBe(
+            "AI check unavailable — Not sent: the checks stopped first.",
+        );
+    });
+
     test("nothing is sent for an exam set up without the option", () => {
         const { aiCheck: _, ...withoutAi } = SETUP;
         expect(aiCheckIndexes(examWith(withoutAi))).toEqual([]);
