@@ -144,7 +144,7 @@ export default class CardContainer {
         parentEl: HTMLElement,
         onDelete: () => void,
         onBackToDecks: () => Promise<void>,
-        onEdit: () => void,
+        private readonly onEdit: () => void,
         private readonly onAnswer: (response: ReviewResponse) => Promise<void>,
         private readonly onSkip: () => void,
         private readonly onReveal: () => void,
@@ -1165,6 +1165,16 @@ export default class CardContainer {
                 return;
             case "KeyS":
                 act(() => this.onSkip());
+                return;
+            case "KeyE":
+                if (
+                    !Platform.isMobile &&
+                    !e.shiftKey &&
+                    !e.isComposing &&
+                    !focused?.closest("select")
+                ) {
+                    act(this.onEdit);
+                }
                 return;
             case "KeyJ":
                 act(() => void this.onJump());

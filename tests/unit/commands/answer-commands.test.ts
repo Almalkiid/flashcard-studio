@@ -1,4 +1,8 @@
-import { answerCommandAvailable, AnswerContext } from "src/commands/answer-commands";
+import {
+    addAnswerCommands,
+    answerCommandAvailable,
+    AnswerContext,
+} from "src/commands/answer-commands";
 import { UIState } from "src/ui/ui-state";
 
 const ready: AnswerContext = {
@@ -9,6 +13,39 @@ const ready: AnswerContext = {
     typing: false,
     state: UIState.CardBack,
 };
+
+test("checking the edit command does not open the editor; invoking it edits the focused card", () => {
+    Object.assign(window, { activeDocument: document });
+    const edit = jest.fn();
+    const ui = {
+        isStudioInFocus: true,
+        contentManager: { _editQuestion: edit },
+        uiState: UIState.CardFront,
+    };
+    const addCommand = jest.fn();
+    const settings = {
+        flashcardAgainText: "Again",
+        flashcardHardText: "Hard",
+        flashcardGoodText: "Good",
+        flashcardEasyText: "Easy",
+    };
+    addAnswerCommands({
+        isInitialized: true,
+        uiManager: ui,
+        dataManager: { settingsManager: { settings } },
+        addCommand,
+    } as never);
+    const command = addCommand.mock.calls
+        .map(([cmd]) => cmd)
+        .find((cmd) => cmd.id === "card-review-edit");
+    expect(command.checkCallback(true)).toBe(true);
+    expect(edit).not.toHaveBeenCalled();
+    expect(command.checkCallback(false)).toBe(true);
+    expect(edit).toHaveBeenCalledTimes(1);
+    ui.uiState = UIState.EditModal;
+    expect(command.checkCallback(false)).toBe(false);
+    expect(edit).toHaveBeenCalledTimes(1);
+});
 
 describe("answerCommandAvailable", () => {
     test("is available in a listed state with the review in front on a computer", () => {
