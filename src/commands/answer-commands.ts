@@ -64,6 +64,12 @@ function answerCommands(plugin: FlashcardStudioPlugin): AnswerCommand[] {
             run: (review) => void review._showAnswer(),
         },
         {
+            id: "card-review-edit",
+            name: () => t("EDIT_CARD"),
+            allowed: [UIState.CardFront, UIState.CardBack],
+            run: (review) => void review._editQuestion(),
+        },
+        {
             id: "card-review-skip",
             name: () => t("SKIP"),
             allowed: [UIState.CardFront, UIState.CardBack],
@@ -84,7 +90,7 @@ function answerCommands(plugin: FlashcardStudioPlugin): AnswerCommand[] {
     ];
 }
 
-/** Registers the eight answer commands, for people who answer with Obsidian's own hotkeys. */
+/** Registers the review commands, for people who answer with Obsidian's own hotkeys. */
 export function addAnswerCommands(plugin: FlashcardStudioPlugin): void {
     for (const command of answerCommands(plugin)) {
         plugin.addCommand({
@@ -94,8 +100,9 @@ export function addAnswerCommands(plugin: FlashcardStudioPlugin): void {
                 if (!plugin.isInitialized) return false;
                 const ui = plugin.uiManager;
                 const review = ui.contentManager;
-                const typing = ["TEXTAREA", "INPUT"].includes(
-                    activeDocument.activeElement?.nodeName ?? "",
+                const focused = activeDocument.activeElement as HTMLElement | null;
+                const typing = Boolean(
+                    focused?.matches("textarea, input, select") || focused?.isContentEditable,
                 );
                 const available = answerCommandAvailable(command.allowed, {
                     ready: plugin.isInitialized,
@@ -112,7 +119,7 @@ export function addAnswerCommands(plugin: FlashcardStudioPlugin): void {
     }
 }
 
-/** Takes the eight answer commands away again. */
+/** Takes the review commands away again. */
 export function removeAnswerCommands(plugin: FlashcardStudioPlugin): void {
     for (const command of answerCommands(plugin)) plugin.removeCommand(command.id);
 }

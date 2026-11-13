@@ -8,6 +8,10 @@ import { UndoHistory } from "src/scheduling/undo-history";
 import { DesktopShellActions } from "src/ui/obsidian-ui-components/content-container/desktop/desktop-shell";
 import ContentManager from "src/ui/obsidian-ui-components/content-container/review-screen";
 import { SessionSummaryActions } from "src/ui/obsidian-ui-components/content-container/session-summary/session-summary";
+import {
+    EditCancelled,
+    FlashcardEditModal,
+} from "src/ui/obsidian-ui-components/modals/card-edit-modal";
 import { UIState } from "src/ui/studio-ui";
 
 import { ReviewSessionContext } from "../helpers/review-session-context";
@@ -237,6 +241,45 @@ async function answerToSummary(cm: ContentManager, cardPane: FakeCardPane) {
     expect(cardPane.showSessionSummary).toHaveBeenCalledTimes(1);
     return cardPane.showSessionSummary.mock.calls[0][1];
 }
+
+describe("editing during review", () => {
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("cancel restores the back and review keyboard focus", async () => {
+        const { cm, ui, note } = await setUp("#flashcards Q::A");
+        await cm.open();
+        await cm._showAnswer();
+        const original = note.text;
+        jest.spyOn(FlashcardEditModal, "Prompt").mockRejectedValue(new EditCancelled());
+        const editing = cm._editQuestion();
+        expect(ui.uiState).toBe(UIState.EditModal);
+        expect(ui.isStudioInFocus).toBe(false);
+        await editing;
+        expect(ui.uiState).toBe(UIState.CardBack);
+        expect(ui.isStudioInFocus).toBe(true);
+        expect(note.text).toBe(original);
+        cm.close();
+    });
+
+    test.each(["advance", "close"])("a pending edit cannot write after %s", async (action) => {
+        const { cm, note, ui } = await setUp("#flashcards\n\nFirst::One\n\nSecond::Two");
+        await cm.open();
+        const original = note.text;
+        const session = note.reviewSession;
+        const write = jest.spyOn(session, "updateCurrentQuestionTextAndCards");
+        jest.spyOn(FlashcardEditModal, "Prompt").mockResolvedValue("Changed::Answer");
+        const editing = cm._editQuestion();
+        if (action === "close") cm.close();
+        else session.skipCurrentCard();
+        await editing;
+        expect(write).not.toHaveBeenCalled();
+        expect(note.text).toBe(original);
+        if (action === "close") expect(ui.isStudioInFocus).toBe(false);
+        cm.close();
+    });
+});
 
 describe("a review closed while its cards are loading", () => {
     // The bug: the review went on into the cards once they had loaded, although it was closed. Its card screen came

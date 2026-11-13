@@ -142,11 +142,12 @@ const settings: StudioSettings = {
 };
 
 function setUp() {
+    const onEdit = jest.fn();
     const onReveal = jest.fn();
     const onAnswer = jest.fn().mockResolvedValue(undefined);
     const plugin = {
         isInitialized: true,
-        dataManager: { data: { settings } },
+        dataManager: { data: { settings: { ...settings } } },
         uiManager: { isStudioInFocus: true, setStudioViewInFocus: jest.fn() },
     };
     const actions = {
@@ -166,7 +167,7 @@ function setUp() {
         parent,
         jest.fn(),
         jest.fn().mockResolvedValue(undefined),
-        jest.fn(),
+        onEdit,
         onAnswer,
         jest.fn(),
         onReveal,
@@ -178,7 +179,7 @@ function setUp() {
     const view = parent.querySelector<HTMLElement>(".fs-card-container");
     if (view === null) throw new Error("no card view");
     const { response } = container as never as { response: { setSuggested: jest.Mock } };
-    return { container, view, onReveal, onAnswer, response };
+    return { container, view, plugin, onEdit, onReveal, onAnswer, response };
 }
 
 /** A session on one card, as the review screen hands it to the card screen. */
@@ -213,6 +214,48 @@ const pressSpace = (): void => {
         new KeyboardEvent("keydown", { code: "Space", key: " ", bubbles: true, cancelable: true }),
     );
 };
+
+function pressEdit(options: KeyboardEventInit = {}): boolean {
+    const event = new KeyboardEvent("keydown", {
+        code: "KeyE",
+        key: "e",
+        bubbles: true,
+        cancelable: true,
+        ...options,
+    });
+    document.activeElement?.dispatchEvent(event);
+    return event.defaultPrevented;
+}
+
+test("plain E edits the front and back once per press", async () => {
+    const { container, onEdit } = setUp();
+    const session = sessionOn("Capital?", "Paris");
+    await container.openSession(session, settings);
+    expect(pressEdit()).toBe(true);
+    pressEdit({ repeat: true });
+    expect(onEdit).toHaveBeenCalledTimes(1);
+    await container.drawBack(session, FlashcardReviewMode.Review, settings, () => null);
+    expect(pressEdit()).toBe(true);
+    expect(onEdit).toHaveBeenCalledTimes(2);
+});
+
+test("editing leaves typing, modified keys and custom hotkeys alone", async () => {
+    const { container, onEdit, plugin } = setUp();
+    await container.openSession(sessionOn("Capital?", "Paris"), settings);
+    for (const option of ["ctrlKey", "metaKey", "altKey", "shiftKey", "isComposing"]) {
+        expect(pressEdit({ [option]: true })).toBe(false);
+    }
+    const input = document.body.createEl("input");
+    input.focus();
+    expect(pressEdit()).toBe(false);
+    input.blur();
+    plugin.uiManager.isStudioInFocus = false;
+    expect(pressEdit()).toBe(false);
+    plugin.uiManager.isStudioInFocus = true;
+    plugin.dataManager.data.settings.useCustomHotkeys = true;
+    expect(pressEdit()).toBe(false);
+    expect(onEdit).not.toHaveBeenCalled();
+});
 
 describe("CardContainer.openSession", () => {
     test("shows the first card and takes the review keys", async () => {
