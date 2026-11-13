@@ -535,6 +535,11 @@ export default class CardContainer {
     /** Empties the card and puts the line that says where it is from at the top, when that is switched on. */
     private resetContent(session: SessionData, settings: StudioSettings): void {
         this.content.empty();
+        // A cloze reads the same before and after its answer shows, so the Studio look styles it apart
+        this.content.toggleClass(
+            "fs-cloze-card",
+            session.currentQuestion.questionType === CardType.Cloze,
+        );
         if (settings.showContextInCards) {
             new ContextSectionComponent(this.content).updateCardContext(
                 true,
@@ -590,7 +595,7 @@ export default class CardContainer {
         this.speaker.stop();
         // A digit must not reach a card that is gone
         this.resetStudyAids();
-        this.content.removeClass("fs-choice-card", "fs-answer-shown");
+        this.content.removeClass("fs-choice-card", "fs-cloze-card", "fs-answer-shown");
         this.cardState = CardState.Front;
         this.waiting = true;
         this.content.empty();
