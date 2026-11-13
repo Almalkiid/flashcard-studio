@@ -2,6 +2,13 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.14.2]
+
+### Changed
+
+- In the Studio look, a cloze card reads the same before and after its answer shows: the same size and place, left-aligned (right-aligned for right-to-left text), without the **Answer** label, so only the hidden words change. Ordinary cards keep their large centred question and the label. ([#11](https://github.com/Almalkiid/flashcard-studio/issues/11))
+- The Studio screens take their page, card and inset backgrounds from your Obsidian theme, in light and dark, and the glow behind the review screen is gone. The accent and the rating colours stay the Studio's own. ([#11](https://github.com/Almalkiid/flashcard-studio/issues/11))
+
 ## [0.14.1]
 
 ### Fixed
