@@ -104,6 +104,7 @@ Run **Flashcard Studio: Review flashcards from all notes** from the command pale
 | @ | Suspend |
 | Ctrl/Cmd + 1 to 7 | Flag (red, orange, green, blue, pink, turquoise, purple) |
 | S | Skip |
+| E | Edit the card (desktop) |
 
 The number keys follow **Answer keys** in the settings. **Anki** (1 Again, 2 Hard, 3 Good, 4 Easy) is the default for new installs. **Original** (1 Hard, 2 Good, 3 Easy, 0 Reset the card) is the layout of the Spaced Repetition plugin, and existing installs keep it until you change the setting.
 

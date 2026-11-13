@@ -22,7 +22,10 @@ test("checking the edit command does not open the editor; invoking it edits the 
         contentManager: { _editQuestion: edit },
         uiState: UIState.CardFront,
     };
-    const addCommand = jest.fn();
+    const addCommand = jest.fn<
+        void,
+        [{ id: string; checkCallback: (checking: boolean) => boolean }]
+    >();
     const settings = {
         flashcardAgainText: "Again",
         flashcardHardText: "Hard",
@@ -38,6 +41,7 @@ test("checking the edit command does not open the editor; invoking it edits the 
     const command = addCommand.mock.calls
         .map(([cmd]) => cmd)
         .find((cmd) => cmd.id === "card-review-edit");
+    if (command === undefined) throw new Error("no edit command");
     expect(command.checkCallback(true)).toBe(true);
     expect(edit).not.toHaveBeenCalled();
     expect(command.checkCallback(false)).toBe(true);

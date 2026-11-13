@@ -14,6 +14,7 @@ Start **Review flashcards from all notes**, choose a deck, then reveal each card
 | @                    | —                 | Suspend                 | Current card                                           |
 | Cmd/Ctrl+1 through 7 | —                 | Set flag colour         | Red, orange, green, blue, pink, turquoise, purple      |
 | S                    | —                 | Skip                    | Leaves the card unscheduled                            |
+| E                    | Edit the card     | Edit the card           | Desktop only; Cmd/Ctrl+Enter saves, Escape discards    |
 | R                    | Read visible side | Read visible side       | Only where speech is available                         |
 
 The card menu exposes the same management actions on phone. It also offers **Edit card**, card information, and a session-only typed-answer switch.
