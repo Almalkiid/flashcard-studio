@@ -2,7 +2,7 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
-## [Unreleased]
+## [0.15.0]
 
 ### Added
 
