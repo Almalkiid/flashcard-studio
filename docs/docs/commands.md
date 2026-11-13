@@ -26,4 +26,4 @@ Commands are available from Obsidian’s command palette. Commands which operate
 | Show the welcome guide                                         | Reopens onboarding.                                                  | Always                      |
 | Create a sample deck                                           | Creates the example deck.                                            | Plugin initialised          |
 
-When **Custom hotkeys** is on, Obsidian also offers **Review card as Again**, **Hard**, **Good**, and **Easy**, plus **Show Answer**, **Skip**, **Reset card’s progress**, and **Open card in background**. They work only while the review has focus and no text field is active.
+When **Custom hotkeys** is on, Obsidian also offers **Review card as Again**, **Hard**, **Good**, and **Easy**, plus **Show Answer**, **Edit this card**, **Skip**, **Reset card’s progress**, and **Open card in background**. They work only while the review has focus and no text field is active.
