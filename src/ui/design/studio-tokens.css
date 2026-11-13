@@ -8,9 +8,9 @@
 
 .fs-studio {
     /* Surfaces */
-    --fs-bg: #f4f6f9;
-    --fs-surface: #ffffff;
-    --fs-surface-2: #f6f7fa;
+    --fs-bg: var(--background-primary);
+    --fs-surface: var(--background-primary-alt);
+    --fs-surface-2: var(--background-secondary);
     --fs-border: rgb(15 23 42 / 7%);
     --fs-border-strong: rgb(15 23 42 / 12%);
 
@@ -74,9 +74,6 @@
 }
 
 .theme-dark .fs-studio {
-    --fs-bg: #0b0d12;
-    --fs-surface: #13161d;
-    --fs-surface-2: #191d26;
     --fs-border: rgb(255 255 255 / 7%);
     --fs-border-strong: rgb(255 255 255 / 12%);
 

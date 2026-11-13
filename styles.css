@@ -1,7 +1,7 @@
 .fs-studio {
-  --fs-bg: #f4f6f9;
-  --fs-surface: #ffffff;
-  --fs-surface-2: #f6f7fa;
+  --fs-bg: var(--background-primary);
+  --fs-surface: var(--background-primary-alt);
+  --fs-surface-2: var(--background-secondary);
   --fs-border: rgb(15 23 42 / 7%);
   --fs-border-strong: rgb(15 23 42 / 12%);
   --fs-text: #0f172a;
@@ -58,9 +58,6 @@
   background-color: var(--fs-bg);
 }
 .theme-dark .fs-studio {
-  --fs-bg: #0b0d12;
-  --fs-surface: #13161d;
-  --fs-surface-2: #191d26;
   --fs-border: rgb(255 255 255 / 7%);
   --fs-border-strong: rgb(255 255 255 / 12%);
   --fs-text: #f1f5f9;
@@ -5157,13 +5154,7 @@ body.fs-reduced-bottom-fade-mask {
   }
 }
 .fs-card-container.fs-look-studio {
-  background:
-    radial-gradient(
-      90% 55% at 50% 0%,
-      color-mix(in srgb, var(--fs-accent) 7%, transparent),
-      transparent 70%
-    ),
-    var(--fs-bg);
+  background: var(--fs-bg);
   .fs-card-toolbar {
     position: relative;
     border: none;
@@ -5319,7 +5310,8 @@ body.fs-reduced-bottom-fade-mask {
     color: var(--fs-text-3);
     white-space: nowrap;
   }
-  .fs-content:not(.fs-answer-shown) > :not(.fs-context, .fs-reveal-hint) {
+  .fs-content:not(.fs-answer-shown, .fs-cloze-card)
+    > :not(.fs-context, .fs-reveal-hint) {
     padding: 0 8px;
     font-size: 24px;
     font-weight: 500;
@@ -5328,14 +5320,15 @@ body.fs-reduced-bottom-fade-mask {
     text-align: center;
     text-wrap: balance;
   }
-  .fs-content:not(.fs-answer-shown) > :first-child:not(.fs-context),
-  .fs-content:not(.fs-answer-shown) > .fs-context + * {
+  .fs-content:not(.fs-answer-shown, .fs-cloze-card)
+    > :first-child:not(.fs-context),
+  .fs-content:not(.fs-answer-shown, .fs-cloze-card) > .fs-context + * {
     margin-top: auto;
   }
   .fs-content:not(.fs-answer-shown) {
     cursor: pointer;
   }
-  .fs-content:not(.fs-answer-shown) > .fs-context {
+  .fs-content:not(.fs-answer-shown, .fs-cloze-card) > .fs-context {
     padding: 0 36px;
     text-align: center;
   }
@@ -5359,7 +5352,7 @@ body.fs-reduced-bottom-fade-mask {
       height: 16px;
     }
   }
-  .fs-content.fs-answer-shown
+  .fs-content.fs-answer-shown:not(.fs-cloze-card)
     > :not(.fs-context, hr, .fs-answer-pill, .fs-answer-pill ~ *) {
     font-size: var(--fs-body);
     font-weight: 500;
@@ -5379,6 +5372,17 @@ body.fs-reduced-bottom-fade-mask {
     font-size: 18px;
     line-height: 1.55;
     animation: fs-reveal 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .fs-content.fs-cloze-card
+    > :not(.fs-context, .fs-reveal-hint, .fs-answer-pill) {
+    font-size: 18px;
+    line-height: 1.55;
+  }
+  .fs-content.fs-cloze-card.fs-answer-shown > .fs-answer-pill {
+    display: none;
+  }
+  .fs-content.fs-cloze-card.fs-answer-shown > .fs-answer-pill ~ * {
+    animation: none;
   }
   .fs-content strong {
     font-weight: 650;
@@ -5647,13 +5651,6 @@ body.fs-reduced-bottom-fade-mask {
   }
 }
 .theme-dark .fs-card-container.fs-look-studio {
-  background:
-    radial-gradient(
-      80% 50% at 50% 0%,
-      color-mix(in srgb, var(--fs-accent) 13%, transparent),
-      transparent 70%
-    ),
-    var(--fs-bg);
   .fs-response .fs-response-button:not(.fs-show-answer-button) {
     box-shadow:
       inset 0 0 0 1px color-mix(in srgb, var(--fs-rating) 22%, transparent),
