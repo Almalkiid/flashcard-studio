@@ -234,6 +234,28 @@ describe("review screens: guards and announcements", function () {
         expect(await browser.$$(".modal.fs-edit-modal").length).toBe(0);
     });
 
+    it("E opens the editor and Escape discards the draft and restores review keys", async function () {
+        if (await isMobile()) this.skip();
+        await useNote(TWO_CARDS);
+        await openFirstCard();
+        const original = readNote();
+        await browser.keys("e");
+        const editor = browser.$(".modal.fs-edit-modal");
+        await editor.waitForDisplayed();
+        const field = editor.$("textarea");
+        await expect(field).toBeFocused();
+        const question = await field.getValue();
+        await browser.keys("s");
+        expect(await field.getValue()).not.toBe(question);
+        await browser.keys("Escape");
+        await editor.waitForDisplayed({ reverse: true });
+        expect(readNote()).toBe(original);
+        await browser.keys("e");
+        await editor.waitForDisplayed();
+        expect(await field.getValue()).toBe(question);
+        await browser.keys("Escape");
+    });
+
     it("the edit dialog keeps a card whose question ends in a question mark", async function () {
         await useNote(QUESTION_MARK_CARD);
         await openFirstCard();

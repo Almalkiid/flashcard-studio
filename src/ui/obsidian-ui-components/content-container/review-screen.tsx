@@ -597,7 +597,12 @@ export default class ContentManager {
                       );
             // The text is of the question that the editor was opened on. If the review has moved on since, the
             // current question is another one, and writing it there would overwrite that question
-            if (reviewSession.currentQuestion !== currentQ) {
+            if (
+                this.isClosed ||
+                this.queueSeq !== reviewSession ||
+                reviewSession.currentCard !== currentCard ||
+                reviewSession.currentQuestion !== currentQ
+            ) {
                 new Notice(t("EDIT_CARD_MOVED_ON"));
                 return;
             }
@@ -610,10 +615,9 @@ export default class ContentManager {
             // Closing the editor without saving is not a failure
             if (!(reason instanceof EditCancelled)) console.error(reason);
         } finally {
-            this.ui.setStudioViewInFocus(wasInFocus);
-            // Closed, whether saved, cancelled or refused
-            if (this.ui.uiState === UIState.EditModal) {
-                this.ui.setUIState(previousState);
+            if (!this.isClosed && this.ui.contentManager === this) {
+                this.ui.setStudioViewInFocus(wasInFocus);
+                if (this.ui.uiState === UIState.EditModal) this.ui.setUIState(previousState);
             }
         }
     }
@@ -1280,6 +1284,7 @@ export default class ContentManager {
             ["-", t("BURY_CARD")],
             ["@", t("SUSPEND_CARD")],
             ["S", t("SKIP")],
+            ["E", t("EDIT_CARD")],
             ["J", t("DESKTOP_KEY_JUMP")],
         );
         if (speechAvailable()) keys.push(["R", t("READ_ALOUD")]);
