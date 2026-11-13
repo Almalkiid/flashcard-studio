@@ -100,6 +100,22 @@ function openEditor(type: CardType, text: string) {
 beforeEach(() => jest.mocked(Notice).mockClear());
 
 describe("saving the edit dialog", () => {
+    test.each([{ ctrlKey: true }, { metaKey: true }])(
+        "Enter with %o saves the draft",
+        async (modifier) => {
+            const { result, fields } = openEditor(CardType.SingleLineBasic, "Q::A");
+            fields[1].value = "B";
+            const event = new KeyboardEvent("keydown", {
+                key: "Enter",
+                cancelable: true,
+                ...modifier,
+            });
+            fields[1].dispatchEvent(event);
+            expect(event.defaultPrevented).toBe(true);
+            await expect(result).resolves.toBe("Q::B");
+        },
+    );
+
     test("a card saved without a change is not written to the note", async () => {
         const { result, save } = openEditor(
             CardType.MultiLineBasic,

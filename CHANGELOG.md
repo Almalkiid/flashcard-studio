@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.15.0]
+
+### Added
+
+- On a computer, **E** opens the editor for the card you are reviewing, on the question or the answer side. Ctrl/Cmd+Enter saves and Escape discards, as before. With **Custom hotkeys** on, **Edit this card** is a command you can give a hotkey of your own. ([#10](https://github.com/Almalkiid/flashcard-studio/issues/10))
+
 ## [0.14.2]
 
 ### Changed
