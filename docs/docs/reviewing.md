@@ -17,6 +17,8 @@ Start **Review flashcards from all notes**, choose a deck, then reveal each card
 | E                    | Edit the card     | Edit the card           | Desktop only; Cmd/Ctrl+Enter saves, Escape discards    |
 | R                    | Read visible side | Read visible side       | Only where speech is available                         |
 
+If another plugin takes Cmd/Ctrl+Enter (a Vim plugin, for example), give **Save the card being edited** a hotkey of your own in Obsidian’s **Settings → Hotkeys**. It works inside the editor, alongside Cmd/Ctrl+Enter.
+
 The card menu exposes the same management actions on phone. It also offers **Edit card**, card information, and a session-only typed-answer switch.
 
 ## Undo, bury, suspend, and flags
