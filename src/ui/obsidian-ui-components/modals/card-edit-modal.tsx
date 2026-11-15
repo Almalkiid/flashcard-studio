@@ -158,6 +158,21 @@ export class FlashcardEditModal extends Modal {
             onClick: () => this.close(),
         });
 
+        // Ctrl/Cmd+Enter saves from a field. It is caught on its way down, before the field has it: an editor that
+        // another plugin puts over a field (Vim Motions does) keeps the key to itself.
+        this.contentEl.addEventListener(
+            "keydown",
+            (event: KeyboardEvent) => {
+                if (event.key !== "Enter" || !(event.ctrlKey || event.metaKey)) return;
+                const target = event.target as HTMLElement | null;
+                if (target?.closest("button")) return;
+                event.preventDefault();
+                event.stopPropagation();
+                this.save();
+            },
+            true,
+        );
+
         // Obsidian's hotkeys do not run while a dialog is open, so the dialog answers the save command's own
         this.scope.register(null, null, (event, context) => {
             const id = FlashcardEditModal.saveCommandId;
@@ -187,12 +202,6 @@ export class FlashcardEditModal extends Modal {
         field.value = value;
         if (this.textDirection === TextDirection.Rtl) field.setAttribute("dir", "rtl");
         field.addEventListener("input", () => this.updateSaveEnabled());
-        field.addEventListener("keydown", (event: KeyboardEvent) => {
-            if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-                event.preventDefault();
-                this.save();
-            }
-        });
         return field;
     }
 
@@ -206,7 +215,32 @@ export class FlashcardEditModal extends Modal {
         this.saveButton.setDisabled(!this.isComplete());
     }
 
+    /**
+     * Saves the fields. When the keyboard is in an editor that another plugin put over a field (Vim Motions does), that
+     * editor may not have copied its text back yet: it does so 100 ms after the last key, or at once when it loses the
+     * focus. So it is made to lose the focus, and the fields are read on the next frame.
+     */
     private save(): void {
+        if (this.settled) return;
+        const doc = this.contentEl.ownerDocument;
+        const focused = doc.activeElement;
+        const own = [this.frontField, this.backField] as Element[];
+        const win = doc.defaultView;
+        if (
+            win !== null &&
+            focused instanceof win.HTMLElement &&
+            this.contentEl.contains(focused) &&
+            !own.includes(focused) &&
+            !(focused instanceof win.HTMLButtonElement)
+        ) {
+            focused.blur();
+            win.requestAnimationFrame(() => this.saveFields());
+            return;
+        }
+        this.saveFields();
+    }
+
+    private saveFields(): void {
         if (this.settled || !this.isComplete()) return;
         const text = withoutTrailingLineBreaks(
             this.sides === null

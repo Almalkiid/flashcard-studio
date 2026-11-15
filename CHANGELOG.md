@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.16.1]
+
+### Fixed
+
+- With Vim Motions' **Vim in text areas** on, Ctrl/Cmd+Enter saves the card editor again, and a save made right after typing keeps the last letters typed. Vim Motions puts its own editor over the editor's text boxes, keeps Ctrl/Cmd+Enter to itself, and copies its text back only after a short pause. ([#10](https://github.com/Almalkiid/flashcard-studio/issues/10))
+
 ## [0.16.0]
 
 ### Added
