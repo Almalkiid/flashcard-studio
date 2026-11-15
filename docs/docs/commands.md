@@ -23,6 +23,7 @@ Commands are available from Obsidian’s command palette. Commands which operate
 | Take an exam                                                   | Opens exam setup.                                                    | Plugin initialised          |
 | Take an exam from this note                                    | Opens exam setup with the active note chosen.                        | Active Markdown note        |
 | Generate cards with AI                                         | Generates from the active note or selected editor text.              | Active Markdown editor      |
+| Save the card being edited                                     | Saves the open card editor; it can have a hotkey of its own.         | Card editor open            |
 | Show the welcome guide                                         | Reopens onboarding.                                                  | Always                      |
 | Create a sample deck                                           | Creates the example deck.                                            | Plugin initialised          |
 
