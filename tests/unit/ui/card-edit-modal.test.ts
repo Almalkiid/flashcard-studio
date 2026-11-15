@@ -172,6 +172,38 @@ describe("the save command (issue #10)", () => {
         expect(modal).toBeDefined();
         expect(FlashcardEditModal.saveOpenEditor(true)).toBe(false);
     });
+
+    test("a field edited in another plugin's editor is saved with its last keys (Vim Motions)", async () => {
+        const { result, fields, modal } = openEditor(CardType.SingleLineBasic, "Q::A");
+        document.body.appendChild(modal.contentEl);
+        // Like Vim Motions: its own editor over the field, which copies the text back when it loses the focus
+        const overlay = modal.contentEl.createDiv({ attr: { tabindex: "0" } });
+        overlay.addEventListener("blur", () =>
+            requestAnimationFrame(() => {
+                fields[1].value = "A edited";
+            }),
+        );
+        overlay.focus();
+        expect(FlashcardEditModal.saveOpenEditor(false)).toBe(true);
+        await expect(result).resolves.toBe("Q::A edited");
+        modal.contentEl.remove();
+    });
+
+    test("Ctrl/Cmd+Enter saves from another plugin's editor that keeps its keys to itself (Vim Motions)", async () => {
+        const { result, fields, modal } = openEditor(CardType.SingleLineBasic, "Q::A");
+        const overlay = modal.contentEl.createDiv();
+        overlay.addEventListener("keydown", (event) => event.stopPropagation());
+        fields[1].value = "B";
+        const event = new KeyboardEvent("keydown", {
+            key: "Enter",
+            ctrlKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        overlay.dispatchEvent(event);
+        expect(event.defaultPrevented).toBe(true);
+        await expect(result).resolves.toBe("Q::B");
+    });
 });
 
 describe("matching a hotkey to a key press", () => {
