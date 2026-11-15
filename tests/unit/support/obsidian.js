@@ -22,10 +22,26 @@ class Component {
 // A mock function, so a test can read the messages back: expect(Notice).toHaveBeenCalledWith("...")
 const Notice = jest.fn();
 
+/** Obsidian's key scope, as far as tests use it: the handlers registered, which tests call themselves. */
+class Scope {
+    constructor() {
+        this.keys = [];
+    }
+    register(modifiers, key, func) {
+        const handler = { modifiers, key, func };
+        this.keys.push(handler);
+        return handler;
+    }
+    unregister(handler) {
+        this.keys = this.keys.filter((h) => h !== handler);
+    }
+}
+
 class Modal extends Component {
     constructor(app) {
         super();
         this.app = app;
+        this.scope = new Scope();
         this.contentEl = document.createElement("div");
         this.titleEl = document.createElement("div");
         this.modalEl = document.createElement("div");
@@ -128,6 +144,7 @@ module.exports = {
     Platform,
     Plugin,
     PluginSettingTab,
+    Scope,
     Setting,
     TAbstractFile,
     TFile,
