@@ -1,5 +1,5 @@
 import "src/ui/obsidian-ui-components/modals/card-edit-modal.css";
-import { App, Modal, Notice } from "obsidian";
+import { App, Hotkey, KeymapContext, Modal, Notice, Platform } from "obsidian";
 
 import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType } from "src/data/data-structures/card/question";
@@ -24,6 +24,39 @@ function withoutTrailingLineBreaks(text: string): string {
     return text.replace(/(?:\n[ \t]*)+$/, "");
 }
 
+/** The id of the command that saves the card being edited, without the plugin's id in front. */
+export const SAVE_EDIT_COMMAND_ID = "card-edit-save";
+
+/** The modifiers of a hotkey as Obsidian writes them for a key press: "Mod" made Meta or Ctrl, sorted, comma-joined. */
+function compiledModifiers(hotkey: Hotkey): string {
+    return hotkey.modifiers
+        .map((modifier) => (modifier === "Mod" ? (Platform.isMacOS ? "Meta" : "Ctrl") : modifier))
+        .sort()
+        .join(",");
+}
+
+/** Whether a key press is `hotkey`, by the same rule Obsidian uses for its own hotkeys. */
+export function isHotkeyPress(hotkey: Hotkey, context: KeymapContext): boolean {
+    if (compiledModifiers(hotkey) !== context.modifiers) return false;
+    return hotkey.key === context.vkey || hotkey.key.toLowerCase() === context.key?.toLowerCase();
+}
+
+/**
+ * The hotkeys set for a command in Obsidian's settings, or its default ones. The hotkey manager is not part of
+ * Obsidian's public API, so without it there are none.
+ */
+function hotkeysOf(app: App, commandId: string): Hotkey[] {
+    const manager = (
+        app as unknown as {
+            hotkeyManager?: {
+                getHotkeys: (id: string) => Hotkey[] | undefined;
+                getDefaultHotkeys: (id: string) => Hotkey[] | undefined;
+            };
+        }
+    ).hotkeyManager;
+    return manager?.getHotkeys(commandId) ?? manager?.getDefaultHotkeys(commandId) ?? [];
+}
+
 /** What the dialog rejects with when it is closed without saving. */
 export class EditCancelled extends Error {
     constructor() {
@@ -44,6 +77,18 @@ export class FlashcardEditModal extends Modal {
     private saveButton!: StudioButton;
     private settled = false;
     private resolvePromise!: (text: string) => void;
+    /** The dialog that is open, for the save command. */
+    private static openEditor: FlashcardEditModal | null = null;
+    /** The full id of the save command, once registered. */
+    public static saveCommandId: string | null = null;
+
+    /** Saves the dialog that is open; false when none is. */
+    public static saveOpenEditor(checking: boolean): boolean {
+        const editor = FlashcardEditModal.openEditor;
+        if (editor === null) return false;
+        if (!checking) editor.save();
+        return true;
+    }
     private rejectPromise!: (reason?: unknown) => void;
 
     /**
@@ -113,10 +158,21 @@ export class FlashcardEditModal extends Modal {
             onClick: () => this.close(),
         });
 
+        // Obsidian's hotkeys do not run while a dialog is open, so the dialog answers the save command's own
+        this.scope.register(null, null, (event, context) => {
+            const id = FlashcardEditModal.saveCommandId;
+            if (id === null || event.isComposing) return;
+            if (!hotkeysOf(this.app, id).some((hotkey) => isHotkeyPress(hotkey, context))) return;
+            this.save();
+            return false;
+        });
+        FlashcardEditModal.openEditor = this;
+
         this.frontField.focus();
     }
 
     onClose(): void {
+        if (FlashcardEditModal.openEditor === this) FlashcardEditModal.openEditor = null;
         this.contentEl.empty();
         if (this.settled) return;
         this.settled = true;

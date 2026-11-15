@@ -6,6 +6,7 @@ import { t } from "src/lang/translate";
 import {
     EditCancelled,
     FlashcardEditModal,
+    isHotkeyPress,
 } from "src/ui/obsidian-ui-components/modals/card-edit-modal";
 import { TextDirection } from "src/utils/text";
 
@@ -70,7 +71,7 @@ beforeAll(() => {
 const settings: StudioSettings = cloneDefaultSettings();
 
 /** Opens the dialog on a card of `type` with `text`; `fields` are the front and back text areas. */
-function openEditor(type: CardType, text: string) {
+function openEditor(type: CardType, text: string, app: unknown = {}) {
     const opened: FlashcardEditModal[] = [];
     const open = jest.spyOn(FlashcardEditModal.prototype, "open").mockImplementation(function (
         this: FlashcardEditModal,
@@ -79,7 +80,7 @@ function openEditor(type: CardType, text: string) {
         this.onOpen();
     });
     const card = { question: { questionType: type } } as never;
-    const result = FlashcardEditModal.Prompt({} as never, settings, card, text, TextDirection.Ltr);
+    const result = FlashcardEditModal.Prompt(app as never, settings, card, text, TextDirection.Ltr);
     open.mockRestore();
     const { contentEl } = opened[0];
     const fields = Array.from(contentEl.querySelectorAll("textarea"));
@@ -94,10 +95,113 @@ function openEditor(type: CardType, text: string) {
         await Promise.resolve();
         return settled;
     };
-    return { result, fields, save, isSettled };
+    /** Sends a key press through the dialog's key scope, as Obsidian does before the text box sees it. */
+    const press = (context: { modifiers: string; key: string; vkey: string }) => {
+        const scope = (
+            opened[0] as unknown as {
+                scope: {
+                    keys: { func: (event: KeyboardEvent, context: unknown) => false | undefined }[];
+                };
+            }
+        ).scope;
+        const event = new KeyboardEvent("keydown", { key: context.key });
+        return scope.keys.map((handler) => handler.func(event, context));
+    };
+    return { result, fields, save, isSettled, press, modal: opened[0] };
 }
 
 beforeEach(() => jest.mocked(Notice).mockClear());
+
+describe("the save command (issue #10)", () => {
+    const COMMAND = "flashcard-studio:card-edit-save";
+    /** An app whose hotkey manager has `hotkeys` set for the save command. */
+    const appWith = (hotkeys: { modifiers: string[]; key: string }[] | undefined) => ({
+        hotkeyManager: {
+            getHotkeys: (id: string) => (id === COMMAND ? hotkeys : undefined),
+            getDefaultHotkeys: (): undefined => undefined,
+        },
+    });
+
+    beforeEach(() => {
+        FlashcardEditModal.saveCommandId = COMMAND;
+    });
+    afterEach(() => {
+        FlashcardEditModal.saveCommandId = null;
+    });
+
+    test("the hotkey set for the command saves the draft, and Obsidian is told the key is used", async () => {
+        const { result, fields, press } = openEditor(
+            CardType.SingleLineBasic,
+            "Q::A",
+            appWith([{ modifiers: ["Alt"], key: "S" }]),
+        );
+        fields[1].value = "B";
+        expect(press({ modifiers: "Alt", key: "ß", vkey: "S" })).toEqual([false]);
+        await expect(result).resolves.toBe("Q::B");
+    });
+
+    test("other keys go on to the text box", async () => {
+        const { fields, press, isSettled } = openEditor(
+            CardType.SingleLineBasic,
+            "Q::A",
+            appWith([{ modifiers: ["Alt"], key: "S" }]),
+        );
+        fields[1].value = "B";
+        expect(press({ modifiers: "", key: "s", vkey: "S" })).toEqual([undefined]);
+        expect(press({ modifiers: "Alt,Shift", key: "S", vkey: "S" })).toEqual([undefined]);
+        expect(await isSettled()).toBe(false);
+    });
+
+    test("with no hotkey set, no key saves through the command", async () => {
+        const { fields, press, isSettled } = openEditor(
+            CardType.SingleLineBasic,
+            "Q::A",
+            appWith(undefined),
+        );
+        fields[1].value = "B";
+        expect(press({ modifiers: "Ctrl", key: "Enter", vkey: "Enter" })).toEqual([undefined]);
+        expect(await isSettled()).toBe(false);
+    });
+
+    test("run from the command palette, it saves the open dialog, and is listed only while one is open", async () => {
+        const { result, fields, modal } = openEditor(CardType.SingleLineBasic, "Q::A");
+        fields[1].value = "B";
+        expect(FlashcardEditModal.saveOpenEditor(true)).toBe(true);
+        expect(FlashcardEditModal.saveOpenEditor(false)).toBe(true);
+        await expect(result).resolves.toBe("Q::B");
+        expect(modal).toBeDefined();
+        expect(FlashcardEditModal.saveOpenEditor(true)).toBe(false);
+    });
+});
+
+describe("matching a hotkey to a key press", () => {
+    test.each([
+        [
+            { modifiers: ["Ctrl", "Shift"], key: "S" },
+            { modifiers: "Ctrl,Shift", key: "S", vkey: "S" },
+            true,
+        ],
+        [
+            { modifiers: ["Shift", "Ctrl"], key: "s" },
+            { modifiers: "Ctrl,Shift", key: "S", vkey: "S" },
+            true,
+        ],
+        [
+            { modifiers: ["Mod"], key: "Enter" },
+            { modifiers: "Ctrl", key: "Enter", vkey: "Enter" },
+            true,
+        ],
+        [
+            { modifiers: ["Ctrl"], key: "S" },
+            { modifiers: "Ctrl,Shift", key: "S", vkey: "S" },
+            false,
+        ],
+        [{ modifiers: [], key: "F2" }, { modifiers: "", key: "F2", vkey: "F2" }, true],
+        [{ modifiers: ["Alt"], key: "S" }, { modifiers: "Alt", key: "ß", vkey: "S" }, true],
+    ])("%o against %o is %s", (hotkey, context, expected) => {
+        expect(isHotkeyPress(hotkey as never, context)).toBe(expected);
+    });
+});
 
 describe("saving the edit dialog", () => {
     test.each([{ ctrlKey: true }, { metaKey: true }])(

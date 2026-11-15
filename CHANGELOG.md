@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [Unreleased]
+
+### Added
+
+- **Save the card being edited** is a command you can give a hotkey of your own in Obsidian's **Settings → Hotkeys**. That hotkey saves the card editor alongside Ctrl/Cmd+Enter, for when another plugin, such as a Vim plugin, takes Ctrl/Cmd+Enter. ([#10](https://github.com/Almalkiid/flashcard-studio/issues/10))
+
 ## [0.15.0]
 
 ### Added

@@ -256,6 +256,40 @@ describe("review screens: guards and announcements", function () {
         await browser.keys("Escape");
     });
 
+    it("a hotkey set for the save command saves the editor (issue #10)", async function () {
+        if (await isMobile()) this.skip();
+        const setSaveHotkey = (hotkeys: { modifiers: string[]; key: string }[]) =>
+            browser.executeObsidian(
+                ({ app }, id, keys) => {
+                    (
+                        app as unknown as {
+                            hotkeyManager: { setHotkeys: (id: string, keys: unknown) => void };
+                        }
+                    ).hotkeyManager.setHotkeys(`${id}:card-edit-save`, keys);
+                },
+                pluginId,
+                hotkeys,
+            );
+        await setSaveHotkey([{ modifiers: ["Alt"], key: "S" }]);
+        try {
+            await useNote(TWO_CARDS);
+            await openFirstCard();
+            await browser.keys("e");
+            const editor = browser.$(".modal.fs-edit-modal");
+            await editor.waitForDisplayed();
+            const fields = await browser.$$(".modal.fs-edit-modal textarea.fs-input");
+            await fields[1].click();
+            await browser.keys("End");
+            await browser.keys(" edited");
+            await browser.keys(["Alt", "s"]);
+            await editor.waitForDisplayed({ reverse: true, timeoutMsg: "the hotkey did not save" });
+            await browser.pause(500);
+            expect(readNote()).toContain("::First answer edited\n");
+        } finally {
+            await setSaveHotkey([]);
+        }
+    });
+
     it("the edit dialog keeps a card whose question ends in a question mark", async function () {
         await useNote(QUESTION_MARK_CARD);
         await openFirstCard();

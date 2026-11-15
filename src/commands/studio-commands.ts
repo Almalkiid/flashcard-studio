@@ -7,6 +7,10 @@ import { createSampleDeck, showWelcome } from "src/onboarding/onboarding";
 import { FlashcardReviewMode } from "src/scheduling/review/review-mode";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { NOTE_RATINGS } from "src/ui/note-ratings";
+import {
+    FlashcardEditModal,
+    SAVE_EDIT_COMMAND_ID,
+} from "src/ui/obsidian-ui-components/modals/card-edit-modal";
 import { exportRevlogCsv, openCustomStudy, openPostpone } from "src/ui/scheduling-commands";
 import { UIState } from "src/ui/ui-state";
 
@@ -103,6 +107,14 @@ export function registerStudioCommands(plugin: FlashcardStudioPlugin): void {
     noteAction("cram-flashcards-in-note", t("CRAM_CARDS_IN_NOTE"), (note) =>
         ui().openDeckContainer(FlashcardReviewMode.Cram, note),
     );
+
+    // Saves the card editor. It has no hotkey of its own: Ctrl/Cmd+Enter always saves, and a hotkey set here as well
+    // is for people whose Ctrl/Cmd+Enter is taken by another plugin
+    FlashcardEditModal.saveCommandId = plugin.addCommand({
+        id: SAVE_EDIT_COMMAND_ID,
+        name: t("EDIT_SAVE_CMD"),
+        checkCallback: (checking: boolean) => FlashcardEditModal.saveOpenEditor(checking),
+    }).id;
 
     // Onboarding
     plugin.addCommand({

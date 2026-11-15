@@ -17,6 +17,7 @@ const en = {
     BACK: "Back to decks",
     SKIP: "Skip this card",
     EDIT_CARD: "Edit this card",
+    EDIT_SAVE_CMD: "Save the card being edited",
     RESET_CARD_PROGRESS: "Start this card over",
     HARD: "Hard",
     GOOD: "Good",
