@@ -12,6 +12,8 @@ mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
 ```
 ````
 
+To limit the note preview to 240 pixels wide, write `image: [[Heart.png|240]]`. Each block can have its own width. The picture and masks shrink together in narrower panes. Review cards use their usual size.
+
 **Hide all, guess one** is the default: every mask appears while one is asked. **Hide one, guess one** shows only the current mask. On the answer, tap the image or its magnifier to zoom.
 
 Edit reviewed masks in the occlusion editor, not by editing `mask:` lines yourself. The editor maintains schedules as masks move. If you rename or move the image, update the `image:` line because Obsidian does not update links inside code blocks. A schedule comment is shared after the block.
