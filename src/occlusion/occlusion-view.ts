@@ -244,6 +244,12 @@ export function renderOcclusion(
         cls: "fs-occ-image",
         attr: { src: app.vault.getResourcePath(file), alt: file.name, draggable: "false" },
     });
+    if (states === "labels") {
+        const size = /^!?\[\[[^|\]]+\|\s*(\d+)\s*\]\]$/.exec(block.image);
+        const width = Number(size?.[1]);
+        if (Number.isSafeInteger(width) && width > 0)
+            stage.setCssProps({ "--fs-occ-preview-width": `${width}px` });
+    }
     fitStageToImage(stage, img);
     const overlay = stage.createSvg("svg", {
         cls: "fs-occ-overlay",
