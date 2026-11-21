@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.17.0]
+
+### Added
+
+- Set the width of an image occlusion preview in a note with `image: [[Heart.png|240]]`. The image and its masks scale together in Live Preview and Reading view. Review cards keep their usual size. ([#16](https://github.com/Almalkiid/flashcard-studio/issues/16))
+
 ## [0.16.1]
 
 ### Fixed

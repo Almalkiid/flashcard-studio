@@ -868,6 +868,25 @@ describe("image occlusion", function () {
         expect(await browser.$(`${card} .fs-occ-answer`).getText()).toBe("Right atrium");
     });
 
+    it("sizes a note preview from the image link and keeps the mask aligned", async function () {
+        await useNote(
+            [TAG, "", BLOCK.replace("[[Heart.png]]", "[[Heart.png|180]]"), ""].join("\n"),
+        );
+        for (const mode of ["source", "preview"] as const) {
+            await openNote(mode);
+            const view = mode === "source" ? ".markdown-source-view" : ".markdown-reading-view";
+            const preview = `${view} .fs-occ.is-note`;
+            await picturesLoaded(`${preview} .fs-occ-image`);
+            const image = await boxOf(`${preview} .fs-occ-image`);
+            const mask = await boxOf(`${preview} rect.fs-mask`);
+            expect(image.width).toBe(180);
+            expect(Math.abs(mask.left - image.left - image.width * RIGHT_ATRIUM.x)).toBeLessThan(2);
+            expect(Math.abs(mask.top - image.top - image.height * RIGHT_ATRIUM.y)).toBeLessThan(2);
+            expect(Math.abs(mask.width - image.width * RIGHT_ATRIUM.w)).toBeLessThan(2);
+            expect(Math.abs(mask.height - image.height * RIGHT_ATRIUM.h)).toBeLessThan(2);
+        }
+    });
+
     it("edits a block in the note: deleting a mask keeps the other masks' schedules with them", async function () {
         const fsrs = (stability: number) =>
             `!fsrs,2030-01-01T00:00:00.000Z,30,${stability},5,2,3,0,0,2029-12-01T00:00:00.000Z`;
