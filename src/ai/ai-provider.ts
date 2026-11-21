@@ -10,7 +10,7 @@ import { t } from "src/lang/translate";
  * The API key is a parameter of the two functions that need it and is never stored, logged or put in an error.
  */
 
-export type AiProviderId = "anthropic" | "openai" | "openai-compatible";
+export type AiProviderId = "anthropic" | "openai" | "gemini" | "openai-compatible";
 
 export interface AiSettings {
     provider: AiProviderId;
@@ -41,6 +41,7 @@ export class AiError extends Error {
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
 /** A big generation on a slow local model can take minutes. */
 const DEFAULT_TIMEOUT_MS = 180_000;
 const MAX_DETAIL_LENGTH = 200;
@@ -79,6 +80,7 @@ export function aiUsesInsecureHttp(settings: AiSettings): boolean {
 export function aiProviderLabel(settings: AiSettings): string {
     if (settings.provider === "anthropic") return t("AI_PROVIDER_ANTHROPIC");
     if (settings.provider === "openai") return t("AI_PROVIDER_OPENAI");
+    if (settings.provider === "gemini") return t("AI_PROVIDER_GEMINI");
     try {
         return new URL(settings.baseUrl.trim()).host;
     } catch {
