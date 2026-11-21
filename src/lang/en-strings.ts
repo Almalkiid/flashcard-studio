@@ -533,6 +533,7 @@ const en = {
     AI_PROVIDER_ANTHROPIC: "Anthropic",
     AI_PROVIDER_OPENAI: "OpenAI",
     AI_PROVIDER_COMPATIBLE: "OpenAI-compatible server",
+    AI_PROVIDER_GEMINI: "Gemini",
     AI_GENERATE_CMD: "Generate cards with AI",
     AI_OPEN_SETTINGS: "Open settings",
     AI_SOURCE: "Source",
