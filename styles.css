@@ -4320,6 +4320,7 @@ body.fs-reduced-bottom-fade-mask {
 .fs-occ-stage {
   position: relative;
   width: min(
+    var(--fs-occ-preview-width, 100%),
     100%,
     calc(var(--fs-occ-max-h, 62vh) * var(--fs-occ-ratio, 1.5)),
     var(--fs-occ-natural, 100%)
