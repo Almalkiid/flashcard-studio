@@ -149,6 +149,23 @@ export function buildAiRequest(
             throw: false,
         };
     }
+    if (settings.provider === "gemini") {
+        return {
+            url: `${GEMINI_URL.replace(/\/+$/, "")}/models/${encodeURIComponent(model)}:generateContent`,
+            method: "POST",
+            headers: {
+                "x-goog-api-key": key,
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: prompt.user }] }],
+                generationConfig: { maxOutputTokens: prompt.maxTokens },
+                systemInstruction: { parts: [{ text: prompt.system }] },
+            }),
+            throw: false,
+        };
+    }
+
     // Servers other than OpenAI's know `max_tokens`, and many do not know `max_completion_tokens`
     return {
         url: `${settings.baseUrl.trim().replace(/\/+$/, "")}/chat/completions`,
@@ -192,6 +209,36 @@ export function readAiReply(provider: AiProviderId, json: unknown): AiReply {
             .map((block) => block.text);
         if (texts.length === 0) throw unexpectedShape();
         return { text: texts.join(""), truncated: json.stop_reason === "max_tokens" };
+    }
+
+    if (provider === "gemini") {
+        if (!isRecord(json) || !Array.isArray(json.candidates)) throw unexpectedShape();
+
+        const candidate = json.candidates[0];
+        if (
+            !isRecord(candidate) ||
+            !isRecord(candidate.content) ||
+            !Array.isArray(candidate.content.parts)
+        ) {
+            throw unexpectedShape();
+        }
+
+        const texts = candidate.content.parts
+            .filter(
+                (part): part is { text: string; thought?: boolean } =>
+                    isRecord(part) &&
+                    part.thought !== true &&
+                    (part.type === undefined || part.type === "text") &&
+                    typeof part.text === "string",
+            )
+            .map((part) => part.text);
+
+        if (texts.length === 0) throw unexpectedShape();
+
+        return {
+            text: texts.join(""),
+            truncated: candidate.finishReason === "MAX_TOKENS",
+        };
     }
 
     const choices = json.choices;
