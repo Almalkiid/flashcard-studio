@@ -631,13 +631,14 @@ describe("AI cards", () => {
         );
     });
 
-    test("provider offers the three kinds", () => {
+    test("provider offers the four kinds", () => {
         const row = findControl(build().items, "aiProvider");
         expect(row.name).toBe("Provider");
         expect(row.control).toMatchObject({ type: "dropdown" });
         expect(Object.entries((row.control as { options: object }).options)).toEqual([
             ["anthropic", "Anthropic"],
             ["openai", "OpenAI"],
+            ["gemini", "Gemini"],
             ["openai-compatible", "Compatible server (such as Ollama)"],
         ]);
     });

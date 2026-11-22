@@ -30,8 +30,8 @@ export function aiGroup(ctx: SettingsContext): SettingDefinitionItem[] {
                         options: {
                             anthropic: "Anthropic",
                             openai: "OpenAI",
-                            "openai-compatible": "Compatible server (such as Ollama)",
                             gemini: "Gemini",
+                            "openai-compatible": "Compatible server (such as Ollama)",
                         },
                     },
                 },
