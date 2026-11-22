@@ -345,4 +345,60 @@ describe("the Studio look of the review screen", function () {
         expect(custom.card).toBe("rgb(60, 30, 90)");
         expect(custom.accent).toBe("#4f8cff");
     });
+
+    it("bold text stands apart from the text around it, in the theme's font and weights (issue #20)", async function () {
+        await useNote(
+            [TAG, "", "It is always advantageous to **identify** a single individual::Ok", ""].join(
+                "\n",
+            ),
+        );
+        await openReview();
+        await browser.$(`${CARD} .fs-content p strong`).waitForExist();
+
+        const read = () =>
+            browser.execute((card: string) => {
+                const text = document.querySelector<HTMLElement>(`${card} .fs-content p`);
+                const bold = text?.querySelector<HTMLElement>("strong");
+                const context = document.querySelector<HTMLElement>(`${card} .fs-context`);
+                if (!text || !bold || !context) throw new Error("no card text");
+                const probe = document.body.createDiv();
+                probe.setCssStyles({
+                    fontFamily: "var(--font-text)",
+                    fontWeight: "var(--bold-weight)",
+                });
+                const theme = getComputedStyle(probe);
+                const expected = { font: theme.fontFamily, bold: theme.fontWeight };
+                probe.remove();
+                return {
+                    text: getComputedStyle(text).fontWeight,
+                    bold: getComputedStyle(bold).fontWeight,
+                    font: getComputedStyle(text).fontFamily,
+                    contextFont: getComputedStyle(context).fontFamily,
+                    themeFont: expected.font,
+                    themeBold: expected.bold,
+                };
+            }, CARD);
+
+        // Obsidian's own weights: text at 400 and bold at 600, as in a note
+        const plain = await read();
+        expect(plain.text).toBe("400");
+        expect(plain.bold).toBe(plain.themeBold);
+        expect(Number(plain.bold) - Number(plain.text)).toBeGreaterThanOrEqual(200);
+        expect(plain.font).toBe(plain.themeFont);
+
+        // A theme or snippet that changes the text font and the bold weight reaches the card; its caption keeps the
+        // interface font
+        await browser.execute(() => {
+            document.body.setCssProps({ "--font-text-theme": "Georgia", "--bold-weight": "800" });
+        });
+        await browser.pause(200);
+        const themed = await read();
+        expect(themed.font).toContain("Georgia");
+        expect(themed.bold).toBe("800");
+        expect(themed.contextFont).not.toContain("Georgia");
+        await browser.execute(() => {
+            document.body.style.removeProperty("--font-text-theme");
+            document.body.style.removeProperty("--bold-weight");
+        });
+    });
 });
