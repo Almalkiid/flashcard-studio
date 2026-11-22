@@ -214,7 +214,7 @@ export function readAiReply(provider: AiProviderId, json: unknown): AiReply {
     if (provider === "gemini") {
         if (!isRecord(json) || !Array.isArray(json.candidates)) throw unexpectedShape();
 
-        const candidate = json.candidates[0];
+        const candidate: unknown = json.candidates[0];
         if (
             !isRecord(candidate) ||
             !isRecord(candidate.content) ||
