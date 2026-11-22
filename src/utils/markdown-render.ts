@@ -127,7 +127,6 @@ export class CardMarkdown {
      */
     private async withFootnotes(markdown: string, sourcePath: string): Promise<string> {
         const none = markdown;
-        if (!markdown.includes("[^")) return none;
         const file = this.app.vault.getFileByPath?.(sourcePath) ?? null;
         if (file === null) return none;
         try {
@@ -158,7 +157,10 @@ export class CardMarkdown {
                         ? target.createDiv({ attr: { dir: "rtl" } })
                         : target;
                 el.addClass("markdown-rendered");
-                const withNotes = await this.withFootnotes(markdown, sourcePath);
+                // Only a card that cites a footnote waits for its note: the others start drawing at once
+                const withNotes = markdown.includes("[^")
+                    ? await this.withFootnotes(markdown, sourcePath)
+                    : markdown;
                 if (!isCurrent()) return false;
                 await MarkdownRenderer.render(this.app, withNotes, el, sourcePath, owner);
                 classifyClozeSpans(el);
