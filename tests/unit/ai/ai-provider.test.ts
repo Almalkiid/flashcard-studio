@@ -48,17 +48,26 @@ test("openai request", () => {
     expect(r.throw).toBe(false);
 });
 
-test ("gemini request", () => {
-    const r = buildAiRequest({ provider: "gemini", model: "gemini-3.8-flash", baseUrl: "" }, "k", prompt,);
-    expect(r.url).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"),
-    expect(r.header).toMatchObject({"x-goog-api-key":"k", "content-type":"application/json"})
+test("gemini request", () => {
+    const r = buildAiRequest(
+        { provider: "gemini", model: "gemini-3.8-flash", baseUrl: "" },
+        "k",
+        prompt,
+    );
+    (expect(r.url).toBe(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    ),
+        expect(r.headers).toMatchObject({
+            "x-goog-api-key": "k",
+            "content-type": "application/json",
+        }));
     expect(JSON.parse(r.body as string)).toEqual({
         contents: [{ role: "user", parts: [{ text: "U" }] }],
         generationConfig: { maxOutputTokens: 100 },
         systemInstruction: { parts: [{ text: "S" }] },
     });
     expect(r.throw).toBe(false);
-})  
+});
 
 test("openai-compatible request without a key sends no auth header", () => {
     const r = buildAiRequest(
@@ -93,11 +102,17 @@ test("reads text from both shapes", () => {
     ).toBe("ab");
     expect(
         readAiText("gemini", {
-            candidates:[
-                {content:{
-                    parts: [{text: "a", type: "text"}, {text: "b", thought:false}]}}
-            ]
-        })
+            candidates: [
+                {
+                    content: {
+                        parts: [
+                            { text: "a", type: "text" },
+                            { text: "b", thought: false },
+                        ],
+                    },
+                },
+            ],
+        }),
     ).toBe("ab");
     expect(readAiText("openai", { choices: [{ message: { content: "x" } }] })).toBe("x");
     expect(readAiText("openai-compatible", { choices: [{ message: { content: "y" } }] })).toBe("y");
@@ -106,7 +121,12 @@ test("reads text from both shapes", () => {
 
 test("a reply of an unexpected shape is a format error", () => {
     expect(() => readAiText("anthropic", { content: [{ type: "tool_use" }] })).toThrow(AiError);
-    expect(() => readAiText("gemini", {candidates:[{content:{parts: [{text: ""}]}}]})).toThrow(AiError);
+    // Only thinking, no answer
+    expect(() =>
+        readAiText("gemini", {
+            candidates: [{ content: { parts: [{ text: "x", thought: true }] } }],
+        }),
+    ).toThrow(AiError);
     expect(() => readAiText("openai", null)).toThrow(AiError);
     try {
         readAiText("openai", { choices: [] });
@@ -361,11 +381,7 @@ describe("readAiReply", () => {
         ).toEqual({ text: "a", truncated: true });
         expect(
             readAiReply("gemini", {
-                candidates:[
-                {content:{
-                    parts: [{text: "a"}]}}
-            ],
-                finishReason: "MAX_TOKENS",
+                candidates: [{ content: { parts: [{ text: "a" }] }, finishReason: "MAX_TOKENS" }],
             }),
         ).toEqual({ text: "a", truncated: true });
         expect(
@@ -376,11 +392,7 @@ describe("readAiReply", () => {
         ).toEqual({ text: "a", truncated: false });
         expect(
             readAiReply("gemini", {
-                candidates:[
-                {content:{
-                    parts: [{text: "a"}]}}
-            ],
-                finishReason: "STOP",
+                candidates: [{ content: { parts: [{ text: "a" }] }, finishReason: "STOP" }],
             }),
         ).toEqual({ text: "a", truncated: false });
         expect(
@@ -478,9 +490,7 @@ describe("aiProviderIdentity", () => {
         expect(aiProviderIdentity({ provider: "anthropic", model: "m", baseUrl: "" })).toBe(
             "anthropic",
         );
-        expect(aiProviderIdentity({ provider: "gemini", model: "m", baseUrl: "" })).toBe(
-            "gemini",
-        );
+        expect(aiProviderIdentity({ provider: "gemini", model: "m", baseUrl: "" })).toBe("gemini");
         expect(aiProviderIdentity({ provider: "openai", model: "m", baseUrl: "x" })).toBe("openai");
         expect(compatible("not an address")).toBe("openai-compatible");
     });
