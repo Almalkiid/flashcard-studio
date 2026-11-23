@@ -24,7 +24,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 - **Practise like the real thing.** Exams with a timer from your multiple choice cards, or all your cards, from decks or the notes you choose, with a question map, a score against your pass mark and the score of each deck, progress that survives closing the tab, and one tap to study what you missed.
 - **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
-- **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI or a local model), look them over, and add only the ones you want.
+- **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI, Gemini or a local model), look them over, and add only the ones you want.
 - **Bring your Anki decks.** Import `.apkg` and text files with their media and decks, and export back to Anki.
 - **Your data stays yours.** Cards and schedules are plain text in your notes, and the review history is plain files that sync between devices without conflicts.
 - **Light and dark, desktop and phone.**
@@ -148,7 +148,7 @@ The speaker button in the card, or the **R** key, reads the side you see with yo
 
 Run **Flashcard Studio: Generate cards with AI** from the command palette, or choose it in the editor's context menu, on a note or on a selection. Choose how many cards (up to 50), which kinds (basic, reversed, cloze, multiple choice), any extra instructions, and whether the cards go into this note, under a **Flashcards** heading, or into a new note next to it. A preview lists the cards: untick the ones you do not want, edit any text, then choose **Add**. The plugin writes the cards in your notes' own syntax and reads each one back with its own parser before adding it. A card that would not read back as itself, for example one with `::` in its question, is shown unticked with the reason, until you edit it. A note without a flashcards tag gets one.
 
-Set it up in **Settings, AI cards**: pick Anthropic, OpenAI or any OpenAI-compatible server such as Ollama, LM Studio or OpenRouter (enter its address, for example `http://localhost:11434/v1`), a model name and your API key. The key is kept in Obsidian's secret storage, not in the plugin's settings file. A local server needs no key. This needs Obsidian 1.13.1 or later.
+Set it up in **Settings, AI cards**: pick Anthropic, OpenAI, Gemini or any OpenAI-compatible server such as Ollama, LM Studio or OpenRouter (enter its address, for example `http://localhost:11434/v1`), a model name and your API key. The key is kept in Obsidian's secret storage, not in the plugin's settings file. A local server needs no key. This needs Obsidian 1.13.1 or later.
 
 Many local servers cut a long note short without saying so (Ollama's default context is 4096 tokens), so raise the context length there when you generate from long notes.
 
