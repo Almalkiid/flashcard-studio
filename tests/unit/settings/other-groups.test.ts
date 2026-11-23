@@ -631,7 +631,7 @@ describe("AI cards", () => {
         );
     });
 
-    test("provider offers the four kinds", () => {
+    test("provider offers the eight kinds", () => {
         const row = findControl(build().items, "aiProvider");
         expect(row.name).toBe("Provider");
         expect(row.control).toMatchObject({ type: "dropdown" });
@@ -639,6 +639,10 @@ describe("AI cards", () => {
             ["anthropic", "Anthropic"],
             ["openai", "OpenAI"],
             ["gemini", "Gemini"],
+            ["deepseek", "DeepSeek"],
+            ["mistral", "Mistral"],
+            ["xai", "xAI (Grok)"],
+            ["openrouter", "OpenRouter (many models, one key)"],
             ["openai-compatible", "Compatible server (such as Ollama)"],
         ]);
     });
@@ -647,6 +651,10 @@ describe("AI cards", () => {
         ["anthropic", DEFAULT_SETTINGS.aiModel],
         ["openai", "gpt-5.1"],
         ["openai-compatible", "llama3.2"],
+        ["openrouter", "openai/gpt-5.2"],
+        ["deepseek", "deepseek-flash"],
+        ["mistral", "mistral-small-latest"],
+        ["xai", "grok-4.7"],
     ] as const)("the model placeholder for %s is %s", (provider, placeholder) => {
         const row = findControl(build(provider).items, "aiModel");
         expect(row.name).toBe("Model");
