@@ -13,6 +13,11 @@ const MODEL_PLACEHOLDER: Record<AiProviderId, string> = {
     openai: "gpt-5.1",
     "openai-compatible": "llama3.2",
     gemini: "gemini-3.8-flash",
+    // Each the example in the provider's own API reference
+    openrouter: "openai/gpt-5.2",
+    deepseek: "deepseek-flash",
+    mistral: "mistral-small-latest",
+    xai: "grok-4.7",
 };
 
 /** Making cards with AI: which provider, which model, where it lives, and the key kept in secret storage. */
@@ -31,6 +36,10 @@ export function aiGroup(ctx: SettingsContext): SettingDefinitionItem[] {
                             anthropic: "Anthropic",
                             openai: "OpenAI",
                             gemini: "Gemini",
+                            deepseek: "DeepSeek",
+                            mistral: "Mistral",
+                            xai: "xAI (Grok)",
+                            openrouter: "OpenRouter (many models, one key)",
                             "openai-compatible": "Compatible server (such as Ollama)",
                         },
                     },

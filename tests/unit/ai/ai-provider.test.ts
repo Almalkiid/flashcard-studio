@@ -5,6 +5,7 @@ import {
     AiError,
     aiErrorFromStatus,
     aiProviderIdentity,
+    aiProviderLabel,
     aiSetupProblem,
     aiUsesInsecureHttp,
     buildAiRequest,
@@ -67,6 +68,73 @@ test("gemini request", () => {
         systemInstruction: { parts: [{ text: "S" }] },
     });
     expect(r.throw).toBe(false);
+});
+
+// Providers with an OpenAI-compatible API at a known address: a name in the menu, no address to type
+describe("preset providers", () => {
+    test.each([
+        ["openrouter", "https://openrouter.ai/api/v1/chat/completions", "max_tokens"],
+        ["deepseek", "https://api.deepseek.com/chat/completions", "max_tokens"],
+        ["mistral", "https://api.mistral.ai/v1/chat/completions", "max_tokens"],
+        // xAI marks max_tokens as deprecated in favour of max_completion_tokens
+        ["xai", "https://api.x.ai/v1/chat/completions", "max_completion_tokens"],
+    ] as const)("%s sends to %s with %s", (provider, url, tokenField) => {
+        const r = buildAiRequest(
+            { provider, model: "m", baseUrl: "http://ignored" },
+            " k ",
+            prompt,
+        );
+        expect(r.url).toBe(url);
+        expect(r.method).toBe("POST");
+        expect(r.headers).toEqual({
+            "content-type": "application/json",
+            Authorization: "Bearer k",
+        });
+        expect(JSON.parse(r.body as string)).toEqual({
+            model: "m",
+            [tokenField]: 100,
+            messages: [
+                { role: "system", content: "S" },
+                { role: "user", content: "U" },
+            ],
+        });
+        expect(r.throw).toBe(false);
+    });
+
+    test.each([
+        ["openrouter", "OpenRouter"],
+        ["deepseek", "DeepSeek"],
+        ["mistral", "Mistral"],
+        ["xai", "xAI"],
+    ] as const)(
+        "%s needs a key and a model, not an address, and is named %s",
+        (provider, label) => {
+            const settings = { provider, model: "m", baseUrl: "" };
+            expect(aiSetupProblem(settings, "")).toBe("no-key");
+            expect(aiSetupProblem(settings, "k")).toBeNull();
+            expect(aiSetupProblem({ ...settings, model: "" }, "k")).toBe("no-model");
+            expect(aiUsesInsecureHttp(settings)).toBe(false);
+            expect(aiProviderLabel(settings)).toBe(label);
+            expect(aiProviderIdentity(settings)).toBe(provider);
+        },
+    );
+
+    test("a reply is read in the OpenAI shape, cut off when the length limit is hit", async () => {
+        const json = { choices: [{ message: { content: "hi" }, finish_reason: "length" }] };
+        expect(readAiReply("mistral", json)).toEqual({ text: "hi", truncated: true });
+        const sent: RequestUrlParam[] = [];
+        const reply = await requestAiReply(
+            { provider: "deepseek", model: "deepseek-flash", baseUrl: "" },
+            "k",
+            prompt,
+            (request) => {
+                sent.push(request);
+                return Promise.resolve({ status: 200, text: JSON.stringify(json) });
+            },
+        );
+        expect(reply.text).toBe("hi");
+        expect(sent[0].url).toBe("https://api.deepseek.com/chat/completions");
+    });
 });
 
 test("openai-compatible request without a key sends no auth header", () => {

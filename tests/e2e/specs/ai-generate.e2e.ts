@@ -725,6 +725,43 @@ describe("generate cards with AI", function () {
         expect(prompt).not.toContain("First paragraph.");
     });
 
+    // Providers with an OpenAI-compatible API at a known address: picked by name, with no address to type
+    for (const [provider, option, label, placeholder] of [
+        ["deepseek", "DeepSeek", "DeepSeek", "deepseek-flash"],
+        ["mistral", "Mistral", "Mistral", "mistral-small-latest"],
+        ["xai", "xAI (Grok)", "xAI", "grok-4.7"],
+        ["openrouter", "OpenRouter (many models, one key)", "OpenRouter", "openai/gpt-5.2"],
+    ] as const) {
+        it(`offers ${label} by name, with no address to type, and sends nothing without a key`, async function () {
+            await setSetting("aiProvider", "anthropic");
+            await setSetting("aiKeySecret", "");
+            await openSettings();
+            try {
+                const select = row("Provider").$("select");
+                await select.waitForExist();
+                await select.selectByVisibleText(option);
+                await browser.waitUntil(async () => (await getSetting("aiProvider")) === provider, {
+                    timeoutMsg: `${label} was not saved as the provider`,
+                });
+                await expect(row("Model").$("input")).toHaveAttribute("placeholder", placeholder);
+                expect(await row("Server address").isDisplayed()).toBe(false);
+            } finally {
+                await closeSettings();
+            }
+
+            await setSetting("aiModel", placeholder);
+            await openDialog(DECK_NOTE);
+            expect(await browser.$(".fs-ai-modal .fs-ai-sent").getText()).toBe(
+                `Sent to ${label} · ${placeholder}`,
+            );
+            await clickGenerate();
+            const error = browser.$(".fs-ai-modal .fs-ai-error");
+            await error.waitForDisplayed();
+            expect(await error.getText()).toContain("no API key");
+            expect(seen).toHaveLength(0);
+        });
+    }
+
     it("has the AI group in the settings, with the key field", async function () {
         await setSetting("aiProvider", "anthropic");
         await setSetting("aiModel", "claude-sonnet-5-5");

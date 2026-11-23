@@ -10,7 +10,57 @@ import { t } from "src/lang/translate";
  * The API key is a parameter of the two functions that need it and is never stored, logged or put in an error.
  */
 
-export type AiProviderId = "anthropic" | "openai" | "gemini" | "openai-compatible";
+export type AiProviderId =
+    | "anthropic"
+    | "openai"
+    | "gemini"
+    | "openrouter"
+    | "deepseek"
+    | "mistral"
+    | "xai"
+    | "openai-compatible";
+
+/**
+ * Providers whose API is OpenAI-compatible at a known address: the same request and reply as a compatible server,
+ * without an address to type. `tokens` is the request field for the length limit, as each provider's API reference
+ * names it.
+ */
+const PRESETS: Partial<
+    Record<
+        AiProviderId,
+        {
+            baseUrl: string;
+            label:
+                | "AI_PROVIDER_OPENROUTER"
+                | "AI_PROVIDER_DEEPSEEK"
+                | "AI_PROVIDER_MISTRAL"
+                | "AI_PROVIDER_XAI";
+            tokens: "max_tokens" | "max_completion_tokens";
+        }
+    >
+> = {
+    openrouter: {
+        baseUrl: "https://openrouter.ai/api/v1",
+        label: "AI_PROVIDER_OPENROUTER",
+        tokens: "max_tokens",
+    },
+    deepseek: {
+        baseUrl: "https://api.deepseek.com",
+        label: "AI_PROVIDER_DEEPSEEK",
+        tokens: "max_tokens",
+    },
+    mistral: {
+        baseUrl: "https://api.mistral.ai/v1",
+        label: "AI_PROVIDER_MISTRAL",
+        tokens: "max_tokens",
+    },
+    // xAI marks max_tokens as deprecated in favour of max_completion_tokens
+    xai: {
+        baseUrl: "https://api.x.ai/v1",
+        label: "AI_PROVIDER_XAI",
+        tokens: "max_completion_tokens",
+    },
+};
 
 export interface AiSettings {
     provider: AiProviderId;
@@ -81,6 +131,8 @@ export function aiProviderLabel(settings: AiSettings): string {
     if (settings.provider === "anthropic") return t("AI_PROVIDER_ANTHROPIC");
     if (settings.provider === "openai") return t("AI_PROVIDER_OPENAI");
     if (settings.provider === "gemini") return t("AI_PROVIDER_GEMINI");
+    const preset = PRESETS[settings.provider];
+    if (preset !== undefined) return t(preset.label);
     try {
         return new URL(settings.baseUrl.trim()).host;
     } catch {
@@ -162,6 +214,17 @@ export function buildAiRequest(
                 generationConfig: { maxOutputTokens: prompt.maxTokens },
                 systemInstruction: { parts: [{ text: prompt.system }] },
             }),
+            throw: false,
+        };
+    }
+
+    const preset = PRESETS[settings.provider];
+    if (preset !== undefined) {
+        return {
+            url: `${preset.baseUrl}/chat/completions`,
+            method: "POST",
+            headers,
+            body: JSON.stringify({ model, [preset.tokens]: prompt.maxTokens, messages }),
             throw: false,
         };
     }
