@@ -2,6 +2,17 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.18.0]
+
+### Added
+
+- **Gemini** is an AI provider for making cards and checking typed answers. Pick it in **Settings → AI cards**, enter a model name such as `gemini-3.8-flash`, and select your Google AI Studio key. Thanks to [@PseudoBlessings](https://github.com/PseudoBlessings). ([#19](https://github.com/Almalkiid/flashcard-studio/pull/19))
+
+### Fixed
+
+- Footnotes in cards show as footnotes, with their text under the card, when the footnote is defined elsewhere in the note. Before, `amigo[^1]` read as "amigo1". ([#21](https://github.com/Almalkiid/flashcard-studio/issues/21))
+- In the Studio look, card text uses your theme's text font and weights, as notes do, so bold words stand out and themes and CSS snippets reach the card. ([#20](https://github.com/Almalkiid/flashcard-studio/issues/20))
+
 ## [0.17.0]
 
 ### Added

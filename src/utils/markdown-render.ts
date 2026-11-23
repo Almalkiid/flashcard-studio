@@ -1,5 +1,6 @@
 import { App, Component, HoverParent, Keymap, MarkdownRenderer, Plugin } from "obsidian";
 
+import { footnoteDefinitions, withCardFootnotes } from "src/utils/card-footnotes";
 import { TextDirection } from "src/utils/text";
 
 /** The id the previews of links in cards are listed under in Obsidian's Page preview settings. */
@@ -120,6 +121,23 @@ export class CardMarkdown {
     }
 
     /**
+     * `markdown` with the definitions of the footnotes it cites from elsewhere in the note (issue #21), which makes
+     * Obsidian draw the citations and the list of footnotes under them. Unchanged when it cites none or the note cannot
+     * be read.
+     */
+    private async withFootnotes(markdown: string, sourcePath: string): Promise<string> {
+        const none = markdown;
+        const file = this.app.vault.getFileByPath?.(sourcePath) ?? null;
+        if (file === null) return none;
+        try {
+            const noteText = await this.app.vault.cachedRead(file);
+            return withCardFootnotes(markdown, footnoteDefinitions(noteText));
+        } catch {
+            return none;
+        }
+    }
+
+    /**
      * A new card is up: lets go of everything the last one rendered. Use the returned renderer for all of this card's
      * text; once another card starts, it draws nothing.
      */
@@ -139,7 +157,12 @@ export class CardMarkdown {
                         ? target.createDiv({ attr: { dir: "rtl" } })
                         : target;
                 el.addClass("markdown-rendered");
-                await MarkdownRenderer.render(this.app, markdown, el, sourcePath, owner);
+                // Only a card that cites a footnote waits for its note: the others start drawing at once
+                const withNotes = markdown.includes("[^")
+                    ? await this.withFootnotes(markdown, sourcePath)
+                    : markdown;
+                if (!isCurrent()) return false;
+                await MarkdownRenderer.render(this.app, withNotes, el, sourcePath, owner);
                 classifyClozeSpans(el);
                 return isCurrent();
             },
