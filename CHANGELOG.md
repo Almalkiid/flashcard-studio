@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.20.0]
+
+### Added
+
+- **DeepSeek**, **Mistral**, **xAI (Grok)** and **OpenRouter** are AI providers you pick by name in **Settings → AI cards**. Enter your key and a model name; there is no server address to look up. OpenRouter reaches many providers' models with one key.
+
 ## [0.19.0]
 
 ### Added
