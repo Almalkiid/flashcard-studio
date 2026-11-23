@@ -12,6 +12,7 @@ const MODEL_PLACEHOLDER: Record<AiProviderId, string> = {
     anthropic: DEFAULT_SETTINGS.aiModel,
     openai: "gpt-5.1",
     "openai-compatible": "llama3.2",
+    gemini: "gemini-3.8-flash",
 };
 
 /** Making cards with AI: which provider, which model, where it lives, and the key kept in secret storage. */
@@ -30,6 +31,7 @@ export function aiGroup(ctx: SettingsContext): SettingDefinitionItem[] {
                             anthropic: "Anthropic",
                             openai: "OpenAI",
                             "openai-compatible": "Compatible server (such as Ollama)",
+                            gemini: "Gemini",
                         },
                     },
                 },
