@@ -6,6 +6,7 @@ import {
     imagePathOf,
     OcclusionBlock,
     parseOcclusionBlock,
+    previewSizeOf,
 } from "src/occlusion/occlusion-block";
 import { cardScrollTop } from "src/occlusion/occlusion-geometry";
 import { typedAnswerTarget } from "src/scheduling/typed-answer";
@@ -244,11 +245,14 @@ export function renderOcclusion(
         cls: "fs-occ-image",
         attr: { src: app.vault.getResourcePath(file), alt: file.name, draggable: "false" },
     });
-    if (states === "labels") {
-        const size = /^!?\[\[[^|\]]+\|\s*(\d+)\s*\]\]$/.exec(block.image);
-        const width = Number(size?.[1]);
-        if (Number.isSafeInteger(width) && width > 0)
-            stage.setCssProps({ "--fs-occ-preview-width": `${width}px` });
+    const size = states === "labels" ? previewSizeOf(block.image) : null;
+    if (size !== null) {
+        // A box (300x200): as wide as fits in it with the picture's proportions, so the masks stay on the picture
+        const width =
+            size.height === null
+                ? `${size.width}px`
+                : `min(${size.width}px, calc(${size.height}px * var(--fs-occ-ratio, 1.5)))`;
+        stage.setCssProps({ "--fs-occ-preview-width": width });
     }
     fitStageToImage(stage, img);
     const overlay = stage.createSvg("svg", {

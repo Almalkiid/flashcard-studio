@@ -12,7 +12,7 @@ mask: b2 ellipse 0.5500 0.2200 0.1400 0.0800 |
 ```
 ````
 
-To limit the note preview to 240 pixels wide, write `image: [[Heart.png|240]]`. Each block can have its own width. The picture and masks shrink together in narrower panes. Review cards use their usual size.
+To limit the note preview to 240 pixels wide, write `image: [[Heart.png|240]]` or `image: ![|240](Heart.png)`. To fit it in a box, write `[[Heart.png|300x200]]` or `![|300x200](Heart.png)`: the picture keeps its proportions. Each block can have its own width. The picture and masks shrink together in narrower panes. Review cards use their usual size.
 
 **Hide all, guess one** is the default: every mask appears while one is asked. **Hide one, guess one** shows only the current mask. On the answer, tap the image or its magnifier to zoom.
 
