@@ -1,0 +1,31 @@
+name: Authorship
+
+# Commits are authored by the maintainer or a contributor, never by an AI tool (see AGENTS.md)
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+jobs:
+    authorship:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+            - name: Pull request commits and description
+              if: github.event_name == 'pull_request'
+              env:
+                  BODY: ${{ github.event.pull_request.body }}
+                  BASE: ${{ github.event.pull_request.base.sha }}
+                  HEAD: ${{ github.event.pull_request.head.sha }}
+              run: |
+                  printf '%s\n' "$BODY" > "$RUNNER_TEMP/body.txt"
+                  .github/scripts/authorship.sh "$BASE..$HEAD" "$RUNNER_TEMP/body.txt"
+            - name: Pushed commits
+              if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+              run: .github/scripts/authorship.sh "${{ github.event.before }}..${{ github.event.after }}"
