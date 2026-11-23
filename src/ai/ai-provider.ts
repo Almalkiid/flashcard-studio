@@ -10,7 +10,7 @@ import { t } from "src/lang/translate";
  * The API key is a parameter of the two functions that need it and is never stored, logged or put in an error.
  */
 
-export type AiProviderId = "anthropic" | "openai" | "openai-compatible";
+export type AiProviderId = "anthropic" | "openai" | "gemini" | "openai-compatible";
 
 export interface AiSettings {
     provider: AiProviderId;
@@ -41,6 +41,7 @@ export class AiError extends Error {
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
 /** A big generation on a slow local model can take minutes. */
 const DEFAULT_TIMEOUT_MS = 180_000;
 const MAX_DETAIL_LENGTH = 200;
@@ -79,6 +80,7 @@ export function aiUsesInsecureHttp(settings: AiSettings): boolean {
 export function aiProviderLabel(settings: AiSettings): string {
     if (settings.provider === "anthropic") return t("AI_PROVIDER_ANTHROPIC");
     if (settings.provider === "openai") return t("AI_PROVIDER_OPENAI");
+    if (settings.provider === "gemini") return t("AI_PROVIDER_GEMINI");
     try {
         return new URL(settings.baseUrl.trim()).host;
     } catch {
@@ -147,6 +149,23 @@ export function buildAiRequest(
             throw: false,
         };
     }
+    if (settings.provider === "gemini") {
+        return {
+            url: `${GEMINI_URL.replace(/\/+$/, "")}/models/${encodeURIComponent(model)}:generateContent`,
+            method: "POST",
+            headers: {
+                "x-goog-api-key": key,
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: prompt.user }] }],
+                generationConfig: { maxOutputTokens: prompt.maxTokens },
+                systemInstruction: { parts: [{ text: prompt.system }] },
+            }),
+            throw: false,
+        };
+    }
+
     // Servers other than OpenAI's know `max_tokens`, and many do not know `max_completion_tokens`
     return {
         url: `${settings.baseUrl.trim().replace(/\/+$/, "")}/chat/completions`,
@@ -190,6 +209,36 @@ export function readAiReply(provider: AiProviderId, json: unknown): AiReply {
             .map((block) => block.text);
         if (texts.length === 0) throw unexpectedShape();
         return { text: texts.join(""), truncated: json.stop_reason === "max_tokens" };
+    }
+
+    if (provider === "gemini") {
+        if (!isRecord(json) || !Array.isArray(json.candidates)) throw unexpectedShape();
+
+        const candidate = json.candidates[0];
+        if (
+            !isRecord(candidate) ||
+            !isRecord(candidate.content) ||
+            !Array.isArray(candidate.content.parts)
+        ) {
+            throw unexpectedShape();
+        }
+
+        const texts = candidate.content.parts
+            .filter(
+                (part): part is { text: string; thought?: boolean } =>
+                    isRecord(part) &&
+                    part.thought !== true &&
+                    (part.type === undefined || part.type === "text") &&
+                    typeof part.text === "string",
+            )
+            .map((part) => part.text);
+
+        if (texts.length === 0) throw unexpectedShape();
+
+        return {
+            text: texts.join(""),
+            truncated: candidate.finishReason === "MAX_TOKENS",
+        };
     }
 
     const choices = json.choices;
