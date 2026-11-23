@@ -135,6 +135,24 @@ export function imagePathOf(image: string): string {
     }
 }
 
+/**
+ * The size an `image:` value asks for, written as Obsidian sizes an embedded image: `[[x|240]]` or `[[x|300x200]]`,
+ * and `![|240](x)` or `![alt|300x200](x)`, where the size follows the last "|" (issues #16, #18). Null when it asks
+ * for none: no size, a word, or a zero.
+ */
+export function previewSizeOf(image: string): { width: number; height: number | null } | null {
+    const text = image.trim();
+    const label = /^!?\[\[(.+?)\]\]$/.exec(text)?.[1] ?? /^!?\[([^\]]*)\]\(.+\)$/.exec(text)?.[1];
+    const pipe = label?.lastIndexOf("|") ?? -1;
+    if (label === undefined || pipe < 0) return null;
+    const size = /^\s*(\d+)\s*(?:x\s*(\d+)\s*)?$/.exec(label.slice(pipe + 1));
+    if (size === null) return null;
+    const width = Number(size[1]);
+    const height = size[2] === undefined ? null : Number(size[2]);
+    if (width <= 0 || height === 0) return null;
+    return { width, height };
+}
+
 /** Whether a line opens an occlusion block: ```image-occlusion or ~~~image-occlusion, trimmed. */
 export function isOcclusionFenceStart(line: string): boolean {
     return FENCE_START.test(line.trim());
