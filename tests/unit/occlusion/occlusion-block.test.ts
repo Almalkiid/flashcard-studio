@@ -6,6 +6,7 @@ import {
     newMaskId,
     occlusionSourceOf,
     parseOcclusionBlock,
+    previewSizeOf,
 } from "src/occlusion/occlusion-block";
 
 const SRC = [
@@ -187,5 +188,33 @@ describe("imagePathOf", () => {
         ["![](100%.png)", "100%.png"],
     ])("%s is %s", (image, path) => {
         expect(imagePathOf(image)).toBe(path);
+    });
+});
+
+// Issue #18: the size an image link asks for, in both of Obsidian's link forms
+describe("previewSizeOf", () => {
+    test.each([
+        ["[[Heart.png|240]]", { width: 240, height: null }],
+        ["![[Heart.png|240]]", { width: 240, height: null }],
+        ["[[Heart.png|300x200]]", { width: 300, height: 200 }],
+        ["[[Heart.png| 300 x 200 ]]", { width: 300, height: 200 }],
+        ["![|240](Heart.png)", { width: 240, height: null }],
+        ["[|240](Heart.png)", { width: 240, height: null }],
+        ["![Heart|300x200](Heart.png)", { width: 300, height: 200 }],
+        ["![|240](<my pic.png>)", { width: 240, height: null }],
+    ])("%s asks for %o", (image, size) => {
+        expect(previewSizeOf(image)).toEqual(size);
+    });
+
+    test.each([
+        "[[Heart.png]]",
+        "![](Heart.png)",
+        "![Heart](Heart.png)",
+        "[[Heart.png|Heart]]",
+        "[[Heart.png|0]]",
+        "![|0x200](Heart.png)",
+        "Heart.png",
+    ])("%s asks for no size", (image) => {
+        expect(previewSizeOf(image)).toBeNull();
     });
 });
