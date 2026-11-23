@@ -173,7 +173,8 @@
         box-shadow:
             inset 4px 0 0 var(--fs-flag-color, transparent),
             var(--fs-shadow-lg);
-        font-family: var(--fs-font);
+        /* The card's text is in the theme's text font, as in a note, so themes and snippets reach it (issue #20) */
+        font-family: var(--font-text, var(--fs-font));
         color: var(--fs-text);
     }
 
@@ -193,6 +194,7 @@
 
     /* The context line (note › heading) as a quiet caption */
     & .fs-context {
+        font-family: var(--fs-font);
         font-size: var(--fs-caption);
         padding-right: 36px;
         font-style: normal;
@@ -207,7 +209,7 @@
     & .fs-content:not(.fs-answer-shown, .fs-cloze-card) > :not(.fs-context, .fs-reveal-hint) {
         padding: 0 8px;
         font-size: 24px;
-        font-weight: 500;
+        font-weight: var(--font-weight, 400);
         line-height: 1.35;
         letter-spacing: -0.018em;
         text-align: center;
@@ -234,6 +236,7 @@
         justify-content: center;
         gap: 8px;
         align-items: center;
+        font-family: var(--fs-font);
         font-size: var(--fs-caption);
         font-weight: 500;
         color: var(--fs-text-3);
@@ -257,13 +260,14 @@
         .fs-content.fs-answer-shown:not(.fs-cloze-card)
         > :not(.fs-context, hr, .fs-answer-pill, .fs-answer-pill ~ *) {
         font-size: var(--fs-body);
-        font-weight: 500;
+        font-weight: var(--font-weight, 400);
         line-height: 1.45;
         color: var(--fs-text-3);
     }
 
     & .fs-answer-pill {
         align-self: flex-start;
+        font-family: var(--fs-font);
         color: var(--fs-green);
         background-color: var(--fs-green-soft);
     }
@@ -294,8 +298,9 @@
         animation: none;
     }
 
+    /* Bold as the theme makes it, well apart from the text around it (issue #20) */
     & .fs-content strong {
-        font-weight: 650;
+        font-weight: var(--bold-weight, 650);
         color: var(--fs-text);
     }
 
