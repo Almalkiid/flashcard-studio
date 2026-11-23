@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.19.0]
+
+### Added
+
+- Image occlusion previews in a note also take Obsidian's other image sizes: a box, `image: [[Heart.png|300x200]]`, which the picture fits in with its proportions, and the Markdown form `image: ![|240](Heart.png)` or `![|300x200](Heart.png)`. The masks stay on the picture, and review cards keep their usual size. ([#18](https://github.com/Almalkiid/flashcard-studio/issues/18))
+
 ## [0.18.0]
 
 ### Added
