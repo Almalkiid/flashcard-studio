@@ -13,6 +13,7 @@ Commands are available from Obsidian’s command palette. Commands which operate
 | Undo last answer                                               | Reverses the last flashcard answer when possible.                    | A reversible answer exists  |
 | Suspend card / Bury until tomorrow                             | Removes the current card permanently/until the next study day.       | Focused card review         |
 | Unsuspend cards in current note / Unbury cards in current note | Clears those markers in the active note.                             | Active Markdown note        |
+| Show suspended cards                                           | Lists every suspended card to search, unsuspend or open its note.    | Plugin initialised          |
 | View Card Info                                                 | Shows state, history, and source for the current card.               | Focused card review         |
 | Open statistics                                                | Opens Flashcard Studio statistics.                                   | Plugin initialised          |
 | Custom study                                                   | Opens extra-study choices.                                           | Plugin initialised          |
