@@ -235,6 +235,20 @@ const en = {
     UNBURY_NOTE_CARDS: "Unbury cards in current note",
     CARDS_UNSUSPENDED: "Unsuspended the cards in this note.",
     CARDS_UNBURIED: "Unburied the cards in this note.",
+    SHOW_SUSPENDED_CARDS: "Show suspended cards",
+    SUSPENDED_CARDS_TITLE: "Suspended cards",
+    SUSPENDED_SEARCH: "Search cards and notes",
+    SUSPENDED_ALL_DECKS: "All decks",
+    SUSPENDED_COUNT: "${count} suspended cards",
+    SUSPENDED_NONE: "No suspended cards.",
+    SUSPENDED_NONE_MATCH: "No suspended cards match.",
+    SUSPENDED_UNSUSPEND: "Unsuspend",
+    SUSPENDED_OPEN_NOTE: "Open note",
+    SUSPENDED_UNSUSPEND_ALL: "Unsuspend all (${count})",
+    SUSPENDED_CONFIRM_TITLE: "Unsuspend ${count} cards?",
+    SUSPENDED_CONFIRM_DESC:
+        "The ${count} cards shown go back into your reviews. Cards hidden by the filters stay suspended.",
+    SUSPENDED_DONE: "Unsuspended ${count} cards.",
 
     // M3a: scheduling
     FSRS_OPTIMIZE: "Optimize parameters",

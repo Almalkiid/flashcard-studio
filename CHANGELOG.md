@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.21.0]
+
+### Added
+
+- **Show suspended cards** (command palette) lists every suspended card in the vault, so a card suspended by accident can be found again. Search the cards and their notes, pick a deck, then **Unsuspend** a card, **Open note** to go to it, or **Unsuspend all** the cards shown, after a confirmation. Only the suspended flag is taken out of the note; nothing else in it changes.
+
 ## [0.20.0]
 
 ### Added

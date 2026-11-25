@@ -11,6 +11,7 @@ import {
     FlashcardEditModal,
     SAVE_EDIT_COMMAND_ID,
 } from "src/ui/obsidian-ui-components/modals/card-edit-modal";
+import { SuspendedCardsModal } from "src/ui/obsidian-ui-components/modals/suspended-cards-modal";
 import { exportRevlogCsv, openCustomStudy, openPostpone } from "src/ui/scheduling-commands";
 import { UIState } from "src/ui/ui-state";
 
@@ -161,6 +162,9 @@ export function registerStudioCommands(plugin: FlashcardStudioPlugin): void {
         t("UNBURY_NOTE_CARDS"),
         unburyAllInText,
         t("CARDS_UNBURIED"),
+    );
+    action("show-suspended-cards", t("SHOW_SUSPENDED_CARDS"), () =>
+        new SuspendedCardsModal(plugin).open(),
     );
 
     // Views, scheduling and exams

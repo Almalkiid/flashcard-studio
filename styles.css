@@ -4862,6 +4862,88 @@ body.fs-reduced-bottom-fade-mask {
     --fs-occ-max-h: 40vh;
   }
 }
+.fs-edit-view {
+  justify-content: center;
+  flex-flow: column;
+  gap: var(--fs-space-4);
+  align-items: center;
+  display: flex;
+  inline-size: 100%;
+  block-size: 100%;
+  textarea.fs-input {
+    resize: none;
+    inline-size: 100%;
+    flex-grow: 1;
+  }
+}
+.fs-edit-modal {
+  height: 80vh;
+  .fs-response {
+    grid-template-columns: repeat(3, auto);
+    display: grid;
+    inline-size: 100%;
+    padding: 0;
+    margin-top: 0;
+    border-top: none;
+  }
+  .fs-response-button {
+    inline-size: 100%;
+  }
+  .fs-dummy-button {
+    cursor: default;
+    opacity: 0;
+  }
+}
+.fs-suspended-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-4-2);
+  margin-bottom: var(--size-4-2);
+}
+.fs-suspended-count {
+  color: var(--text-muted);
+}
+.fs-suspended-list {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.fs-suspended-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-4-2);
+  padding: var(--size-4-2) 0;
+  border-top: 1px solid var(--background-modifier-border);
+}
+.fs-suspended-text {
+  min-width: 0;
+}
+.fs-suspended-front,
+.fs-suspended-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fs-suspended-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+.fs-suspended-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--size-4-1);
+}
+.fs-suspended-empty {
+  color: var(--text-muted);
+  padding: var(--size-4-4) 0;
+  text-align: center;
+}
+.fs-confirmation-modal-content {
+  gap: var(--fs-space-4);
+  flex-flow: column;
+  display: flex;
+}
 .fs-custom-study-modal {
   .setting-item input[type="number"] {
     width: 6em;
@@ -5005,11 +5087,6 @@ body.fs-reduced-bottom-fade-mask {
   :is(th, td):is(:nth-child(2), :nth-child(4)) {
     display: none;
   }
-}
-.fs-confirmation-modal-content {
-  gap: var(--fs-space-4);
-  flex-flow: column;
-  display: flex;
 }
 #fs-modal-view {
   max-height: 100%;
@@ -5288,7 +5365,7 @@ body.fs-reduced-bottom-fade-mask {
     box-shadow:
       inset 4px 0 0 var(--fs-flag-color, transparent),
       var(--fs-shadow-lg);
-    font-family: var(--fs-font);
+    font-family: var(--font-text, var(--fs-font));
     color: var(--fs-text);
   }
   .fs-content > * {
@@ -5302,6 +5379,7 @@ body.fs-reduced-bottom-fade-mask {
     display: none;
   }
   .fs-context {
+    font-family: var(--fs-font);
     font-size: var(--fs-caption);
     padding-right: 36px;
     font-style: normal;
@@ -5315,7 +5393,7 @@ body.fs-reduced-bottom-fade-mask {
     > :not(.fs-context, .fs-reveal-hint) {
     padding: 0 8px;
     font-size: 24px;
-    font-weight: 500;
+    font-weight: var(--font-weight, 400);
     line-height: 1.35;
     letter-spacing: -0.018em;
     text-align: center;
@@ -5339,6 +5417,7 @@ body.fs-reduced-bottom-fade-mask {
     justify-content: center;
     gap: 8px;
     align-items: center;
+    font-family: var(--fs-font);
     font-size: var(--fs-caption);
     font-weight: 500;
     color: var(--fs-text-3);
@@ -5356,12 +5435,13 @@ body.fs-reduced-bottom-fade-mask {
   .fs-content.fs-answer-shown:not(.fs-cloze-card)
     > :not(.fs-context, hr, .fs-answer-pill, .fs-answer-pill ~ *) {
     font-size: var(--fs-body);
-    font-weight: 500;
+    font-weight: var(--font-weight, 400);
     line-height: 1.45;
     color: var(--fs-text-3);
   }
   .fs-answer-pill {
     align-self: flex-start;
+    font-family: var(--fs-font);
     color: var(--fs-green);
     background-color: var(--fs-green-soft);
   }
@@ -5386,7 +5466,7 @@ body.fs-reduced-bottom-fade-mask {
     animation: none;
   }
   .fs-content strong {
-    font-weight: 650;
+    font-weight: var(--bold-weight, 650);
     color: var(--fs-text);
   }
   .fs-content ul,
@@ -7479,38 +7559,6 @@ body:not(.is-mobile) .fs-card-container:not(.fs-custom-hotkeys) {
 @media (prefers-reduced-motion: reduce) {
   .fs-studio .fs-card-info-note {
     transition: none;
-  }
-}
-.fs-edit-view {
-  justify-content: center;
-  flex-flow: column;
-  gap: var(--fs-space-4);
-  align-items: center;
-  display: flex;
-  inline-size: 100%;
-  block-size: 100%;
-  textarea.fs-input {
-    resize: none;
-    inline-size: 100%;
-    flex-grow: 1;
-  }
-}
-.fs-edit-modal {
-  height: 80vh;
-  .fs-response {
-    grid-template-columns: repeat(3, auto);
-    display: grid;
-    inline-size: 100%;
-    padding: 0;
-    margin-top: 0;
-    border-top: none;
-  }
-  .fs-response-button {
-    inline-size: 100%;
-  }
-  .fs-dummy-button {
-    cursor: default;
-    opacity: 0;
   }
 }
 .fs-note-review-header-subtitle-wrapper {
