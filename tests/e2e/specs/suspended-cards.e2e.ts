@@ -168,10 +168,8 @@ describe("Suspended cards (#26)", function () {
         await browser.waitUntil(() => !readNote().includes("susp"), {
             timeoutMsg: "the card was not unsuspended in its note",
         });
-        // Only the flag goes; the schedule stays (written on its own line, as the plugin writes every comment)
-        expect(readNote()).toContain(
-            "Alpha question::Alpha answer\n<!--SR:!2026-12-01,3,250,id=aaaaaa-->",
-        );
+        // Only the flag goes: every other byte of the note stays as it was
+        expect(readNote()).toBe(MAIN_NOTE.replace(",susp-->", "-->"));
         expect(readOther().match(/,susp/g)).toHaveLength(2);
         await search("");
         expect(await rowTexts()).toHaveLength(2);

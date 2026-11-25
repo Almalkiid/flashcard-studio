@@ -133,11 +133,23 @@ export function cloneCardMeta(meta: CardMeta): CardMeta {
 /**
  * Removes the tokens matching `shouldRemove` from every segment of every `<!--SR:...-->` comment in a note,
  * leaving all other text byte-identical. Only tokens after a segment's fixed fields are considered.
+ *
+ * @param only - The cards to change, by their place in the question: then only the question's first comment, which
+ *               holds its cards' segments, is changed.
  */
-function removeMetaTokensInText(text: string, shouldRemove: (token: string) => boolean): string {
-    return text.replace(/<!--SR:(.+?)-->/g, (_match: string, comment: string) => {
-        const segments = comment.split("!").map((segment) => {
+function removeMetaTokensInText(
+    text: string,
+    shouldRemove: (token: string) => boolean,
+    only?: ReadonlySet<number>,
+): string {
+    let seen = 0;
+    return text.replace(/<!--SR:(.+?)-->/g, (match: string, comment: string) => {
+        if (only !== undefined && seen++ > 0) return match;
+        // The comment starts with "!", so the segment of card n is the one at n + 1
+        const lead = comment.startsWith("!") ? 1 : 0;
+        const segments = comment.split("!").map((segment, at) => {
             if (segment.length === 0) return segment;
+            if (only !== undefined && !only.has(at - lead)) return segment;
             const fields = segment.split(",");
             const fixedFieldCount =
                 fields[0] === FSRS_COMMENT_PREFIX ? FSRS_FIXED_FIELDS : SM2_FIXED_FIELDS;
@@ -152,6 +164,14 @@ function removeMetaTokensInText(text: string, shouldRemove: (token: string) => b
 /** Unsuspends every card in a note's text. */
 export function unsuspendAllInText(text: string): string {
     return removeMetaTokensInText(text, (token) => token === "susp");
+}
+
+/**
+ * Unsuspends the chosen cards of a question's text, by their place in the question. Only their `susp` flag goes:
+ * every other byte, later comments included, stays as it was.
+ */
+export function unsuspendCardsInText(text: string, cardIndices: ReadonlySet<number>): string {
+    return removeMetaTokensInText(text, (token) => token === "susp", cardIndices);
 }
 
 /** Unburies every card in a note's text. */

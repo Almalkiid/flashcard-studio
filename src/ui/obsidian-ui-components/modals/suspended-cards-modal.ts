@@ -1,10 +1,9 @@
 import "src/ui/obsidian-ui-components/modals/suspended-cards-modal.css";
 import { Modal, Notice, Setting } from "obsidian";
 
-import { DataStore } from "src/data/data-store/store";
 import type { Card } from "src/data/data-structures/card/flashcard";
 import { t } from "src/lang/translate";
-import { filterSuspended, groupByQuestion, suspendedCards } from "src/scheduling/suspended-cards";
+import { filterSuspended, suspendedCards, unsuspendCards } from "src/scheduling/suspended-cards";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirm-modal";
 import { openQuestionInNote } from "src/ui/open-question";
@@ -146,25 +145,18 @@ export class SuspendedCardsModal extends Modal {
     }
 
     /**
-     * Unsuspends the cards, writing each question once. A question whose note changed since it was read is left as it
-     * is, and said so.
+     * Unsuspends the cards (see {@link unsuspendCards}), says so when some could not be, and lists the vault again,
+     * whatever happened, so the rows and their buttons are what the notes say.
      *
      * @returns How many cards were unsuspended.
      */
     private async unsuspend(cards: Card[]): Promise<number> {
-        let done = 0;
-        let failed = false;
-        for (const [question, group] of groupByQuestion(cards)) {
-            for (const card of group) card.meta.suspended = false;
-            if (await DataStore.getInstance().writeSchedule(question)) {
-                done += group.length;
-            } else {
-                for (const card of group) card.meta.suspended = true;
-                failed = true;
-            }
+        try {
+            const result = await unsuspendCards(cards);
+            if (result.failed > 0) new Notice(t("CHANGE_NOT_SAVED_NOTE_CHANGED"));
+            return result.done;
+        } finally {
+            await this.reload();
         }
-        if (failed) new Notice(t("CHANGE_NOT_SAVED_NOTE_CHANGED"));
-        await this.reload();
-        return done;
     }
 }

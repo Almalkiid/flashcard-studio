@@ -6,6 +6,7 @@ import {
     isBuried,
     parseCommentMeta,
     parseSegmentMeta,
+    unsuspendCardsInText,
 } from "src/data/card-meta";
 
 describe("card meta", () => {
@@ -99,5 +100,34 @@ describe("card meta", () => {
         expect(hasPersistentMeta({ ...emptyCardMeta(), flag: 4 })).toBe(true);
         expect(hasPersistentMeta({ ...emptyCardMeta(), leech: true })).toBe(true);
         expect(hasPersistentMeta({ ...emptyCardMeta(), extras: ["x=1"] })).toBe(true);
+    });
+});
+
+describe("unsuspendCardsInText", () => {
+    test("removes the flag of the chosen cards only, leaving every other byte as it was", () => {
+        const text =
+            "Q {{c1::a}} {{c2::b}}\n<!--SR:!2026-12-01,3,250,id=aaaaaa,susp!2026-12-02,4,250,id=bbbbbb,susp-->";
+        expect(unsuspendCardsInText(text, new Set([1]))).toBe(
+            "Q {{c1::a}} {{c2::b}}\n<!--SR:!2026-12-01,3,250,id=aaaaaa,susp!2026-12-02,4,250,id=bbbbbb-->",
+        );
+        expect(unsuspendCardsInText(text, new Set([0, 1]))).toBe(
+            "Q {{c1::a}} {{c2::b}}\n<!--SR:!2026-12-01,3,250,id=aaaaaa!2026-12-02,4,250,id=bbbbbb-->",
+        );
+    });
+
+    test("keeps the comment of a card never reviewed, and never touches a later comment", () => {
+        const text =
+            "Q1\n?\nA1\n<!--SR:!2000-01-01,1,250,id=aaaaaa,susp-->\n\nmore\n<!--SR:!2026-12-01,3,250,id=bbbbbb,susp-->";
+        expect(unsuspendCardsInText(text, new Set([0]))).toBe(
+            "Q1\n?\nA1\n<!--SR:!2000-01-01,1,250,id=aaaaaa-->\n\nmore\n<!--SR:!2026-12-01,3,250,id=bbbbbb,susp-->",
+        );
+    });
+
+    test("reads an FSRS segment's fields as fixed, so only the flag after them goes", () => {
+        const text =
+            "Q::A <!--SR:!fsrs,2023-09-02T00:00:00.000Z,4,4.5,5.2,2,3,0,0,2023-08-29T00:00:00.000Z,id=aaaaaa,susp,flag=2-->";
+        expect(unsuspendCardsInText(text, new Set([0]))).toBe(
+            "Q::A <!--SR:!fsrs,2023-09-02T00:00:00.000Z,4,4.5,5.2,2,3,0,0,2023-08-29T00:00:00.000Z,id=aaaaaa,flag=2-->",
+        );
     });
 });
