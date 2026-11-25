@@ -193,6 +193,26 @@ describe("Suspended cards (#26)", function () {
         expect(readNote()).toContain(REVIEWED_SUSPENDED);
     });
 
+    it("on a phone, the search box and each card's text get the full width", async function () {
+        const phone = await browser.executeObsidian(({ obsidian }) => obsidian.Platform.isPhone);
+        if (!phone) this.skip();
+        await openDialog();
+        const sizes = await browser.execute((dialog) => {
+            const content = document.querySelector<HTMLElement>(`${dialog} .modal-content`)!;
+            const search = document.querySelector<HTMLElement>(`${dialog} .fs-suspended-search`)!;
+            const fronts = [
+                ...document.querySelectorAll<HTMLElement>(`${dialog} .fs-suspended-front`),
+            ];
+            return {
+                content: content.clientWidth,
+                search: search.getBoundingClientRect().width,
+                cut: fronts.filter((front) => front.scrollWidth > front.clientWidth).length,
+            };
+        }, DIALOG);
+        expect(sizes.search).toBeGreaterThan(sizes.content * 0.8);
+        expect(sizes.cut).toBe(0);
+    });
+
     it("opens the note of a card", async function () {
         await openDialog();
         await search("gamma");

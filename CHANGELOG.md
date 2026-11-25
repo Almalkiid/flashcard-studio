@@ -2,6 +2,12 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.21.1]
+
+### Fixed
+
+- **Show suspended cards** on a phone: the search box and the deck filter each take the full width, and a card's question shows in full above its buttons instead of being cut off after a few words.
+
 ## [0.21.0]
 
 ### Added
