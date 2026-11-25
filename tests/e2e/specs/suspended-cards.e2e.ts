@@ -193,6 +193,34 @@ describe("Suspended cards (#26)", function () {
         expect(readNote()).toContain(REVIEWED_SUSPENDED);
     });
 
+    it("on a phone, the search box and each card's text get the full width", async function () {
+        const phone = await browser.executeObsidian(({ obsidian }) => obsidian.Platform.isPhone);
+        if (!phone) this.skip();
+        await openDialog();
+        // The rows come after the dialog: measure only once all three are there
+        await browser.waitUntil(async () => (await browser.$$(ROW).length) === 3, {
+            timeoutMsg: "the cards were not listed",
+        });
+        const sizes = await browser.execute((dialog) => {
+            const content = document.querySelector<HTMLElement>(`${dialog} .modal-content`)!;
+            const search = document.querySelector<HTMLElement>(`${dialog} .fs-suspended-search`)!;
+            const fronts = [
+                ...document.querySelectorAll<HTMLElement>(`${dialog} .fs-suspended-front`),
+            ];
+            return {
+                content: content.clientWidth,
+                search: search.getBoundingClientRect().width,
+                fronts: fronts.map((front) => front.getBoundingClientRect().width),
+                cut: fronts.filter((front) => front.scrollWidth > front.clientWidth).length,
+            };
+        }, DIALOG);
+        expect(sizes.search).toBeGreaterThan(sizes.content * 0.8);
+        expect(sizes.fronts).toHaveLength(3);
+        // Each question has a line of its own, above its buttons, not a narrow column beside them
+        for (const width of sizes.fronts) expect(width).toBeGreaterThan(sizes.content * 0.8);
+        expect(sizes.cut).toBe(0);
+    });
+
     it("opens the note of a card", async function () {
         await openDialog();
         await search("gamma");
