@@ -126,6 +126,44 @@ function algorithmRow(ctx: SettingsContext): SettingDefinition {
     });
 }
 
+/**
+ * FSRS-6 or FSRS-7 (issue #27). Like the algorithm, the choice is confirmed first; it changes no card until it is
+ * answered, and each card keeps its due date.
+ */
+function fsrsVersionRow(ctx: SettingsContext): SettingDefinition {
+    return bindKeys<SettingDefinition>(["fsrsVersion"], {
+        name: "FSRS version",
+        desc: "FSRS-7 uses its default parameters. Custom parameters and Optimize apply to FSRS-6.",
+        aliases: ["fsrs-7", "fsrs7", "fsrs-6", "fsrs6", "version"],
+        visible: onFsrs(ctx),
+        render: (setting: Setting) => {
+            setting.addDropdown((dropdown) => {
+                dropdown
+                    .addOption("7", "FSRS-7 (recommended)")
+                    .addOption("6", "FSRS-6")
+                    .setValue(String(ctx.settings.fsrsVersion))
+                    .onChange((value) => {
+                        const chosen = value === "7" ? 7 : 6;
+                        if (chosen === ctx.settings.fsrsVersion) return;
+                        dropdown.setValue(String(ctx.settings.fsrsVersion));
+                        ctx.confirm(
+                            chosen === 7 ? "Switch to FSRS-7?" : "Switch to FSRS-6?",
+                            chosen === 7
+                                ? "Each card keeps its due date. From its next answer, a new card, or a card whose whole review history is in the review log, is scheduled with FSRS-7. Other cards stay on FSRS-6."
+                                : "Each card keeps its due date. From its next answer, every card is scheduled with FSRS-6.",
+                            async () => {
+                                ctx.settings.fsrsVersion = chosen;
+                                await ctx.commit(["fsrsVersion"]);
+                                ctx.refresh();
+                                dropdown.setValue(String(chosen));
+                            },
+                        );
+                    });
+            });
+        },
+    });
+}
+
 /** The stability in days of every FSRS card in play, or none while the cards are still loading. */
 function fsrsStabilities(ctx: SettingsContext): number[] {
     const { dataManager } = ctx.plugin;
@@ -371,6 +409,7 @@ function sm2Page(ctx: SettingsContext): SettingDefinitionPage {
 export function schedulingGroup(ctx: SettingsContext): SettingDefinitionItem[] {
     const rows: SettingGroupItem[] = [
         algorithmRow(ctx),
+        fsrsVersionRow(ctx),
         {
             name: "Desired retention (%)",
             desc: "Chance you still remember a card when it comes due. Higher means more reviews.",

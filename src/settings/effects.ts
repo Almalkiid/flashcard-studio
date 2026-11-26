@@ -37,6 +37,7 @@ export const EFFECTS_BY_KEY: Partial<Record<StoredKey, Effect[]>> = {
     fsrsLoadBalance: ["refreshScheduler"],
     fsrsEasyDays: ["refreshScheduler"],
     fsrsWeights: ["refreshScheduler"],
+    fsrsVersion: ["refreshScheduler"],
     algorithm: ["rebuildScheduler"],
     latexClozes: ["mathMacro"],
     enableReviewReminders: ["reminders"],
@@ -81,6 +82,7 @@ export interface EffectHost {
  */
 const RELOAD_KEYS: readonly StoredKey[] = [
     "fsrsWeights",
+    "fsrsVersion",
     "algorithm",
     "latexClozes",
     "enableReviewReminders",

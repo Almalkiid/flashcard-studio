@@ -127,6 +127,7 @@ describe("the group", () => {
         expect(group.heading).toBe("Scheduling");
         expect((group.items ?? []).map((item) => (item as { name: string }).name)).toEqual([
             "Algorithm",
+            "FSRS version",
             "Desired retention (%)",
             "Expected workload",
             "Optimize parameters",
@@ -150,6 +151,7 @@ describe("the group", () => {
                 "maximumInterval",
                 "fsrsLearningSteps",
                 "fsrsRelearningSteps",
+                "fsrsVersion",
                 "fsrsEnableFuzz",
                 "fsrsLoadBalance",
                 "fsrsEasyDays",

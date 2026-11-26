@@ -2,7 +2,7 @@ import { cloneDefaultSettings, StudioSettings } from "src/data/settings-model";
 import { SchedulerKind } from "src/scheduling/schedule/scheduler-kind";
 import type { StoredKey } from "src/settings/adapters";
 
-/** What a new install starts with: the shipped defaults on FSRS, with Anki's answer keys and fuzz. */
+/** What a new install starts with: the shipped defaults on FSRS, with Anki's answer keys and fuzz, and FSRS-7. */
 export function freshInstallSettings(): StudioSettings {
     const settings = cloneDefaultSettings();
     settings.algorithm = SchedulerKind.FSRS;
@@ -10,6 +10,7 @@ export function freshInstallSettings(): StudioSettings {
     settings.fsrsEnableFuzz = true;
     settings.fsrsLoadBalance = false;
     settings.fsrsEasyDays = [];
+    settings.fsrsVersion = 7;
     return settings;
 }
 

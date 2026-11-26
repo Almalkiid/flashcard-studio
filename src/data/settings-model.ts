@@ -74,6 +74,8 @@ export interface StudioSettings {
     /** Opt-in: choose a quiet due day from FSRS's fuzz window. */
     fsrsLoadBalance: boolean;
     fsrsRelearningSteps: string;
+    /** The FSRS model new answers use: 6 (ts-fsrs 5.4.2) or 7 (ts-fsrs 6). Issue #27. */
+    fsrsVersion: 6 | 7;
     fsrsWeights: string;
     /** A typed answer ignores accents ("cafe" matches "café"). */
     ignoreAccentsWhenTyping: boolean;
@@ -206,6 +208,8 @@ export const DEFAULT_SETTINGS: StudioSettings = {
     fsrsLearningSteps: "1m 10m",
     fsrsLoadBalance: false,
     fsrsRelearningSteps: "10m",
+    // Settings saved before FSRS-7 existed stay on FSRS-6; a new install starts on FSRS-7 (see `freshInstallSettings`)
+    fsrsVersion: 6,
     // Empty means FSRS's default weights
     fsrsWeights: "",
     ignoreAccentsWhenTyping: false,
@@ -399,6 +403,9 @@ export function upgradeSettings(settings: StudioSettings): void {
         easyDays.filter((day) => Number.isInteger(day) && day >= 0 && day <= 6),
     );
     settings.fsrsEasyDays = Array.from(validDays).sort((x, y) => x - y);
+
+    // FSRS-7 only when chosen; anything else (missing, hand-edited) is FSRS-6, so no schedule changes by surprise
+    if (settings.fsrsVersion !== 7) settings.fsrsVersion = 6;
 }
 
 /** Questions about the tag and folder lists of the settings. */
