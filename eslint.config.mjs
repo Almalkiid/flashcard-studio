@@ -43,9 +43,9 @@ export default tseslint.config(
                 {
                     enforceCamelCaseLower: true,
                     // algorithm names, and "Repetition" from the term spaced repetition
-                    ignoreWords: ["FSRS", "OSR", "SM-2", "Repetition"],
+                    ignoreWords: ["FSRS", "FSRS-6", "FSRS-7", "OSR", "SM-2", "Repetition"],
                     // ignoreWords skips the first word of a string, so those need a regex
-                    ignoreRegex: ["^FSRS ", "^SM-2"],
+                    ignoreRegex: ["^FSRS ", "^FSRS-[67]", "^SM-2"],
                 },
             ],
         },
