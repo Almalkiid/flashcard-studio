@@ -1,5 +1,4 @@
-/* eslint-disable camelcase -- ts-fsrs's card fields are snake_case */
-import { clamp, fsrs, Rating, State } from "ts-fsrs";
+import { clamp } from "ts-fsrs";
 
 import { DEFAULT_SETTINGS, StudioSettings } from "src/data/settings-model";
 import { CardDueDateHistogram } from "src/scheduling/due-histogram";
@@ -294,25 +293,22 @@ describe("SM-2 cards under FSRS", () => {
             fields[6] = String(Number(fields[6]) - 4);
             return fields.join(",");
         }
-        // No such row for ease 300: ask ts-fsrs for a card of stability 1 and difficulty 3.625 reviewed just now
-        const card = {
-            due: new Date("2023-09-07T00:00:00.000Z"),
-            stability: 1,
-            difficulty: 3.625,
-            elapsed_days: 0,
-            scheduled_days: 1,
-            learning_steps: 0,
-            reps: 1,
-            lapses: 0,
-            state: State.Review,
-            last_review: new Date(DEFAULT_CLOCK),
+        // No such row for ease 300: a card of stability 1 and difficulty 3.625 reviewed just now, as ts-fsrs 5.4.2
+        // schedules it (pinned, so a library change cannot move the expected value with it; issue #27)
+        const ease300: Record<string, string> = {
+            "defaults/Again":
+                "!fsrs,2023-09-06T00:10:00.000Z,0,0.35504029,7.88980922,3,2,1,0,2023-09-06T00:00:00.000Z",
+            "defaults/Hard":
+                "!fsrs,2023-09-07T00:00:00.000Z,1,1,5.7532063,2,2,0,0,2023-09-06T00:00:00.000Z",
+            "defaults/Good":
+                "!fsrs,2023-09-08T00:00:00.000Z,2,1.05072037,3.61660337,2,2,0,0,2023-09-06T00:00:00.000Z",
+            "defaults/Easy":
+                "!fsrs,2023-09-09T00:00:00.000Z,3,1.80755662,1.48000044,2,2,0,0,2023-09-06T00:00:00.000Z",
         };
-        const next = fsrs(buildFsrsParameters(settingsOf(row.config))).next(
-            card,
-            new Date(DEFAULT_CLOCK),
-            Rating[row.grade],
-        );
-        return FsrsState.fromFsrsCard(next.card).formatScheduleAsComment();
+        const pinned = ease300[`${row.config}/${row.grade}`];
+        if (pinned === undefined)
+            throw new Error(`no pinned ease-300 row for ${row.config}/${row.grade}`);
+        return pinned;
     };
 
     test("440 rows; the 16 that used to throw are scheduled as a review that was just done (decision D5a)", () => {
