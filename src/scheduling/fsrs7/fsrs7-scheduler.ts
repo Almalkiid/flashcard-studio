@@ -10,6 +10,12 @@ import { ReviewResponse } from "src/scheduling/schedule/review-item";
 import { moment } from "src/utils/moment-en";
 
 const DAY_MS = 86_400_000;
+
+/**
+ * FSRS-7 counts exact time, so a button's interval could change between showing the card and pressing the button. The
+ * answers worked out when a card is shown are kept this long and applied at the press, moved to its time.
+ */
+const SHOWN_ANSWERS_MS = 30 * 60_000;
 const GRADES: Partial<Record<ReviewResponse, Fsrs7Grade>> = {
     [ReviewResponse.Again]: 1,
     [ReviewResponse.Hard]: 2,
@@ -27,6 +33,8 @@ const round8 = (value: number): number => Math.round(value * 1e8) / 1e8;
 export class Fsrs7Scheduler {
     private readonly engine: Fsrs7Engine;
     private readonly loadBalance: { maximumInterval: number; easyDays: readonly number[] } | null;
+    private shown: { seed: string; at: number; answers: Record<Fsrs7Grade, Fsrs7Card> } | null =
+        null;
 
     constructor(settings: StudioSettings) {
         // Balancing picks the day inside the fuzz window itself, so the model's own fuzz is off (as for FSRS-6)
@@ -75,7 +83,7 @@ export class Fsrs7Scheduler {
      * end at the card's last review (an answer missing from the log): then the card stays on FSRS-6.
      */
     fromHistory(card: FsrsState, answers: readonly Fsrs7Answer[]): FsrsState | null {
-        const replayed = this.engine.replay(answers);
+        const replayed = this.engine.replay(answers.filter((answer) => answer.t > 0));
         const last = card.lastReview?.valueOf();
         if (replayed === null || replayed.lastReview === null || last === undefined) return null;
         // The log's time is taken a few milliseconds after the note's, so a minute apart is the same answer
@@ -101,7 +109,7 @@ export class Fsrs7Scheduler {
     ): FsrsState {
         const grade = GRADES[response];
         if (grade === undefined) throw new Error(`Unsupported FSRS response: ${response}`);
-        const answers = this.engine.answers(card, now.toDate(), seed);
+        const answers = this.answersAt(card, now, seed);
         const result = answers[grade];
         const balance = this.loadBalance;
         if (balance === null || result.state !== 2 || result.intervalDays < 1) {
@@ -147,6 +155,27 @@ export class Fsrs7Scheduler {
             { ...result, intervalDays: interval, due: new Date(now.valueOf() + interval * DAY_MS) },
             this.engine,
         );
+    }
+
+    /** The answers shown for this card if they are recent enough, moved to `now`; otherwise worked out at `now`. */
+    private answersAt(card: Fsrs7Card, now: Moment, seed: string): Record<Fsrs7Grade, Fsrs7Card> {
+        const at = now.valueOf();
+        const shown = this.shown;
+        if (shown?.seed === seed && at >= shown.at && at - shown.at <= SHOWN_ANSWERS_MS) {
+            const moved = {} as Record<Fsrs7Grade, Fsrs7Card>;
+            for (const grade of [1, 2, 3, 4] as const) {
+                const answer = shown.answers[grade];
+                moved[grade] = {
+                    ...answer,
+                    due: new Date(answer.due.valueOf() + (at - shown.at)),
+                    lastReview: now.toDate(),
+                };
+            }
+            return moved;
+        }
+        const answers = this.engine.answers(card, now.toDate(), seed);
+        this.shown = { seed, at, answers };
+        return answers;
     }
 
     /** Stable for a card from showing the buttons to answering: its last review and memory. */

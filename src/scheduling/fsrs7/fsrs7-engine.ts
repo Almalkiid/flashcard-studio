@@ -75,8 +75,8 @@ type Scheduler = ReturnType<typeof definition.create>;
 
 /**
  * FSRS-7 (ts-fsrs 6) with the plugin's settings: default FSRS-7 weights (custom weights are FSRS-6 weights), the
- * user's retention, learning steps (kept, not overridden by the model), maximum interval and fuzz, and whole-day
- * review intervals like FSRS-6. Fuzz is seeded from the card, so a button shows the interval its answer applies.
+ * user's retention, learning steps (kept, not overridden by the model), maximum interval and fuzz. Time between
+ * answers is exact; a review interval is whole days (at least one), like FSRS-6. Fuzz is seeded from the card, so a button shows the interval its answer applies.
  */
 export class Fsrs7Engine {
     private readonly scheduler: Scheduler;
@@ -87,7 +87,9 @@ export class Fsrs7Engine {
         this.scheduler = definition.create({
             config: {
                 weights: FSRS7_DEFAULT_WEIGHTS,
-                fractionalDays: false,
+                // Exact elapsed time, so same-day answers count their hours (Anki); review intervals are
+                // rounded to whole days below
+                fractionalDays: true,
                 enableShortTerm: true,
                 numRelearningSteps: relearningSteps.length,
                 desiredRetention: settings.fsrsDesiredRetention,
@@ -157,16 +159,17 @@ export class Fsrs7Engine {
                     ? now
                     : card.lastReview,
             cardId: seed,
-            reps: card.reps,
-            lapses: card.lapses,
-            scheduledDays: card.intervalDays,
-            learningStep: card.learningStep,
+            // ts-fsrs 6 rejects negative counts that FSRS-6 accepted (a hand-edited comment)
+            reps: Math.max(0, Math.trunc(card.reps)),
+            lapses: Math.max(0, Math.trunc(card.lapses)),
+            scheduledDays: Math.max(0, card.intervalDays),
+            learningStep: Math.max(0, Math.trunc(card.learningStep)),
         };
     }
 
     private static fromLibrary(card: LibraryCard, answeredAt?: Date): Fsrs7Card {
         const state = card.state as Fsrs7Card["state"];
-        const intervalDays = state === 2 ? Math.round(card.scheduledDays) : 0;
+        const intervalDays = state === 2 ? Math.max(1, Math.round(card.scheduledDays)) : 0;
         // A review card is due whole days after the answer, as with FSRS-6; a learning step keeps its exact time
         const due =
             state === 2 && answeredAt

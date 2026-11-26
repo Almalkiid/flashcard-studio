@@ -22,7 +22,8 @@ const isReset = (entry: ReviewLogEntry): boolean =>
 export function fsrs7Histories(entries: readonly ReviewLogEntry[]): Map<string, Fsrs7Answer[]> {
     const byCard = new Map<string, ReviewLogEntry[]>();
     for (const entry of entries) {
-        if (entry.c === "") continue;
+        // No card, or no usable time (ts-fsrs 6 rejects the epoch itself)
+        if (entry.c === "" || !(entry.t > 0)) continue;
         const list = byCard.get(entry.c);
         if (list) list.push(entry);
         else byCard.set(entry.c, [entry]);

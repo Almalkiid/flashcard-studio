@@ -1,5 +1,7 @@
 import { browser, expect } from "@wdio/globals";
+import * as fs from "fs";
 import { afterEach, before, describe, it } from "mocha";
+import * as path from "path";
 
 import {
     addListItem,
@@ -66,6 +68,16 @@ async function hasCommand(commandId: string): Promise<boolean> {
             commandId,
         ),
     );
+}
+
+const SCREENSHOT_DIR = path.resolve("docs/media/screenshots");
+
+/** Saves a picture for the docs and issue replies when SCREENSHOTS=1. */
+async function screenshot(name: string): Promise<void> {
+    if (process.env.SCREENSHOTS !== "1") return;
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    const device = (await isMobile()) ? "mobile" : "desktop";
+    await browser.saveScreenshot(path.join(SCREENSHOT_DIR, `${name}-${device}.png`));
 }
 
 /** Picks an algorithm in the dropdown and confirms the dialog that asks first. */
@@ -335,8 +347,11 @@ describe("settings", function () {
         await dropdown.waitForClickable({ timeoutMsg: "the FSRS version dropdown is not shown" });
         const start = String(await getSetting("fsrsVersion"));
         expect(await dropdown.getValue()).toEqual(start);
+        await row("FSRS version").scrollIntoView();
+        await screenshot("fsrs-version-setting");
         for (const value of start === "7" ? ["6", "7"] : ["7", "6"]) {
             await dropdown.selectByAttribute("value", value);
+            if (value === "7") await screenshot("fsrs-version-confirm");
             await clickWhenSettled(".fs-confirmation-modal-button-container button.mod-warning");
             await browser.waitUntil(async () => String(await getSetting("fsrsVersion")) === value, {
                 timeoutMsg: `the FSRS version did not change to ${value}`,
