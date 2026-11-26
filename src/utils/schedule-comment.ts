@@ -4,8 +4,8 @@ import { PREFERRED_DATE_FORMAT } from "src/data/formats";
 import {
     FSRS_COMMENT_PREFIX,
     FSRS7_TOKEN_PREFIX,
-    FsrsState,
     Fsrs7Traces,
+    FsrsState,
     parseFsrsTimestamp,
 } from "src/scheduling/schedule/fsrs-state";
 import { ScheduleState } from "src/scheduling/schedule/schedule-state";

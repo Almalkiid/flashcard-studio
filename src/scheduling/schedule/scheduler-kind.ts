@@ -45,11 +45,12 @@ export interface IScheduler {
         notePath: string,
         cardHistogram: DueDateHistogram,
     ): ScheduleState;
-    /** Every later answer. */
+    /** Every later answer. `cardId` lets FSRS-7 find the card's review history (issue #27). */
     cardCalcUpdatedSchedule(
         response: ReviewResponse,
         schedule: ScheduleState,
         cardHistogram: DueDateHistogram,
+        cardId?: string | null,
     ): ScheduleState;
 }
 

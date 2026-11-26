@@ -343,7 +343,12 @@ export class ReviewSession implements IReviewSession {
     determineCardSchedule(response: ReviewResponse, card: Card): ScheduleState {
         if (response === ReviewResponse.Reset) return this.algorithm.cardGetResetSchedule();
         return card.hasSchedule
-            ? this.algorithm.cardCalcUpdatedSchedule(response, card.scheduleInfo, this.histogram)
+            ? this.algorithm.cardCalcUpdatedSchedule(
+                  response,
+                  card.scheduleInfo,
+                  this.histogram,
+                  card.meta.id,
+              )
             : this.algorithm.cardGetNewSchedule(
                   response,
                   card.question.note.filePath,
