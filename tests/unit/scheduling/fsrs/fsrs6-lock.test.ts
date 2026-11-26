@@ -61,7 +61,7 @@ const answer = (
     return scheduler(settings).cardCalcUpdatedSchedule(response, schedule(comment), histogram);
 };
 
-/** Everything a schedule decides: state, interval, due time, stability, difficulty. */
+/** Five fields of a schedule: state, interval, due time, stability, difficulty. */
 const summary = (result: ScheduleState) => {
     const fsrsState = result as FsrsState;
     return [
@@ -98,6 +98,7 @@ describe("custom weights", () => {
     };
 
     test("the captured weights cover 15 distinct lists and steps", () => {
+        expect(captured.length).toBe(15);
         expect(new Set(captured.map((row) => `${row.name}|${row.steps}`)).size).toBe(15);
     });
 
@@ -117,6 +118,7 @@ describe("custom weights", () => {
         const settings = { ...DEFAULT_SETTINGS };
         writeControl(settings, "fsrsWeights", D.slice(0, 19).join(", "), { isMobile: false });
         expect(settings.fsrsWeights).toBe([...D.slice(0, 19), 0, 0.5].join(", "));
+        expect(parseFsrsWeights(settings.fsrsWeights, 1).weights?.length).toBe(21);
     });
 
     test("a 17-weight list with w5 = -1 is saved as finite weights that load again", () => {
@@ -155,7 +157,7 @@ describe("custom weights", () => {
         );
     });
 
-    test("a 17-weight list with w5 = 5 loads as 5.4.2 does, and schedules with w4 clipped to 10", () => {
+    test("a 17-weight list with w5 = 5 loads as 5.4.2 does, and gives the scheduler w4 clipped to 10", () => {
         const typedText = D.slice(0, 17)
             .map((x, i) => (i === 5 ? 5 : x))
             .join(", ");
@@ -180,6 +182,19 @@ describe("custom weights", () => {
         );
         expect(settings.fsrsWeights).toBe(
             D.map((x, i) => (i === 17 || i === 18 ? 0.490273 : x)).join(", "),
+        );
+    });
+
+    test("saving weights clips w17 and w18 for 2 relearning steps", () => {
+        const settings = { ...DEFAULT_SETTINGS, fsrsRelearningSteps: "1m 10m" };
+        writeControl(
+            settings,
+            "fsrsWeights",
+            D.map((x, i) => (i === 17 ? 1.2 : i === 18 ? 0.9 : x)).join(", "),
+            { isMobile: false },
+        );
+        expect(settings.fsrsWeights).toBe(
+            D.map((x, i) => (i === 17 || i === 18 ? 0.600459 : x)).join(", "),
         );
     });
 
@@ -235,6 +250,19 @@ describe("custom weights", () => {
         );
         expect([easy.interval, easy.dueDateAsUnix]).toEqual([184, Date.parse(NOW) + 184 * DAY_MS]);
     });
+
+    test("a review card's interval rounds as 5.4.2 does: default weights, retention 0.97 → Good 318 days", () => {
+        const card = "!fsrs,2026-11-26T12:00:00.000Z,30,1388,5,2,10,0,0,2026-10-27T12:00:00.000Z";
+        expect(
+            answer(
+                { fsrsDesiredRetention: 0.97 },
+                card,
+                ReviewResponse.Good,
+            ).formatScheduleAsComment(),
+        ).toBe(
+            "!fsrs,2027-10-10T12:00:00.000Z,318,1429.7357367,4.99022837,2,11,0,0,2026-11-26T12:00:00.000Z",
+        );
+    });
 });
 
 describe("learning steps", () => {
@@ -270,17 +298,34 @@ describe("learning steps", () => {
         expect(summary(again)).toEqual([2, 1, "2026-11-27T13:00:00.000Z", 0.212, 6.4133]);
     });
 
-    test("a 25h relearning step on a review card's Again, with a 1-day maximum", () => {
-        const card = "!fsrs,2026-11-26T12:00:00.000Z,30,100,5,2,10,0,0,2026-10-27T12:00:00.000Z";
-        expect(
-            summary(
-                answer(
-                    { maximumInterval: 1, fsrsRelearningSteps: "25h" },
-                    card,
-                    ReviewResponse.Again,
-                ),
-            ),
-        ).toEqual([2, 1, "2026-11-27T13:00:00.000Z", 3.38869849, 8.34176237]);
+    describe.each([
+        [
+            "a review card",
+            "!fsrs,2026-11-26T12:00:00.000Z,30,100,5,2,10,0,0,2026-10-27T12:00:00.000Z",
+            "!fsrs,2026-11-27T13:00:00.000Z,1,3.38869849,8.34176237,2,11,1,0,2026-11-26T12:00:00.000Z",
+        ],
+        [
+            "an already-relearning card",
+            "!fsrs,2026-11-26T12:00:00.000Z,0,30,5,3,10,1,0,2026-10-27T12:00:00.000Z",
+            "!fsrs,2026-11-27T13:00:00.000Z,1,2.32398883,8.34176237,2,11,1,0,2026-11-26T12:00:00.000Z",
+        ],
+    ])("a 25h relearning step on %s's Again, with a 1-day maximum", (_name, card, expected) => {
+        test.each([
+            [false, false],
+            [true, false],
+            [false, true],
+            [true, true],
+        ])("fuzz %s, load balance %s: the full due time is kept", (fuzz, balance) => {
+            const settings = {
+                maximumInterval: 1,
+                fsrsRelearningSteps: "25h",
+                fsrsEnableFuzz: fuzz,
+                fsrsLoadBalance: balance,
+            };
+            expect(answer(settings, card, ReviewResponse.Again).formatScheduleAsComment()).toBe(
+                expected,
+            );
+        });
     });
 
     // Hard waits (1 + 2878) / 2 = 1439.5 minutes; 5.4.2 rounds it to a full day and graduates the card
@@ -399,6 +444,47 @@ describe("the maximum interval", () => {
                 .interval,
         ).toBe(30);
     });
+
+    // 5.4.2 caps Good and Easy before balancing, so both pick the same balanced day
+    test.each([
+        [
+            "a learning card at a 5-day maximum",
+            "!fsrs,2026-11-26T12:00:00.000Z,0,10,5,1,1,0,1,2026-11-26T11:50:00.000Z",
+            5,
+            {},
+            [4, 4],
+        ],
+        [
+            "a relearning card at a 30-day maximum",
+            "!fsrs,2026-11-26T12:00:00.000Z,0,30,5,3,10,1,0,2026-11-16T12:00:00.000Z",
+            30,
+            {},
+            [27, 27],
+        ],
+        [
+            "a relearning card at a 30-day maximum, busy days 22-29",
+            "!fsrs,2026-11-26T12:00:00.000Z,0,30,5,3,10,1,0,2026-11-16T12:00:00.000Z",
+            30,
+            { 22: 50, 23: 50, 24: 50, 25: 50, 26: 50, 27: 50, 28: 50, 29: 50 },
+            [30, 30],
+        ],
+    ])(
+        "with load balancing, %s gives Good and Easy the same day",
+        (_name, card, maximumInterval, busy, expected) => {
+            expect(
+                [ReviewResponse.Good, ReviewResponse.Easy].map(
+                    (response) =>
+                        answer(
+                            { maximumInterval, fsrsLoadBalance: true },
+                            card,
+                            response,
+                            NOW,
+                            new CardDueDateHistogram(busy),
+                        ).interval,
+                ),
+            ).toEqual(expected);
+        },
+    );
 
     test("with load balancing at a 3-day maximum, a busy review card gives Again 1, Hard 2, Good 3, Easy 4", () => {
         const card =
@@ -587,7 +673,36 @@ test("stability stops at 5.4.2's ceiling of 36,500 days", () => {
 describe("optimizer score", () => {
     const withWeight = (index: number, value: number) => D.map((x, i) => (i === index ? value : x));
 
-    test("w0 = 0.05 scores as w0 = 0.1 (the initial stability floor)", () => {
+    test.each([
+        [1 as const, 0, { logLoss: 0.30337411789108404, rmse: 0.26439259265876425, count: 2 }],
+        [2 as const, 1, { logLoss: 0.2895828145779823, rmse: 0.2558405291388211, count: 2 }],
+        [3 as const, 2, { logLoss: 0.2682547266263955, rmse: 0.243591213537983, count: 2 }],
+        [4 as const, 3, { logLoss: 0.26250575477798044, rmse: 0.24054558292667697, count: 2 }],
+    ])(
+        "first rating %i with w%i = 0.05 scores as 0.1 (the initial stability floor)",
+        (firstRating, index, expected) => {
+            const histories = [
+                {
+                    cardId: "c1",
+                    reviews: [
+                        { t: 0, rating: firstRating, deltaT: 0 },
+                        { t: DAY_MS, rating: 3 as const, deltaT: 1 },
+                        { t: 6 * DAY_MS, rating: 3 as const, deltaT: 5 },
+                    ],
+                },
+            ];
+            expect(evaluateParameters(histories, withWeight(index, 0.05))).toEqual(expected);
+            expect(evaluateParameters(histories, withWeight(index, 0.1))).toEqual(expected);
+        },
+    );
+
+    test("a 17-weight list with w5 = 5 is scored with w4 clipped from 14.4133 to 10", () => {
+        const weights = parseFsrsWeights(
+            D.slice(0, 17)
+                .map((x, i) => (i === 5 ? 5 : x))
+                .join(", "),
+            1,
+        ).weights;
         const histories = [
             {
                 cardId: "c1",
@@ -595,14 +710,19 @@ describe("optimizer score", () => {
                     { t: 0, rating: 1 as const, deltaT: 0 },
                     { t: DAY_MS, rating: 3 as const, deltaT: 1 },
                     { t: 6 * DAY_MS, rating: 3 as const, deltaT: 5 },
+                    { t: 16 * DAY_MS, rating: 3 as const, deltaT: 10 },
                 ],
             },
         ];
-        expect(evaluateParameters(histories, withWeight(0, 0.05))).toEqual({
-            logLoss: 0.30337411789108404,
-            rmse: 0.26439259265876425,
-            count: 2,
-        });
+        const expected = { logLoss: 0.39669836948839016, rmse: 0.32890563312204446, count: 3 };
+        expect(weights?.[4]).toBe(14.4133);
+        expect(evaluateParameters(histories, weights ?? [])).toEqual(expected);
+        expect(
+            evaluateParameters(
+                histories,
+                (weights ?? []).map((x, i) => (i === 4 ? 10 : x)),
+            ),
+        ).toEqual(expected);
     });
 
     test("w19 = 0 scores as w19 = 0.01 on same-day reviews", () => {
@@ -616,10 +736,8 @@ describe("optimizer score", () => {
                 ],
             },
         ];
-        expect(evaluateParameters(histories, withWeight(19, 0))).toEqual({
-            logLoss: 0.07465297924756621,
-            rmse: 0.0980109014371771,
-            count: 2,
-        });
+        const expected = { logLoss: 0.07465297924756621, rmse: 0.0980109014371771, count: 2 };
+        expect(evaluateParameters(histories, withWeight(19, 0))).toEqual(expected);
+        expect(evaluateParameters(histories, withWeight(19, 0.01))).toEqual(expected);
     });
 });
