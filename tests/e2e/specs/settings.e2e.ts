@@ -347,14 +347,25 @@ describe("settings", function () {
         await dropdown.waitForClickable({ timeoutMsg: "the FSRS version dropdown is not shown" });
         const start = String(await getSetting("fsrsVersion"));
         expect(await dropdown.getValue()).toEqual(start);
-        await row("FSRS version").scrollIntoView();
+        const proceed = browser.$(".fs-confirmation-modal-button-container button.mod-warning");
+        await row("FSRS version").scrollIntoView({ block: "center" });
         await screenshot("fsrs-version-setting");
         for (const value of start === "7" ? ["6", "7"] : ["7", "6"]) {
             await dropdown.selectByAttribute("value", value);
-            if (value === "7") await screenshot("fsrs-version-confirm");
+            if (value === "7") {
+                // The picture shows the open dialog, once it has stopped moving
+                await proceed.waitForClickable({ timeoutMsg: "the confirmation did not open" });
+                await proceed.waitForStable({ timeoutMsg: "the confirmation kept moving" });
+                await screenshot("fsrs-version-confirm");
+            }
             await clickWhenSettled(".fs-confirmation-modal-button-container button.mod-warning");
             await browser.waitUntil(async () => String(await getSetting("fsrsVersion")) === value, {
                 timeoutMsg: `the FSRS version did not change to ${value}`,
+            });
+            // The next choice starts once this dialog has closed
+            await proceed.waitForDisplayed({
+                reverse: true,
+                timeoutMsg: "the confirmation stayed open",
             });
             expect(await dropdown.getValue()).toEqual(value);
         }
