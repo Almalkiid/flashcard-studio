@@ -43,7 +43,7 @@ function settingsOf(folder: string): StudioSettings {
     ) as { settings: StudioSettings };
     upgradeSettings(data.settings);
     const kept = Object.entries(data.settings).filter(([, value]) => value !== null);
-    return Object.assign(cloneDefaultSettings(), Object.fromEntries(kept)) as StudioSettings;
+    return Object.assign(cloneDefaultSettings(), Object.fromEntries(kept));
 }
 
 run("real data: every schedule answered with every button", () => {
