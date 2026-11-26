@@ -426,6 +426,41 @@ describe("the maximum interval", () => {
         ).toEqual([2, 1, "2026-11-27T12:00:00.000Z", 3.38869849, 8.34176237]);
     });
 
+    // Found replaying 5.2 million real reviews (anki-revlogs-10k, 100 users): when Hard reaches the maximum, 5.4.2
+    // keeps Good and Easy a day apart from it, so they pass the maximum by 1-2 days (3.4% of reviews at maximum 30
+    // with fuzz on). ts-fsrs 6 keeps them within it. Pinned as today's behaviour, not fixed here.
+    test.each([
+        [
+            "stability 60, fuzz off",
+            "!fsrs,2026-11-26T12:00:00.000Z,30,60,5,2,10,0,0,2026-10-27T12:00:00.000Z",
+            false,
+            [30, 31, 32],
+        ],
+        [
+            "stability 45, fuzz on",
+            "!fsrs,2026-11-26T12:00:00.000Z,30,45,5,2,10,0,0,2026-10-27T12:00:00.000Z",
+            true,
+            [30, 31, 32],
+        ],
+        [
+            "stability 60, fuzz on",
+            "!fsrs,2026-11-26T12:00:00.000Z,30,60,5,2,10,0,0,2026-10-27T12:00:00.000Z",
+            true,
+            [29, 30, 31],
+        ],
+    ])(
+        "a mature review card at a 30-day maximum (%s): Hard, Good, Easy a day apart",
+        (_name, card, fuzz, expected) => {
+            expect(
+                [ReviewResponse.Hard, ReviewResponse.Good, ReviewResponse.Easy].map(
+                    (response) =>
+                        answer({ maximumInterval: 30, fsrsEnableFuzz: fuzz }, card, response)
+                            .interval,
+                ),
+            ).toEqual(expected);
+        },
+    );
+
     test("with load balancing and no learning steps, a new card's answers stay at a 1-day maximum", () => {
         const intervals = BUTTONS.map(
             (response) =>
