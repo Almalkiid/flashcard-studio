@@ -2,6 +2,20 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.22.0]
+
+### Added
+
+- **FSRS-7** ([#27](https://github.com/Almalkiid/flashcard-studio/issues/27)), the newest FSRS model: it remembers each card with a fast and a slow memory trace, and counts the hours between same-day reviews. Choose it in **Settings → Scheduling → FSRS version**.
+    - **New installs** start on FSRS-7. **Existing vaults stay on FSRS-6** until you switch; nothing changes for them otherwise.
+    - After you switch, new and reset cards use FSRS-7. A card you already study moves to FSRS-7 at its next answer when its whole review history is in the review log (its memory is rebuilt from that history, as Anki does); a card without it stays on FSRS-6. Every card keeps its due date.
+    - FSRS-7 uses its default parameters for now. Custom parameters and **Optimize parameters** apply to FSRS-6.
+    - A card answered with FSRS-7 can still be reviewed by an older Flashcard Studio on another device; it then counts as an FSRS-6 card again.
+
+### Changed
+
+- FSRS-6 is locked to the scheduling it has always had, with tests that fail if any library update would move a due date.
+
 ## [0.21.1]
 
 ### Fixed

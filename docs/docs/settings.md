@@ -55,14 +55,15 @@ Defaults are for a new install. “Shown when” names a condition that hides or
 
 ## Scheduling
 
-| Option                  | What it does                                                  | Default    | Shown when |
-| ----------------------- | ------------------------------------------------------------- | ---------- | ---------- |
-| Algorithm               | Selects FSRS or SM-2; a card is rewritten on its next answer. | FSRS       | Always     |
-| Desired retention       | FSRS recall target; higher means more reviews.                | 90%        | FSRS       |
-| Expected workload       | Estimates daily FSRS work from loaded cards.                  | —          | FSRS       |
-| Optimize parameters     | Fits FSRS parameters to review history.                       | Not set    | FSRS       |
-| Next day starts at      | Defines the daily boundary in 24-hour time.                   | `00:00:00` | Always     |
-| Maximum interval (days) | Prevents a card waiting longer than this.                     | 36,525     | Always     |
+| Option                  | What it does                                                  | Default                                           | Shown when |
+| ----------------------- | ------------------------------------------------------------- | ------------------------------------------------- | ---------- |
+| Algorithm               | Selects FSRS or SM-2; a card is rewritten on its next answer. | FSRS                                              | Always     |
+| FSRS version            | FSRS-7 or FSRS-6; FSRS-7 uses default parameters.             | FSRS-7 for new installs, FSRS-6 for existing ones | FSRS       |
+| Desired retention       | FSRS recall target; higher means more reviews.                | 90%                                               | FSRS       |
+| Expected workload       | Estimates daily FSRS work from loaded cards.                  | —                                                 | FSRS       |
+| Optimize parameters     | Fits FSRS parameters to review history.                       | Not set                                           | FSRS       |
+| Next day starts at      | Defines the daily boundary in 24-hour time.                   | `00:00:00`                                        | Always     |
+| Maximum interval (days) | Prevents a card waiting longer than this.                     | 36,525                                            | Always     |
 
 ### Advanced FSRS
 
