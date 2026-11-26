@@ -301,7 +301,12 @@ describe("settings", function () {
 
     it("changing the algorithm shows and hides rows without opening the settings again", async function () {
         await openSettings();
-        const fsrsOnly = ["Desired retention (%)", "Optimize parameters", "Advanced FSRS"];
+        const fsrsOnly = [
+            "FSRS version",
+            "Desired retention (%)",
+            "Optimize parameters",
+            "Advanced FSRS",
+        ];
         for (const name of fsrsOnly) expect(await row(name).isDisplayed()).toBe(true);
         expect(await row("SM-2").isDisplayed()).toBe(false);
 
@@ -322,6 +327,22 @@ describe("settings", function () {
         await browser.waitUntil(async () => !(await row("SM-2").isDisplayed()), {
             timeoutMsg: "the SM-2 page stayed after the switch back",
         });
+    });
+
+    it("the FSRS version switches between FSRS-6 and FSRS-7 after confirming (issue #27)", async function () {
+        await openSettings();
+        const dropdown = row("FSRS version").$("select");
+        await dropdown.waitForClickable({ timeoutMsg: "the FSRS version dropdown is not shown" });
+        const start = String(await getSetting("fsrsVersion"));
+        expect(await dropdown.getValue()).toEqual(start);
+        for (const value of start === "7" ? ["6", "7"] : ["7", "6"]) {
+            await dropdown.selectByAttribute("value", value);
+            await clickWhenSettled(".fs-confirmation-modal-button-container button.mod-warning");
+            await browser.waitUntil(async () => String(await getSetting("fsrsVersion")) === value, {
+                timeoutMsg: `the FSRS version did not change to ${value}`,
+            });
+            expect(await dropdown.getValue()).toEqual(value);
+        }
     });
 
     it("turning review reminders on enables their options", async function () {
