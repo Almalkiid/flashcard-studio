@@ -157,7 +157,10 @@ export class Fsrs7Engine {
             // A last review after the answer (a clock that was ahead) counts as no time passed
             lastReviewAt:
                 card.lastReview === null
-                    ? null
+                    ? // A reviewed card always has one; a hand-edited comment may not: no time passed
+                      card.state === 0
+                        ? null
+                        : now
                     : card.lastReview.valueOf() <= 0 || card.lastReview.valueOf() > now.valueOf()
                       ? now
                       : card.lastReview,

@@ -58,7 +58,8 @@ export class Fsrs7Scheduler {
         notePath: string,
     ): FsrsState {
         const card = this.engine.newCard(now.toDate());
-        return this.answer(card, response, now, histogram, `new:${notePath}`, `new:${notePath}`);
+        // Not kept between showing and answering: a new card's answers do not depend on the time it is answered
+        return this.answer(card, response, now, histogram, `new:${notePath}`, null);
     }
 
     /** A later answer to an FSRS-7 card. `cardId` (when known) is part of what tells cards apart. */
@@ -71,7 +72,8 @@ export class Fsrs7Scheduler {
     ): FsrsState {
         const input = Fsrs7Scheduler.toEngine(card);
         // Everything the answers depend on: the card's id and every field of its schedule
-        const identity = `${cardId ?? ""}|${JSON.stringify(input)}`;
+        // Only a card with an id is kept between showing and answering: no id, nothing to tell cards apart by
+        const identity = cardId ? `${cardId}|${JSON.stringify(input)}` : null;
         return this.answer(input, response, now, histogram, Fsrs7Scheduler.seed(card), identity);
     }
 
@@ -103,7 +105,7 @@ export class Fsrs7Scheduler {
         now: Moment,
         histogram: DueDateHistogram,
         seed: string,
-        identity: string,
+        identity: string | null,
     ): FsrsState {
         const grade = GRADES[response];
         if (grade === undefined) throw new Error(`Unsupported FSRS response: ${response}`);
@@ -121,11 +123,16 @@ export class Fsrs7Scheduler {
         now: Moment,
         histogram: DueDateHistogram,
         seed: string,
-        identity: string,
+        identity: string | null,
     ): Record<Fsrs7Grade, Fsrs7Card> {
         const at = now.valueOf();
         const shown = this.shown;
-        if (shown?.identity === identity && at >= shown.at && at - shown.at <= SHOWN_ANSWERS_MS) {
+        if (
+            identity !== null &&
+            shown?.identity === identity &&
+            at >= shown.at &&
+            at - shown.at <= SHOWN_ANSWERS_MS
+        ) {
             const moved = {} as Record<Fsrs7Grade, Fsrs7Card>;
             for (const grade of GRADE_LIST) {
                 const answer = shown.answers[grade];
@@ -139,7 +146,7 @@ export class Fsrs7Scheduler {
         }
         const raw = this.engine.answers(card, now.toDate(), seed);
         const answers = this.balanced(card, raw, now, histogram, seed);
-        this.shown = { identity, at, answers };
+        if (identity !== null) this.shown = { identity, at, answers };
         return answers;
     }
 

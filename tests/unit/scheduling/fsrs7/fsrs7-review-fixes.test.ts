@@ -213,12 +213,20 @@ test("7. exact time: the interval on a button is the one applied up to 10 minute
         );
         const shownAt = last + interval * 86_400_000 + Math.floor(random() * 3 * 86_400_000);
         for (const r of BUTTONS) {
-            const shown = s.schedule(card, r, moment(shownAt), new CardDueDateHistogram());
+            // A reviewed card has an id (written with its first answer)
+            const shown = s.schedule(
+                card,
+                r,
+                moment(shownAt),
+                new CardDueDateHistogram(),
+                `card-${i}`,
+            );
             const applied = s.schedule(
                 card,
                 r,
                 moment(shownAt + 600_000),
                 new CardDueDateHistogram(),
+                `card-${i}`,
             );
             if (shown.interval !== applied.interval) differences++;
             expect(applied.lastReview?.valueOf()).toBe(shownAt + 600_000);
@@ -283,5 +291,62 @@ describe("confirmation review (Codex)", () => {
         const shown = good(s, card, "card-a", "2026-11-08T23:55:00.000Z");
         const applied = good(s, card, "card-a", "2026-11-09T00:05:00.000Z");
         expect(applied.interval).toBe(shown.interval);
+    });
+});
+
+describe("second confirmation review (Codex)", () => {
+    const A =
+        "!fsrs,2026-12-24T12:00:00.000Z,53,53.86951316,1,2,1,0,0,2026-11-01T12:00:00.000Z,f7=11.7841:9.42728:53.86951316:1:1:1793534400000";
+
+    test("11. a second new card in the same note gets its own balanced day", () => {
+        const settings = { fsrsLoadBalance: true };
+        const histogram = new CardDueDateHistogram();
+        const reused = v(7, settings);
+        clockAt("2026-11-09T12:00:00.000Z");
+        const first = reused.cardGetNewSchedule(ReviewResponse.Easy, "two-cards.md", histogram);
+        histogram.increment(first.interval);
+        clockAt("2026-11-09T12:01:00.000Z");
+        const second = reused.cardGetNewSchedule(ReviewResponse.Easy, "two-cards.md", histogram);
+        const fresh = v(7, settings).cardGetNewSchedule(
+            ReviewResponse.Easy,
+            "two-cards.md",
+            histogram,
+        );
+        expect(second.formatScheduleAsComment()).toBe(fresh.formatScheduleAsComment());
+    });
+
+    test("12. cards without an id never share answers", () => {
+        const s = v(7);
+        clockAt("2026-11-09T12:00:00.000Z");
+        s.cardCalcUpdatedSchedule(ReviewResponse.Good, parse(A), new CardDueDateHistogram(), null);
+        clockAt("2026-11-09T12:01:00.000Z");
+        const b = s.cardCalcUpdatedSchedule(
+            ReviewResponse.Good,
+            parse(A),
+            new CardDueDateHistogram(),
+            null,
+        );
+        const fresh = v(7).cardCalcUpdatedSchedule(
+            ReviewResponse.Good,
+            parse(A),
+            new CardDueDateHistogram(),
+            null,
+        );
+        expect(b.formatScheduleAsComment()).toBe(fresh.formatScheduleAsComment());
+    });
+
+    test("13. a reviewed FSRS-7 card without a last review date does not throw", () => {
+        const text =
+            "!fsrs,2026-12-24T12:00:00.000Z,53,53.86951316,1,2,1,0,0,-,f7=11.7841:9.42728:53.86951316:1:1:-";
+        expect(parse(text).fsrs7).not.toBeNull();
+        clockAt("2026-11-09T12:01:00.000Z");
+        expect(() =>
+            v(7).cardCalcUpdatedSchedule(
+                ReviewResponse.Good,
+                parse(text),
+                new CardDueDateHistogram(),
+                "edge",
+            ),
+        ).not.toThrow();
     });
 });
