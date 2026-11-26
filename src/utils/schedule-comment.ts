@@ -132,14 +132,23 @@ export class CommentParser {
     }
 
     /**
-     * FSRS-7's traces from the segment's `f7=` token, or null when there is none, it cannot be read, or its S90 is not
-     * field 3: then a version without FSRS-7 answered the card and kept the old token, and the card is FSRS-6 again.
+     * FSRS-7's traces from the segment's `f7=` token, or null when there is none, it cannot be read, or the S90,
+     * difficulty, review count or last review it names are not the segment's: then a version without FSRS-7 answered
+     * the card and kept the old token, and the card is FSRS-6 again.
      */
     private static parseFsrs7Token(fields: string[]): Fsrs7Traces | null {
         const token = fields.slice(10).find((field) => field.trim().startsWith(FSRS7_TOKEN_PREFIX));
         if (token === undefined) return null;
         const parts = token.trim().slice(FSRS7_TOKEN_PREFIX.length).split(":");
-        if (parts.length !== 3 || parts[2] !== fields[3]) return null;
+        const lastReview = fields[9] === undefined ? undefined : parseFsrsTimestamp(fields[9]);
+        const review = lastReview?.isValid() ? String(lastReview.valueOf()) : "-";
+        const fresh =
+            parts.length === 6 &&
+            parts[2] === fields[3] &&
+            parts[3] === fields[4] &&
+            parts[4] === fields[6] &&
+            parts[5] === review;
+        if (!fresh) return null;
         const [stability, stabilityFast] = parts.slice(0, 2).map(Number);
         const valid = [stability, stabilityFast].every((x) => Number.isFinite(x) && x > 0);
         return valid ? { stability, stabilityFast } : null;

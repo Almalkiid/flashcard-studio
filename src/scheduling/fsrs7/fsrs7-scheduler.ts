@@ -29,7 +29,10 @@ export class Fsrs7Scheduler {
     private readonly loadBalance: { maximumInterval: number; easyDays: readonly number[] } | null;
 
     constructor(settings: StudioSettings) {
-        this.engine = new Fsrs7Engine(settings);
+        // Balancing picks the day inside the fuzz window itself, so the model's own fuzz is off (as for FSRS-6)
+        this.engine = new Fsrs7Engine(
+            settings.fsrsLoadBalance ? { ...settings, fsrsEnableFuzz: false } : settings,
+        );
         this.loadBalance = settings.fsrsLoadBalance
             ? { maximumInterval: settings.maximumInterval, easyDays: settings.fsrsEasyDays }
             : null;
@@ -82,9 +85,9 @@ export class Fsrs7Scheduler {
         ) {
             return null;
         }
-        // The card keeps its due date and interval; only its memory is FSRS-7's now
+        // Only the memory is FSRS-7's now: the card keeps its state, step, counts, times and due date
         return Fsrs7Scheduler.toState(
-            { ...replayed, due: card.dueDate.toDate(), intervalDays: card.interval },
+            { ...Fsrs7Scheduler.toEngine(card), memory: replayed.memory },
             this.engine,
         );
     }
@@ -108,26 +111,38 @@ export class Fsrs7Scheduler {
         const elapsedDays = card.lastReview
             ? Math.max(0, Math.floor((now.valueOf() - card.lastReview.valueOf()) / DAY_MS))
             : 0;
-        const balanced = (forGrade: Fsrs7Grade): number => {
-            const target = answers[forGrade].intervalDays;
-            const below = forGrade > 2 ? ((forGrade - 1) as Fsrs7Grade) : null;
-            const belowTarget = below === null ? 0 : answers[below].intervalDays;
-            return pickFsrsBalancedInterval({
-                targetInterval: target,
-                elapsedDays,
-                maximumInterval: balance.maximumInterval,
-                histogram,
-                now,
-                seed,
-                easyDays: balance.easyDays,
-                currentDueUnix: card.state === 0 ? undefined : card.due.valueOf(),
-                minimumInterval:
-                    below !== null && belowTarget >= 1 && belowTarget < target
-                        ? balanced(below) + 1
-                        : undefined,
-            });
-        };
-        const interval = balanced(grade);
+        const cap = balance.maximumInterval;
+        // Hard, Good and Easy in turn, each a quiet day at least a day after the grade below, never past the maximum;
+        // at the maximum two grades may share the same day
+        let below = 0;
+        let interval = result.intervalDays;
+        for (const forGrade of [2, 3, 4] as const) {
+            const target = answers[forGrade];
+            if (target.state !== 2 || target.intervalDays < 1) continue;
+            const minimum = below >= 1 ? below + 1 : undefined;
+            const picked =
+                minimum !== undefined && minimum > cap
+                    ? cap
+                    : pickFsrsBalancedInterval({
+                          targetInterval: Math.max(
+                              Math.min(target.intervalDays, cap),
+                              minimum ?? 1,
+                          ),
+                          elapsedDays,
+                          maximumInterval: cap,
+                          histogram,
+                          now,
+                          seed,
+                          easyDays: balance.easyDays,
+                          currentDueUnix: card.state === 0 ? undefined : card.due.valueOf(),
+                          minimumInterval: minimum,
+                      });
+            below = Math.max(below, Math.min(picked, cap));
+            if (forGrade === grade) {
+                interval = below;
+                break;
+            }
+        }
         return Fsrs7Scheduler.toState(
             { ...result, intervalDays: interval, due: new Date(now.valueOf() + interval * DAY_MS) },
             this.engine,

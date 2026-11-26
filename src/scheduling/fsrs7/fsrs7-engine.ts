@@ -151,7 +151,11 @@ export class Fsrs7Engine {
             state: card.state,
             scheduleStatus: card.state === 0 ? "new" : card.state === 2 ? "review" : "learning",
             dueAt: card.due,
-            lastReviewAt: card.lastReview,
+            // A last review after the answer (a clock that was ahead) counts as no time passed
+            lastReviewAt:
+                card.lastReview && card.lastReview.valueOf() > now.valueOf()
+                    ? now
+                    : card.lastReview,
             cardId: seed,
             reps: card.reps,
             lapses: card.lapses,

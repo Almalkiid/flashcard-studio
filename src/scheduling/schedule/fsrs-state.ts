@@ -18,7 +18,11 @@ export interface Fsrs7Traces {
     stabilityFast: number;
 }
 
-/** The schedule-owned token of an FSRS-7 card: `f7=<stability>:<stabilityFast>:<S90 of field 3>`. */
+/**
+ * The schedule-owned token of an FSRS-7 card: `f7=<stability>:<stabilityFast>:<S90>:<difficulty>:<reps>:<lastReview ms>`.
+ * The last four repeat fields 3, 4, 6 and 10, so a version without FSRS-7 that answers the card (and keeps the token)
+ * leaves a token that no longer matches.
+ */
 export const FSRS7_TOKEN_PREFIX = "f7=";
 
 /** The segment for a card never reviewed, in FSRS's format: ten fields, a dash for each time. */
@@ -117,7 +121,7 @@ export class FsrsState extends ScheduleState {
 
     /**
      * `!fsrs,due,interval,stability,difficulty,state,reps,lapses,learningSteps,lastReview` (see `CommentParser`), and for
-     * an FSRS-7 card `,f7=<stability>:<stabilityFast>:<S90>` (field 3 is that S90).
+     * an FSRS-7 card the `f7=` token (see `FSRS7_TOKEN_PREFIX`).
      */
     formatScheduleAsComment(): string {
         const fields = [
@@ -134,7 +138,10 @@ export class FsrsState extends ScheduleState {
         ];
         if (this.fsrs7) {
             const { stability, stabilityFast } = this.fsrs7;
-            fields.push(`${FSRS7_TOKEN_PREFIX}${stability}:${stabilityFast}:${this.stability}`);
+            const review = this.lastReview?.valueOf() ?? "-";
+            fields.push(
+                `${FSRS7_TOKEN_PREFIX}${stability}:${stabilityFast}:${this.stability}:${this.difficulty}:${this.reps}:${review}`,
+            );
         }
         return fields.join(",");
     }

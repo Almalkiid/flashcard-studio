@@ -3,9 +3,9 @@ import { FsrsState } from "src/scheduling/schedule/fsrs-state";
 import { CommentParser } from "src/utils/schedule-comment";
 
 const FSRS6 = "!fsrs,2026-12-06T12:00:00.000Z,10,9.5,5.1,2,4,0,0,2026-11-26T12:00:00.000Z";
-// Field 3 is S90 (12.25); the token holds the two traces and the S90 they belong to
+// Field 3 is S90 (12.25); the token holds the two traces, then the S90, difficulty, reps and last review it belongs to
 const FSRS7 =
-    "!fsrs,2026-12-08T12:00:00.000Z,12,12.25,5.1,2,4,0,0,2026-11-26T12:00:00.000Z,f7=10.5:40.25:12.25";
+    "!fsrs,2026-12-08T12:00:00.000Z,12,12.25,5.1,2,4,0,0,2026-11-26T12:00:00.000Z,f7=10.5:40.25:12.25:5.1:4:1795694400000";
 
 const parse = (text: string) => CommentParser.parseMultiScheduleComment(text)[0] as FsrsState;
 
@@ -29,12 +29,16 @@ describe("FSRS-7 in the schedule comment (issue #27)", () => {
         expect(parse(stale).stability).toBe(13.5);
     });
 
-    test.each(["f7=x:1:12.25", "f7=10.5:40.25", "f7=-1:40.25:12.25", "f7=10.5:0:12.25"])(
-        "an unreadable token (%s) is ignored",
-        (token) => {
-            expect(parse(FSRS7.replace(/f7=.*$/, token)).fsrs7).toBeNull();
-        },
-    );
+    test.each([
+        "f7=x:1:12.25:5.1:4:1795694400000",
+        "f7=10.5:40.25:12.25",
+        "f7=-1:40.25:12.25:5.1:4:1795694400000",
+        "f7=10.5:0:12.25:5.1:4:1795694400000",
+        "f7=10.5:40.25:12.25:5.1:5:1795694400000",
+        "f7=10.5:40.25:12.25:5.1:4:1795694460000",
+    ])("an unreadable token (%s) is ignored", (token) => {
+        expect(parse(FSRS7.replace(/f7=.*$/, token)).fsrs7).toBeNull();
+    });
 
     test("the f7 token belongs to the schedule: metadata never keeps or repeats it", () => {
         const meta = parseSegmentMeta(`${FSRS7.slice(1)},id=k3f9a2,susp,custom`);
