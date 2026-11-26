@@ -82,10 +82,32 @@ export default tseslint.config(
                             group: ["./", "../"],
                             message: "Import from src/ with an absolute path, not a relative one.",
                         },
+                        {
+                            // FSRS-6 stays on ts-fsrs 5.4.2 (issue #27); only the FSRS-7 code may use ts-fsrs 6
+                            group: ["ts-fsrs-6", "ts-fsrs-6/*"],
+                            message:
+                                "ts-fsrs 6 is for FSRS-7 only: import it under src/scheduling/fsrs7/.",
+                        },
                     ],
                 },
             ],
             "no-restricted-syntax": ["error", ...shippedCodeSyntax],
+        },
+    },
+    {
+        files: ["src/scheduling/fsrs7/**"],
+        rules: {
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        {
+                            group: ["./", "../"],
+                            message: "Import from src/ with an absolute path, not a relative one.",
+                        },
+                    ],
+                },
+            ],
         },
     },
     {

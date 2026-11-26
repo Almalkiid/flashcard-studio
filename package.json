@@ -35,6 +35,7 @@
         "minimatch": "^11.0.4",
         "sql.js": "1.14.2",
         "ts-fsrs": "5.4.2",
+        "ts-fsrs-6": "npm:ts-fsrs@6.0.1",
         "ts-fsrs-optimizer": "0.1.2"
     },
     "devDependencies": {
