@@ -144,7 +144,7 @@ export class Fsrs7Scheduler {
         return {
             due: card.dueDate.toDate(),
             intervalDays: card.interval,
-            state: card.state as Fsrs7Card["state"],
+            state: card.state,
             memory: { ...traces, difficulty: card.difficulty },
             reps: card.reps,
             lapses: card.lapses,

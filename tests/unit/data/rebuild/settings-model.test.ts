@@ -57,6 +57,8 @@ describe("upgradeSettings against the golden vectors (settings-upgrade.json)", (
         "fsrsLoadBalance",
         "fsrsEasyDays",
         "typedAnswerEvaluation",
+        // FSRS-7 (issue #27): saved settings without a version are FSRS-6
+        "fsrsVersion",
     ]);
 
     test.each(golden.cases.map((c: UpgradeCase) => [c.name, c]))("%s", (_name, c: UpgradeCase) => {

@@ -78,7 +78,7 @@ describe("FSRS-6 or FSRS-7 per answer (issue #27)", () => {
         expect(card.dueDateAsUnix).toBe(Date.parse(NOW) + 10 * MIN);
         const text = card.formatScheduleAsComment();
         expect((parse(text) as FsrsState).fsrs7).toEqual(card.fsrs7);
-        expect(parse(text)!.formatScheduleAsComment()).toBe(text);
+        expect(parse(text).formatScheduleAsComment()).toBe(text);
     });
 
     test("FSRS-7 mode: an FSRS-7 card stays FSRS-7, and a reset card starts again on FSRS-7", () => {
@@ -145,7 +145,7 @@ describe("FSRS-6 or FSRS-7 per answer (issue #27)", () => {
         card = answer(s7, card);
         at("2026-12-10T12:00:00.000Z");
         const six = answer(v6(), card);
-        const stripped = parse(card.formatScheduleAsComment().replace(/,f7=.*$/, ""))!;
+        const stripped = parse(card.formatScheduleAsComment().replace(/,f7=.*$/, ""));
         expect(six.fsrs7).toBeNull();
         expect(six.formatScheduleAsComment()).toBe(
             answer(v6(), stripped).formatScheduleAsComment(),

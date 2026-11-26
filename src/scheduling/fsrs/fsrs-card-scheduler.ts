@@ -1,3 +1,5 @@
+import { State } from "ts-fsrs";
+
 import type { StudioSettings } from "src/data/settings-model";
 import type { DueDateHistogram } from "src/scheduling/due-histogram";
 import { FsrsScheduler } from "src/scheduling/fsrs/fsrs-scheduler";
@@ -76,7 +78,7 @@ export class FsrsCardScheduler implements IScheduler {
         const fsrs7 = this.fsrs7;
         if (fsrs7 !== null && schedule instanceof FsrsState) {
             // A reset card is new again
-            if (schedule.state === 0)
+            if (schedule.state === State.New)
                 return fsrs7.scheduleNew(response, now, cardHistogram, cardId ?? "");
             if (schedule.fsrs7) return fsrs7.schedule(schedule, response, now, cardHistogram);
             const answers = cardId ? this.history.get(cardId) : undefined;
