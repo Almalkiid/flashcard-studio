@@ -213,20 +213,14 @@ test("7. exact time: the interval on a button is the one applied up to 10 minute
         );
         const shownAt = last + interval * 86_400_000 + Math.floor(random() * 3 * 86_400_000);
         for (const r of BUTTONS) {
-            // A reviewed card has an id (written with its first answer)
-            const shown = s.schedule(
-                card,
-                r,
-                moment(shownAt),
-                new CardDueDateHistogram(),
-                `card-${i}`,
-            );
+            // The same card object is shown, then answered
+            const shown = s.schedule(card, r, moment(shownAt), new CardDueDateHistogram(), card);
             const applied = s.schedule(
                 card,
                 r,
                 moment(shownAt + 600_000),
                 new CardDueDateHistogram(),
-                `card-${i}`,
+                card,
             );
             if (shown.interval !== applied.interval) differences++;
             expect(applied.lastReview?.valueOf()).toBe(shownAt + 600_000);
@@ -288,8 +282,19 @@ describe("confirmation review (Codex)", () => {
         );
         expect(parse(card).fsrs7).not.toBeNull();
         const s = v(7, settings);
-        const shown = good(s, card, "card-a", "2026-11-08T23:55:00.000Z");
-        const applied = good(s, card, "card-a", "2026-11-09T00:05:00.000Z");
+        // The review shows one schedule object, then answers that same object
+        const shownCard = parse(card);
+        const at = (iso: string) => {
+            clockAt(iso);
+            return s.cardCalcUpdatedSchedule(
+                ReviewResponse.Good,
+                shownCard,
+                new CardDueDateHistogram(),
+                "card-a",
+            );
+        };
+        const shown = at("2026-11-08T23:55:00.000Z");
+        const applied = at("2026-11-09T00:05:00.000Z");
         expect(applied.interval).toBe(shown.interval);
     });
 });
@@ -348,5 +353,37 @@ describe("second confirmation review (Codex)", () => {
                 "edge",
             ),
         ).not.toThrow();
+    });
+});
+
+describe("third confirmation review (Codex): the kept answers belong to the shown schedule object", () => {
+    const A =
+        "!fsrs,2026-12-24T12:00:00.000Z,53,53.86951316,1,2,1,0,0,2026-11-01T12:00:00.000Z,f7=11.7841:9.42728:53.86951316:1:1:1793534400000";
+    const good = (s: FsrsCardScheduler, schedule: ScheduleState, at: string) => {
+        clockAt(at);
+        return s.cardCalcUpdatedSchedule(
+            ReviewResponse.Good,
+            schedule,
+            new CardDueDateHistogram(),
+            "abc123",
+        );
+    };
+
+    test("14. two copied cards with the same id and schedule never share answers", () => {
+        const s = v(7);
+        good(s, parse(A), "2026-11-09T12:00:00.000Z");
+        const copy = good(s, parse(A), "2026-11-09T12:01:00.000Z");
+        const fresh = good(v(7), parse(A), "2026-11-09T12:01:00.000Z");
+        expect(copy.formatScheduleAsComment()).toBe(fresh.formatScheduleAsComment());
+    });
+
+    test("15. the very card shown keeps its answers until it is answered", () => {
+        const s = v(7);
+        const shownCard = parse(A);
+        const shown = good(s, shownCard, "2026-11-09T12:00:00.000Z");
+        const applied = good(s, shownCard, "2026-11-09T12:09:00.000Z") as FsrsState;
+        expect(applied.interval).toBe(shown.interval);
+        expect(applied.fsrs7).toEqual((shown as FsrsState).fsrs7);
+        expect(applied.lastReview?.toISOString()).toBe("2026-11-09T12:09:00.000Z");
     });
 });

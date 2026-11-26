@@ -31,11 +31,20 @@ const round8 = (value: number): number => Math.round(value * 1e8) / 1e8;
  * Answers cards with FSRS-7 and gives the plugin's FSRS schedules back: field 3 holds S90, the traces go in the
  * `f7` token. Load balancing follows the FSRS-6 rules (quiet day inside the fuzz window, Hard < Good < Easy).
  */
+/**
+ * What makes a later call the same card as the one shown: the very schedule object the review is showing (a copied
+ * card, a re-read note or an answered card is another object) and every field it held then.
+ */
+interface ShownIdentity {
+    owner: object;
+    fingerprint: string;
+}
+
 export class Fsrs7Scheduler {
     private readonly engine: Fsrs7Engine;
     private readonly loadBalance: { maximumInterval: number; easyDays: readonly number[] } | null;
     private shown: {
-        identity: string;
+        identity: ShownIdentity;
         at: number;
         answers: Record<Fsrs7Grade, Fsrs7Card>;
     } | null = null;
@@ -62,18 +71,21 @@ export class Fsrs7Scheduler {
         return this.answer(card, response, now, histogram, `new:${notePath}`, null);
     }
 
-    /** A later answer to an FSRS-7 card. `cardId` (when known) is part of what tells cards apart. */
+    /**
+     * A later answer to an FSRS-7 card.
+     *
+     * @param shownAs - The schedule object the review shows for this card (by default `card`): the answers worked out
+     *                  for it are kept until it is answered (see `finalAnswers`).
+     */
     schedule(
         card: FsrsState,
         response: ReviewResponse,
         now: Moment,
         histogram: DueDateHistogram,
-        cardId?: string | null,
+        shownAs: object = card,
     ): FsrsState {
         const input = Fsrs7Scheduler.toEngine(card);
-        // Everything the answers depend on: the card's id and every field of its schedule
-        // Only a card with an id is kept between showing and answering: no id, nothing to tell cards apart by
-        const identity = cardId ? `${cardId}|${JSON.stringify(input)}` : null;
+        const identity = { owner: shownAs, fingerprint: JSON.stringify(input) };
         return this.answer(input, response, now, histogram, Fsrs7Scheduler.seed(card), identity);
     }
 
@@ -105,7 +117,7 @@ export class Fsrs7Scheduler {
         now: Moment,
         histogram: DueDateHistogram,
         seed: string,
-        identity: string | null,
+        identity: ShownIdentity | null,
     ): FsrsState {
         const grade = GRADES[response];
         if (grade === undefined) throw new Error(`Unsupported FSRS response: ${response}`);
@@ -115,21 +127,22 @@ export class Fsrs7Scheduler {
 
     /**
      * The card each button gives, after load balancing. FSRS-7 counts exact time, so these are worked out once when
-     * the card is shown and kept for half an hour for the same card (same id and the very same schedule), then
-     * applied at the press, moved to its time: the interval on a button is the one applied.
+     * the card is shown and kept for half an hour for that very card (see `ShownIdentity`), then applied at the press,
+     * moved to its time: the interval on a button is the one applied.
      */
     private finalAnswers(
         card: Fsrs7Card,
         now: Moment,
         histogram: DueDateHistogram,
         seed: string,
-        identity: string | null,
+        identity: ShownIdentity | null,
     ): Record<Fsrs7Grade, Fsrs7Card> {
         const at = now.valueOf();
         const shown = this.shown;
         if (
             identity !== null &&
-            shown?.identity === identity &&
+            shown?.identity.owner === identity.owner &&
+            shown.identity.fingerprint === identity.fingerprint &&
             at >= shown.at &&
             at - shown.at <= SHOWN_ANSWERS_MS
         ) {
