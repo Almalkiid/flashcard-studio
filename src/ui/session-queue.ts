@@ -14,6 +14,8 @@ import {
     monthsBetween,
 } from "src/scheduling/custom-study";
 import { countToday, DailyLimits, monthsCovering } from "src/scheduling/daily-limits";
+import { FsrsCardScheduler } from "src/scheduling/fsrs/fsrs-card-scheduler";
+import { fsrs7Histories } from "src/scheduling/fsrs7/fsrs7-history";
 import { createCardRisk, reviewOrderOf } from "src/scheduling/review/review-order";
 import {
     FlashcardReviewMode,
@@ -131,6 +133,7 @@ export class ReviewQueueLoader {
                 : null;
 
         const settings = data.data.settings;
+        await this.loadFsrs7History();
         const reviewSession = new ReviewSession(
             this.reviewMode,
             new DeckWalker(iteratorOrderFor(settings), null),
@@ -144,6 +147,23 @@ export class ReviewQueueLoader {
         );
         reviewSession.setDeckRoot(fullTree, remainingTree);
         return reviewSession;
+    }
+
+    /**
+     * With FSRS-7, the scheduler gets every card's complete review history, from which an FSRS-6 card's FSRS-7 memory
+     * is rebuilt at its next answer (issue #27). A log that cannot be read leaves those cards on FSRS-6.
+     */
+    private async loadFsrs7History(): Promise<void> {
+        const scheduler = ActiveScheduler.getInstance();
+        if (!(scheduler instanceof FsrsCardScheduler) || !scheduler.usesFsrs7) return;
+        try {
+            scheduler.setReviewHistory(
+                fsrs7Histories(await this.plugin.dataManager.reviewLog.readAll()),
+            );
+        } catch (error) {
+            console.error("Flashcard Studio: couldn't read the review log for FSRS-7", error);
+            scheduler.setReviewHistory(new Map());
+        }
     }
 
     /**

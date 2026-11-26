@@ -1,5 +1,7 @@
 import { browser, expect } from "@wdio/globals";
+import * as fs from "fs";
 import { afterEach, before, describe, it } from "mocha";
+import * as path from "path";
 
 import {
     addListItem,
@@ -66,6 +68,16 @@ async function hasCommand(commandId: string): Promise<boolean> {
             commandId,
         ),
     );
+}
+
+const SCREENSHOT_DIR = path.resolve("docs/media/screenshots");
+
+/** Saves a picture for the docs and issue replies when SCREENSHOTS=1. */
+async function screenshot(name: string): Promise<void> {
+    if (process.env.SCREENSHOTS !== "1") return;
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    const device = (await isMobile()) ? "mobile" : "desktop";
+    await browser.saveScreenshot(path.join(SCREENSHOT_DIR, `${name}-${device}.png`));
 }
 
 /** Picks an algorithm in the dropdown and confirms the dialog that asks first. */
@@ -301,7 +313,12 @@ describe("settings", function () {
 
     it("changing the algorithm shows and hides rows without opening the settings again", async function () {
         await openSettings();
-        const fsrsOnly = ["Desired retention (%)", "Optimize parameters", "Advanced FSRS"];
+        const fsrsOnly = [
+            "FSRS version",
+            "Desired retention (%)",
+            "Optimize parameters",
+            "Advanced FSRS",
+        ];
         for (const name of fsrsOnly) expect(await row(name).isDisplayed()).toBe(true);
         expect(await row("SM-2").isDisplayed()).toBe(false);
 
@@ -322,6 +339,36 @@ describe("settings", function () {
         await browser.waitUntil(async () => !(await row("SM-2").isDisplayed()), {
             timeoutMsg: "the SM-2 page stayed after the switch back",
         });
+    });
+
+    it("the FSRS version switches between FSRS-6 and FSRS-7 after confirming (issue #27)", async function () {
+        await openSettings();
+        const dropdown = row("FSRS version").$("select");
+        await dropdown.waitForClickable({ timeoutMsg: "the FSRS version dropdown is not shown" });
+        const start = String(await getSetting("fsrsVersion"));
+        expect(await dropdown.getValue()).toEqual(start);
+        const proceed = browser.$(".fs-confirmation-modal-button-container button.mod-warning");
+        await row("FSRS version").scrollIntoView({ block: "center" });
+        await screenshot("fsrs-version-setting");
+        for (const value of start === "7" ? ["6", "7"] : ["7", "6"]) {
+            await dropdown.selectByAttribute("value", value);
+            if (value === "7") {
+                // The picture shows the open dialog, once it has stopped moving
+                await proceed.waitForClickable({ timeoutMsg: "the confirmation did not open" });
+                await proceed.waitForStable({ timeoutMsg: "the confirmation kept moving" });
+                await screenshot("fsrs-version-confirm");
+            }
+            await clickWhenSettled(".fs-confirmation-modal-button-container button.mod-warning");
+            await browser.waitUntil(async () => String(await getSetting("fsrsVersion")) === value, {
+                timeoutMsg: `the FSRS version did not change to ${value}`,
+            });
+            // The next choice starts once this dialog has closed
+            await proceed.waitForDisplayed({
+                reverse: true,
+                timeoutMsg: "the confirmation stayed open",
+            });
+            expect(await dropdown.getValue()).toEqual(value);
+        }
     });
 
     it("turning review reminders on enables their options", async function () {

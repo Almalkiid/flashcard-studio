@@ -53,6 +53,9 @@ const settingsDiff = (settings: StudioSettings) => {
 function expectedOf(name: string, result: unknown) {
     const expected = JSON.parse(JSON.stringify(result));
     delete expected.settingsDiffVsShippedDefaults.clozePatterns;
+    // FSRS-7 came after the golden run: a new install starts on it, saved settings stay on FSRS-6 (issue #27)
+    if (expected.isFirstRun)
+        expected.settingsDiffVsShippedDefaults.fsrsVersion = { default: 6, loaded: 7 };
     if (name === "null value overrides a default") {
         delete expected.settingsDiffVsShippedDefaults.flashcardTags;
     }
@@ -90,6 +93,8 @@ describe("loadData against the golden vectors (plugin-data.json)", () => {
         delete actual.settings.fsrsEasyDays;
         expect(actual.settings.typedAnswerEvaluation).toBe("deterministic");
         delete actual.settings.typedAnswerEvaluation;
+        expect(actual.settings.fsrsVersion).toBe(6);
+        delete actual.settings.fsrsVersion;
         expect(actual).toEqual(expected);
     });
 });

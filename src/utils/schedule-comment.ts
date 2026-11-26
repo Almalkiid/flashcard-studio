@@ -3,6 +3,8 @@ import { State } from "ts-fsrs";
 import { PREFERRED_DATE_FORMAT } from "src/data/formats";
 import {
     FSRS_COMMENT_PREFIX,
+    FSRS7_TOKEN_PREFIX,
+    Fsrs7Traces,
     FsrsState,
     parseFsrsTimestamp,
 } from "src/scheduling/schedule/fsrs-state";
@@ -125,7 +127,31 @@ export class CommentParser {
             numbers.lapses,
             numbers.steps,
             last?.isValid() ? last : null,
+            CommentParser.parseFsrs7Token(fields),
         );
+    }
+
+    /**
+     * FSRS-7's traces from the segment's `f7=` token, or null when there is none, it cannot be read, or the S90,
+     * difficulty, review count or last review it names are not the segment's: then a version without FSRS-7 answered
+     * the card and kept the old token, and the card is FSRS-6 again.
+     */
+    private static parseFsrs7Token(fields: string[]): Fsrs7Traces | null {
+        const token = fields.slice(10).find((field) => field.trim().startsWith(FSRS7_TOKEN_PREFIX));
+        if (token === undefined) return null;
+        const parts = token.trim().slice(FSRS7_TOKEN_PREFIX.length).split(":");
+        const lastReview = fields[9] === undefined ? undefined : parseFsrsTimestamp(fields[9]);
+        const review = lastReview?.isValid() ? String(lastReview.valueOf()) : "-";
+        const fresh =
+            parts.length === 6 &&
+            parts[2] === fields[3] &&
+            parts[3] === fields[4] &&
+            parts[4] === fields[6] &&
+            parts[5] === review;
+        if (!fresh) return null;
+        const [stability, stabilityFast] = parts.slice(0, 2).map(Number);
+        const valid = [stability, stabilityFast].every((x) => Number.isFinite(x) && x > 0);
+        return valid ? { stability, stabilityFast } : null;
     }
 
     private static warnUnreadable(segment: string): void {

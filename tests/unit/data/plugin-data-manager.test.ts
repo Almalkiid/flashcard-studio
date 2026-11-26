@@ -45,7 +45,12 @@ describe("the first run and how the Studio opens", () => {
         const changed = (Object.keys(untouched) as (keyof typeof untouched)[]).filter(
             (key) => JSON.stringify(fresh[key]) !== JSON.stringify(untouched[key]),
         );
-        expect(changed.sort()).toEqual(["algorithm", "answerKeys", "fsrsEnableFuzz"]);
+        expect(changed.sort()).toEqual([
+            "algorithm",
+            "answerKeys",
+            "fsrsEnableFuzz",
+            "fsrsVersion",
+        ]);
     });
 
     test("a new install on a phone keeps the modal, and the phone's own settings", async () => {

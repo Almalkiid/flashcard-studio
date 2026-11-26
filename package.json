@@ -1,6 +1,6 @@
 {
     "name": "flashcard-studio",
-    "version": "0.21.1",
+    "version": "0.22.0",
     "description": "Flashcards and note review for Obsidian: FSRS scheduling, a full review history, daily limits, statistics and exams, on desktop and mobile.",
     "keywords": [
         "obsidian",
@@ -35,6 +35,7 @@
         "minimatch": "^11.0.4",
         "sql.js": "1.14.2",
         "ts-fsrs": "5.4.2",
+        "ts-fsrs-6": "npm:ts-fsrs@6.0.1",
         "ts-fsrs-optimizer": "0.1.2"
     },
     "devDependencies": {

@@ -11,7 +11,7 @@ Capital of France::Paris
 <!--SR:!fsrs,...,id=k3f9a2-->
 ```
 
-The comment is parsed as schedule metadata; its exact FSRS/SM-2 fields are internal and may change. It can also carry `susp`, `bury=`, `flag=`, and `leech` markers. **Schedule on the card’s last line** puts the comment after the card’s last text instead. **Hide schedules in a callout** places new schedule metadata in a folded callout. Callout-card schedules stay after the callout, and image-occlusion masks share one comment after their block.
+The comment is parsed as schedule metadata; its exact FSRS/SM-2 fields are internal and may change. An FSRS-7 card also carries `f7=` with its two memory traces. It can also carry `susp`, `bury=`, `flag=`, and `leech` markers. **Schedule on the card’s last line** puts the comment after the card’s last text instead. **Hide schedules in a callout** places new schedule metadata in a folded callout. Callout-card schedules stay after the callout, and image-occlusion masks share one comment after their block.
 
 ## Note-review frontmatter
 
