@@ -1,4 +1,4 @@
-import { FSRS_COMMENT_PREFIX } from "src/scheduling/schedule/fsrs-state";
+import { FSRS_COMMENT_PREFIX, FSRS7_TOKEN_PREFIX } from "src/scheduling/schedule/fsrs-state";
 import { CommentParser } from "src/utils/schedule-comment";
 
 /**
@@ -67,7 +67,8 @@ export function parseSegmentMeta(segment: string): CardMeta {
 
     for (const rawToken of fields.slice(fixedFieldCount)) {
         const token = rawToken.trim();
-        if (token.length === 0) continue;
+        // FSRS-7's token belongs to the schedule, which writes it; one kept by an older version is dropped
+        if (token.length === 0 || token.startsWith(FSRS7_TOKEN_PREFIX)) continue;
 
         if (token === "susp") {
             meta.suspended = true;

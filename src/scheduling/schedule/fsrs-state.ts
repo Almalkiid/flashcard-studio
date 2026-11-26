@@ -9,6 +9,18 @@ import { moment } from "src/utils/moment-en";
 /** The word that starts an FSRS segment of a schedule comment (`!fsrs,...`). */
 export const FSRS_COMMENT_PREFIX = "fsrs";
 
+/**
+ * FSRS-7's two memory traces (issue #27). The difficulty is the segment's field 4, shared with FSRS-6; field 3 holds S90,
+ * the days until recall falls to 90%, which is what an older version or an FSRS-6 reader takes for the stability.
+ */
+export interface Fsrs7Traces {
+    stability: number;
+    stabilityFast: number;
+}
+
+/** The schedule-owned token of an FSRS-7 card: `f7=<stability>:<stabilityFast>:<S90 of field 3>`. */
+export const FSRS7_TOKEN_PREFIX = "f7=";
+
 /** The segment for a card never reviewed, in FSRS's format: ten fields, a dash for each time. */
 export const FSRS_EMPTY_SCHEDULE_COMMENT = `!${FSRS_COMMENT_PREFIX},-,0,0,0,0,0,0,0,-`;
 
@@ -62,6 +74,8 @@ export class FsrsState extends ScheduleState {
         /** The index of the next learning step. */
         public learningSteps: number,
         public lastReview: Moment | null,
+        /** FSRS-7's traces, or null for an FSRS-6 card. */
+        public fsrs7: Fsrs7Traces | null = null,
     ) {
         const overdueMs = dueDate ? globalDateProvider.now.valueOf() - dueDate.valueOf() : 0;
         super(SchedulerKind.FSRS, dueDate, interval, difficultyToEase(difficulty), overdueMs);
@@ -101,9 +115,12 @@ export class FsrsState extends ScheduleState {
         /* eslint-enable camelcase -- the snake_case card fields end here */
     }
 
-    /** `!fsrs,due,interval,stability,difficulty,state,reps,lapses,learningSteps,lastReview` (see `CommentParser`). */
+    /**
+     * `!fsrs,due,interval,stability,difficulty,state,reps,lapses,learningSteps,lastReview` (see `CommentParser`), and for
+     * an FSRS-7 card `,f7=<stability>:<stabilityFast>:<S90>` (field 3 is that S90).
+     */
     formatScheduleAsComment(): string {
-        return [
+        const fields = [
             `!${FSRS_COMMENT_PREFIX}`,
             formatFsrsTimestamp(this.dueDate),
             this.interval,
@@ -114,7 +131,12 @@ export class FsrsState extends ScheduleState {
             this.lapses,
             this.learningSteps,
             formatFsrsTimestamp(this.lastReview),
-        ].join(",");
+        ];
+        if (this.fsrs7) {
+            const { stability, stabilityFast } = this.fsrs7;
+            fields.push(`${FSRS7_TOKEN_PREFIX}${stability}:${stabilityFast}:${this.stability}`);
+        }
+        return fields.join(",");
     }
 }
 
