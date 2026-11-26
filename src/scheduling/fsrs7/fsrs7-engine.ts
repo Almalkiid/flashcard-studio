@@ -152,12 +152,15 @@ export class Fsrs7Engine {
             ...card.memory,
             state: card.state,
             scheduleStatus: card.state === 0 ? "new" : card.state === 2 ? "review" : "learning",
-            dueAt: card.due,
+            // ts-fsrs 6 rejects a date at the epoch itself (a hand-edited 1970-01-01)
+            dueAt: card.due.valueOf() > 0 ? card.due : now,
             // A last review after the answer (a clock that was ahead) counts as no time passed
             lastReviewAt:
-                card.lastReview && card.lastReview.valueOf() > now.valueOf()
-                    ? now
-                    : card.lastReview,
+                card.lastReview === null
+                    ? null
+                    : card.lastReview.valueOf() <= 0 || card.lastReview.valueOf() > now.valueOf()
+                      ? now
+                      : card.lastReview,
             cardId: seed,
             // ts-fsrs 6 rejects negative counts that FSRS-6 accepted (a hand-edited comment)
             reps: Math.max(0, Math.trunc(card.reps)),

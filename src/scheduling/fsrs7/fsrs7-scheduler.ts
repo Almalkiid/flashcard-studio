@@ -10,6 +10,7 @@ import { ReviewResponse } from "src/scheduling/schedule/review-item";
 import { moment } from "src/utils/moment-en";
 
 const DAY_MS = 86_400_000;
+const GRADE_LIST = [1, 2, 3, 4] as const;
 
 /**
  * FSRS-7 counts exact time, so a button's interval could change between showing the card and pressing the button. The
@@ -33,8 +34,11 @@ const round8 = (value: number): number => Math.round(value * 1e8) / 1e8;
 export class Fsrs7Scheduler {
     private readonly engine: Fsrs7Engine;
     private readonly loadBalance: { maximumInterval: number; easyDays: readonly number[] } | null;
-    private shown: { seed: string; at: number; answers: Record<Fsrs7Grade, Fsrs7Card> } | null =
-        null;
+    private shown: {
+        identity: string;
+        at: number;
+        answers: Record<Fsrs7Grade, Fsrs7Card>;
+    } | null = null;
 
     constructor(settings: StudioSettings) {
         // Balancing picks the day inside the fuzz window itself, so the model's own fuzz is off (as for FSRS-6)
@@ -53,29 +57,22 @@ export class Fsrs7Scheduler {
         histogram: DueDateHistogram,
         notePath: string,
     ): FsrsState {
-        return this.answer(
-            this.engine.newCard(now.toDate()),
-            response,
-            now,
-            histogram,
-            `new:${notePath}`,
-        );
+        const card = this.engine.newCard(now.toDate());
+        return this.answer(card, response, now, histogram, `new:${notePath}`, `new:${notePath}`);
     }
 
-    /** A later answer to an FSRS-7 card. */
+    /** A later answer to an FSRS-7 card. `cardId` (when known) is part of what tells cards apart. */
     schedule(
         card: FsrsState,
         response: ReviewResponse,
         now: Moment,
         histogram: DueDateHistogram,
+        cardId?: string | null,
     ): FsrsState {
-        return this.answer(
-            Fsrs7Scheduler.toEngine(card),
-            response,
-            now,
-            histogram,
-            Fsrs7Scheduler.seed(card),
-        );
+        const input = Fsrs7Scheduler.toEngine(card);
+        // Everything the answers depend on: the card's id and every field of its schedule
+        const identity = `${cardId ?? ""}|${JSON.stringify(input)}`;
+        return this.answer(input, response, now, histogram, Fsrs7Scheduler.seed(card), identity);
     }
 
     /**
@@ -106,26 +103,67 @@ export class Fsrs7Scheduler {
         now: Moment,
         histogram: DueDateHistogram,
         seed: string,
+        identity: string,
     ): FsrsState {
         const grade = GRADES[response];
         if (grade === undefined) throw new Error(`Unsupported FSRS response: ${response}`);
-        const answers = this.answersAt(card, now, seed);
-        const result = answers[grade];
-        const balance = this.loadBalance;
-        if (balance === null || result.state !== 2 || result.intervalDays < 1) {
-            return Fsrs7Scheduler.toState(result, this.engine);
-        }
+        const answers = this.finalAnswers(card, now, histogram, seed, identity);
+        return Fsrs7Scheduler.toState(answers[grade], this.engine);
+    }
 
+    /**
+     * The card each button gives, after load balancing. FSRS-7 counts exact time, so these are worked out once when
+     * the card is shown and kept for half an hour for the same card (same id and the very same schedule), then
+     * applied at the press, moved to its time: the interval on a button is the one applied.
+     */
+    private finalAnswers(
+        card: Fsrs7Card,
+        now: Moment,
+        histogram: DueDateHistogram,
+        seed: string,
+        identity: string,
+    ): Record<Fsrs7Grade, Fsrs7Card> {
+        const at = now.valueOf();
+        const shown = this.shown;
+        if (shown?.identity === identity && at >= shown.at && at - shown.at <= SHOWN_ANSWERS_MS) {
+            const moved = {} as Record<Fsrs7Grade, Fsrs7Card>;
+            for (const grade of GRADE_LIST) {
+                const answer = shown.answers[grade];
+                moved[grade] = {
+                    ...answer,
+                    due: new Date(answer.due.valueOf() + (at - shown.at)),
+                    lastReview: now.toDate(),
+                };
+            }
+            return moved;
+        }
+        const raw = this.engine.answers(card, now.toDate(), seed);
+        const answers = this.balanced(card, raw, now, histogram, seed);
+        this.shown = { identity, at, answers };
+        return answers;
+    }
+
+    /**
+     * With load balancing, Hard, Good and Easy in turn each get a quiet day at least a day after the grade below,
+     * never past the maximum (at the maximum two grades may share a day). Again and learning steps are left alone.
+     */
+    private balanced(
+        card: Fsrs7Card,
+        answers: Record<Fsrs7Grade, Fsrs7Card>,
+        now: Moment,
+        histogram: DueDateHistogram,
+        seed: string,
+    ): Record<Fsrs7Grade, Fsrs7Card> {
+        const balance = this.loadBalance;
+        if (balance === null) return answers;
         const elapsedDays = card.lastReview
             ? Math.max(0, Math.floor((now.valueOf() - card.lastReview.valueOf()) / DAY_MS))
             : 0;
         const cap = balance.maximumInterval;
-        // Hard, Good and Easy in turn, each a quiet day at least a day after the grade below, never past the maximum;
-        // at the maximum two grades may share the same day
+        const result = { ...answers };
         let below = 0;
-        let interval = result.intervalDays;
-        for (const forGrade of [2, 3, 4] as const) {
-            const target = answers[forGrade];
+        for (const grade of [2, 3, 4] as const) {
+            const target = answers[grade];
             if (target.state !== 2 || target.intervalDays < 1) continue;
             const minimum = below >= 1 ? below + 1 : undefined;
             const picked =
@@ -146,36 +184,13 @@ export class Fsrs7Scheduler {
                           minimumInterval: minimum,
                       });
             below = Math.max(below, Math.min(picked, cap));
-            if (forGrade === grade) {
-                interval = below;
-                break;
-            }
+            result[grade] = {
+                ...target,
+                intervalDays: below,
+                due: new Date(now.valueOf() + below * DAY_MS),
+            };
         }
-        return Fsrs7Scheduler.toState(
-            { ...result, intervalDays: interval, due: new Date(now.valueOf() + interval * DAY_MS) },
-            this.engine,
-        );
-    }
-
-    /** The answers shown for this card if they are recent enough, moved to `now`; otherwise worked out at `now`. */
-    private answersAt(card: Fsrs7Card, now: Moment, seed: string): Record<Fsrs7Grade, Fsrs7Card> {
-        const at = now.valueOf();
-        const shown = this.shown;
-        if (shown?.seed === seed && at >= shown.at && at - shown.at <= SHOWN_ANSWERS_MS) {
-            const moved = {} as Record<Fsrs7Grade, Fsrs7Card>;
-            for (const grade of [1, 2, 3, 4] as const) {
-                const answer = shown.answers[grade];
-                moved[grade] = {
-                    ...answer,
-                    due: new Date(answer.due.valueOf() + (at - shown.at)),
-                    lastReview: now.toDate(),
-                };
-            }
-            return moved;
-        }
-        const answers = this.engine.answers(card, now.toDate(), seed);
-        this.shown = { seed, at, answers };
-        return answers;
+        return result;
     }
 
     /** Stable for a card from showing the buttons to answering: its last review and memory. */

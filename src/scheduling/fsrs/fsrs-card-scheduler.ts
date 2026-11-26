@@ -80,10 +80,11 @@ export class FsrsCardScheduler implements IScheduler {
             // A reset card is new again
             if (schedule.state === State.New)
                 return fsrs7.scheduleNew(response, now, cardHistogram, cardId ?? "");
-            if (schedule.fsrs7) return fsrs7.schedule(schedule, response, now, cardHistogram);
+            if (schedule.fsrs7)
+                return fsrs7.schedule(schedule, response, now, cardHistogram, cardId);
             const answers = cardId ? this.history.get(cardId) : undefined;
             const moved = answers ? fsrs7.fromHistory(schedule, answers) : null;
-            if (moved) return fsrs7.schedule(moved, response, now, cardHistogram);
+            if (moved) return fsrs7.schedule(moved, response, now, cardHistogram, cardId);
         }
         return this.scheduler.schedule(schedule, response, now, cardHistogram);
     }

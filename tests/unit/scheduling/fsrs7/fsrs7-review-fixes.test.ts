@@ -226,3 +226,62 @@ test("7. exact time: the interval on a button is the one applied up to 10 minute
     }
     expect(differences).toBe(0);
 });
+
+describe("confirmation review (Codex)", () => {
+    const A =
+        "!fsrs,2026-12-24T12:00:00.000Z,53,53.86951316,1,2,1,0,0,2026-11-01T12:00:00.000Z,f7=11.7841:9.42728:53.86951316:1:1:1793534400000";
+    const withFields = (text: string, fast: number, lapses: number) =>
+        text
+            .replace(",2,1,0,0,", `,2,1,${lapses},0,`)
+            .replace("f7=11.7841:9.42728:", `f7=11.7841:${fast}:`);
+    const good = (s: FsrsCardScheduler, text: string, id: string, at: string) => {
+        clockAt(at);
+        return s.cardCalcUpdatedSchedule(
+            ReviewResponse.Good,
+            parse(text),
+            new CardDueDateHistogram(),
+            id,
+        ) as FsrsState;
+    };
+
+    test("8. answers kept for one card are never given to another card, or to the same card with other values", () => {
+        const s = v(7);
+        good(s, A, "card-a", "2026-11-09T12:00:00.000Z");
+        const B = withFields(A, 100, 7);
+        expect(parse(B).fsrs7).not.toBeNull();
+        const cached = good(s, B, "card-b", "2026-11-09T12:01:00.000Z");
+        const fresh = good(v(7), B, "card-b", "2026-11-09T12:01:00.000Z");
+        expect(cached.formatScheduleAsComment()).toBe(fresh.formatScheduleAsComment());
+        expect(cached.lapses).toBe(7);
+        // The same id with changed memory is not the same card either
+        const C = withFields(A, 100, 0);
+        expect(good(s, C, "card-a", "2026-11-09T12:02:00.000Z").formatScheduleAsComment()).toBe(
+            good(v(7), C, "card-a", "2026-11-09T12:02:00.000Z").formatScheduleAsComment(),
+        );
+    });
+
+    test("9. a due date or last review at 1 January 1970 does not throw", () => {
+        for (const text of [
+            A.replace("2026-12-24T12:00:00.000Z", "1970-01-01T00:00:00.000Z"),
+            A.replace(",2026-11-01T12:00:00.000Z,", ",1970-01-01T00:00:00.000Z,").replace(
+                ":1793534400000",
+                ":0",
+            ),
+        ]) {
+            expect(() => good(v(7), text, "card-a", "2026-11-09T12:01:00.000Z")).not.toThrow();
+        }
+    });
+
+    test("10. with load balancing and an easy day, the interval shown before midnight is applied after it", () => {
+        const settings = { fsrsLoadBalance: true, fsrsEasyDays: [1] };
+        const card = A.replace(",2,1,0,0,", ",2,2,0,0,").replace(
+            "f7=11.7841:9.42728:53.86951316:1:1:",
+            "f7=11.7841:16:53.86951316:1:2:",
+        );
+        expect(parse(card).fsrs7).not.toBeNull();
+        const s = v(7, settings);
+        const shown = good(s, card, "card-a", "2026-11-08T23:55:00.000Z");
+        const applied = good(s, card, "card-a", "2026-11-09T00:05:00.000Z");
+        expect(applied.interval).toBe(shown.interval);
+    });
+});
