@@ -22,7 +22,7 @@ Flashcard Studio turns the Markdown you already write into spaced repetition fla
 - **Know where you are weak.** The statistics rank your decks by how well you remembered them in the last 30 days, against your target, and the home screen puts the weakest one first with one tap to study it.
 - **Fix mistakes while they are fresh.** At the end of a session, **Review mistakes** goes over exactly the cards you missed.
 - **Practise like the real thing.** Exams with a timer from your multiple choice cards, or all your cards, from decks or the notes you choose, with a question map, a score against your pass mark and the score of each deck, progress that survives closing the tab, and one tap to study what you missed.
-- **Anki's scheduling.** FSRS with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
+- **Anki's scheduling.** FSRS-7 or FSRS-6, with learning steps, Anki's learn ahead limit, daily limits, custom study, and an optimizer that fits FSRS to your own reviews.
 - **Full control.** Undo, suspend, bury, flags and leeches, and a card info screen with every review of a card.
 - **Cards written for you.** Generate cards from a note with your own AI provider (Anthropic, OpenAI, Gemini, DeepSeek, Mistral, xAI, OpenRouter or a local model), look them over, and add only the ones you want.
 - **Bring your Anki decks.** Import `.apkg` and text files with their media and decks, and export back to Anki.
@@ -109,6 +109,17 @@ Run **Flashcard Studio: Review flashcards from all notes** from the command pale
 The number keys follow **Answer keys** in the settings. **Anki** (1 Again, 2 Hard, 3 Good, 4 Easy) is the default for new installs. **Original** (1 Hard, 2 Good, 3 Easy, 0 Reset the card) is the layout of the Spaced Repetition plugin, and existing installs keep it until you change the setting.
 
 On a phone, the same actions are in the card menu.
+
+### FSRS-6 and FSRS-7
+
+**Settings → Scheduling → FSRS version** picks the FSRS model that schedules your cards.
+
+- **FSRS-7** (recommended) is the newest model. It remembers each card with a fast and a slow memory trace, and counts the exact time between reviews, so same-day reviews and learning steps count. New installs start on it.
+- **FSRS-6** is the model Flashcard Studio used before 0.22.0. Vaults that already existed stay on it until you switch, and its schedules are exactly as before.
+
+When you switch to FSRS-7, nothing is rewritten at once, and every card keeps its due date. From its next answer, a new card uses FSRS-7, and so does a card whose whole review history is in the review log: its memory is rebuilt from that history, as Anki does. A card without a full history (for example one carried over from the Spaced Repetition plugin) stays on FSRS-6. Switching back to FSRS-6 also takes effect at each card's next answer.
+
+FSRS-7 uses its default parameters for now. **Custom parameters** and **Optimize parameters** apply to FSRS-6. Cards answered with FSRS-7 can still be reviewed by an older Flashcard Studio on another device; such a card then counts as an FSRS-6 card again.
 
 ### Multiple choice
 
@@ -206,7 +217,7 @@ Each exam is saved as one plain file in `Flashcard Studio/Exams/`, for example `
 
 ## Where your data lives
 
-- **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the Spaced Repetition plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the Spaced Repetition plugin ignores.
+- **The schedule of each card** is an HTML comment after the card: `<!--SR:!fsrs,...,id=k3f9a2-->`. It is the same format the Spaced Repetition plugin uses, plus a short card id and optional markers (`susp`, `bury=`, `flag=`, `leech`) that the Spaced Repetition plugin ignores. An FSRS-7 card also carries `f7=` with its two memory traces.
 - **Your review history** is in `Flashcard Studio/Review log/`, with one Markdown file per device per month (for example `2026-09 iphone-81c2.md`). Each answer is one line of JSON. Because every device writes only its own files, syncing with Obsidian Sync, iCloud or any other service never creates conflicts.
 - **Your exams** are in `Flashcard Studio/Exams/`, one Markdown file each. Like the review log, they are never read as cards. An exam in progress is kept in a file of its own in the plugin's folder (`exam-drafts/`, one file for each exam and device, named like the review log's files) until it is submitted or discarded, so it never touches your settings.
 - **Settings** are in the plugin's `data.json`.
@@ -236,7 +247,7 @@ Flashcard Studio works offline. It makes a network request only in four cases:
 ## Compatibility and credits
 
 - Flashcard Studio reads and writes the note format of the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) plugin, so cards and schedules you already have carry over.
-- The memory model is [FSRS](https://github.com/open-spaced-repetition/ts-fsrs), through the ts-fsrs library.
+- The memory model is [FSRS](https://github.com/open-spaced-repetition/ts-fsrs), through the ts-fsrs library: version 5.4.2 for FSRS-6 and version 6 for FSRS-7.
 
 All source code in this repository is original to Flashcard Studio, apart from the public-domain cyrb53 hash (by bryc), which card ids depend on. Third-party libraries are used as dependencies under their own licenses (see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
 
