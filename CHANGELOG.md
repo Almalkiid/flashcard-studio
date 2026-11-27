@@ -2,6 +2,18 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.23.0]
+
+### Added
+
+- **Image cloze** ([#28](https://github.com/Almalkiid/flashcard-studio/issues/28)): image masks asked like text clozes. Run **Add image cloze** (a command, and an item in the editor menu on a line with an image).
+    - Each mask says on which cards it is asked: card numbers as in Anki (`1`, `1,2`, `0` for always hidden), or overlap letters (`a` asked, `h` hidden, `s` shown). A mask can carry a hint, written on it while it is asked; the answer is the picture under it.
+    - Text clozes in the same paragraph share card numbers with the masks: card 1 asks text cloze 1 and every mask with `1`.
+    - Each card keeps its schedule by its card number when text clozes or masks are added, moved or removed.
+    - Image cloze cards are left out of exams, as text clozes are, and are not exported to Anki yet.
+    - **Image occlusion** blocks and **Add image occlusion** are unchanged.
+    - Older versions of Flashcard Studio do not support notes with an image cloze block: update every device before you add one.
+
 ## [0.22.0]
 
 ### Added
