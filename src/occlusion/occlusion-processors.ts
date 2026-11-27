@@ -11,6 +11,7 @@ import {
     TFile,
 } from "obsidian";
 
+import { imageClozeNoteProblem } from "src/cards/image-cloze-question";
 import { Question } from "src/data/data-structures/card/question";
 import { t } from "src/lang/translate";
 import { IMAGE_CLOZE_LANG } from "src/occlusion/image-cloze-block";
@@ -109,7 +110,23 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
 
     // An image cloze block in a note: the picture with each mask's card field and hint on it
     plugin.registerMarkdownCodeBlockProcessor(IMAGE_CLOZE_LANG, (source, el, ctx) => {
-        renderImageClozeNote(el, plugin.app, ctx.sourcePath, source, ownerOf(el, ctx));
+        const section = ctx.getSectionInfo(el);
+        const problem =
+            section === null
+                ? null
+                : imageClozeNoteProblem(
+                      section.text,
+                      section.lineStart,
+                      plugin.dataManager.data.settings,
+                  );
+        renderImageClozeNote(
+            el,
+            plugin.app,
+            ctx.sourcePath,
+            source,
+            ownerOf(el, ctx),
+            problem === null ? undefined : t(problem),
+        );
     });
 
     plugin.addCommand({

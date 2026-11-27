@@ -676,6 +676,11 @@ const en = {
     IMAGE_CLOZE_INVALID_BLOCK: "This image cloze block needs an image and at least one mask.",
     IMAGE_CLOZE_INVALID_CARD: "This image cloze card could not be read.",
     IMAGE_CLOZE_CARD_NUMBER: "Card ${n}",
+    IMAGE_CLOZE_UNCLOSED: "This image cloze block is not closed: add a line with ``` under it.",
+    IMAGE_CLOZE_TWO_BLOCKS: "This card has two image cloze blocks. Keep one per card.",
+    IMAGE_CLOZE_NOTHING_ASKED: "No mask is asked on any card. Give a mask a card number or an a.",
+    IMAGE_CLOZE_BAD_SCHEDULE:
+        "The schedule comment of this card cannot be read, so it makes no cards.",
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: "Reviews today",
     STATS_METRIC_STREAK: "Day streak",

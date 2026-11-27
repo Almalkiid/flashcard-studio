@@ -13,6 +13,9 @@ import { CommentParser } from "src/utils/schedule-comment";
  * @property {number} flag - 0 for none, 1 to 7 for Anki's flag colours.
  * @property {boolean} leech - Marked as a leech after too many lapses.
  * @property {string[]} extras - Unknown tokens, preserved verbatim on rewrite.
+ * @property {number} [cardNumber] - For a question whose schedules are bound to card numbers (one with an image cloze
+ *           block), the card's number, written as `c=<n>`; absent for every other card, whose metadata is unchanged.
+ *           It is set when the question is loaded: reading a segment leaves `c=` among the unknown tokens.
  */
 export interface CardMeta {
     id: string | null;
@@ -21,6 +24,7 @@ export interface CardMeta {
     flag: number;
     leech: boolean;
     extras: string[];
+    cardNumber?: number;
 }
 
 const FSRS_FIXED_FIELDS = 10;
@@ -30,7 +34,14 @@ const ID_PATTERN = /^[0-9a-z]{1,16}$/;
 const YMD_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export function emptyCardMeta(): CardMeta {
-    return { id: null, suspended: false, buryUntil: null, flag: 0, leech: false, extras: [] };
+    return {
+        id: null,
+        suspended: false,
+        buryUntil: null,
+        flag: 0,
+        leech: false,
+        extras: [],
+    };
 }
 
 /**
@@ -107,6 +118,7 @@ export function parseCommentMeta(questionText: string): CardMeta[] {
  */
 export function formatMetaTokens(meta: CardMeta): string {
     const tokens: string[] = [];
+    if (meta.cardNumber !== undefined) tokens.push(`c=${meta.cardNumber}`);
     if (meta.id) tokens.push(`id=${meta.id}`);
     if (meta.suspended) tokens.push("susp");
     if (meta.buryUntil) tokens.push(`bury=${meta.buryUntil}`);

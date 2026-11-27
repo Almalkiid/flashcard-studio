@@ -1,4 +1,4 @@
-import { CardFrontBackUtil } from "src/cards/expand";
+import { CardFrontBack, CardFrontBackUtil } from "src/cards/expand";
 import { parse, ParsedQuestionInfo, parserOptionsFromSettings } from "src/cards/parse";
 import { CardMeta, emptyCardMeta, parseCommentMeta } from "src/data/card-meta";
 import { DataStore } from "src/data/data-store/store";
@@ -6,8 +6,10 @@ import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType, Question } from "src/data/data-structures/card/question";
 import { IVaultNoteFile } from "src/data/data-structures/file/vault-note";
 import { TopicPath, TopicPathList } from "src/data/decks/topic-path";
+import { bindQuestion, segmentAt } from "src/data/segment-binding";
 import { SettingsUtil, StudioSettings } from "src/data/settings-model";
 import { legacyClozeCardIndices } from "src/math/math-cloze";
+import { scanImageClozeFences } from "src/occlusion/image-cloze-block";
 import { ScheduleState } from "src/scheduling/schedule/schedule-state";
 import { splitNoteIntoFrontmatterAndContent, TextDirection } from "src/utils/text";
 
@@ -115,11 +117,32 @@ export class NoteQuestionParser {
     }
 
     private populateCards(question: Question): void {
+        // A block line holding a comment is read before anything else: such a question is not a card, so no schedule
+        // is read from it and nothing is written over it
+        const original = question.questionText.original;
+        if (scanImageClozeFences(original.split("\n")).some((span) => span.hasComment)) {
+            question.setCardList([]);
+            return;
+        }
         const frontsAndBacks = CardFrontBackUtil.expand(
             question.questionType,
             question.questionText.actualQuestion,
             this.settings,
         );
+        const bound = bindQuestion(
+            original,
+            question.questionText.actualQuestion,
+            question.questionType,
+            this.settings,
+        );
+        if (bound === "unreadable") {
+            question.setCardList([]);
+            return;
+        }
+        if (bound !== null) {
+            this.populateBoundCards(question, frontsAndBacks, bound.cardNumbers, bound.positions);
+            return;
+        }
         let schedules: ScheduleState[] = DataStore.getInstance().createSchedule(
             question.questionText.original,
         );
@@ -156,6 +179,42 @@ export class NoteQuestionParser {
                     meta: meta[index] ?? emptyCardMeta(),
                 }),
         );
+        question.setCardList(cards);
+    }
+
+    /**
+     * The cards of a question whose schedules are bound to card numbers: each card reads its schedule and metadata from
+     * its own segment (by raw position, so empty segments never shift them), knows its number, and is never marked
+     * changed by reading.
+     */
+    private populateBoundCards(
+        question: Question,
+        frontsAndBacks: CardFrontBack[],
+        cardNumbers: number[],
+        positions: (number | null)[],
+    ): void {
+        const original = question.questionText.original;
+        const cards = frontsAndBacks.map((side, index) => {
+            const raw = positions[index] ?? null;
+            const segment = raw === null ? null : segmentAt(original, raw);
+            const comment = segment === null || segment === "" ? null : `<!--SR:!${segment}-->`;
+            const meta =
+                comment === null
+                    ? emptyCardMeta()
+                    : (parseCommentMeta(comment)[0] ?? emptyCardMeta());
+            meta.extras = meta.extras.filter((token) => !token.startsWith("c="));
+            meta.cardNumber = side.cardNumber ?? cardNumbers[index] ?? index + 1;
+            return new Card({
+                front: side.front,
+                back: side.back,
+                cardIdx: index,
+                scheduleInfo:
+                    comment === null
+                        ? null
+                        : (DataStore.getInstance().createSchedule(comment)[0] ?? null),
+                meta,
+            });
+        });
         question.setCardList(cards);
     }
 }

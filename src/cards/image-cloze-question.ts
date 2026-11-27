@@ -15,6 +15,10 @@ import {
     QuestionTypeClozeFormatter,
     QuestionTypeClozeInputFormatter,
 } from "src/cards/expand";
+import { parse, ParsedQuestionInfo, parserOptionsFromSettings } from "src/cards/parse";
+import { withoutScheduleComments } from "src/data/data-store/schedule-comment";
+import { CardType } from "src/data/data-structures/card/question";
+import { CommentBinding, readBinding } from "src/data/segment-binding";
 import { StudioSettings } from "src/data/settings-model";
 import { createClozeNote } from "src/math/math-cloze";
 import {
@@ -230,4 +234,78 @@ export function withFencesKept(
         kept.cardNumber = card.cardNumber;
         return kept;
     });
+}
+
+/** Where an image cloze block in a note belongs: a block that never closes, or the question it is in. */
+export type ImageClozeContext =
+    | { kind: "unclosed" }
+    | {
+          kind: "question";
+          info: ParsedQuestionInfo;
+          read: QuestionRead | null;
+          binding: CommentBinding;
+      };
+
+/**
+ * The question an image cloze block of a note belongs to, found by the real parser on the whole note, for what the
+ * note view says about a block and for the editor. A block that never closes needs no question to be told so. Null
+ * when the block is in no question: in a basic, reversed or callout card it is only drawn, as in the note.
+ */
+export function resolveImageClozeContext(
+    noteText: string,
+    blockLine: number,
+    settings: StudioSettings,
+): ImageClozeContext | null {
+    const lines = noteText.split("\n");
+    const spans = scanImageClozeFences(lines);
+    const span =
+        spans.find((one) => one.open <= blockLine && blockLine <= one.close) ??
+        spans.find((one) => one.open >= blockLine);
+    if (span === undefined) return null;
+    if (!span.closed) return { kind: "unclosed" };
+
+    const info = parse(noteText, parserOptionsFromSettings(settings)).find((question) =>
+        question.isQuestionLineNum(span.open),
+    );
+    if (info === undefined) return null;
+    if (info.cardType !== CardType.Cloze && info.cardType !== CardType.ImageCloze) return null;
+    const text = withoutScheduleComments(info.text);
+    return {
+        kind: "question",
+        info,
+        read: readImageClozeQuestion(text, settings),
+        binding: readBinding(info.text),
+    };
+}
+
+export type ImageClozeNoteProblem =
+    | "IMAGE_CLOZE_UNCLOSED"
+    | "IMAGE_CLOZE_TWO_BLOCKS"
+    | "IMAGE_CLOZE_NOTHING_ASKED"
+    | "IMAGE_CLOZE_BAD_SCHEDULE";
+
+/**
+ * What the note view says about a block's question, or null when it is fine. "Nothing asked" is only for a block alone:
+ * beside text clozes, masks that are all hidden are fine, the text asks.
+ */
+export function imageClozeNoteProblem(
+    noteText: string,
+    blockLine: number,
+    settings: StudioSettings,
+): ImageClozeNoteProblem | null {
+    const context = resolveImageClozeContext(noteText, blockLine, settings);
+    if (context === null) return null;
+    if (context.kind === "unclosed") return "IMAGE_CLOZE_UNCLOSED";
+    const { info, read, binding } = context;
+    if (read !== null && read.ok === false && read.problem === "two-blocks")
+        return "IMAGE_CLOZE_TWO_BLOCKS";
+    if (binding.kind === "unreadable") return "IMAGE_CLOZE_BAD_SCHEDULE";
+    if (
+        info.cardType === CardType.ImageCloze &&
+        read !== null &&
+        read.ok === true &&
+        read.question.cardNumbers.length === 0
+    )
+        return "IMAGE_CLOZE_NOTHING_ASKED";
+    return null;
 }

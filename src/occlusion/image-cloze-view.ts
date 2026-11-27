@@ -169,6 +169,7 @@ export function renderImageClozeNote(
     sourcePath: string,
     source: string,
     owner?: Component,
+    problem?: string,
 ): HTMLElement | null {
     const read = parseImageClozeBlock(source);
     // `=== false`: without strict null checks, `!read.ok` does not narrow to the failed read
@@ -189,5 +190,11 @@ export function renderImageClozeNote(
         const field = read.block.masks[index].fieldText;
         mask.label = mask.label.length > 0 ? `${field} · ${mask.label}` : field;
     });
-    return renderOcclusion(el, app, sourcePath, view, "labels", owner, { cloze: true });
+    const stage = renderOcclusion(el, app, sourcePath, view, "labels", owner, { cloze: true });
+    // What is wrong with the question around the block (it is not a card): above the picture
+    if (problem !== undefined) {
+        const line = el.createDiv({ cls: "fs-occ-missing fs-occ-problem", text: problem });
+        el.insertBefore(line, el.firstChild);
+    }
+    return stage;
 }
