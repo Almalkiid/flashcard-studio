@@ -4,10 +4,24 @@ import type { Question } from "src/data/data-structures/card/question";
 import type { Deck } from "src/data/decks/deck";
 import { positionsForEdit } from "src/data/segment-binding";
 import { StudioSettings } from "src/data/settings-model";
+import { imageClozeCardText } from "src/occlusion/image-cloze-view";
+import { occlusionCardText } from "src/occlusion/occlusion-view";
 import { isInDeck } from "src/scheduling/custom-study";
 import { ReviewItemState } from "src/scheduling/schedule/review-item";
 
 /** Every suspended card of a deck hierarchy, each once however many decks it is in. */
+/**
+ * A card as the suspended list shows it: an image card as its question and what it asks (its front is data), any
+ * other card as its text on one line.
+ */
+export function suspendedCardText(card: Pick<Card, "front">): string {
+    return (
+        imageClozeCardText(card.front) ??
+        occlusionCardText(card.front) ??
+        card.front.replace(/\s+/g, " ").trim()
+    );
+}
+
 export function suspendedCards(root: Deck): Card[] {
     const cards = root.getFlattenedReviewItemArray(ReviewItemState.AnyItem, true);
     return [...new Set(cards)].filter((card) => card.meta.suspended);

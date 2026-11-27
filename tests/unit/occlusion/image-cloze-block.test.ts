@@ -196,3 +196,35 @@ describe("scanImageClozeFences", () => {
         expect(scanImageClozeFences(["```image-occlusion", "image: x.png", "```"])).toEqual([]);
     });
 });
+
+describe("scanImageClozeFences and inline code", () => {
+    test("a line of inline code with three backticks is not a fence: the block after it is found", () => {
+        const lines = ["Use ```x``` here", "```code```", "```image-cloze", "image: x.png", "```"];
+        expect(scanImageClozeFences(lines).map(({ open, close }) => [open, close])).toEqual([
+            [2, 4],
+        ]);
+    });
+
+    test("a tilde line with text after it opens a fence, as in Markdown", () => {
+        const lines = ["~~~strike~~~", "```image-cloze", "image: x.png", "```", "~~~"];
+        expect(scanImageClozeFences(lines)).toEqual([]);
+    });
+});
+
+describe("a line the block does not know", () => {
+    test("is named, so a typo never drops a mask on the next save", () => {
+        const source =
+            "image: x.png\nmask: 1 | a rect 0 0 .1 .1 |\nmasks: 2 | b rect .5 .5 .1 .1 |";
+        expect(parseImageClozeBlock(source)).toEqual({
+            ok: false,
+            line: 3,
+            problem: "unknown-line",
+        });
+    });
+
+    test("blank lines are fine", () => {
+        expect(parseImageClozeBlock("image: x.png\n\nmask: 1 | a rect 0 0 .1 .1 |\n").ok).toBe(
+            true,
+        );
+    });
+});

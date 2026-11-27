@@ -4,6 +4,7 @@ import { cloneDefaultSettings } from "src/data/settings-model";
 import { parseImageClozeBlock } from "src/occlusion/image-cloze-block";
 import {
     imageClozeInsertion,
+    imageEmbedsIn,
     locateImageClozeBlock,
     replaceImageClozeBlock,
     sameCardNumbers,
@@ -92,7 +93,29 @@ describe("imageClozeInsertion", () => {
         ).toEqual({
             line: 1,
             text: `\n${FENCED}`,
+            joined: true,
+            paragraph: ["The ==1;;a== pumps.", "More of it.", "<!--SR:!2026-01-01,1,250-->"],
         });
+    });
+
+    test("says whether the block joined a cloze paragraph: then a plain image in it would show the answer", () => {
+        const clozes = { clozePatterns: ["==[123;;]answer[;;hint]=="], latexClozes: false };
+        expect(
+            imageClozeInsertion(["The ==1;;a== pumps.", "![[Heart.png]]"], 1, FENCED, clozes)
+                .joined,
+        ).toBe(true);
+        expect(
+            imageClozeInsertion(["Plain text.", "![[Heart.png]]"], 1, FENCED, clozes).joined,
+        ).toBe(false);
+        // The paragraph the block joined, so a plain image in it is found however the picture was chosen
+        expect(
+            imageClozeInsertion(
+                ["The ==1;;a== fills.", "![[Heart.png]]", "", "x"],
+                0,
+                FENCED,
+                clozes,
+            ).paragraph,
+        ).toEqual(["The ==1;;a== fills.", "![[Heart.png]]"]);
     });
 
     test("in a paragraph whose only clozes are math clozes: it joins that card too (final review #1)", () => {
@@ -114,4 +137,14 @@ describe("sameCardNumbers", () => {
         expect(sameCardNumbers([1, 5], [1, 2])).toBe(false);
         expect(sameCardNumbers([1, 5], [1, 5, 6])).toBe(false);
     });
+});
+
+test("imageEmbedsIn finds every image embed in a paragraph, wiki and Markdown, not plain links", () => {
+    expect(
+        imageEmbedsIn([
+            "The ==1;;a== fills. ![[Heart.png|200]]",
+            "![Heart](pics/Heart.png) and [[Note]]",
+        ]),
+    ).toEqual(["![[Heart.png|200]]", "![Heart](pics/Heart.png)"]);
+    expect(imageEmbedsIn(["no image here", "[[Heart.png]]"])).toEqual([]);
 });

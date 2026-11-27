@@ -182,6 +182,141 @@ function scrollCardToMask(el: HTMLElement, scroller: HTMLElement, stage: HTMLEle
         (maskBox.left + maskBox.right) / 2 - stageBox.left - scroller.clientWidth / 2;
 }
 
+/**
+ * A bubble with a mask's whole hint: a small "Hint" label over the hint, on a raised card whose arrow points at the
+ * mask, which is ringed while the bubble is open. It goes under the mask, or above it when there is no room under it,
+ * or, when neither fits, floats over the picture (the arrow hidden), so it is never cut off by the picture's frame and
+ * only scrolls for a hint taller than the picture itself.
+ */
+function showHintBubble(
+    stage: HTMLElement,
+    tag: HTMLElement,
+    mask: OcclusionBlock["masks"][number],
+    index: number,
+): void {
+    const bubble = stage.createDiv({ cls: "fs-occ-hint-bubble" });
+    bubble.setAttribute("role", "tooltip");
+    bubble.setAttribute("data-mask", String(index));
+    bubble.id = `fs-occ-hint-${++hintBubbleCount}`;
+    const label = bubble.createDiv({ cls: "fs-occ-hint-bubble-label" });
+    setIcon(label.createSpan({ cls: "fs-occ-hint-bubble-icon" }), "lightbulb");
+    label.createSpan({ text: t("IMAGE_CLOZE_HINT_FIELD") });
+    bubble.createDiv({ cls: "fs-occ-hint-bubble-text", text: plainLabel(mask.label) });
+    tag.addClass("is-open");
+    tag.setAttribute("aria-expanded", "true");
+    tag.setAttribute("aria-describedby", bubble.id);
+
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    const gap = 12;
+    const edge = 6;
+    bubble.setCssProps({ "--fs-occ-room": height > 0 ? `${height - 2 * edge}px` : "none" });
+    const tall = bubble.offsetHeight;
+    const maskTop = mask.y * height;
+    const maskBottom = (mask.y + mask.h) * height;
+    let place: "below" | "above" | "floating";
+    let top: number;
+    if (height === 0) {
+        // Not laid out yet: by where the mask is on the picture
+        place = mask.y + mask.h > 0.6 ? "above" : "below";
+        top = 0;
+    } else if (maskBottom + gap + tall <= height - edge) {
+        place = "below";
+        top = maskBottom + gap;
+    } else if (maskTop - gap - tall >= edge) {
+        place = "above";
+        top = maskTop - gap - tall;
+    } else {
+        place = "floating";
+        top = Math.max(edge, height - tall - edge);
+    }
+    bubble.toggleClass("is-above", place === "above");
+    bubble.toggleClass("is-floating", place === "floating");
+
+    // Centred on the mask, never past the picture's sides; the arrow stays on the mask
+    const centre = (mask.x + mask.w / 2) * width;
+    const left = Math.max(
+        edge,
+        Math.min(centre - bubble.offsetWidth / 2, width - bubble.offsetWidth - edge),
+    );
+    bubble.setCssProps({
+        "--fs-occ-bubble-top": `${top}px`,
+        "--fs-occ-left": `${left}px`,
+        "--fs-occ-arrow": `${centre - left}px`,
+    });
+    bubble.addEventListener("click", (event) => {
+        event.stopPropagation();
+        closeHintBubble(stage);
+    });
+
+    // Placed for the picture's size when it opened: a new size (a narrower pane, a turned phone) closes it rather than
+    // leave it where it no longer fits. A browser reports once when it starts watching, which is not a resize
+    if (typeof ResizeObserver !== "undefined") {
+        let first = true;
+        const watcher = new ResizeObserver(() => {
+            if (first) first = false;
+            else closeHintBubble(stage);
+        });
+        watcher.observe(stage);
+        resizeWatchers.set(bubble, watcher);
+    }
+}
+
+/** Ids for hint bubbles, so a mask's button can name the bubble it opened. */
+let hintBubbleCount = 0;
+
+/** What closes an open bubble when the picture changes size, by bubble. */
+const resizeWatchers = new WeakMap<HTMLElement, { disconnect(): void }>();
+
+/**
+ * A mask's hint as a button: reached with Tab, named by the whole hint, opened with a tap, a click, Enter or Space, and
+ * closed with Escape or another tap. It is not a tap or a key for the card: none of these turn it or answer it.
+ */
+function makeHintButton(
+    stage: HTMLElement,
+    tag: HTMLElement,
+    mask: OcclusionBlock["masks"][number],
+    index: number,
+): void {
+    tag.setAttribute("title", mask.label);
+    tag.setAttribute("role", "button");
+    tag.setAttribute("tabindex", "0");
+    tag.setAttribute("aria-label", `${t("IMAGE_CLOZE_HINT_FIELD")}: ${plainLabel(mask.label)}`);
+    tag.setAttribute("aria-expanded", "false");
+    const toggle = () => {
+        const open = stage.querySelector(".fs-occ-hint-bubble");
+        const same = open?.getAttribute("data-mask") === String(index);
+        closeHintBubble(stage);
+        if (!same) showHintBubble(stage, tag, mask, index);
+    };
+    tag.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggle();
+    });
+    tag.addEventListener("keydown", (event) => {
+        const open = tag.getAttribute("aria-expanded") === "true";
+        if (event.key !== "Enter" && event.key !== " " && !(event.key === "Escape" && open)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key === "Escape") closeHintBubble(stage);
+        else toggle();
+    });
+}
+
+/** Closes the open hint bubble of a picture, if any, and unmarks its mask. */
+function closeHintBubble(stage: HTMLElement): void {
+    const bubble = stage.querySelector<HTMLElement>(".fs-occ-hint-bubble");
+    if (bubble !== null) {
+        resizeWatchers.get(bubble)?.disconnect();
+        bubble.remove();
+    }
+    stage.querySelectorAll(".fs-occ-tag.is-open").forEach((open) => {
+        open.removeClass("is-open");
+        open.setAttribute("aria-expanded", "false");
+        open.removeAttribute("aria-describedby");
+    });
+}
+
 /** How an image cloze card differs from an image occlusion card when it is drawn. Left out: as image occlusion. */
 export interface OcclusionRenderOptions {
     /** The text on each mask, by mask index ("" for none), in place of "?" and the labels. */
@@ -326,8 +461,13 @@ export function renderOcclusion(
             cls: state === "hidden-active" ? "fs-occ-tag is-question" : "fs-occ-tag",
         });
         tag.createSpan({ cls: "fs-occ-tag-text", text });
-        // A hint is clipped to its mask: the whole of it is in the tooltip
-        if (options.cloze === true) tag.setAttribute("title", mask.label);
+        // A hint on an asked mask is words, not the lone "?": it is set as a label, not as the big question mark
+        if (options.cloze === true && state === "hidden-active" && text !== "?")
+            tag.addClass("is-hint");
+        // A mask with a hint: the hint is clipped to the mask, and the whole of it opens in a bubble. A mask without one
+        // has nothing to open, so its tap stays a tap on the card
+        if (options.cloze === true && mask.label.length > 0)
+            makeHintButton(stage, tag, mask, index);
         tag.setCssProps({
             "--fs-occ-x": percent(mask.x),
             "--fs-occ-y": percent(mask.y),

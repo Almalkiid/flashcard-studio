@@ -220,6 +220,17 @@ describe("an edited text is checked against the note parser", () => {
 });
 
 describe("an image cloze block", () => {
+    test("a cloze with a ~~~ block reads back as one question with comments on the same line", () => {
+        const tilde =
+            "The ==1;;a== pumps.\n~~~image-cloze\nimage: x.png\nmask: 1 | a rect 0 0 .1 .1 | hint\n~~~";
+        expect(
+            readsBackAsOneQuestion(CardType.Cloze, tilde, {
+                ...settings,
+                cardCommentOnSameLine: true,
+            }),
+        ).toBe(true);
+    });
+
     const block = "```image-cloze\nimage: x.png\nmask: 1 | a rect 0 0 .1 .1 | hint\n```";
 
     test("reads back as one question, its comment on a line of its own, also with comments on the same line", () => {

@@ -321,6 +321,8 @@ export class OcclusionEditorModal extends Modal {
         this.hintInput.addEventListener("input", () => {
             this.model.setHint(this.hintInput?.value ?? "");
             this.renderChips();
+            // A hint can make the block unreadable (a comment in it): say so while it is typed
+            this.renderProblems();
         });
     }
 

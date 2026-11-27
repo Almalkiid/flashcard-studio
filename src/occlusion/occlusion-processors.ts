@@ -29,6 +29,7 @@ import {
 } from "src/occlusion/image-cloze-block";
 import {
     imageClozeInsertion,
+    imageEmbedsIn,
     locateImageClozeBlock,
     replaceImageClozeBlock,
 } from "src/occlusion/image-cloze-edit";
@@ -420,6 +421,7 @@ function insertImageClozeBlock(
     editor: Editor,
     block: ImageClozeBlock,
     settings: StudioSettings,
+    isThePicture: (embed: string) => boolean,
 ): void {
     const fenced = "```" + IMAGE_CLOZE_LANG + "\n" + formatImageClozeBlock(block) + "\n```";
     if (editor.somethingSelected()) {
@@ -427,8 +429,17 @@ function insertImageClozeBlock(
         return;
     }
     const lines = editor.getValue().split("\n");
-    const { line, text } = imageClozeInsertion(lines, editor.getCursor().line, fenced, settings);
+    const { line, text, joined, paragraph } = imageClozeInsertion(
+        lines,
+        editor.getCursor().line,
+        fenced,
+        settings,
+    );
     editor.replaceRange(text, { line, ch: lines[line].length });
+    // The block joined a cloze paragraph that also shows the picture as a plain image, however the picture was chosen:
+    // that image would show the answer on the card
+    if (joined && imageEmbedsIn(paragraph).some(isThePicture))
+        new Notice(t("IMAGE_CLOZE_EMBED_SHOWS_ANSWER"));
 }
 
 /** The command: choose an image (or use the one the cursor is on), draw the masks, insert the block. */
@@ -488,7 +499,13 @@ function addImageCloze(
             sourcePath,
             { image, mode: "hide-all", question: "", masks: [] },
             textCardsAtCursor(editor, settings),
-            ({ block }) => insertImageClozeBlock(editor, block, settings),
+            ({ block }) =>
+                insertImageClozeBlock(
+                    editor,
+                    block,
+                    settings,
+                    (embed) => resolveImagePath(app, embed, sourcePath)?.path === file.path,
+                ),
         ).open();
     };
     chooseImage(plugin, editor, sourcePath, edit);

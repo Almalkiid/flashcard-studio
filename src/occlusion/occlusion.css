@@ -688,18 +688,147 @@
     }
 }
 
-/* An image cloze card: a hint is written inside its mask, wrapped and cut to the mask; the whole hint is its tooltip */
+/* An image cloze card: a hint is written inside its mask on one line, cut with "…" when it is longer; a tap opens it */
 .fs-occ.is-cloze .fs-occ-tag {
     overflow: hidden;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .fs-occ.is-cloze .fs-occ-tag-text {
     flex: initial;
     max-width: 100%;
-    max-height: 100%;
-    white-space: normal;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* A hint on an asked mask: a soft, rounded label, sized as words rather than the big "?" */
+.fs-occ.is-cloze .fs-occ-tag.is-question.is-hint {
+    font-size: clamp(11px, 2.1cqw, 15px);
+    font-weight: 600;
+}
+
+.fs-occ.is-cloze .fs-occ-tag.is-question.is-hint .fs-occ-tag-text {
+    padding: 0.15em 0.55em;
+    border-radius: 999px;
+    box-shadow: none;
+    letter-spacing: 0.005em;
+}
+
+/* The whole hint: a raised card from the Studio's own tokens, its arrow pointing at the mask */
+.fs-occ-hint-bubble {
+    position: absolute;
+    z-index: 3;
+    top: var(--fs-occ-bubble-top, 0);
+    left: var(--fs-occ-left, 0);
+    box-sizing: border-box;
+    width: max-content;
+    max-width: min(86%, 340px);
+    padding: 10px 14px 12px;
+    border-radius: var(--fs-radius-md);
+    font-family: var(--fs-font);
+    /* Body text, not the card front's headline: it wraps to fill its lines, at the normal spacing */
+    font-size: 15px;
+    letter-spacing: normal;
+    text-wrap: pretty;
+    text-align: left;
+    color: var(--fs-text);
+    background-color: var(--fs-surface);
+    box-shadow:
+        var(--fs-shadow-lg),
+        0 0 0 1px var(--fs-border-strong);
+    pointer-events: auto;
+    cursor: default;
+    transform-origin: var(--fs-occ-arrow, 50%) top;
+    animation: fs-occ-bubble-in 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.fs-occ-hint-bubble.is-above {
+    transform-origin: var(--fs-occ-arrow, 50%) bottom;
+}
+
+.fs-occ-hint-bubble-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--fs-accent);
+}
+
+.fs-occ-hint-bubble-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background-color: var(--fs-accent-soft);
+}
+
+.fs-occ-hint-bubble-icon svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Only a hint taller than the picture scrolls, inside the card, so the card never clips its own arrow */
+.fs-occ-hint-bubble-text {
+    max-height: calc(var(--fs-occ-room, 100vh) - 46px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    font-size: 15px;
+    font-weight: 450;
+    line-height: 1.5;
     overflow-wrap: anywhere;
-    text-align: center;
+}
+
+/* The arrow: a corner of the card's own colour and edge, under the mask or over it */
+.fs-occ-hint-bubble::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: var(--fs-occ-arrow, 50%);
+    width: 12px;
+    height: 12px;
+    border-top-left-radius: 3px;
+    background-color: var(--fs-surface);
+    box-shadow: -1px -1px 0 var(--fs-border-strong);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.fs-occ-hint-bubble.is-above::before {
+    top: auto;
+    bottom: -6px;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 3px;
+    box-shadow: 1px 1px 0 var(--fs-border-strong);
+}
+
+/* Floating over the picture: not next to its mask, so no arrow */
+.fs-occ-hint-bubble.is-floating::before {
+    display: none;
+}
+
+@keyframes fs-occ-bubble-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fs-occ-hint-bubble {
+        animation: none;
+    }
 }
 
 /* The editor's line of what is wrong with a cloze block: only there when something is */

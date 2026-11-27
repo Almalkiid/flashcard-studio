@@ -43,7 +43,7 @@ export interface ImageClozeBlock {
 }
 
 export type BlockProblem =
-    "field" | "geometry" | "duplicate-id" | "comment" | "no-image" | "no-mask";
+    "field" | "geometry" | "duplicate-id" | "comment" | "no-image" | "no-mask" | "unknown-line";
 
 /** A block, or what is wrong with it: the line (from 1, in the text between the fences; 0 for the whole block). */
 export type BlockRead =
@@ -55,8 +55,11 @@ const LETTERS = /^[ash]{1,99}$/;
 const ID_AND_GEOMETRY = /^([\w-]+)\s+(.+)$/;
 const OPENING = /^(`{3,}|~{3,})image-cloze\s*$/;
 const CLOSING = /^(`{3,}|~{3,})\s*$/;
-/** Any fence that opens a code block: three or more backticks or tildes, then anything. */
-const ANY_OPENING = /^(`{3,}|~{3,})/;
+/**
+ * Any fence that opens a code block: three or more backticks with no backtick after them (so ```code``` on one line is
+ * inline code), or three or more tildes, then anything, as in Markdown.
+ */
+const ANY_OPENING = /^(?:(`{3,})(?!.*`)|(~{3,}))/;
 /** Leading spaces and quote markers: what is in front of a fence that is indented or in a quote. */
 const LEAD = /^\s*(?:>\s*)*/;
 
@@ -101,7 +104,11 @@ export function parseImageClozeBlock(source: string): BlockRead {
     const ids = new Set<string>();
     for (const [at, line] of lines.entries()) {
         const key = KEY_LINE.exec(line.trimEnd());
-        if (key === null) continue;
+        // Strict: a line the block does not know (a typo such as `masks:`) is named, not dropped at the next save
+        if (key === null) {
+            if (line.trim().length > 0) return { ok: false, line: at + 1, problem: "unknown-line" };
+            continue;
+        }
 
         const name = key[1].toLowerCase();
         const value = key[2].trim();
@@ -169,7 +176,8 @@ export function scanImageClozeFences(lines: string[]): FenceSpan[] {
         const line = lines[open];
         const lead = LEAD.exec(line)?.[0] ?? "";
         const rest = line.slice(lead.length).trimEnd();
-        const fence = ANY_OPENING.exec(rest)?.[1];
+        const opening = ANY_OPENING.exec(rest);
+        const fence = opening === null ? undefined : (opening[1] ?? opening[2]);
         if (fence === undefined) continue;
 
         const quoted = lead.includes(">");

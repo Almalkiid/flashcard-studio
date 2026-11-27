@@ -3,7 +3,12 @@ import { Modal, Notice, Setting } from "obsidian";
 
 import type { Card } from "src/data/data-structures/card/flashcard";
 import { t } from "src/lang/translate";
-import { filterSuspended, suspendedCards, unsuspendCards } from "src/scheduling/suspended-cards";
+import {
+    filterSuspended,
+    suspendedCards,
+    suspendedCardText,
+    unsuspendCards,
+} from "src/scheduling/suspended-cards";
 import type FlashcardStudioPlugin from "src/studio-plugin";
 import { ConfirmationModal } from "src/ui/obsidian-ui-components/modals/confirm-modal";
 import { openQuestionInNote } from "src/ui/open-question";
@@ -106,7 +111,7 @@ export class SuspendedCardsModal extends Modal {
     private renderRow(card: Card): void {
         const row = this.listEl.createDiv({ cls: "fs-suspended-row" });
         const text = row.createDiv({ cls: "fs-suspended-text" });
-        text.createDiv({ cls: "fs-suspended-front", text: card.front.replace(/\s+/g, " ").trim() });
+        text.createDiv({ cls: "fs-suspended-front", text: suspendedCardText(card) });
         text.createDiv({ cls: "fs-suspended-note", text: card.question.note.filePath });
 
         const actions = row.createDiv({ cls: "fs-suspended-actions" });

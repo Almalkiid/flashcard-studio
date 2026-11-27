@@ -683,6 +683,8 @@ const en = {
         "The schedule comment of this card cannot be read, so it makes no cards.",
     IMAGE_CLOZE_EDITOR_TITLE: "Image cloze",
     IMAGE_CLOZE_ADD_COMMAND: "Add image cloze",
+    IMAGE_CLOZE_EMBED_SHOWS_ANSWER:
+        "The picture is also in this card as a plain image, which shows the answer: remove that line.",
     IMAGE_CLOZE_CARD_FIELD: "Cards for this mask",
     IMAGE_CLOZE_CARD_PLACEHOLDER: "1, or 1,2, or 0 for always hidden, or letters a, h, s",
     IMAGE_CLOZE_HINT_FIELD: "Hint",

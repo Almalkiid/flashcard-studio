@@ -38,9 +38,10 @@ mask: c1 rect 0.1 0.1 0.2 0.2 | France
 
 An image cloze block asks its masks like text clozes. Each mask says on which cards it is asked, and can carry a hint. There is no answer field: the answer is the part of the picture under the mask. Run **Add image cloze** (a command, and an item in the editor menu on a line with an image).
 
+<!-- The text and the block are one paragraph, one card: a blank line between them would split it. -->
+<!-- prettier-ignore -->
 ````markdown
 The ==1;;left ventricle== pumps blood to the ==2;;aorta==.
-
 ```image-cloze
 image: [[Heart.png]]
 mode: hide-all

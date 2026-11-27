@@ -1,4 +1,9 @@
-import { CardType, isClozeKind, showsBackOnly } from "src/data/data-structures/card/question";
+import {
+    CardType,
+    endsWithFence,
+    isClozeKind,
+    showsBackOnly,
+} from "src/data/data-structures/card/question";
 
 test("cloze kinds: text clozes and image clozes; never multiple choice, no typed answer of their own", () => {
     expect(isClozeKind(CardType.Cloze)).toBe(true);
@@ -13,4 +18,18 @@ test("cards that show only their back, which is the whole card", () => {
     expect(showsBackOnly(CardType.ImageCloze)).toBe(true);
     expect(showsBackOnly(CardType.SingleLineBasic)).toBe(false);
     expect(showsBackOnly(CardType.Callout)).toBe(false);
+});
+
+describe("endsWithFence: a schedule comment never goes on a closing fence line", () => {
+    test.each([
+        ["```", true],
+        ["text\n```", true],
+        ["text\n~~~", true],
+        ["text\n~~~~", true],
+        ["text\n  ~~~  ", true],
+        ["text ~~~ more", false],
+        ["plain text", false],
+    ])("%p → %p", (text, expected) => {
+        expect(endsWithFence(text)).toBe(expected);
+    });
 });

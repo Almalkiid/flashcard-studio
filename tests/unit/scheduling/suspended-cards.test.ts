@@ -3,7 +3,15 @@ import { Card } from "src/data/data-structures/card/flashcard";
 import { Question } from "src/data/data-structures/card/question";
 import { Deck } from "src/data/decks/deck";
 import { TopicPath, TopicPathList } from "src/data/decks/topic-path";
-import { filterSuspended, groupByQuestion, suspendedCards } from "src/scheduling/suspended-cards";
+import { parseImageClozeBlock } from "src/occlusion/image-cloze-block";
+import { imageClozeCardMarkdown } from "src/occlusion/image-cloze-view";
+import { occlusionCardMarkdown } from "src/occlusion/occlusion-view";
+import {
+    filterSuspended,
+    groupByQuestion,
+    suspendedCards,
+    suspendedCardText,
+} from "src/scheduling/suspended-cards";
 
 interface CardOptions {
     front?: string;
@@ -104,5 +112,40 @@ describe("groupByQuestion", () => {
         expect(groups.size).toBe(2);
         expect(groups.get(question)).toEqual([first, second]);
         expect(groups.get(other.question)).toEqual([other]);
+    });
+});
+
+describe("suspendedCardText", () => {
+    const cardWithFront = (front: string) => ({ front }) as Card;
+
+    test("an image cloze card shows its question and hints, not its data", () => {
+        const read = parseImageClozeBlock(
+            "image: x.png\nquestion: Name it\nmask: 1 | a rect 0 0 .1 .1 | chamber",
+        );
+        if (!read.ok) throw new Error("not read");
+        const front = imageClozeCardMarkdown({
+            kind: "cloze",
+            block: read.block,
+            card: 1,
+            side: "front",
+            textCards: 0,
+        });
+        expect(suspendedCardText(cardWithFront(front))).toBe("Name it · chamber");
+    });
+
+    test("an image occlusion card shows its question and the label of its mask", () => {
+        const block = {
+            image: "x.png",
+            mode: "hide-all" as const,
+            question: "Q",
+            masks: [{ id: "a", shape: "rect" as const, x: 0, y: 0, w: 0.1, h: 0.1, label: "A" }],
+        };
+        expect(suspendedCardText(cardWithFront(occlusionCardMarkdown(block, 0, "front")))).toBe(
+            "Q · A",
+        );
+    });
+
+    test("any other card as before: its text on one line", () => {
+        expect(suspendedCardText(cardWithFront("What  is\n**this**?"))).toBe("What is **this**?");
     });
 });

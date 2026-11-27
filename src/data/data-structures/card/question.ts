@@ -31,6 +31,14 @@ export enum CardType {
     ImageCloze,
 }
 
+/**
+ * Whether a text ends with a code fence (backticks, as always, or a closing line of tildes), where a schedule comment
+ * on the same line would turn the closing fence into text and leave the block open.
+ */
+export function endsWithFence(text: string): boolean {
+    return text.endsWith("```") || /(^|\n)[ \t]*~{3,}[ \t]*$/.test(text);
+}
+
 /** A cloze question: text clozes, or an image cloze block alone. Never multiple choice, no typed answer of its own. */
 export function isClozeKind(type: CardType): boolean {
     return type === CardType.Cloze || type === CardType.ImageCloze;
@@ -70,7 +78,7 @@ export class QuestionText {
     }
 
     endsWithCodeBlock(): boolean {
-        return this.actualQuestion.endsWith("```");
+        return endsWithFence(this.actualQuestion);
     }
 
     static create(

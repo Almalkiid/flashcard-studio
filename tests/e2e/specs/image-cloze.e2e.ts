@@ -209,7 +209,7 @@ describe("image cloze", function () {
         expect(picture.tags).toEqual(["first"]);
     });
 
-    it("a long hint on a small mask stays inside the mask and wraps", async function () {
+    it("a long hint on a small mask is cut with an ellipsis, and a tap shows it whole in a bubble", async function () {
         const hint = "a long hint that goes on ".repeat(8).trim();
         await useNote(
             [TAG, "", block(`mask: 1 | ra rect 0.4000 0.4000 0.0800 0.0800 | ${hint}`), ""].join(
@@ -234,15 +234,81 @@ describe("image cloze", function () {
                     tag.top >= mask.top - 1 &&
                     tag.right <= mask.right + 1 &&
                     tag.bottom <= mask.bottom + 1,
-                wraps: getComputedStyle(span).whiteSpace === "normal",
+                cut: getComputedStyle(span).textOverflow === "ellipsis",
                 title,
             };
         });
         expect(fit).not.toBeNull();
         expect(fit?.inside).toBe(true);
-        expect(fit?.wraps).toBe(true);
+        expect(fit?.cut).toBe(true);
         expect(fit?.title).toBe(hint);
         await screenshot("long-hint");
+
+        // A tap opens a bubble with the whole hint, inside the picture, and the card stays on its front
+        await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
+        // The bubble fades in: measure and picture it once it has
+        await browser.pause(300);
+        const bubble = await browser.execute(() => {
+            const card = ".fs-view .fs-card-container";
+            const el = document.querySelector<HTMLElement>(`${card} .fs-occ-hint-bubble`);
+            const stage = document.querySelector(`${card} .fs-occ-stage`)?.getBoundingClientRect();
+            if (el === null || stage === undefined) return null;
+            const box = el.getBoundingClientRect();
+            return {
+                text: el.querySelector(".fs-occ-hint-bubble-text")?.textContent ?? "",
+                inside:
+                    box.left >= stage.left - 1 &&
+                    box.right <= stage.right + 1 &&
+                    box.top >= stage.top - 1 &&
+                    box.bottom <= stage.bottom + 1,
+                // A solid background of its own, so it reads over the picture
+                solid: /^rgb\(/.test(getComputedStyle(el).backgroundColor),
+            };
+        });
+        expect(bubble).toEqual({ text: hint, inside: true, solid: true });
+        expect(
+            await browser.$(".fs-view .fs-card-container .fs-show-answer-button").isDisplayed(),
+        ).toBe(true);
+        await screenshot("long-hint-tapped");
+        // The same in the dark theme
+        await browser.execute(() => {
+            document.body.classList.replace("theme-light", "theme-dark");
+        });
+        await browser.pause(200);
+        await screenshot("long-hint-tapped-dark");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-dark", "theme-light");
+        });
+    });
+
+    it("a hint of a sentence opens under its mask, with its arrow, in light and dark", async function () {
+        const hint = "The upper chamber that receives blood back from the body";
+        await useNote([TAG, "", block(`mask: 1 | ra ${RIGHT_ATRIUM} | ${hint}`), ""].join("\n"));
+        await openReview();
+        await cardShown();
+        await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
+        await browser.pause(300);
+        const placed = await browser.execute(() => {
+            const card = ".fs-view .fs-card-container";
+            const el = document.querySelector(`${card} .fs-occ-hint-bubble`);
+            return {
+                below:
+                    el !== null &&
+                    !el.classList.contains("is-above") &&
+                    !el.classList.contains("is-floating"),
+                text: el?.querySelector(".fs-occ-hint-bubble-text")?.textContent ?? "",
+            };
+        });
+        expect(placed).toEqual({ below: true, text: hint });
+        await screenshot("hint-bubble");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-light", "theme-dark");
+        });
+        await browser.pause(200);
+        await screenshot("hint-bubble-dark");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-dark", "theme-light");
+        });
     });
 
     it("edits a block in the note: only the block's lines change, the text and the schedule comment stay", async function () {
@@ -269,8 +335,11 @@ describe("image cloze", function () {
         // Nothing is wrong: no problem line
         expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(false);
         await browser.$$(".fs-occ-editor .fs-occ-chip")[1].click();
-        // Card field, then hint
+        // Card field, then hint. A hint holding a comment is named as it is typed
+        await browser.$$(".fs-occ-editor .fs-occ-input")[1].setValue("bad <!-- hint");
+        expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(true);
         await browser.$$(".fs-occ-editor .fs-occ-input")[1].setValue("other chamber");
+        expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(false);
         await screenshot("editor");
         await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
         await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });
