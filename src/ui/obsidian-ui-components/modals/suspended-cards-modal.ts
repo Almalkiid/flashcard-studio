@@ -152,7 +152,10 @@ export class SuspendedCardsModal extends Modal {
      */
     private async unsuspend(cards: Card[]): Promise<number> {
         try {
-            const result = await unsuspendCards(cards);
+            const result = await unsuspendCards(
+                cards,
+                this.plugin.dataManager.settingsManager.settings,
+            );
             if (result.failed > 0) new Notice(t("CHANGE_NOT_SAVED_NOTE_CHANGED"));
             return result.done;
         } finally {

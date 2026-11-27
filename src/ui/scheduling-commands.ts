@@ -1,6 +1,8 @@
 import { normalizePath, Notice, TFile } from "obsidian";
 
+import type { Card } from "src/data/data-structures/card/flashcard";
 import { Question, QuestionText } from "src/data/data-structures/card/question";
+import { positionsForEdit } from "src/data/segment-binding";
 import { t } from "src/lang/translate";
 import { customStudyMode, CustomStudySpec } from "src/scheduling/custom-study";
 import { formatRevlogCsv, revlogCsvFileName } from "src/scheduling/optimizer/revlog-csv";
@@ -64,14 +66,16 @@ export async function postponeDueReviews(
     );
 
     // Only the cards that were counted and confirmed move, not every segment that happens to be due
-    const chosen = new Map<Question, Set<number>>();
-    for (const card of cards) {
-        chosen.set(card.question, (chosen.get(card.question) ?? new Set()).add(card.cardIdx));
-    }
+    const chosen = new Map<Question, Card[]>();
+    for (const card of cards)
+        chosen.set(card.question, [...(chosen.get(card.question) ?? []), card]);
 
     let moved = 0;
     const { settings } = plugin.dataManager.settingsManager;
-    for (const [question, indices] of chosen) {
+    for (const [question, group] of chosen) {
+        // Each card's segment is found in the text being changed, by its card number when the question has them
+        const indices = positionsForEdit(question.questionText.original, question, group, settings);
+        if (indices === "unreadable") continue;
         const result = postponeInText(
             question.questionText.original,
             { todayStartMs, days },

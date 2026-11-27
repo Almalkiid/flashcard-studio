@@ -2,6 +2,8 @@ import { unsuspendCardsInText } from "src/data/card-meta";
 import type { Card } from "src/data/data-structures/card/flashcard";
 import type { Question } from "src/data/data-structures/card/question";
 import type { Deck } from "src/data/decks/deck";
+import { positionsForEdit } from "src/data/segment-binding";
+import { StudioSettings } from "src/data/settings-model";
 import { isInDeck } from "src/scheduling/custom-study";
 import { ReviewItemState } from "src/scheduling/schedule/review-item";
 
@@ -44,12 +46,21 @@ export function groupByQuestion(cards: Card[]): Map<Question, Card[]> {
  *
  * @returns How many cards were unsuspended, and how many could not be.
  */
-export async function unsuspendCards(cards: Card[]): Promise<{ done: number; failed: number }> {
+export async function unsuspendCards(
+    cards: Card[],
+    settings: StudioSettings,
+): Promise<{ done: number; failed: number }> {
     let done = 0;
     let failed = 0;
     for (const [question, group] of groupByQuestion(cards)) {
         const original = question.questionText.original;
-        const text = unsuspendCardsInText(original, new Set(group.map((card) => card.cardIdx)));
+        // Each card's segment is found in the text being changed, by its card number when the question has them
+        const positions = positionsForEdit(original, question, group, settings);
+        if (positions === "unreadable") {
+            failed += group.length;
+            continue;
+        }
+        const text = unsuspendCardsInText(original, positions);
         let written = false;
         try {
             written = text === original || (await question.replaceOriginalText(text));

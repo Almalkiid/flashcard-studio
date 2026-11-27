@@ -13,7 +13,8 @@ import {
     readImageClozeQuestion,
     swapImageClozeFences,
 } from "src/cards/image-cloze-question";
-import { CardType } from "src/data/data-structures/card/question";
+import type { Card } from "src/data/data-structures/card/flashcard";
+import { CardType, Question } from "src/data/data-structures/card/question";
 import { StudioSettings } from "src/data/settings-model";
 import { createClozeNote, legacyClozeCardIndices } from "src/math/math-cloze";
 
@@ -155,4 +156,31 @@ export function bindQuestion(
 /** The text of the segment at a raw position of the first comment, or null. */
 export function segmentAt(commentText: string, raw: number): string | null {
     return rawPieces(commentText)?.find((piece) => piece.raw === raw)?.piece ?? null;
+}
+
+/**
+ * The raw segment positions to change in `text` for some cards of one question, read from that text at the moment of
+ * the change: by card number for a question in scope (a card with no segment is left out), by place for every other
+ * question, as always. "unreadable" when the question's comment cannot be read: then nothing is changed.
+ */
+export function positionsForEdit(
+    text: string,
+    question: Pick<Question, "questionText" | "questionType">,
+    cards: Pick<Card, "cardIdx">[],
+    settings: StudioSettings,
+): Set<number> | "unreadable" {
+    const bound = bindQuestion(
+        text,
+        question.questionText.actualQuestion,
+        question.questionType,
+        settings,
+    );
+    if (bound === null) return new Set(cards.map((card) => card.cardIdx));
+    if (bound === "unreadable") return "unreadable";
+    const positions = new Set<number>();
+    for (const card of cards) {
+        const raw = bound.positions[card.cardIdx] ?? null;
+        if (raw !== null) positions.add(raw);
+    }
+    return positions;
 }
