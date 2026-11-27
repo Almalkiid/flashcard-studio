@@ -167,6 +167,8 @@ export class Question {
     note: Note;
     /** Set when loading the note found something to correct in it; the note is then rewritten. */
     hasChanged: boolean = false;
+    /** Whether a write keeps the history of removed card numbers; off only for the write that removes it. */
+    keepRemovedHistory: boolean = true;
 
     /** Where the question is in the note now. Writes through this plugin move it; the parser's numbers stay. */
     private lines: LineSpan | null = null;

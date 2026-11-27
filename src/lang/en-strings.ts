@@ -249,6 +249,24 @@ const en = {
     SUSPENDED_CONFIRM_DESC:
         "The ${count} cards shown go back into your reviews. Cards hidden by the filters stay suspended.",
     SUSPENDED_DONE: "Unsuspended ${count} cards.",
+    REMOVE_KEPT_HISTORY: "Remove history of removed cards",
+    KEPT_HISTORY_TITLE: "History of removed cards",
+    KEPT_HISTORY_INTRO:
+        "These cards are no longer asked: no mask or cloze uses their number. Their history stays in the note, so a card comes back with it if you use its number again.",
+    KEPT_HISTORY_COUNT: "${count} removed cards with history",
+    KEPT_HISTORY_COUNT_ONE: "1 removed card with history",
+    KEPT_HISTORY_NONE: "No removed card keeps a history.",
+    KEPT_HISTORY_CARDS: "Card ${numbers} of “${question}”",
+    KEPT_HISTORY_REMOVE: "Remove",
+    KEPT_HISTORY_REMOVE_ALL: "Remove all (${count})",
+    KEPT_HISTORY_CONFIRM_TITLE: "Remove ${count} histories?",
+    KEPT_HISTORY_CONFIRM_TITLE_ONE: "Remove this history?",
+    KEPT_HISTORY_CONFIRM_DESC:
+        "The reviews and due dates of these ${count} removed cards are deleted from their notes. A number used again then starts as a new card. This cannot be undone.",
+    KEPT_HISTORY_CONFIRM_DESC_ONE:
+        "The reviews and due date of this removed card are deleted from its note. If you use its number again, it starts as a new card. This cannot be undone.",
+    KEPT_HISTORY_DONE: "Removed the history of ${count} cards.",
+    KEPT_HISTORY_DONE_ONE: "Removed the history of 1 card.",
 
     // M3a: scheduling
     FSRS_OPTIMIZE: "Optimize parameters",

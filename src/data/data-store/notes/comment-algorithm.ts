@@ -23,6 +23,7 @@ export class Sm2NoteStore implements IDataStoreAlgorithm {
 
     /** For cards bound to card numbers, the segments of the numbers no card uses any more, kept as they were. */
     keptSegments(question: Question): string[] {
+        if (question.keepRemovedHistory === false) return [];
         const numbers = question.cards.map((card) => card.meta.cardNumber);
         if (!numbers.some((k) => k !== undefined)) return [];
         return keptSegments(

@@ -5027,6 +5027,12 @@ body.fs-reduced-bottom-fade-mask {
 .fs-suspended-count {
   color: var(--text-muted);
 }
+.fs-suspended-intro {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.45;
+  margin-bottom: var(--size-4-3);
+}
 .fs-suspended-list {
   max-height: 60vh;
   overflow-y: auto;

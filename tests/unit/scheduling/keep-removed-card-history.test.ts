@@ -1,4 +1,5 @@
 import { StudioSettings } from "src/data/settings-model";
+import { keptHistories, removeKeptHistories } from "src/scheduling/kept-history";
 
 import { load, settingsWith, setUp } from "../storage/helpers";
 
@@ -78,5 +79,61 @@ describe("a removed card number keeps its history, as in Anki", () => {
         expect(vault.texts.get("N.md")).toMatch(
             /<!--SR:!2026-12-01,3,250,id=\w+!2026-12-02,3,250,id=\w+-->/,
         );
+    });
+});
+
+describe("removing the history of removed cards (Anki: Empty Cards)", () => {
+    test("lists each question with kept history once, with its removed numbers", async () => {
+        const { note } = await loaded(
+            `==1;;a==\n${BLOCK("mask: 5 | m rect 0 0 .1 .1 |")}\n<!--SR:!${C1}!${C2}!${C5}-->`,
+        );
+        const [question] = note.questionList;
+        expect(keptHistories(note.questionList.flatMap((q) => q.cards))).toEqual([
+            { question, numbers: [2] },
+        ]);
+    });
+
+    test("a question without kept history is not listed", async () => {
+        const { note } = await loaded(
+            `==1;;a==\n${BLOCK("mask: 2 | m rect 0 0 .1 .1 |")}\n<!--SR:!${C1}!${C2}-->`,
+        );
+        expect(keptHistories(note.questionList.flatMap((q) => q.cards))).toEqual([]);
+    });
+
+    test("removing drops only the kept segments; the cards' own stay", async () => {
+        const { vault, question, settings } = await loaded(
+            `==1;;a==\n${BLOCK("mask: 5 | m rect 0 0 .1 .1 |")}\n<!--SR:!${C1}!${C2}!${C5}-->`,
+        );
+
+        expect(await removeKeptHistories([question], settings)).toEqual({ done: 1, failed: 0 });
+
+        const text = vault.texts.get("N.md") ?? "";
+        expect(text).not.toContain("c=2");
+        expect(text).toContain("2026-12-01,3,250,c=1");
+        expect(text).toContain("2026-12-05,3,250,c=5");
+        // And a later write does not bring it back
+        await question.writeQuestion(settings);
+        expect(vault.texts.get("N.md")).not.toContain("c=2");
+    });
+
+    test("cards never reviewed and only kept history: the comment goes", async () => {
+        const { vault, question, settings } = await loaded(
+            `==1;;a==\n${BLOCK("mask: 1 | m rect 0 0 .1 .1 |")}\n<!--SR:!${C2}-->`,
+        );
+
+        expect(await removeKeptHistories([question], settings)).toEqual({ done: 1, failed: 0 });
+
+        expect(vault.texts.get("N.md")).not.toContain("<!--SR:");
+    });
+
+    test("a note changed since it was read: nothing is written, counted as failed", async () => {
+        const { vault, question, settings } = await loaded(
+            `==1;;a==\n${BLOCK("mask: 5 | m rect 0 0 .1 .1 |")}\n<!--SR:!${C1}!${C2}!${C5}-->`,
+        );
+        const changed = (vault.texts.get("N.md") ?? "").replace("==1;;a==", "==1;;b==");
+        vault.texts.set("N.md", changed);
+
+        expect(await removeKeptHistories([question], settings)).toEqual({ done: 0, failed: 1 });
+        expect(vault.texts.get("N.md")).toBe(changed);
     });
 });

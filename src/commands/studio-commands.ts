@@ -11,6 +11,7 @@ import {
     FlashcardEditModal,
     SAVE_EDIT_COMMAND_ID,
 } from "src/ui/obsidian-ui-components/modals/card-edit-modal";
+import { KeptHistoryModal } from "src/ui/obsidian-ui-components/modals/kept-history-modal";
 import { SuspendedCardsModal } from "src/ui/obsidian-ui-components/modals/suspended-cards-modal";
 import { exportRevlogCsv, openCustomStudy, openPostpone } from "src/ui/scheduling-commands";
 import { UIState } from "src/ui/ui-state";
@@ -165,6 +166,9 @@ export function registerStudioCommands(plugin: FlashcardStudioPlugin): void {
     );
     action("show-suspended-cards", t("SHOW_SUSPENDED_CARDS"), () =>
         new SuspendedCardsModal(plugin).open(),
+    );
+    action("remove-kept-history", t("REMOVE_KEPT_HISTORY"), () =>
+        new KeptHistoryModal(plugin).open(),
     );
 
     // Views, scheduling and exams
