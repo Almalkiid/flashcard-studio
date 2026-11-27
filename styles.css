@@ -5238,7 +5238,7 @@ body.fs-reduced-bottom-fade-mask {
   max-height: 100%;
   max-width: 100%;
   padding: 0;
-  :is(.modal-header, .modal-close-button) {
+  :is(.modal-header, .modal-close-button, .modal-header-button) {
     display: none;
   }
   .fs-modal-content {

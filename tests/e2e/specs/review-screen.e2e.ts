@@ -99,6 +99,18 @@ describe("review screen", function () {
         await setSetting("reviewLook", "studio");
     });
 
+    it("shows one close button: Obsidian's own is hidden", async function () {
+        await openFirstCard();
+        // Obsidian 1.15 adds its close button outside the dialog's header; older versions inside it
+        const shownCloseIcons = await browser.execute(
+            () =>
+                [...document.querySelectorAll("#fs-modal-view svg.lucide-x")].filter(
+                    (icon) => icon.getBoundingClientRect().width > 0,
+                ).length,
+        );
+        expect(shownCloseIcons).toBe(1);
+    });
+
     for (const look of ["classic", "studio"]) {
         it(`${look}: hovering the card does not obscure review controls with a tooltip`, async function () {
             if (await isMobile()) this.skip();

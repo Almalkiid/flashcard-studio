@@ -5,7 +5,8 @@
     max-width: 100%;
     padding: 0;
 
-    :is(.modal-header, .modal-close-button) {
+    /* Obsidian's own close button (outside the header since Obsidian 1.15): the review has its own */
+    :is(.modal-header, .modal-close-button, .modal-header-button) {
         display: none;
     }
 

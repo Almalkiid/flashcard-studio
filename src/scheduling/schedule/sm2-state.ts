@@ -23,6 +23,13 @@ export class Sm2State extends ScheduleState {
     static readonly dummyDueDateForNewCard = "2000-01-01";
     static readonly initialInterval = 1;
 
+    /**
+     * The due date as the note wrote it, when that holds more than the day: a copy of the Spaced Repetition plugin
+     * writes a time after it (`2023-09-21-13-25`). The day is what schedules the card; the text is written back as it
+     * was while the card keeps that day, so a save of another card of the question does not lose the time.
+     */
+    writtenDue: string | null = null;
+
     /** @param delayedBeforeReviewTicks - Left out, worked out from the due date (see `lateness`). */
     constructor(
         dueDate: Moment,
@@ -47,6 +54,8 @@ export class Sm2State extends ScheduleState {
         const day = this.dueDate
             ? formatDate(this.dueDateAsUnix, PREFERRED_DATE_FORMAT)
             : Sm2State.dummyDueDateForNewCard;
+        if (this.writtenDue?.startsWith(`${day}-`))
+            return `!${this.writtenDue},${this.interval},${this.latestEase}`;
         return `!${day},${this.interval},${this.latestEase}`;
     }
 
