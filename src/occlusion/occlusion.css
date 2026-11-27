@@ -691,6 +691,22 @@
 /* An image cloze card: a hint is written inside its mask, wrapped and cut to the mask; the whole hint is its tooltip */
 .fs-occ.is-cloze .fs-occ-tag {
     overflow: hidden;
+    /* A hint is tapped to show all of it */
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* A tapped hint: all of it, over the picture, as wide as it needs up to most of the picture */
+.fs-occ.is-cloze .fs-occ-tag.is-expanded {
+    overflow: visible;
+    z-index: 2;
+}
+
+.fs-occ.is-cloze .fs-occ-tag.is-expanded .fs-occ-tag-text {
+    flex: none;
+    width: max-content;
+    max-width: 70cqw;
+    max-height: none;
 }
 
 .fs-occ.is-cloze .fs-occ-tag-text {

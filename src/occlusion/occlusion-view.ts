@@ -327,7 +327,14 @@ export function renderOcclusion(
         });
         tag.createSpan({ cls: "fs-occ-tag-text", text });
         // A hint is clipped to its mask: the whole of it is in the tooltip
-        if (options.cloze === true) tag.setAttribute("title", mask.label);
+        if (options.cloze === true) {
+            tag.setAttribute("title", mask.label);
+            // A tap shows the whole hint (a phone has no tooltip), and is not a tap on the card: it does not turn it
+            tag.addEventListener("click", (event) => {
+                event.stopPropagation();
+                tag.toggleClass("is-expanded", !tag.hasClass("is-expanded"));
+            });
+        }
         tag.setCssProps({
             "--fs-occ-x": percent(mask.x),
             "--fs-occ-y": percent(mask.y),

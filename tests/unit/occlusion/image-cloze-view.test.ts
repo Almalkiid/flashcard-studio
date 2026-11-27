@@ -206,6 +206,21 @@ describe("drawing into the page", () => {
         expect(el.querySelectorAll(".fs-mask.is-revealed")).toHaveLength(2);
     });
 
+    test("a tap on a hint shows all of it, and does not turn the card; a second tap shrinks it again", () => {
+        const host = document.body.createDiv();
+        let turned = 0;
+        host.addEventListener("click", () => turned++);
+        const el = host.createDiv();
+        renderImageClozeCard(el, appWith(true), "note.md", spec(1, "front"));
+        const tag = el.querySelector<HTMLElement>(".fs-occ-tag");
+        if (tag === null) throw new Error("no hint tag");
+        tag.click();
+        expect(tag.classList.contains("is-expanded")).toBe(true);
+        expect(turned).toBe(0);
+        tag.click();
+        expect(tag.classList.contains("is-expanded")).toBe(false);
+    });
+
     test("an image that is not in the vault, on a card and in the note", () => {
         const card = document.body.createDiv();
         renderImageClozeCard(card, appWith(false), "note.md", spec(1, "front"));
