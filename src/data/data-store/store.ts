@@ -81,7 +81,7 @@ export class DataStore {
 export interface IDataStoreAlgorithm {
     questionFormatScheduleAsHtmlComment(question: Question): string;
     /** The segments of removed card numbers that the question's comment keeps (see `keptSegments`). */
-    keptSegments(question: Question): string[];
+    keptSegments(question: Question): { number: number; segment: string }[];
 }
 
 /** The comment writer in use. */

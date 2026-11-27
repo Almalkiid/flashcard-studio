@@ -137,3 +137,38 @@ describe("removing the history of removed cards (Anki: Empty Cards)", () => {
         expect(vault.texts.get("N.md")).toBe(changed);
     });
 });
+
+describe("what the review found", () => {
+    test("a question with a second schedule comment: removing the history keeps that comment, as it was", async () => {
+        const text = "==a==\n<!--SR:!2026-12-02,7,230,c=3-->\n==b==\n<!--SR:!2026-12-04,10,250-->";
+        const { vault, note, settings } = await loaded(text);
+        const histories = keptHistories(note.questionList.flatMap((q) => q.cards));
+        expect(histories.map((h) => h.numbers)).toEqual([[3]]);
+        const before = vault.texts.get("N.md");
+
+        const result = await removeKeptHistories(
+            histories.map((h) => h.question),
+            settings,
+        );
+
+        // Not removed, so nothing else is lost: the note is as it was, and the list says it failed
+        expect(result).toEqual({ done: 0, failed: 1 });
+        expect(vault.texts.get("N.md")).toBe(before);
+        expect(vault.texts.get("N.md")).toContain("2026-12-04,10,250");
+    });
+
+    test("spaces around c= : every kept number is listed, so the count asked about is the count removed", async () => {
+        const { note } = await loaded(
+            "==a==\n<!--SR:!2026-12-02,7,230,c=3!2026-12-04,10,250, c=4-->",
+        );
+        expect(
+            keptHistories(note.questionList.flatMap((q) => q.cards)).map((h) => h.numbers),
+        ).toEqual([[3, 4]]);
+        const only = await loaded(
+            "==1;;a==\n<!--SR:!2026-12-01,3,250,c=1!2026-12-04,10,250, c=4-->",
+        );
+        expect(
+            keptHistories(only.note.questionList.flatMap((q) => q.cards)).map((h) => h.numbers),
+        ).toEqual([[4]]);
+    });
+});

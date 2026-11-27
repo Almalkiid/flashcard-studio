@@ -158,15 +158,22 @@ export function bindQuestion(
  * cards' own, so a card whose number is used again gets its history back, as Anki keeps a card until "Empty Cards".
  * None unless the comment is numbered.
  */
-export function keptSegments(commentText: string, used: Iterable<number>): string[] {
+export function keptSegments(commentText: string, used: Iterable<number>): KeptSegment[] {
     const binding = readBinding(commentText);
     if (binding.kind !== "numbered") return [];
     const inUse = new Set(used);
+    // The numbers are the ones the binding read, so whatever it accepts (spaces around `c=`) is kept and listed alike
     return [...binding.rawOf]
         .filter(([k]) => !inUse.has(k))
         .sort(([a], [b]) => a - b)
-        .map(([, raw]) => segmentAt(commentText, raw) ?? "")
-        .filter((segment) => segment.length > 0);
+        .map(([number, raw]) => ({ number, segment: segmentAt(commentText, raw) ?? "" }))
+        .filter(({ segment }) => segment.length > 0);
+}
+
+/** A segment kept for a card number no card uses any more, as written. */
+export interface KeptSegment {
+    number: number;
+    segment: string;
 }
 
 /** The text of the segment at a raw position of the first comment, or null. */

@@ -9,8 +9,6 @@ export interface KeptHistory {
     numbers: number[];
 }
 
-const CARD_NUMBER = /(?:^|,)c=([1-9]\d*)(?:,|$)/;
-
 /** The questions of some cards that keep the history of removed card numbers, each once, with those numbers. */
 export function keptHistories(cards: Card[]): KeptHistory[] {
     const result: KeptHistory[] = [];
@@ -20,8 +18,7 @@ export function keptHistories(cards: Card[]): KeptHistory[] {
         seen.add(question);
         const numbers = DataStoreAlgorithm.getInstance()
             .keptSegments(question)
-            .map((segment) => Number(CARD_NUMBER.exec(segment)?.[1] ?? 0))
-            .filter((k) => k > 0);
+            .map(({ number }) => number);
         if (numbers.length > 0) result.push({ question, numbers });
     }
     return result;
@@ -39,6 +36,12 @@ export async function removeKeptHistories(
     let done = 0;
     let failed = 0;
     for (const question of questions) {
+        // A question with a second schedule comment (two cards' lines with no blank line between them) is written
+        // with only its first one: removing the history could drop the other's schedules, so it is left as it is
+        if ((question.questionText.original.match(/<!--SR:/g) ?? []).length > 1) {
+            failed++;
+            continue;
+        }
         let written = false;
         question.keepRemovedHistory = false;
         try {

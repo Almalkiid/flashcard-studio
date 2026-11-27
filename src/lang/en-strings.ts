@@ -267,6 +267,8 @@ const en = {
         "The reviews and due date of this removed card are deleted from its note. If you use its number again, it starts as a new card. This cannot be undone.",
     KEPT_HISTORY_DONE: "Removed the history of ${count} cards.",
     KEPT_HISTORY_DONE_ONE: "Removed the history of 1 card.",
+    KEPT_HISTORY_NOT_REMOVED:
+        "Some histories were not removed: their note changed, or their question has a second schedule comment. Open the note to remove them by hand.",
 
     // M3a: scheduling
     FSRS_OPTIMIZE: "Optimize parameters",

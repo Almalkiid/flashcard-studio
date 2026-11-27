@@ -153,7 +153,7 @@ export class KeptHistoryModal extends Modal {
                 items.map((item) => item.question),
                 this.plugin.dataManager.settingsManager.settings,
             );
-            if (result.failed > 0) new Notice(t("CHANGE_NOT_SAVED_NOTE_CHANGED"));
+            if (result.failed > 0) new Notice(t("KEPT_HISTORY_NOT_REMOVED"));
             // What a question still keeps after its write: nothing when written, all of it when not
             const left = keptHistories(items.flatMap((item) => item.question.cards));
             return this.cardCount(items) - this.cardCount(left);

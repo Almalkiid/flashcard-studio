@@ -3,7 +3,7 @@ import { IDataStoreAlgorithm } from "src/data/data-store/store";
 import type { Card } from "src/data/data-structures/card/flashcard";
 import type { Question } from "src/data/data-structures/card/question";
 import { SCHEDULE_COMMENT_PREFIX, SCHEDULE_COMMENT_SUFFIX } from "src/data/formats";
-import { keptSegments } from "src/data/segment-binding";
+import { type KeptSegment, keptSegments } from "src/data/segment-binding";
 import { StudioSettings } from "src/data/settings-model";
 import { FSRS_EMPTY_SCHEDULE_COMMENT } from "src/scheduling/schedule/fsrs-state";
 import { SchedulerKind } from "src/scheduling/schedule/scheduler-kind";
@@ -16,13 +16,13 @@ export class Sm2NoteStore implements IDataStoreAlgorithm {
     questionFormatScheduleAsHtmlComment(question: Question): string {
         const segments = question.cards.map((card) => this.formatCardSchedule(card)).join("");
         const kept = this.keptSegments(question)
-            .map((segment) => "!" + segment)
+            .map(({ segment }) => "!" + segment)
             .join("");
         return SCHEDULE_COMMENT_PREFIX + segments + kept + SCHEDULE_COMMENT_SUFFIX;
     }
 
     /** For cards bound to card numbers, the segments of the numbers no card uses any more, kept as they were. */
-    keptSegments(question: Question): string[] {
+    keptSegments(question: Question): KeptSegment[] {
         if (question.keepRemovedHistory === false) return [];
         const numbers = question.cards.map((card) => card.meta.cardNumber);
         if (!numbers.some((k) => k !== undefined)) return [];
