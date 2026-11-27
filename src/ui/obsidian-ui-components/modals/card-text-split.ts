@@ -1,6 +1,6 @@
 import { CardFrontBackUtil } from "src/cards/expand";
 import { parse, parserOptionsFromSettings } from "src/cards/parse";
-import { CardType, isClozeKind } from "src/data/data-structures/card/question";
+import { CardType, endsWithFence, isClozeKind } from "src/data/data-structures/card/question";
 import { CARD_METADATA_CALLOUT } from "src/data/formats";
 import { StudioSettings } from "src/data/settings-model";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/text";
@@ -106,7 +106,7 @@ function withScheduleComment(
         lines.push(`${CARD_METADATA_CALLOUT} `, `>  ${comment}`);
     } else if (
         settings.cardCommentOnSameLine &&
-        !text.endsWith("```") &&
+        !endsWithFence(text) &&
         !isCallout &&
         type !== CardType.ImageOcclusion &&
         type !== CardType.ImageCloze
