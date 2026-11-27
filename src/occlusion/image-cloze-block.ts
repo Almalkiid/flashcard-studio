@@ -55,6 +55,8 @@ const LETTERS = /^[ash]{1,99}$/;
 const ID_AND_GEOMETRY = /^([\w-]+)\s+(.+)$/;
 const OPENING = /^(`{3,}|~{3,})image-cloze\s*$/;
 const CLOSING = /^(`{3,}|~{3,})\s*$/;
+/** Any fence that opens a code block: three or more backticks or tildes, then anything. */
+const ANY_OPENING = /^(`{3,}|~{3,})/;
 /** Leading spaces and quote markers: what is in front of a fence that is indented or in a quote. */
 const LEAD = /^\s*(?:>\s*)*/;
 
@@ -165,38 +167,40 @@ export function scanImageClozeFences(lines: string[]): FenceSpan[] {
     const spans: FenceSpan[] = [];
     for (let open = 0; open < lines.length; open++) {
         const line = lines[open];
-        if (!isImageClozeFenceLine(line)) continue;
-
         const lead = LEAD.exec(line)?.[0] ?? "";
+        const rest = line.slice(lead.length).trimEnd();
+        const fence = ANY_OPENING.exec(rest)?.[1];
+        if (fence === undefined) continue;
+
         const quoted = lead.includes(">");
-        const fence = OPENING.exec(line.slice(lead.length).trimEnd())?.[1] ?? "```";
-        let close = lines.length - 1;
-        let closed = false;
-        for (let at = open + 1; at < lines.length; at++) {
-            if (quoted && !/^\s*>/.test(lines[at])) {
-                close = at - 1;
-                break;
-            }
-            const closing = CLOSING.exec(lines[at].replace(LEAD, "").trimEnd());
-            if (
-                closing !== null &&
-                closing[1][0] === fence[0] &&
-                closing[1].length >= fence.length
-            ) {
-                close = at;
-                closed = true;
-                break;
-            }
-        }
-        spans.push({
-            open,
-            close,
-            leftEdge: lead.length === 0,
-            quoted,
-            closed,
-            hasComment: lines.slice(open, close + 1).some((text) => text.includes("<!--")),
-        });
+        const { close, closed } = fenceEnd(lines, open, fence, quoted);
+        // An ordinary code block is skipped whole: an example of the syntax in it is not a block
+        if (OPENING.test(rest))
+            spans.push({
+                open,
+                close,
+                leftEdge: lead.length === 0,
+                quoted,
+                closed,
+                hasComment: lines.slice(open, close + 1).some((text) => text.includes("<!--")),
+            });
         open = close;
     }
     return spans;
+}
+
+/** The line that closes a fence opened on lines[open], or, unclosed, the last line of the note or of its quote. */
+function fenceEnd(
+    lines: string[],
+    open: number,
+    fence: string,
+    quoted: boolean,
+): { close: number; closed: boolean } {
+    for (let at = open + 1; at < lines.length; at++) {
+        if (quoted && !/^\s*>/.test(lines[at])) return { close: at - 1, closed: false };
+        const closing = CLOSING.exec(lines[at].replace(LEAD, "").trimEnd());
+        if (closing !== null && closing[1][0] === fence[0] && closing[1].length >= fence.length)
+            return { close: at, closed: true };
+    }
+    return { close: lines.length - 1, closed: false };
 }
