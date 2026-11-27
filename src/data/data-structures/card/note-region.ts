@@ -238,22 +238,23 @@ export function replaceCardKeepingLineEnds(
     replacement: string,
 ): string {
     const run = text.slice(region.start, region.end).replace(/\r\n?/g, "\n");
-    let post = region.post;
-    let card = run.slice(region.pre.length, run.length - post.length);
-    // White space after the card on its last line is that line's own (a line break there), not padding to put after
-    // whatever replaces the card: the replacement may add lines (a schedule comment) after it
-    if (post !== "" && !post.includes("\n")) {
-        card += post;
-        post = "";
-    }
-    const lines = card.split("\n");
+    // White space after the card on its last line (the run's padding) is read as that line's own
+    const onLastLine = region.post !== "" && !region.post.includes("\n");
+    const card = run.slice(region.pre.length, run.length - region.post.length);
+    const lines = (onLastLine ? card + region.post : card).split("\n");
+    let lastKept = false;
     const kept = replacement
         .split("\n")
         .map((line, at) => {
             const was = lines[at];
-            return was !== undefined && was !== line && was.trimEnd() === line ? was : line;
+            const same = was !== undefined && was !== line && was.trimEnd() === line;
+            if (same && at === lines.length - 1) lastKept = true;
+            return same ? was : line;
         })
         .join("\n");
+    // That line came back as it was, so it has its white space again (a line break there); when it changed (a schedule
+    // comment rewritten), the white space stays after the replacement, as it always did
+    const post = onLastLine && lastKept ? "" : region.post;
     return replaceCard(text, { ...region, post }, kept);
 }
 

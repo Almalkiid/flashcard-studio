@@ -89,3 +89,11 @@ describe("what the review found", () => {
         );
     });
 });
+
+test("white space after a schedule comment stays after the rewritten comment, as before (12 real notes)", async () => {
+    const text = "#flashcards\n\nA ==cloze== here\n<!--SR:!2025-04-19,54,310-->  \n\nNext::card\n";
+    const saved = await reviewFirstCard(text);
+    expect(saved).toBe(
+        "#flashcards\n\nA ==cloze== here\n<!--SR:!2026-10-20,12,260,id=012345-->  \n\nNext::card\n",
+    );
+});
