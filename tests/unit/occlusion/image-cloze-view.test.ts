@@ -215,15 +215,22 @@ describe("drawing into the page", () => {
         const tags = el.querySelectorAll<HTMLElement>(".fs-occ-tag");
         tags[0].click();
         const bubble = el.querySelector(".fs-occ-hint-bubble");
-        expect(bubble?.textContent).toBe("chamber");
+        // A small "Hint" label over the hint itself
+        expect(bubble?.querySelector(".fs-occ-hint-bubble-label")?.textContent).toBe("Hint");
+        expect(bubble?.querySelector(".fs-occ-hint-bubble-text")?.textContent).toBe("chamber");
         expect(bubble?.getAttribute("role")).toBe("tooltip");
+        // The mask it belongs to is marked while it is open
+        expect(tags[0].classList.contains("is-open")).toBe(true);
         expect(turned).toBe(0);
-        // Another mask's hint: one bubble at a time
+        // Another mask's hint: one bubble at a time, and only that mask marked
         tags[1].click();
         expect(el.querySelectorAll(".fs-occ-hint-bubble")).toHaveLength(1);
-        expect(el.querySelector(".fs-occ-hint-bubble")?.textContent).toBe("valve");
+        expect(el.querySelector(".fs-occ-hint-bubble-text")?.textContent).toBe("valve");
+        expect(tags[0].classList.contains("is-open")).toBe(false);
+        expect(tags[1].classList.contains("is-open")).toBe(true);
         tags[1].click();
         expect(el.querySelector(".fs-occ-hint-bubble")).toBeNull();
+        expect(tags[1].classList.contains("is-open")).toBe(false);
     });
 
     test("a mask low on the picture has its bubble above it", () => {
@@ -261,4 +268,15 @@ describe("drawing into the page", () => {
             "Line 5 of this image cloze block cannot be read.",
         );
     });
+});
+
+test("an asked mask's hint is set as a label; a mask without one keeps the big question mark", () => {
+    const el = document.body.createDiv();
+    renderImageClozeCard(el, appWith(true), "note.md", spec(2, "front"));
+    expect(el.querySelector(".fs-occ-tag.is-question")?.classList.contains("is-hint")).toBe(false);
+    const other = document.body.createDiv();
+    renderImageClozeCard(other, appWith(true), "note.md", spec(1, "front"));
+    expect(other.querySelector(".fs-occ-tag.is-question")?.classList.contains("is-hint")).toBe(
+        true,
+    );
 });

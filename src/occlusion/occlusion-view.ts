@@ -183,42 +183,74 @@ function scrollCardToMask(el: HTMLElement, scroller: HTMLElement, stage: HTMLEle
 }
 
 /**
- * A bubble with a mask's whole hint, under the mask (above it when the mask is low on the picture), its arrow pointing
- * at the mask, kept inside the picture. Normal-size text on the page's own surface, so the picture stays readable.
+ * A bubble with a mask's whole hint: a small "Hint" label over the hint, on a raised card whose arrow points at the
+ * mask, which is ringed while the bubble is open. It goes under the mask, or above it when there is no room under it,
+ * or, when neither fits, floats over the picture (the arrow hidden), so it is never cut off by the picture's frame and
+ * only scrolls for a hint taller than the picture itself.
  */
 function showHintBubble(
     stage: HTMLElement,
+    tag: HTMLElement,
     mask: OcclusionBlock["masks"][number],
     index: number,
 ): void {
-    const bubble = stage.createDiv({ cls: "fs-occ-hint-bubble", text: plainLabel(mask.label) });
+    const bubble = stage.createDiv({ cls: "fs-occ-hint-bubble" });
     bubble.setAttribute("role", "tooltip");
     bubble.setAttribute("data-mask", String(index));
-    // On the side of the mask with more room, and no taller than that room (a longer hint scrolls in the bubble), so
-    // the picture's frame never cuts it off. Before the picture is laid out, a mask low on it has its bubble above
-    const height = stage.clientHeight;
-    const gap = 16;
-    const below = height * (1 - mask.y - mask.h) - gap;
-    const above = height * mask.y - gap;
-    const onTop = height > 0 ? above > below : mask.y + mask.h > 0.6;
-    bubble.toggleClass("is-above", onTop);
-    bubble.setCssProps({
-        "--fs-occ-top": percent(mask.y + mask.h),
-        "--fs-occ-bottom": percent(1 - mask.y),
-        ...(height > 0 ? { "--fs-occ-room": `${Math.max(48, onTop ? above : below)}px` } : {}),
-    });
-    // Centred on the mask, but never past the picture's edges; the arrow stays on the mask
+    const label = bubble.createDiv({ cls: "fs-occ-hint-bubble-label" });
+    setIcon(label.createSpan({ cls: "fs-occ-hint-bubble-icon" }), "lightbulb");
+    label.createSpan({ text: t("IMAGE_CLOZE_HINT_FIELD") });
+    bubble.createDiv({ cls: "fs-occ-hint-bubble-text", text: plainLabel(mask.label) });
+    tag.addClass("is-open");
+
     const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    const gap = 12;
+    const edge = 6;
+    bubble.setCssProps({ "--fs-occ-room": height > 0 ? `${height - 2 * edge}px` : "none" });
+    const tall = bubble.offsetHeight;
+    const maskTop = mask.y * height;
+    const maskBottom = (mask.y + mask.h) * height;
+    let place: "below" | "above" | "floating";
+    let top: number;
+    if (height === 0) {
+        // Not laid out yet: by where the mask is on the picture
+        place = mask.y + mask.h > 0.6 ? "above" : "below";
+        top = 0;
+    } else if (maskBottom + gap + tall <= height - edge) {
+        place = "below";
+        top = maskBottom + gap;
+    } else if (maskTop - gap - tall >= edge) {
+        place = "above";
+        top = maskTop - gap - tall;
+    } else {
+        place = "floating";
+        top = Math.max(edge, height - tall - edge);
+    }
+    bubble.toggleClass("is-above", place === "above");
+    bubble.toggleClass("is-floating", place === "floating");
+
+    // Centred on the mask, never past the picture's sides; the arrow stays on the mask
     const centre = (mask.x + mask.w / 2) * width;
     const left = Math.max(
-        4,
-        Math.min(centre - bubble.offsetWidth / 2, width - bubble.offsetWidth - 4),
+        edge,
+        Math.min(centre - bubble.offsetWidth / 2, width - bubble.offsetWidth - edge),
     );
-    bubble.setCssProps({ "--fs-occ-left": `${left}px`, "--fs-occ-arrow": `${centre - left}px` });
+    bubble.setCssProps({
+        "--fs-occ-bubble-top": `${top}px`,
+        "--fs-occ-left": `${left}px`,
+        "--fs-occ-arrow": `${centre - left}px`,
+    });
     bubble.addEventListener("click", (event) => {
         event.stopPropagation();
-        bubble.remove();
+        closeHintBubble(stage);
     });
+}
+
+/** Closes the open hint bubble of a picture, if any, and unmarks its mask. */
+function closeHintBubble(stage: HTMLElement): void {
+    stage.querySelector(".fs-occ-hint-bubble")?.remove();
+    stage.querySelectorAll(".fs-occ-tag.is-open").forEach((open) => open.removeClass("is-open"));
 }
 
 /** How an image cloze card differs from an image occlusion card when it is drawn. Left out: as image occlusion. */
@@ -365,6 +397,9 @@ export function renderOcclusion(
             cls: state === "hidden-active" ? "fs-occ-tag is-question" : "fs-occ-tag",
         });
         tag.createSpan({ cls: "fs-occ-tag-text", text });
+        // A hint on an asked mask is words, not the lone "?": it is set as a label, not as the big question mark
+        if (options.cloze === true && state === "hidden-active" && text !== "?")
+            tag.addClass("is-hint");
         // A hint is clipped to its mask: the whole of it is in the tooltip
         if (options.cloze === true) {
             tag.setAttribute("title", mask.label);
@@ -374,8 +409,8 @@ export function renderOcclusion(
                 event.stopPropagation();
                 const open = stage.querySelector(".fs-occ-hint-bubble");
                 const same = open?.getAttribute("data-mask") === String(index);
-                open?.remove();
-                if (!same) showHintBubble(stage, mask, index);
+                closeHintBubble(stage);
+                if (!same) showHintBubble(stage, tag, mask, index);
             });
         }
         tag.setCssProps({

@@ -246,6 +246,8 @@ describe("image cloze", function () {
 
         // A tap opens a bubble with the whole hint, inside the picture, and the card stays on its front
         await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
+        // The bubble fades in: measure and picture it once it has
+        await browser.pause(300);
         const bubble = await browser.execute(() => {
             const card = ".fs-view .fs-card-container";
             const el = document.querySelector<HTMLElement>(`${card} .fs-occ-hint-bubble`);
@@ -253,7 +255,7 @@ describe("image cloze", function () {
             if (el === null || stage === undefined) return null;
             const box = el.getBoundingClientRect();
             return {
-                text: el.textContent ?? "",
+                text: el.querySelector(".fs-occ-hint-bubble-text")?.textContent ?? "",
                 inside:
                     box.left >= stage.left - 1 &&
                     box.right <= stage.right + 1 &&
@@ -268,6 +270,45 @@ describe("image cloze", function () {
             await browser.$(".fs-view .fs-card-container .fs-show-answer-button").isDisplayed(),
         ).toBe(true);
         await screenshot("long-hint-tapped");
+        // The same in the dark theme
+        await browser.execute(() => {
+            document.body.classList.replace("theme-light", "theme-dark");
+        });
+        await browser.pause(200);
+        await screenshot("long-hint-tapped-dark");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-dark", "theme-light");
+        });
+    });
+
+    it("a hint of a sentence opens under its mask, with its arrow, in light and dark", async function () {
+        const hint = "The upper chamber that receives blood back from the body";
+        await useNote([TAG, "", block(`mask: 1 | ra ${RIGHT_ATRIUM} | ${hint}`), ""].join("\n"));
+        await openReview();
+        await cardShown();
+        await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
+        await browser.pause(300);
+        const placed = await browser.execute(() => {
+            const card = ".fs-view .fs-card-container";
+            const el = document.querySelector(`${card} .fs-occ-hint-bubble`);
+            return {
+                below:
+                    el !== null &&
+                    !el.classList.contains("is-above") &&
+                    !el.classList.contains("is-floating"),
+                text: el?.querySelector(".fs-occ-hint-bubble-text")?.textContent ?? "",
+            };
+        });
+        expect(placed).toEqual({ below: true, text: hint });
+        await screenshot("hint-bubble");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-light", "theme-dark");
+        });
+        await browser.pause(200);
+        await screenshot("hint-bubble-dark");
+        await browser.execute(() => {
+            document.body.classList.replace("theme-dark", "theme-light");
+        });
     });
 
     it("edits a block in the note: only the block's lines change, the text and the schedule comment stay", async function () {

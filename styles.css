@@ -4874,31 +4874,76 @@ body.fs-reduced-bottom-fade-mask {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.fs-occ.is-cloze .fs-occ-tag.is-question.is-hint {
+  font-size: clamp(11px, 2.1cqw, 15px);
+  font-weight: 600;
+}
+.fs-occ.is-cloze .fs-occ-tag.is-question.is-hint .fs-occ-tag-text {
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  box-shadow: none;
+  letter-spacing: 0.005em;
+}
 .fs-occ-hint-bubble {
   position: absolute;
   z-index: 3;
+  top: var(--fs-occ-bubble-top, 0);
   left: var(--fs-occ-left, 0);
-  top: calc(var(--fs-occ-top) + 10px);
+  box-sizing: border-box;
   width: max-content;
-  max-width: min(80%, 320px);
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
-  max-height: var(--fs-occ-room, none);
-  overflow-y: auto;
+  max-width: min(86%, 340px);
+  padding: 10px 14px 12px;
+  border-radius: var(--fs-radius-md);
+  font-family: var(--fs-font);
+  font-size: 15px;
+  letter-spacing: normal;
+  text-wrap: pretty;
   text-align: left;
   color: var(--fs-text);
   background-color: var(--fs-surface);
   box-shadow:
-    var(--fs-shadow),
-    0 0 0 1px var(--fs-border);
+    var(--fs-shadow-lg),
+    0 0 0 1px var(--fs-border-strong);
   pointer-events: auto;
+  cursor: default;
+  transform-origin: var(--fs-occ-arrow, 50%) top;
+  animation: fs-occ-bubble-in 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .fs-occ-hint-bubble.is-above {
-  top: auto;
-  bottom: calc(var(--fs-occ-bottom) + 10px);
+  transform-origin: var(--fs-occ-arrow, 50%) bottom;
+}
+.fs-occ-hint-bubble-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fs-accent);
+}
+.fs-occ-hint-bubble-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background-color: var(--fs-accent-soft);
+}
+.fs-occ-hint-bubble-icon svg {
+  width: 12px;
+  height: 12px;
+}
+.fs-occ-hint-bubble-text {
+  max-height: calc(var(--fs-occ-room, 100vh) - 46px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  font-size: 15px;
+  font-weight: 450;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .fs-occ-hint-bubble:before {
   content: "";
@@ -4907,14 +4952,35 @@ body.fs-reduced-bottom-fade-mask {
   left: var(--fs-occ-arrow, 50%);
   width: 12px;
   height: 12px;
+  border-top-left-radius: 3px;
   background-color: var(--fs-surface);
-  box-shadow: -1px -1px 0 var(--fs-border);
+  box-shadow: -1px -1px 0 var(--fs-border-strong);
   transform: translate(-50%) rotate(45deg);
 }
 .fs-occ-hint-bubble.is-above:before {
   top: auto;
   bottom: -6px;
-  box-shadow: 1px 1px 0 var(--fs-border);
+  border-top-left-radius: 0;
+  border-bottom-right-radius: 3px;
+  box-shadow: 1px 1px 0 var(--fs-border-strong);
+}
+.fs-occ-hint-bubble.is-floating:before {
+  display: none;
+}
+@keyframes fs-occ-bubble-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fs-occ-hint-bubble {
+    animation: none;
+  }
 }
 .fs-occ-problem.is-empty {
   display: none;
