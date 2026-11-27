@@ -227,6 +227,22 @@ export function findCard(text: string, card: string, readAt: LineSpan | null): R
 }
 
 /** The note text with the run of lines replaced by `replacement` (LF line endings), keeping the note's line endings. */
+/**
+ * The replacement with the white space each line had at its end in the note, where the line is otherwise the same: two
+ * spaces at the end of a line are a Markdown line break, and a card's own text has them trimmed (as it was read).
+ */
+export function withTrailingSpaceOf(text: string, region: Region, replacement: string): string {
+    const run = text.slice(region.start, region.end).replace(/\r\n?/g, "\n");
+    const lines = run.slice(region.pre.length, run.length - region.post.length).split("\n");
+    return replacement
+        .split("\n")
+        .map((line, at) => {
+            const was = lines[at];
+            return was !== undefined && was !== line && was.trimEnd() === line ? was : line;
+        })
+        .join("\n");
+}
+
 export function replaceCard(text: string, region: Region, replacement: string): string {
     const inserted =
         region.ending === "\n" ? replacement : replacement.replace(/\n/g, region.ending);

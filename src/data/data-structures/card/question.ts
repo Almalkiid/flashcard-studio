@@ -8,6 +8,7 @@ import {
     LineSpan,
     lineStarts,
     replaceCard,
+    withTrailingSpaceOf,
 } from "src/data/data-structures/card/note-region";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/data/decks/topic-path";
 import { CARD_METADATA_CALLOUT, SCHEDULE_COMMENT_PREFIX } from "src/data/formats";
@@ -356,7 +357,13 @@ export class Question {
             );
             return null;
         }
-        const newText = replaceCard(noteText, region, replacement);
+        // The note keeps the line breaks (two spaces at a line's end) of the lines that did not change; the question's
+        // own text stays trimmed, as it is read
+        const newText = replaceCard(
+            noteText,
+            region,
+            withTrailingSpaceOf(noteText, region, replacement),
+        );
         return {
             noteText: newText,
             replacement,
