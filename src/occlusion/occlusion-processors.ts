@@ -420,6 +420,7 @@ function insertImageClozeBlock(
     editor: Editor,
     block: ImageClozeBlock,
     settings: StudioSettings,
+    fromCursorLine: boolean,
 ): void {
     const fenced = "```" + IMAGE_CLOZE_LANG + "\n" + formatImageClozeBlock(block) + "\n```";
     if (editor.somethingSelected()) {
@@ -427,8 +428,15 @@ function insertImageClozeBlock(
         return;
     }
     const lines = editor.getValue().split("\n");
-    const { line, text } = imageClozeInsertion(lines, editor.getCursor().line, fenced, settings);
+    const { line, text, joined } = imageClozeInsertion(
+        lines,
+        editor.getCursor().line,
+        fenced,
+        settings,
+    );
     editor.replaceRange(text, { line, ch: lines[line].length });
+    // The block joined the cloze paragraph the image is in: the plain image there would show the answer on the card
+    if (joined && fromCursorLine) new Notice(t("IMAGE_CLOZE_EMBED_SHOWS_ANSWER"));
 }
 
 /** The command: choose an image (or use the one the cursor is on), draw the masks, insert the block. */
@@ -458,16 +466,16 @@ function chooseImage(
     plugin: FlashcardStudioPlugin,
     editor: Editor,
     sourcePath: string,
-    edit: (file: TFile) => void,
+    edit: (file: TFile, fromCursorLine: boolean) => void,
 ): void {
     const app = plugin.app;
     const embedded = imageOnCursorLine(editor, plugin, sourcePath);
     if (embedded !== null) {
-        edit(embedded);
+        edit(embedded, true);
     } else if (vaultImages(app).length === 0) {
         new Notice(t("OCCLUSION_NO_IMAGES"));
     } else {
-        new ImageSuggestModal(app, edit).open();
+        new ImageSuggestModal(app, (file) => edit(file, false)).open();
     }
 }
 
@@ -481,14 +489,14 @@ function addImageCloze(
     const sourcePath = view.file?.path ?? "";
     const settings = plugin.dataManager.data.settings;
 
-    const edit = (file: TFile) => {
+    const edit = (file: TFile, fromCursorLine: boolean) => {
         const image = app.fileManager.generateMarkdownLink(file, sourcePath).replace(/^!/, "");
         OcclusionEditorModal.forCloze(
             app,
             sourcePath,
             { image, mode: "hide-all", question: "", masks: [] },
             textCardsAtCursor(editor, settings),
-            ({ block }) => insertImageClozeBlock(editor, block, settings),
+            ({ block }) => insertImageClozeBlock(editor, block, settings, fromCursorLine),
         ).open();
     };
     chooseImage(plugin, editor, sourcePath, edit);

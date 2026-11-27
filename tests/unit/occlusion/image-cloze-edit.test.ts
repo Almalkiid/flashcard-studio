@@ -92,7 +92,19 @@ describe("imageClozeInsertion", () => {
         ).toEqual({
             line: 1,
             text: `\n${FENCED}`,
+            joined: true,
         });
+    });
+
+    test("says whether the block joined a cloze paragraph: then a plain image in it would show the answer", () => {
+        const clozes = { clozePatterns: ["==[123;;]answer[;;hint]=="], latexClozes: false };
+        expect(
+            imageClozeInsertion(["The ==1;;a== pumps.", "![[Heart.png]]"], 1, FENCED, clozes)
+                .joined,
+        ).toBe(true);
+        expect(
+            imageClozeInsertion(["Plain text.", "![[Heart.png]]"], 1, FENCED, clozes).joined,
+        ).toBe(false);
     });
 
     test("in a paragraph whose only clozes are math clozes: it joins that card too (final review #1)", () => {

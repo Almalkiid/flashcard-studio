@@ -74,7 +74,7 @@ export function imageClozeInsertion(
     cursorLine: number,
     fenced: string,
     clozes: { clozePatterns: string[]; latexClozes?: boolean } = { clozePatterns: [] },
-): { line: number; text: string } {
+): { line: number; text: string; joined: boolean } {
     if (!blank(lines[cursorLine]) && clozes.clozePatterns.length > 0) {
         let first = cursorLine;
         while (first > 0 && !blank(lines[first - 1])) first--;
@@ -90,12 +90,12 @@ export function imageClozeInsertion(
         if (made.note !== null) {
             let end = last;
             while (end > first && lines[end].startsWith("<!--SR:")) end--;
-            return { line: end, text: `\n${fenced}` };
+            return { line: end, text: `\n${fenced}`, joined: true };
         }
     }
     const before = blank(lines[cursorLine]) ? "\n" : "\n\n";
     const after = blank(lines[cursorLine + 1]) ? "" : "\n";
-    return { line: cursorLine, text: `${before}${fenced}${after}` };
+    return { line: cursorLine, text: `${before}${fenced}${after}`, joined: false };
 }
 
 /** Whether an edit leaves a question's card numbers as they were: an edit during review may not change them. */
