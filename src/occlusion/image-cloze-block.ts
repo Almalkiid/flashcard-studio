@@ -43,7 +43,7 @@ export interface ImageClozeBlock {
 }
 
 export type BlockProblem =
-    "field" | "geometry" | "duplicate-id" | "comment" | "no-image" | "no-mask";
+    "field" | "geometry" | "duplicate-id" | "comment" | "no-image" | "no-mask" | "unknown-line";
 
 /** A block, or what is wrong with it: the line (from 1, in the text between the fences; 0 for the whole block). */
 export type BlockRead =
@@ -104,7 +104,11 @@ export function parseImageClozeBlock(source: string): BlockRead {
     const ids = new Set<string>();
     for (const [at, line] of lines.entries()) {
         const key = KEY_LINE.exec(line.trimEnd());
-        if (key === null) continue;
+        // Strict: a line the block does not know (a typo such as `masks:`) is named, not dropped at the next save
+        if (key === null) {
+            if (line.trim().length > 0) return { ok: false, line: at + 1, problem: "unknown-line" };
+            continue;
+        }
 
         const name = key[1].toLowerCase();
         const value = key[2].trim();

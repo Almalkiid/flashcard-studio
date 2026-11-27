@@ -210,3 +210,21 @@ describe("scanImageClozeFences and inline code", () => {
         expect(scanImageClozeFences(lines)).toEqual([]);
     });
 });
+
+describe("a line the block does not know", () => {
+    test("is named, so a typo never drops a mask on the next save", () => {
+        const source =
+            "image: x.png\nmask: 1 | a rect 0 0 .1 .1 |\nmasks: 2 | b rect .5 .5 .1 .1 |";
+        expect(parseImageClozeBlock(source)).toEqual({
+            ok: false,
+            line: 3,
+            problem: "unknown-line",
+        });
+    });
+
+    test("blank lines are fine", () => {
+        expect(parseImageClozeBlock("image: x.png\n\nmask: 1 | a rect 0 0 .1 .1 |\n").ok).toBe(
+            true,
+        );
+    });
+});
