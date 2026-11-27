@@ -2,6 +2,17 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.24.0]
+
+### Added
+
+- **A removed card keeps its history**, as in Anki. When you delete a cloze or image mask number, its review history stays in the note's schedule comment, and the card picks it up again if you bring the number back.
+- **Remove history of removed cards**, a new command like Anki's "Empty Cards". It lists the notes that keep history for removed cards, asks before it removes anything, and leaves notes with more than one schedule comment alone.
+
+### Fixed
+
+- A review save no longer strips the two spaces at the end of a line (a Markdown line break) from a card's lines. Undo keeps them too, and so does a card on its own line with spaces after it.
+
 ## [0.23.1]
 
 ### Fixed
