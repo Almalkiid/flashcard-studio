@@ -2,6 +2,20 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.23.1]
+
+### Fixed
+
+- **Image cloze** ([#28](https://github.com/Almalkiid/flashcard-studio/issues/28)):
+    - A long hint is cut short on its mask. Tap it (or press Enter or Space) to see the whole hint in a bubble at the mask, in light and dark themes; tap again or press Escape to close it. Hints work with a keyboard and a screen reader.
+    - A mask without a hint shows `?`, and tapping it reveals the answer as before.
+    - **Add image cloze** warns when the card still shows the picture as a plain image, which gives the answer away.
+    - Unknown lines in an image cloze block are shown as a problem instead of being removed when the block is edited.
+    - The editor's problem line updates while you type a hint.
+    - The suspended cards list shows an image cloze card by its question and hints.
+    - A schedule comment is no longer written onto a closing `~~~` fence, and a one-line ` ```code``` ` is not read as a block.
+    - The guide's example works as written.
+
 ## [0.23.0]
 
 ### Added
