@@ -31,6 +31,16 @@ export enum CardType {
     ImageCloze,
 }
 
+/** A cloze question: text clozes, or an image cloze block alone. Never multiple choice, no typed answer of its own. */
+export function isClozeKind(type: CardType): boolean {
+    return type === CardType.Cloze || type === CardType.ImageCloze;
+}
+
+/** A question whose back is the whole card, so the study screen shows only the back: clozes and image cards. */
+export function showsBackOnly(type: CardType): boolean {
+    return isClozeKind(type) || type === CardType.ImageOcclusion;
+}
+
 const BLOCK_ID_AT_END = / (\^[A-Za-z0-9-]+)$/;
 const TAG_AT_START = /^#[^\s#]+/;
 

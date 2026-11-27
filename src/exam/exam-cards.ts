@@ -1,5 +1,5 @@
 import { Card } from "src/data/data-structures/card/flashcard";
-import { CardType } from "src/data/data-structures/card/question";
+import { isClozeKind } from "src/data/data-structures/card/question";
 import { Deck } from "src/data/decks/deck";
 import { ExamCardInput } from "src/exam/exam";
 import { cardKey } from "src/scheduling/custom-study";
@@ -20,7 +20,7 @@ export function collectExamCards(tree: Deck): ExamCardInput[] {
                 deck: path,
                 front: item.front,
                 back: item.back,
-                isCloze: item.question.questionType === CardType.Cloze,
+                isCloze: isClozeKind(item.question.questionType),
                 suspended: item.meta.suspended,
                 sourcePath: item.question.note?.filePath ?? "",
             });

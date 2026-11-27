@@ -167,6 +167,17 @@ describe("collectExportNotes", () => {
         expect(notes.map((note) => note.front)).toEqual(["Q"]);
     });
 
+    test("image cloze questions, alone or with text clozes, are skipped and counted: the picture would give the answers away", async () => {
+        const block = "```image-cloze\nimage: x.png\nmask: 1 | a rect 0 0 .1 .1 | hint\n```";
+        const deck = await deckFromText(
+            `#flashcards\n\n${block}\n\nThe ==1;;a== pumps.\n${block}\n\nQ::A\n`,
+            settings,
+        );
+        const { notes, skipped } = await collectExportNotes(deck, settings);
+        expect(skipped).toBe(2);
+        expect(notes.map((note) => note.front)).toEqual(["Q"]);
+    });
+
     test("collects a single deck of the tree", async () => {
         const deck = await deckFromText(
             "#flashcards/A\n\nQ1::A1\n\n#flashcards/B\nQ2::A2\n",

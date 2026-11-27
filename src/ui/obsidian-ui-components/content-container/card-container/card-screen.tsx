@@ -6,7 +6,7 @@ import { App, Component, Platform, requestUrl, setIcon } from "obsidian";
 import { gradeTypedAnswer } from "src/ai/typed-answer-grading";
 import { SemanticReveal } from "src/ai/typed-answer-reveal";
 import { Card } from "src/data/data-structures/card/flashcard";
-import { CardType } from "src/data/data-structures/card/question";
+import { CardType, isClozeKind, showsBackOnly } from "src/data/data-structures/card/question";
 import {
     isChoiceCorrect,
     parseMultipleChoice,
@@ -434,7 +434,7 @@ export default class CardContainer {
         const typedTarget =
             choice === null &&
             this.typeAnswersOn() &&
-            session.currentQuestion.questionType !== CardType.Cloze
+            !isClozeKind(session.currentQuestion.questionType)
                 ? this.typedTargetOf(session.currentQuestion.questionType, card?.back ?? "")
                 : null;
         this.content.toggleClass("fs-choice-card", choice !== null);
@@ -634,7 +634,7 @@ export default class CardContainer {
         reuse: boolean,
     ): ChoiceState | null {
         const card: Card | null = session.cardData.currentCard;
-        if (card === null || session.currentQuestion.questionType === CardType.Cloze) {
+        if (card === null || isClozeKind(session.currentQuestion.questionType)) {
             return null;
         }
         const mc = parseMultipleChoice(card.back);
@@ -690,6 +690,7 @@ export default class CardContainer {
      * about. Null when the card has nothing to type.
      */
     private typedTargetOf(questionType: CardType, back: string): string | null {
+        if (questionType === CardType.ImageCloze) return null;
         return questionType === CardType.ImageOcclusion
             ? occlusionTypedTarget(back)
             : typedAnswerTarget(back);
@@ -865,9 +866,9 @@ export default class CardContainer {
                     : ReviewResponse.Again;
             }
         } else {
-            // A cloze card, and an image occlusion card, show only their back: it is the whole card
+            // A cloze card, and an image card, show only their back: it is the whole card
             const questionType = session.currentQuestion.questionType;
-            if (questionType !== CardType.Cloze && questionType !== CardType.ImageOcclusion) {
+            if (!showsBackOnly(questionType)) {
                 const front = await this.drawCardFrontContent(session, settings, markdown);
                 if (!front.stillUp) return;
                 this.content.createEl("hr");

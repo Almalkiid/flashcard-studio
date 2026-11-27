@@ -218,3 +218,26 @@ describe("an edited text is checked against the note parser", () => {
         expect(readsBackAsOneQuestion(CardType.SingleLineBasic, "Q::A\nB", regions)).toBe(false);
     });
 });
+
+describe("an image cloze block", () => {
+    const block = "```image-cloze\nimage: x.png\nmask: 1 | a rect 0 0 .1 .1 | hint\n```";
+
+    test("reads back as one question, its comment on a line of its own, also with comments on the same line", () => {
+        for (const cardCommentOnSameLine of [false, true])
+            expect(
+                readsBackAsOneQuestion(CardType.ImageCloze, block, {
+                    ...settings,
+                    cardCommentOnSameLine,
+                }),
+            ).toBe(true);
+    });
+
+    test("in card regions, as a cloze is", () => {
+        const regions = {
+            ...settings,
+            multilineCardStartMarker: "+++",
+            multilineCardEndMarker: "+++",
+        };
+        expect(readsBackAsOneQuestion(CardType.ImageCloze, block, regions)).toBe(true);
+    });
+});
