@@ -701,3 +701,8 @@
     overflow-wrap: anywhere;
     text-align: center;
 }
+
+/* The editor's line of what is wrong with a cloze block: only there when something is */
+.fs-occ-problem.is-empty {
+    display: none;
+}

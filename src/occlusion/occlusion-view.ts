@@ -196,6 +196,8 @@ export interface OcclusionRenderOptions {
     side?: "front" | "back";
     /** An image cloze card: class `is-cloze`, and each tag's full text (the mask's label) as its tooltip. */
     cloze?: boolean;
+    /** False: the card opens at its top, not scrolled to the asked mask (a card whose text asks first). */
+    scrollToMask?: boolean;
 }
 
 /**
@@ -338,7 +340,7 @@ export function renderOcclusion(
     // mask when the picture has loaded (after two frames: the card sets its own scroll to the top when it is drawn).
     const card = states !== "labels";
     const scroll = () => scrollCardToMask(el, scroller, stage);
-    if (card) {
+    if (card && options.scrollToMask !== false) {
         const later = () =>
             el.win.requestAnimationFrame(() => el.win.requestAnimationFrame(scroll));
         img.addEventListener("load", later);

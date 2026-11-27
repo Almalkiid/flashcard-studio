@@ -156,6 +156,8 @@ export function renderImageClozeCard(
         questionLine: spec.block.question.length > 0 || spec.textCards === 0,
         side: spec.side,
         cloze: true,
+        // A card with text clozes opens at its text, which asks too; a picture alone scrolls to its mask
+        scrollToMask: spec.textCards === 0,
     });
 }
 

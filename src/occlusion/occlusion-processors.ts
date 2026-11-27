@@ -38,13 +38,7 @@ import {
     renderImageClozeCard,
     renderImageClozeNote,
 } from "src/occlusion/image-cloze-view";
-import {
-    BlockKind,
-    BlockKindSuggestModal,
-    ImageSuggestModal,
-    isImageFile,
-    vaultImages,
-} from "src/occlusion/image-suggest-modal";
+import { ImageSuggestModal, isImageFile, vaultImages } from "src/occlusion/image-suggest-modal";
 import {
     OCCLUSION_LANG,
     OcclusionBlock,
@@ -166,6 +160,12 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
         name: t("OCCLUSION_ADD_COMMAND"),
         editorCallback: (editor, view) => addImageOcclusion(plugin, editor, view),
     });
+    // A command of its own, so that Add image occlusion stays exactly what it was
+    plugin.addCommand({
+        id: "fs-add-image-cloze",
+        name: t("IMAGE_CLOZE_ADD_COMMAND"),
+        editorCallback: (editor, view) => addImageCloze(plugin, editor, view),
+    });
     plugin.registerEvent(
         plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
             // Only on an image: a menu that gains an item for everyone would change every right-click there is
@@ -175,6 +175,12 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
                     .setTitle(t("OCCLUSION_ADD_COMMAND"))
                     .setIcon("image-plus")
                     .onClick(() => addImageOcclusion(plugin, editor, view)),
+            );
+            menu.addItem((item) =>
+                item
+                    .setTitle(t("IMAGE_CLOZE_ADD_COMMAND"))
+                    .setIcon("image-plus")
+                    .onClick(() => addImageCloze(plugin, editor, view)),
             );
         }),
     );
@@ -439,19 +445,49 @@ function addImageOcclusion(
     const app = plugin.app;
     const sourcePath = view.file?.path ?? "";
 
-    const edit = (kind: BlockKind, file: TFile) => {
+    const edit = (file: TFile) => {
         // The link the vault's own settings would write for the image, as a link: the block reads it either way
         const image = app.fileManager.generateMarkdownLink(file, sourcePath).replace(/^!/, "");
-        if (kind === "answers") {
-            new OcclusionEditorModal(
-                app,
-                sourcePath,
-                { image, mode: "hide-all", question: "", masks: [] },
-                ({ block }) => insertBlock(editor, block),
-            ).open();
-            return;
-        }
-        const settings = plugin.dataManager.data.settings;
+        new OcclusionEditorModal(
+            app,
+            sourcePath,
+            { image, mode: "hide-all", question: "", masks: [] },
+            ({ block }) => insertBlock(editor, block),
+        ).open();
+    };
+    chooseImage(plugin, editor, sourcePath, edit);
+}
+
+/** The image of a new block: the one the cursor is on, or one picked from the vault. */
+function chooseImage(
+    plugin: FlashcardStudioPlugin,
+    editor: Editor,
+    sourcePath: string,
+    edit: (file: TFile) => void,
+): void {
+    const app = plugin.app;
+    const embedded = imageOnCursorLine(editor, plugin, sourcePath);
+    if (embedded !== null) {
+        edit(embedded);
+    } else if (vaultImages(app).length === 0) {
+        new Notice(t("OCCLUSION_NO_IMAGES"));
+    } else {
+        new ImageSuggestModal(app, edit).open();
+    }
+}
+
+/** The command for cloze cards: choose an image, draw masks with card numbers and hints, insert an image cloze block. */
+function addImageCloze(
+    plugin: FlashcardStudioPlugin,
+    editor: Editor,
+    view: MarkdownView | MarkdownFileInfo,
+): void {
+    const app = plugin.app;
+    const sourcePath = view.file?.path ?? "";
+    const settings = plugin.dataManager.data.settings;
+
+    const edit = (file: TFile) => {
+        const image = app.fileManager.generateMarkdownLink(file, sourcePath).replace(/^!/, "");
         OcclusionEditorModal.forCloze(
             app,
             sourcePath,
@@ -460,16 +496,5 @@ function addImageOcclusion(
             ({ block }) => insertImageClozeBlock(editor, block, settings),
         ).open();
     };
-
-    // The kind first: answers (as the command always made), or cloze cards
-    new BlockKindSuggestModal(app, (kind) => {
-        const embedded = imageOnCursorLine(editor, plugin, sourcePath);
-        if (embedded !== null) {
-            edit(kind, embedded);
-        } else if (vaultImages(app).length === 0) {
-            new Notice(t("OCCLUSION_NO_IMAGES"));
-        } else {
-            new ImageSuggestModal(app, (file) => edit(kind, file)).open();
-        }
-    }).open();
+    chooseImage(plugin, editor, sourcePath, edit);
 }
