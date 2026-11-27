@@ -27,6 +27,8 @@ export enum CardType {
     Callout,
     // An image with masks on it, in a fenced `image-occlusion` block: one card per mask
     ImageOcclusion,
+    // An `image-cloze` block with no text clozes beside it: one card per card number its masks ask on
+    ImageCloze,
 }
 
 const BLOCK_ID_AT_END = / (\^[A-Za-z0-9-]+)$/;
@@ -217,6 +219,7 @@ export class Question {
         if (this.questionText.endsWithCodeBlock()) sameLine = false;
         if (this.isCalloutCard) sameLine = false;
         if (this.parsedQuestionInfo?.cardType === CardType.ImageOcclusion) sameLine = false;
+        if (this.parsedQuestionInfo?.cardType === CardType.ImageCloze) sameLine = false;
         return commentInCallout || sameLine ? " " : "\n";
     }
 
