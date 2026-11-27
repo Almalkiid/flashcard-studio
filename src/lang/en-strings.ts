@@ -672,6 +672,10 @@ const en = {
     OCCLUSION_ZOOM_OUT: "Zoom out",
     OCCLUSION_NEEDS_MASK: "Draw at least one mask first.",
     OCCLUSION_BLOCK_NOT_FOUND: "The block was not found in the note. Open the note and try again.",
+    IMAGE_CLOZE_INVALID_LINE: "Line ${line} of this image cloze block cannot be read.",
+    IMAGE_CLOZE_INVALID_BLOCK: "This image cloze block needs an image and at least one mask.",
+    IMAGE_CLOZE_INVALID_CARD: "This image cloze card could not be read.",
+    IMAGE_CLOZE_CARD_NUMBER: "Card ${n}",
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: "Reviews today",
     STATS_METRIC_STREAK: "Day streak",

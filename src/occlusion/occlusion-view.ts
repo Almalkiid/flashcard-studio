@@ -182,6 +182,22 @@ function scrollCardToMask(el: HTMLElement, scroller: HTMLElement, stage: HTMLEle
         (maskBox.left + maskBox.right) / 2 - stageBox.left - scroller.clientWidth / 2;
 }
 
+/** How an image cloze card differs from an image occlusion card when it is drawn. Left out: as image occlusion. */
+export interface OcclusionRenderOptions {
+    /** The text on each mask, by mask index ("" for none), in place of "?" and the labels. */
+    tags?: string[];
+    /** The order the masks are drawn in, by index: the last is on top. */
+    order?: number[];
+    /** False: no answer under the picture. */
+    answerLine?: boolean;
+    /** False: no question above the picture. */
+    questionLine?: boolean;
+    /** The side of the card, when it does not follow from a revealed mask. */
+    side?: "front" | "back";
+    /** An image cloze card: class `is-cloze`, and each tag's full text (the mask's label) as its tooltip. */
+    cloze?: boolean;
+}
+
 /**
  * Draws a block into `el`: the image, and over it a mask for each state. `states` is what maskStates gives for a
  * review card, or "labels" for the note's own view, where every mask is outlined with its label in it.
@@ -198,14 +214,17 @@ export function renderOcclusion(
     block: OcclusionBlock,
     states: MaskState[] | "labels",
     owner?: Component,
+    options: OcclusionRenderOptions = {},
 ): HTMLElement | null {
     el.empty();
     el.addClass("fs-studio", "fs-occ");
-    el.removeClass("is-front", "is-back", "is-note");
+    el.removeClass("is-front", "is-back", "is-note", "is-cloze");
+    if (options.cloze === true) el.addClass("is-cloze");
     const revealed = states === "labels" ? -1 : states.indexOf("revealed");
-    el.addClass(states === "labels" ? "is-note" : revealed >= 0 ? "is-back" : "is-front");
+    const back = options.side === undefined ? revealed >= 0 : options.side === "back";
+    el.addClass(states === "labels" ? "is-note" : back ? "is-back" : "is-front");
 
-    if (states !== "labels") {
+    if (states !== "labels" && options.questionLine !== false) {
         el.createDiv({
             cls: "fs-occ-question",
             text: block.question || t("OCCLUSION_DEFAULT_QUESTION"),
@@ -214,6 +233,7 @@ export function renderOcclusion(
 
     // On the back the label is also written under the picture. It is the answer, so it shows without the picture too.
     const addAnswer = () => {
+        if (options.answerLine === false) return;
         if (revealed < 0 || block.masks[revealed].label.length === 0) return;
         const answer = el.createDiv({ cls: "fs-occ-answer" });
         if (owner === undefined) answer.setText(block.masks[revealed].label);
@@ -260,7 +280,9 @@ export function renderOcclusion(
         attr: { viewBox: "0 0 1 1", preserveAspectRatio: "none", "aria-hidden": "true" },
     });
 
-    block.masks.forEach((mask, index) => {
+    const order = options.order ?? block.masks.map((_mask, index) => index);
+    order.forEach((index) => {
+        const mask = block.masks[index];
         const state: MaskState = states === "labels" ? "revealed" : states[index];
         if (state === "none") return;
 
@@ -290,12 +312,20 @@ export function renderOcclusion(
         // "?" in the mask that the card asks about. The labels are on the masks only in the note's own view: on the
         // back of a card the answer is under the picture, which usually has the label written on it already
         const text =
-            state === "hidden-active" ? "?" : states === "labels" ? plainLabel(mask.label) : "";
+            options.tags !== undefined
+                ? options.tags[index]
+                : state === "hidden-active"
+                  ? "?"
+                  : states === "labels"
+                    ? plainLabel(mask.label)
+                    : "";
         if (text.length === 0) return;
         const tag = stage.createDiv({
             cls: state === "hidden-active" ? "fs-occ-tag is-question" : "fs-occ-tag",
         });
         tag.createSpan({ cls: "fs-occ-tag-text", text });
+        // A hint is clipped to its mask: the whole of it is in the tooltip
+        if (options.cloze === true) tag.setAttribute("title", mask.label);
         tag.setCssProps({
             "--fs-occ-x": percent(mask.x),
             "--fs-occ-y": percent(mask.y),
@@ -318,10 +348,10 @@ export function renderOcclusion(
     // On the back of a card, a click or a tap on the picture, or on the button in its corner, zooms it. It is not a click
     // on the card, which has nothing more to show. On the front there is no zoom: a click or a tap on the picture is a
     // click on the card, which shows the answer, as on every other card. In a note, on a phone, the picture zooms too.
-    const zoomable = revealed >= 0 || (!card && Platform.isMobile);
+    const zoomable = (card && back) || (!card && Platform.isMobile);
     if (zoomable) {
         const button =
-            revealed >= 0
+            card && back
                 ? frame.createEl("button", { cls: "fs-occ-zoom", attr: { type: "button" } })
                 : null;
         const showZoom = () => {

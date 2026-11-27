@@ -687,3 +687,17 @@
         --fs-occ-max-h: 40vh;
     }
 }
+
+/* An image cloze card: a hint is written inside its mask, wrapped and cut to the mask; the whole hint is its tooltip */
+.fs-occ.is-cloze .fs-occ-tag {
+    overflow: hidden;
+}
+
+.fs-occ.is-cloze .fs-occ-tag-text {
+    flex: initial;
+    max-width: 100%;
+    max-height: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+}

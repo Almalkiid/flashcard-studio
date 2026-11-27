@@ -13,6 +13,13 @@ import {
 
 import { Question } from "src/data/data-structures/card/question";
 import { t } from "src/lang/translate";
+import { IMAGE_CLOZE_LANG } from "src/occlusion/image-cloze-block";
+import {
+    IMAGE_CLOZE_CARD_LANG,
+    parseImageClozeCardSpec,
+    renderImageClozeCard,
+    renderImageClozeNote,
+} from "src/occlusion/image-cloze-view";
 import { ImageSuggestModal, isImageFile, vaultImages } from "src/occlusion/image-suggest-modal";
 import {
     OCCLUSION_LANG,
@@ -87,6 +94,22 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
             event.stopPropagation();
             editBlock(plugin, block, el, ctx);
         });
+    });
+
+    // An image cloze card in the study screen: `fs-image-cloze-card`, which the card's front and back hold
+    plugin.registerMarkdownCodeBlockProcessor(IMAGE_CLOZE_CARD_LANG, (source, el, ctx) => {
+        const spec = parseImageClozeCardSpec(source);
+        if (spec === null) {
+            el.addClass("fs-studio", "fs-occ");
+            el.createDiv({ cls: "fs-occ-missing", text: t("IMAGE_CLOZE_INVALID_CARD") });
+            return;
+        }
+        renderImageClozeCard(el, plugin.app, ctx.sourcePath, spec, ownerOf(el, ctx));
+    });
+
+    // An image cloze block in a note: the picture with each mask's card field and hint on it
+    plugin.registerMarkdownCodeBlockProcessor(IMAGE_CLOZE_LANG, (source, el, ctx) => {
+        renderImageClozeNote(el, plugin.app, ctx.sourcePath, source, ownerOf(el, ctx));
     });
 
     plugin.addCommand({
