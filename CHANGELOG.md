@@ -2,6 +2,13 @@
 
 All notable changes to Flashcard Studio are listed here. Versions follow [semantic versioning](https://semver.org).
 
+## [0.24.1]
+
+### Fixed
+
+- The review window shows one close button again. Obsidian 1.15 added its own close button beside Flashcard Studio's.
+- A due date written with a time (such as `2023-09-21-13-25`, from a copy of the Spaced Repetition plugin) keeps its time while that card is not reviewed. Before, a review of another card of the same question rewrote every date without the time.
+
 ## [0.24.0]
 
 ### Added
