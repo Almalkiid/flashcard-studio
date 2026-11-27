@@ -56,3 +56,36 @@ describe("a save keeps the line breaks of a card (two spaces at the end of a lin
         );
     });
 });
+
+describe("what the review found", () => {
+    test("only the last line has two spaces: they stay on that line, not behind the schedule", async () => {
+        for (const ending of ["\n", "\r\n"]) {
+            const text = ["#flashcards", "Q", "?", "A  ", ""].join(ending);
+            const saved = await reviewFirstCard(text);
+            expect(saved).toBe(
+                ["#flashcards", "Q", "?", "A  ", "<!--SR:!2026-10-20,12,260,id=012345-->", ""].join(
+                    ending,
+                ),
+            );
+        }
+    });
+
+    test("an undo puts the card back byte for byte, line breaks and all; a later write to another card keeps them", async () => {
+        const text = "#flashcards\nQ  \n?\nA  \n\nR::S\n";
+        setUp(settings);
+        const { vault, note } = await load(text, settings);
+        const [question, other] = note.questionList;
+        const before = question.questionText.original;
+        question.cards[0].scheduleInfo = scheduleFor({ set: "sm2", due: "2026-10-20" });
+        await question.writeQuestion(settings);
+
+        expect(await question.replaceOriginalText(before)).toBe(true);
+        expect(vault.texts.get("N.md")).toBe(text);
+
+        other.cards[0].scheduleInfo = scheduleFor({ set: "sm2", due: "2026-10-21" });
+        expect(await other.writeQuestion(settings)).toBe(true);
+        expect(vault.texts.get("N.md")).toBe(
+            "#flashcards\nQ  \n?\nA  \n\nR::S\n<!--SR:!2026-10-21,12,260,id=6789ab-->\n",
+        );
+    });
+});

@@ -228,19 +228,33 @@ export function findCard(text: string, card: string, readAt: LineSpan | null): R
 
 /** The note text with the run of lines replaced by `replacement` (LF line endings), keeping the note's line endings. */
 /**
- * The replacement with the white space each line had at its end in the note, where the line is otherwise the same: two
- * spaces at the end of a line are a Markdown line break, and a card's own text has them trimmed (as it was read).
+ * Replaces a card's run as {@link replaceCard} does, but each line written back keeps the white space it had at its end
+ * in the note when it is otherwise the same: two spaces at the end of a line are a Markdown line break, and a card's own
+ * text has them trimmed (as it was read). Every write of a card's text goes through here.
  */
-export function withTrailingSpaceOf(text: string, region: Region, replacement: string): string {
+export function replaceCardKeepingLineEnds(
+    text: string,
+    region: Region,
+    replacement: string,
+): string {
     const run = text.slice(region.start, region.end).replace(/\r\n?/g, "\n");
-    const lines = run.slice(region.pre.length, run.length - region.post.length).split("\n");
-    return replacement
+    let post = region.post;
+    let card = run.slice(region.pre.length, run.length - post.length);
+    // White space after the card on its last line is that line's own (a line break there), not padding to put after
+    // whatever replaces the card: the replacement may add lines (a schedule comment) after it
+    if (post !== "" && !post.includes("\n")) {
+        card += post;
+        post = "";
+    }
+    const lines = card.split("\n");
+    const kept = replacement
         .split("\n")
         .map((line, at) => {
             const was = lines[at];
             return was !== undefined && was !== line && was.trimEnd() === line ? was : line;
         })
         .join("\n");
+    return replaceCard(text, { ...region, post }, kept);
 }
 
 export function replaceCard(text: string, region: Region, replacement: string): string {
