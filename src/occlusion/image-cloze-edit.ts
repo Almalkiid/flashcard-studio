@@ -2,8 +2,7 @@
  * Writing an edited image cloze block back into its note, and where a new block goes. The block's schedule comment is
  * never touched here: its segments carry card numbers, so they stay right whatever the masks do.
  */
-import { ClozeCrafter } from "clozecraft";
-
+import { createClozeNote } from "src/math/math-cloze";
 import {
     formatImageClozeBlock,
     ImageClozeBlock,
@@ -74,15 +73,21 @@ export function imageClozeInsertion(
     lines: string[],
     cursorLine: number,
     fenced: string,
-    clozePatterns: string[] = [],
+    clozes: { clozePatterns: string[]; latexClozes?: boolean } = { clozePatterns: [] },
 ): { line: number; text: string } {
-    if (!blank(lines[cursorLine]) && clozePatterns.length > 0) {
+    if (!blank(lines[cursorLine]) && clozes.clozePatterns.length > 0) {
         let first = cursorLine;
         while (first > 0 && !blank(lines[first - 1])) first--;
         let last = cursorLine;
         while (!blank(lines[last + 1])) last++;
-        const crafter = new ClozeCrafter(clozePatterns);
-        if (lines.slice(first, last + 1).some((line) => crafter.isClozeNote(line))) {
+        // Read as loading reads it, math clozes included, so a paragraph of math clozes is a cloze paragraph too
+        const paragraph = lines.slice(first, last + 1).join("\n");
+        const made = createClozeNote(paragraph, clozes.clozePatterns, clozes.latexClozes === true, {
+            asking: () => "",
+            showingAnswer: () => "",
+            hiding: () => "",
+        });
+        if (made.note !== null) {
             let end = last;
             while (end > first && lines[end].startsWith("<!--SR:")) end--;
             return { line: end, text: `\n${fenced}` };

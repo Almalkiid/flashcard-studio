@@ -397,6 +397,7 @@ export class OcclusionEditorModal extends Modal {
             lines.push(
                 t("IMAGE_CLOZE_FIELD_PROBLEMS", { masks: problems.map((i) => i + 1).join(", ") }),
             );
+        if (this.model.blockProblem() === "comment") lines.push(t("IMAGE_CLOZE_HINT_COMMENT"));
         if (this.model.nothingAsked()) lines.push(t("IMAGE_CLOZE_NOTHING_ASKED"));
         const unused = this.model.unusedNumbers(this.openedNumbers);
         if (unused.length > 0)
@@ -593,6 +594,11 @@ export class OcclusionEditorModal extends Modal {
         }
         if (this.cloze && this.model.nothingAsked()) {
             new Notice(t("IMAGE_CLOZE_NOTHING_ASKED"));
+            return;
+        }
+        // The block as it would be written must read back: a hint holding a comment would make it unreadable
+        if (this.cloze && this.model.blockProblem() !== null) {
+            new Notice(t("IMAGE_CLOZE_BLOCK_UNREADABLE"));
             return;
         }
 

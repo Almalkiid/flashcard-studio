@@ -1,4 +1,11 @@
-import { CardField, ImageClozeBlock, readCardField } from "src/occlusion/image-cloze-block";
+import {
+    BlockProblem,
+    CardField,
+    formatImageClozeBlock,
+    ImageClozeBlock,
+    parseImageClozeBlock,
+    readCardField,
+} from "src/occlusion/image-cloze-block";
 import { cardNumbersOf, nextFreeNumber } from "src/occlusion/image-cloze-cards";
 import {
     MaskShape,
@@ -129,6 +136,15 @@ export class OcclusionEditorModel {
     unusedNumbers(before: number[]): number[] {
         const now = new Set(this.cardNumbers());
         return before.filter((k) => !now.has(k));
+    }
+
+    /**
+     * What keeps the block from reading back as it would be written, or null: a hint that holds a comment, as well as
+     * a card field that cannot be read. Checked on the block as it would be saved, so nothing unreadable is written.
+     */
+    blockProblem(): BlockProblem | null {
+        const read = parseImageClozeBlock(formatImageClozeBlock(this.clozeResult()));
+        return read.ok === false ? read.problem : null;
     }
 
     /** The image cloze block to save. A card field that cannot be read is written as typed and read as asking nothing. */

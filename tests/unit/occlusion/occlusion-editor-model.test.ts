@@ -138,6 +138,16 @@ describe("OcclusionEditorModel for cloze cards", () => {
         expect(model.masks[1].hint).toBe("a hint");
     });
 
+    test("a block that would not read back as written is a problem: a hint holding a comment (final review #2)", () => {
+        const model = OcclusionEditorModel.fromCloze(clozeBlock(["1", "fine"]), 0);
+        expect(model.blockProblem()).toBeNull();
+        model.select(0);
+        model.setHint("<!-- comment -->");
+        expect(model.fieldProblems()).toEqual([]);
+        expect(model.nothingAsked()).toBe(false);
+        expect(model.blockProblem()).toBe("comment");
+    });
+
     test("nothing asked, for a block alone; beside text cards it is fine", () => {
         expect(
             OcclusionEditorModel.fromCloze(clozeBlock(["0", ""], ["hs", ""]), 0).nothingAsked(),

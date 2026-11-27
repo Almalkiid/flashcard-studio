@@ -1,3 +1,6 @@
+import { parse, parserOptionsFromSettings } from "src/cards/parse";
+import { CardType } from "src/data/data-structures/card/question";
+import { cloneDefaultSettings } from "src/data/settings-model";
 import { parseImageClozeBlock } from "src/occlusion/image-cloze-block";
 import {
     imageClozeInsertion,
@@ -81,10 +84,27 @@ describe("imageClozeInsertion", () => {
             "",
             "next",
         ];
-        expect(imageClozeInsertion(lines, 0, FENCED, ["==[123;;]answer[;;hint]=="])).toEqual({
+        expect(
+            imageClozeInsertion(lines, 0, FENCED, {
+                clozePatterns: ["==[123;;]answer[;;hint]=="],
+                latexClozes: false,
+            }),
+        ).toEqual({
             line: 1,
             text: `\n${FENCED}`,
         });
+    });
+
+    test("in a paragraph whose only clozes are math clozes: it joins that card too (final review #1)", () => {
+        const settings = { ...cloneDefaultSettings(), latexClozes: true };
+        const lines = ["The $\\cloze{atrium}$ fills first.", "", "next"];
+        const { line, text } = imageClozeInsertion(lines, 0, FENCED, settings);
+        const note = [...lines.slice(0, line), lines[line] + text, ...lines.slice(line + 1)].join(
+            "\n",
+        );
+        const questions = parse(note, parserOptionsFromSettings(settings));
+        expect(questions.map((q) => CardType[q.cardType])).toEqual(["Cloze"]);
+        expect(questions[0].text).toContain("```image-cloze");
     });
 });
 

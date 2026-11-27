@@ -689,6 +689,8 @@ const en = {
     IMAGE_CLOZE_HINT_PLACEHOLDER: "Written on the mask while it is asked",
     IMAGE_CLOZE_FIELD_PROBLEMS: "The cards of mask ${masks} cannot be read.",
     IMAGE_CLOZE_FIX_FIELDS: "Fix the cards of the masks that cannot be read first.",
+    IMAGE_CLOZE_HINT_COMMENT: "A hint cannot hold <!--: the block would not be read.",
+    IMAGE_CLOZE_BLOCK_UNREADABLE: "The block would not be read as written, so it was not saved.",
     IMAGE_CLOZE_UNUSED_NUMBERS:
         "No mask asks on card ${numbers} any more: its schedule goes at the next write of this card.",
     IMAGE_CLOZE_EDIT_CHANGES_CARDS:

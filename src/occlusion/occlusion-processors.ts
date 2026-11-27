@@ -427,12 +427,7 @@ function insertImageClozeBlock(
         return;
     }
     const lines = editor.getValue().split("\n");
-    const { line, text } = imageClozeInsertion(
-        lines,
-        editor.getCursor().line,
-        fenced,
-        settings.clozePatterns,
-    );
+    const { line, text } = imageClozeInsertion(lines, editor.getCursor().line, fenced, settings);
     editor.replaceRange(text, { line, ch: lines[line].length });
 }
 
