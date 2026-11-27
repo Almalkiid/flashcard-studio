@@ -29,6 +29,7 @@ import {
 } from "src/occlusion/image-cloze-block";
 import {
     imageClozeInsertion,
+    imageEmbedsIn,
     locateImageClozeBlock,
     replaceImageClozeBlock,
 } from "src/occlusion/image-cloze-edit";
@@ -420,7 +421,7 @@ function insertImageClozeBlock(
     editor: Editor,
     block: ImageClozeBlock,
     settings: StudioSettings,
-    fromCursorLine: boolean,
+    isThePicture: (embed: string) => boolean,
 ): void {
     const fenced = "```" + IMAGE_CLOZE_LANG + "\n" + formatImageClozeBlock(block) + "\n```";
     if (editor.somethingSelected()) {
@@ -428,15 +429,17 @@ function insertImageClozeBlock(
         return;
     }
     const lines = editor.getValue().split("\n");
-    const { line, text, joined } = imageClozeInsertion(
+    const { line, text, joined, paragraph } = imageClozeInsertion(
         lines,
         editor.getCursor().line,
         fenced,
         settings,
     );
     editor.replaceRange(text, { line, ch: lines[line].length });
-    // The block joined the cloze paragraph the image is in: the plain image there would show the answer on the card
-    if (joined && fromCursorLine) new Notice(t("IMAGE_CLOZE_EMBED_SHOWS_ANSWER"));
+    // The block joined a cloze paragraph that also shows the picture as a plain image, however the picture was chosen:
+    // that image would show the answer on the card
+    if (joined && imageEmbedsIn(paragraph).some(isThePicture))
+        new Notice(t("IMAGE_CLOZE_EMBED_SHOWS_ANSWER"));
 }
 
 /** The command: choose an image (or use the one the cursor is on), draw the masks, insert the block. */
@@ -466,16 +469,16 @@ function chooseImage(
     plugin: FlashcardStudioPlugin,
     editor: Editor,
     sourcePath: string,
-    edit: (file: TFile, fromCursorLine: boolean) => void,
+    edit: (file: TFile) => void,
 ): void {
     const app = plugin.app;
     const embedded = imageOnCursorLine(editor, plugin, sourcePath);
     if (embedded !== null) {
-        edit(embedded, true);
+        edit(embedded);
     } else if (vaultImages(app).length === 0) {
         new Notice(t("OCCLUSION_NO_IMAGES"));
     } else {
-        new ImageSuggestModal(app, (file) => edit(file, false)).open();
+        new ImageSuggestModal(app, edit).open();
     }
 }
 
@@ -489,14 +492,20 @@ function addImageCloze(
     const sourcePath = view.file?.path ?? "";
     const settings = plugin.dataManager.data.settings;
 
-    const edit = (file: TFile, fromCursorLine: boolean) => {
+    const edit = (file: TFile) => {
         const image = app.fileManager.generateMarkdownLink(file, sourcePath).replace(/^!/, "");
         OcclusionEditorModal.forCloze(
             app,
             sourcePath,
             { image, mode: "hide-all", question: "", masks: [] },
             textCardsAtCursor(editor, settings),
-            ({ block }) => insertImageClozeBlock(editor, block, settings, fromCursorLine),
+            ({ block }) =>
+                insertImageClozeBlock(
+                    editor,
+                    block,
+                    settings,
+                    (embed) => resolveImagePath(app, embed, sourcePath)?.path === file.path,
+                ),
         ).open();
     };
     chooseImage(plugin, editor, sourcePath, edit);

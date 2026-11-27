@@ -280,3 +280,79 @@ test("an asked mask's hint is set as a label; a mask without one keeps the big q
         true,
     );
 });
+
+describe("the hint bubble for keyboards, screen readers, resizing and masks without a hint", () => {
+    const key = (target: HTMLElement, name: string) => {
+        const event = new KeyboardEvent("keydown", { key: name, bubbles: true, cancelable: true });
+        target.dispatchEvent(event);
+        return event;
+    };
+
+    test("a hint is a button: reached by Tab, opened by Enter or Space, named by its whole hint, closed by Escape", () => {
+        const host = document.body.createDiv();
+        let keysThatReachedTheCard = 0;
+        host.addEventListener("keydown", () => keysThatReachedTheCard++);
+        const el = host.createDiv();
+        renderImageClozeCard(el, appWith(true), "note.md", spec(1, "front"));
+        const tag = el.querySelector<HTMLElement>(".fs-occ-tag");
+        if (tag === null) throw new Error("no hint");
+        expect(tag.getAttribute("role")).toBe("button");
+        expect(tag.getAttribute("tabindex")).toBe("0");
+        expect(tag.getAttribute("aria-label")).toBe("Hint: chamber");
+        expect(tag.getAttribute("aria-expanded")).toBe("false");
+
+        expect(key(tag, "Enter").defaultPrevented).toBe(true);
+        const bubble = el.querySelector(".fs-occ-hint-bubble");
+        expect(bubble).not.toBeNull();
+        expect(tag.getAttribute("aria-expanded")).toBe("true");
+        expect(tag.getAttribute("aria-describedby")).toBe(bubble?.id);
+        expect(bubble?.id).not.toBe("");
+
+        key(tag, "Escape");
+        expect(el.querySelector(".fs-occ-hint-bubble")).toBeNull();
+        expect(tag.getAttribute("aria-expanded")).toBe("false");
+        key(tag, " ");
+        expect(el.querySelector(".fs-occ-hint-bubble")).not.toBeNull();
+        // None of these keys reached the review screen's shortcuts (Space shows the answer there)
+        expect(keysThatReachedTheCard).toBe(0);
+    });
+
+    test("an open bubble closes when the picture changes size", () => {
+        const observers: (() => void)[] = [];
+        const original = (window as unknown as Record<string, unknown>).ResizeObserver;
+        (window as unknown as Record<string, unknown>).ResizeObserver = class {
+            constructor(callback: () => void) {
+                observers.push(callback);
+            }
+            observe(): void {}
+            disconnect(): void {}
+        };
+        try {
+            const el = document.body.createDiv();
+            renderImageClozeCard(el, appWith(true), "note.md", spec(1, "front"));
+            el.querySelector<HTMLElement>(".fs-occ-tag")?.click();
+            expect(el.querySelector(".fs-occ-hint-bubble")).not.toBeNull();
+            // A browser reports once when it starts watching: that is not a resize
+            observers.forEach((callback) => callback());
+            expect(el.querySelector(".fs-occ-hint-bubble")).not.toBeNull();
+            observers.forEach((callback) => callback());
+            expect(el.querySelector(".fs-occ-hint-bubble")).toBeNull();
+        } finally {
+            (window as unknown as Record<string, unknown>).ResizeObserver = original;
+        }
+    });
+
+    test("a mask without a hint shows ? and its tap reaches the card, as before: no empty bubble", () => {
+        const host = document.body.createDiv();
+        let turned = 0;
+        host.addEventListener("click", () => turned++);
+        const el = host.createDiv();
+        renderImageClozeCard(el, appWith(true), "note.md", spec(2, "front"));
+        const tag = el.querySelector<HTMLElement>(".fs-occ-tag.is-question");
+        expect(tag?.textContent).toBe("?");
+        tag?.click();
+        expect(el.querySelector(".fs-occ-hint-bubble")).toBeNull();
+        expect(turned).toBe(1);
+        expect(tag?.getAttribute("role")).toBeNull();
+    });
+});
