@@ -243,6 +243,28 @@ describe("image cloze", function () {
         expect(fit?.wraps).toBe(true);
         expect(fit?.title).toBe(hint);
         await screenshot("long-hint");
+
+        // A tap shows the whole hint over the picture, and the card stays on its front
+        await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
+        const expanded = await browser.execute(() => {
+            const tag = document.querySelector(".fs-view .fs-card-container .fs-occ-tag");
+            const mask = document.querySelector(".fs-view .fs-card-container .fs-mask.is-active");
+            const text = tag?.querySelector(".fs-occ-tag-text")?.getBoundingClientRect();
+            const span = tag?.querySelector(".fs-occ-tag-text");
+            const background =
+                span === null || span === undefined ? "" : getComputedStyle(span).backgroundColor;
+            return {
+                expanded: tag?.classList.contains("is-expanded") ?? false,
+                wider: (text?.width ?? 0) > (mask?.getBoundingClientRect().width ?? 0),
+                // The words have a solid background of their own, so they read over the picture
+                solid: /^rgb\(/.test(background),
+            };
+        });
+        expect(expanded).toEqual({ expanded: true, wider: true, solid: true });
+        expect(
+            await browser.$(".fs-view .fs-card-container .fs-show-answer-button").isDisplayed(),
+        ).toBe(true);
+        await screenshot("long-hint-tapped");
     });
 
     it("edits a block in the note: only the block's lines change, the text and the schedule comment stay", async function () {
@@ -269,8 +291,11 @@ describe("image cloze", function () {
         // Nothing is wrong: no problem line
         expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(false);
         await browser.$$(".fs-occ-editor .fs-occ-chip")[1].click();
-        // Card field, then hint
+        // Card field, then hint. A hint holding a comment is named as it is typed
+        await browser.$$(".fs-occ-editor .fs-occ-input")[1].setValue("bad <!-- hint");
+        expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(true);
         await browser.$$(".fs-occ-editor .fs-occ-input")[1].setValue("other chamber");
+        expect(await browser.$(".fs-occ-editor .fs-occ-problem").isDisplayed()).toBe(false);
         await screenshot("editor");
         await browser.$(".fs-occ-editor .fs-occ-btn.is-primary").click();
         await browser.$(".fs-occ-editor-modal").waitForExist({ reverse: true });

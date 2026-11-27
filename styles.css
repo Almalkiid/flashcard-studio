@@ -4864,6 +4864,23 @@ body.fs-reduced-bottom-fade-mask {
 }
 .fs-occ.is-cloze .fs-occ-tag {
   overflow: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.fs-occ.is-cloze .fs-occ-tag.is-expanded {
+  overflow: visible;
+  z-index: 2;
+}
+.fs-occ.is-cloze .fs-occ-tag.is-expanded .fs-occ-tag-text {
+  flex: none;
+  width: max-content;
+  max-width: 70cqw;
+  max-height: none;
+  padding: 0.35em 0.7em;
+  border-radius: 8px;
+  color: var(--fs-on-accent);
+  background-color: var(--fs-accent);
+  box-shadow: var(--fs-shadow);
 }
 .fs-occ.is-cloze .fs-occ-tag-text {
   flex: initial;
