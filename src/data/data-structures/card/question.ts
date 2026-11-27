@@ -247,12 +247,12 @@ export class Question {
         const blockId = text.obsidianBlockId ? " " + text.obsidianBlockId : "";
         let result = text.keptTag + text.formatTopicAndQuestion();
 
-        const hasSchedule = this.cards.some(
-            (card) => card.hasSchedule || hasPersistentMeta(card.meta),
-        );
-        const comment = hasSchedule
-            ? DataStoreAlgorithm.getInstance().questionFormatScheduleAsHtmlComment(this)
-            : "";
+        const algorithm = DataStoreAlgorithm.getInstance();
+        // The history of a removed card number is kept, so a comment that holds one is written even with no schedule
+        const hasSchedule =
+            this.cards.some((card) => card.hasSchedule || hasPersistentMeta(card.meta)) ||
+            algorithm.keptSegments(this).length > 0;
+        const comment = hasSchedule ? algorithm.questionFormatScheduleAsHtmlComment(this) : "";
         if (comment === "") {
             // When a schedule comment is being removed (an undone first answer), drop the separator that was added
             // before it, so the note returns to exactly how it was

@@ -694,7 +694,7 @@ const en = {
     IMAGE_CLOZE_HINT_COMMENT: "A hint cannot hold <!--: the block would not be read.",
     IMAGE_CLOZE_BLOCK_UNREADABLE: "The block would not be read as written, so it was not saved.",
     IMAGE_CLOZE_UNUSED_NUMBERS:
-        "No mask asks on card ${numbers} any more: its schedule goes at the next write of this card.",
+        "No mask asks on card ${numbers} any more: its history is kept, and comes back if you use the number again.",
     IMAGE_CLOZE_EDIT_CHANGES_CARDS:
         "This edit changes the card numbers of a card in this session, so it was not saved.",
     // Design: statistics

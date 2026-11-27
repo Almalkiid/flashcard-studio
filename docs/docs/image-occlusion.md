@@ -61,7 +61,7 @@ mask: 0   | d4m rect 0.7000 0.7000 0.1000 0.1000 |
 
 Differences from Anki:
 
-- When no mask or text cloze asks on a number any more, that card's schedule is removed the next time the card's note is written, as for a removed text cloze. Anki keeps the empty card until **Empty Cards**. The editor names such numbers before you save.
+- When no mask or text cloze asks on a number any more, that card is no longer shown, but its history stays in the note, as Anki keeps the card until **Empty Cards**. Use the number again and the card comes back with its history. The editor names such numbers before you save. To remove the history of removed cards, run **Remove history of removed cards**.
 - A hidden mask that covers an asked one still covers it on the back, as in Anki.
 
 Older versions of Flashcard Studio do not support notes with an image cloze block: they show it as code and may give its schedules to the wrong cards. Image cloze cards are left out of exams, as text clozes are, and are not exported to Anki yet (the export counts them as skipped).

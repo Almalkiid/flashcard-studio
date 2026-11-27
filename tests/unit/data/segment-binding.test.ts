@@ -216,13 +216,15 @@ describe("schedules follow card numbers through edits", () => {
         ]);
     });
 
-    test("text cloze 2 removed: card 5 keeps its schedule, 2's is gone at the next write", async () => {
+    test("text cloze 2 removed: card 5 keeps its schedule, and 2's is kept after it at the next write", async () => {
         const [question] = await load(`==1;;a==\n${BLOCK(mask5)}\n${comment}`);
         expect(cardsOf(question)).toEqual([
             ["2026-01-01,1,250", 1],
             ["2026-01-05,5,250", 5],
         ]);
-        expect(stripIds(question.formatForNote(settingsWith()))).not.toContain("c=2");
+        // As Anki keeps the card until "Empty Cards": cloze 2 written again gets its history back
+        const written = stripIds(question.formatForNote(settingsWith()));
+        expect(written).toMatch(/c=1!2026-01-05,5,250,c=5!2026-01-02,2,250,c=2-->/);
     });
 
     test("mask 5 deleted and put back before any write: kept", async () => {
