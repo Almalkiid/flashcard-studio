@@ -55,8 +55,11 @@ const LETTERS = /^[ash]{1,99}$/;
 const ID_AND_GEOMETRY = /^([\w-]+)\s+(.+)$/;
 const OPENING = /^(`{3,}|~{3,})image-cloze\s*$/;
 const CLOSING = /^(`{3,}|~{3,})\s*$/;
-/** Any fence that opens a code block: three or more backticks or tildes, then anything. */
-const ANY_OPENING = /^(`{3,}|~{3,})/;
+/**
+ * Any fence that opens a code block: three or more backticks with no backtick after them (so ```code``` on one line is
+ * inline code), or three or more tildes, then anything, as in Markdown.
+ */
+const ANY_OPENING = /^(?:(`{3,})(?!.*`)|(~{3,}))/;
 /** Leading spaces and quote markers: what is in front of a fence that is indented or in a quote. */
 const LEAD = /^\s*(?:>\s*)*/;
 
@@ -169,7 +172,8 @@ export function scanImageClozeFences(lines: string[]): FenceSpan[] {
         const line = lines[open];
         const lead = LEAD.exec(line)?.[0] ?? "";
         const rest = line.slice(lead.length).trimEnd();
-        const fence = ANY_OPENING.exec(rest)?.[1];
+        const opening = ANY_OPENING.exec(rest);
+        const fence = opening === null ? undefined : (opening[1] ?? opening[2]);
         if (fence === undefined) continue;
 
         const quoted = lead.includes(">");

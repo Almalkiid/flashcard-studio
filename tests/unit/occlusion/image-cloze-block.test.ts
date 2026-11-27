@@ -196,3 +196,17 @@ describe("scanImageClozeFences", () => {
         expect(scanImageClozeFences(["```image-occlusion", "image: x.png", "```"])).toEqual([]);
     });
 });
+
+describe("scanImageClozeFences and inline code", () => {
+    test("a line of inline code with three backticks is not a fence: the block after it is found", () => {
+        const lines = ["Use ```x``` here", "```code```", "```image-cloze", "image: x.png", "```"];
+        expect(scanImageClozeFences(lines).map(({ open, close }) => [open, close])).toEqual([
+            [2, 4],
+        ]);
+    });
+
+    test("a tilde line with text after it opens a fence, as in Markdown", () => {
+        const lines = ["~~~strike~~~", "```image-cloze", "image: x.png", "```", "~~~"];
+        expect(scanImageClozeFences(lines)).toEqual([]);
+    });
+});
