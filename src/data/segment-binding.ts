@@ -153,6 +153,29 @@ export function bindQuestion(
     return { cardNumbers, positions: bindSegments(commentText, cardNumbers, textCards, legacy) };
 }
 
+/**
+ * The segments of the first comment whose card number no card uses, as written, by number. A write keeps them after the
+ * cards' own, so a card whose number is used again gets its history back, as Anki keeps a card until "Empty Cards".
+ * None unless the comment is numbered.
+ */
+export function keptSegments(commentText: string, used: Iterable<number>): KeptSegment[] {
+    const binding = readBinding(commentText);
+    if (binding.kind !== "numbered") return [];
+    const inUse = new Set(used);
+    // The numbers are the ones the binding read, so whatever it accepts (spaces around `c=`) is kept and listed alike
+    return [...binding.rawOf]
+        .filter(([k]) => !inUse.has(k))
+        .sort(([a], [b]) => a - b)
+        .map(([number, raw]) => ({ number, segment: segmentAt(commentText, raw) ?? "" }))
+        .filter(({ segment }) => segment.length > 0);
+}
+
+/** A segment kept for a card number no card uses any more, as written. */
+export interface KeptSegment {
+    number: number;
+    segment: string;
+}
+
 /** The text of the segment at a raw position of the first comment, or null. */
 export function segmentAt(commentText: string, raw: number): string | null {
     return rawPieces(commentText)?.find((piece) => piece.raw === raw)?.piece ?? null;

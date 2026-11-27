@@ -10,6 +10,14 @@
     color: var(--text-muted);
 }
 
+/* The history of removed cards: one line on what the list is, above it */
+.fs-suspended-intro {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    line-height: 1.45;
+    margin-bottom: var(--size-4-3);
+}
+
 .fs-suspended-list {
     max-height: 60vh;
     overflow-y: auto;
