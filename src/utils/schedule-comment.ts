@@ -12,6 +12,9 @@ import { ScheduleState } from "src/scheduling/schedule/schedule-state";
 import { Sm2State } from "src/scheduling/schedule/sm2-state";
 import { DateUtil, formatDate } from "src/utils/clock";
 
+/** A due date with a time after the day, as a copy of the Spaced Repetition plugin writes it: `2023-09-21-13-25`. */
+const DUE_WITH_TIME = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}$/;
+
 /**
  * Reads the text of a `<!--SR:...-->` comment: one segment per card of a question, each starting with `!`, in the
  * order of the cards. Anything after the fields a segment needs (`id=...`, `susp`, ...) is not part of the schedule.
@@ -83,7 +86,9 @@ export class CommentParser {
         ) {
             return null;
         }
-        return new Sm2State(dueDate, interval, ease);
+        const schedule = new Sm2State(dueDate, interval, ease);
+        if (DUE_WITH_TIME.test(dueDateStr)) schedule.writtenDue = dueDateStr;
+        return schedule;
     }
 
     /**
