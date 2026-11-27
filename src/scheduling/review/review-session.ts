@@ -14,6 +14,7 @@ import type { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import type { StudioSettings } from "src/data/settings-model";
 import { t } from "src/lang/translate";
 import type { Note } from "src/note-review/note";
+import { sameCardNumbers } from "src/occlusion/image-cloze-edit";
 import type { DailyLimits } from "src/scheduling/daily-limits";
 import { cardDueDayKey, DueDateHistogram } from "src/scheduling/due-histogram";
 import { DeckStats } from "src/scheduling/review/deck-stats";
@@ -625,6 +626,18 @@ export class ReviewSession implements IReviewSession {
         const sides = CardFrontBackUtil.expand(question.questionType, text, settings);
         if (sides.length !== question.cards.length) {
             new Notice(t("EDIT_CHANGES_CARD_COUNT"));
+            return;
+        }
+        // Cards bound to card numbers keep them: an edit that renumbers them is refused, as one that changes the count
+        const before = question.cards.map((card) => card.meta.cardNumber);
+        if (
+            before.some((k) => k !== undefined) &&
+            !sameCardNumbers(
+                before.map((k, at) => k ?? at + 1),
+                sides.map((side, at) => side.cardNumber ?? at + 1),
+            )
+        ) {
+            new Notice(t("IMAGE_CLOZE_EDIT_CHANGES_CARDS"));
             return;
         }
 

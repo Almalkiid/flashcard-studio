@@ -681,6 +681,20 @@ const en = {
     IMAGE_CLOZE_NOTHING_ASKED: "No mask is asked on any card. Give a mask a card number or an a.",
     IMAGE_CLOZE_BAD_SCHEDULE:
         "The schedule comment of this card cannot be read, so it makes no cards.",
+    IMAGE_CLOZE_EDITOR_TITLE: "Image cloze",
+    IMAGE_CLOZE_CARD_FIELD: "Cards for this mask",
+    IMAGE_CLOZE_CARD_PLACEHOLDER: "1, or 1,2, or 0 for always hidden, or letters a, h, s",
+    IMAGE_CLOZE_HINT_FIELD: "Hint",
+    IMAGE_CLOZE_HINT_PLACEHOLDER: "Written on the mask while it is asked",
+    IMAGE_CLOZE_FIELD_PROBLEMS: "The cards of mask ${masks} cannot be read.",
+    IMAGE_CLOZE_FIX_FIELDS: "Fix the cards of the masks that cannot be read first.",
+    IMAGE_CLOZE_UNUSED_NUMBERS:
+        "No mask asks on card ${numbers} any more: its schedule goes at the next write of this card.",
+    IMAGE_CLOZE_KIND_ANSWERS: "Answers: one card per mask, with its answer",
+    IMAGE_CLOZE_KIND_CLOZE: "Cloze cards: masks asked by card number, with hints",
+    IMAGE_CLOZE_PICK_KIND: "What should the masks make?",
+    IMAGE_CLOZE_EDIT_CHANGES_CARDS:
+        "This edit changes the card numbers of a card in this session, so it was not saved.",
     // Design: statistics
     STATS_METRIC_REVIEWS_TODAY: "Reviews today",
     STATS_METRIC_STREAK: "Day streak",

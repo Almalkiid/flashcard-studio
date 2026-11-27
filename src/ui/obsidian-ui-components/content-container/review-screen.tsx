@@ -3,6 +3,7 @@ import { App, Notice, Platform, TFile } from "obsidian";
 import { meaningChecker } from "src/ai/ai-access";
 import { NotePickerModal } from "src/ai/note-picker-modal";
 import { openGenerateCards } from "src/ai/open-generate-cards";
+import { hasImageClozeBlock } from "src/cards/image-cloze-question";
 import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType } from "src/data/data-structures/card/question";
 import { Deck } from "src/data/decks/deck";
@@ -15,7 +16,7 @@ import { isInExamsFolder } from "src/exam/exam-results-file";
 import { ExamRunner } from "src/exam/exam-run";
 import { readExamResults, saveExamResult } from "src/exam/exam-store";
 import { t } from "src/lang/translate";
-import { editOcclusionQuestion } from "src/occlusion/occlusion-processors";
+import { editImageClozeQuestion, editOcclusionQuestion } from "src/occlusion/occlusion-processors";
 import { customStudyMode, CustomStudySpec, forgottenCardIds } from "src/scheduling/custom-study";
 import {
     FlashcardReviewMode,
@@ -585,17 +586,23 @@ export default class ContentManager {
         const wasInFocus = this.ui.isStudioInFocus;
         this.ui.setStudioViewInFocus(false);
         try {
-            // An image occlusion card is edited in the occlusion editor, not as text
-            const newText =
-                currentQ.questionType === CardType.ImageOcclusion
-                    ? await editOcclusionQuestion(this.app, currentQ)
-                    : await FlashcardEditModal.Prompt(
-                          this.app,
-                          this.settings,
-                          currentCard,
-                          currentQ.questionText.actualQuestion,
-                          currentQ.questionText.textDirection,
-                      );
+            // An image occlusion card is edited in the occlusion editor, not as text; an image cloze question (a block
+            // alone, or text clozes with a block) in the editor on its block, with the text around it kept
+            const imageCloze =
+                currentQ.questionType === CardType.ImageCloze ||
+                (currentQ.questionType === CardType.Cloze &&
+                    hasImageClozeBlock(currentQ.questionText.actualQuestion));
+            const newText = imageCloze
+                ? await editImageClozeQuestion(this.app, currentQ, this.settings)
+                : currentQ.questionType === CardType.ImageOcclusion
+                  ? await editOcclusionQuestion(this.app, currentQ)
+                  : await FlashcardEditModal.Prompt(
+                        this.app,
+                        this.settings,
+                        currentCard,
+                        currentQ.questionText.actualQuestion,
+                        currentQ.questionText.textDirection,
+                    );
             // The text is of the question that the editor was opened on. If the review has moved on since, the
             // current question is another one, and writing it there would overwrite that question
             if (

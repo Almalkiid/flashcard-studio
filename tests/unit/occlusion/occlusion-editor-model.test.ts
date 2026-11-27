@@ -1,3 +1,4 @@
+import { parseImageClozeBlock } from "src/occlusion/image-cloze-block";
 import type { OcclusionBlock } from "src/occlusion/occlusion-block";
 import { OcclusionEditorModel } from "src/occlusion/occlusion-editor-model";
 
@@ -87,5 +88,70 @@ describe("OcclusionEditorModel", () => {
         model.select(0);
         model.setLabel("changed");
         expect(block.masks[0].label).toBe("A");
+    });
+});
+
+describe("OcclusionEditorModel for cloze cards", () => {
+    const clozeBlock = (...fields: [string, string][]) => {
+        const lines = fields.map(
+            ([field, hint], at) => `mask: ${field} | m${at} rect ${at / 10} 0 .05 .05 | ${hint}`,
+        );
+        const read = parseImageClozeBlock(["image: [[x.png]]", ...lines].join("\n"));
+        if (!read.ok) throw new Error("not read");
+        return read.block;
+    };
+
+    test("opens in the cloze kind with each mask's card field and hint; an unchanged block comes back as it was", () => {
+        const original = clozeBlock(["1", "one"], ["ash", ""]);
+        const model = OcclusionEditorModel.fromCloze(original, 0);
+        expect(model.kind).toBe("cloze");
+        expect(model.masks.map((mask) => [mask.fieldText, mask.hint])).toEqual([
+            ["1", "one"],
+            ["ash", ""],
+        ]);
+        expect(model.clozeResult()).toEqual(original);
+    });
+
+    test("the answers kind is unchanged", () => {
+        expect(new OcclusionEditorModel(block).kind).toBe("answers");
+    });
+
+    test("a new mask gets the lowest free number, the text's cards counted", () => {
+        const model = OcclusionEditorModel.fromCloze(clozeBlock(["3", ""]), 2);
+        model.addMask({ x: 0.5, y: 0.5, w: 0.1, h: 0.1 });
+        expect(model.masks[1].fieldText).toBe("4");
+    });
+
+    test("with 1 to 99 all in use, a new mask's card field is empty and is a problem", () => {
+        const model = OcclusionEditorModel.fromCloze(clozeBlock(["1", ""]), 99);
+        model.addMask({ x: 0.5, y: 0.5, w: 0.1, h: 0.1 });
+        expect(model.masks[1].fieldText).toBe("");
+        expect(model.fieldProblems()).toEqual([1]);
+    });
+
+    test("a card field that cannot be read is a problem; setField and setHint change the selected mask", () => {
+        const model = OcclusionEditorModel.fromCloze(clozeBlock(["1", ""], ["2", ""]), 0);
+        model.select(1);
+        model.setField("x");
+        model.setHint("a hint");
+        expect(model.fieldProblems()).toEqual([1]);
+        expect(model.masks[1].hint).toBe("a hint");
+    });
+
+    test("nothing asked, for a block alone; beside text cards it is fine", () => {
+        expect(
+            OcclusionEditorModel.fromCloze(clozeBlock(["0", ""], ["hs", ""]), 0).nothingAsked(),
+        ).toBe(true);
+        expect(OcclusionEditorModel.fromCloze(clozeBlock(["0", ""]), 2).nothingAsked()).toBe(false);
+        expect(OcclusionEditorModel.fromCloze(clozeBlock(["1", ""]), 0).nothingAsked()).toBe(false);
+    });
+
+    test("deleting the last mask of a number names that number as unused", () => {
+        const model = OcclusionEditorModel.fromCloze(clozeBlock(["1", ""], ["5", ""]), 0);
+        const before = model.cardNumbers();
+        model.select(1);
+        model.removeSelected();
+        expect(model.unusedNumbers(before)).toEqual([5]);
+        expect(model.unusedNumbers(before)).not.toContain(1);
     });
 });

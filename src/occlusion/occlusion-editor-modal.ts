@@ -2,6 +2,8 @@ import "src/occlusion/occlusion.css";
 import { App, Modal, Notice, setIcon } from "obsidian";
 
 import { t } from "src/lang/translate";
+import { ImageClozeBlock } from "src/occlusion/image-cloze-block";
+import { toOcclusionView } from "src/occlusion/image-cloze-view";
 import {
     imagePathOf,
     MaskShape,
@@ -64,6 +66,11 @@ const HANDLE_CURSOR: Record<Handle, string> = {
 /** Saves an edited block. False, or an error, says it was not saved: the editor stays open. */
 type SaveHandler = (result: OcclusionEditorResult) => boolean | void | Promise<boolean | void>;
 
+/** Saves an edited image cloze block, as `SaveHandler` does. */
+export type ClozeSaveHandler = (result: {
+    block: ImageClozeBlock;
+}) => boolean | void | Promise<boolean | void>;
+
 /**
  * The editor of an occlusion block: the picture, and masks to draw on it with the mouse or a finger (pointer events).
  * Drag on empty space to draw a mask, drag a mask to move it, drag its handles to resize it. The selected mask has
@@ -80,6 +87,13 @@ export class OcclusionEditorModal extends Modal {
     private stage: HTMLElement | null = null;
     private layer: HTMLElement | null = null;
     private labelInput: HTMLInputElement | null = null;
+    /** Cloze cards: the selected mask's card field and hint, the line that says what is wrong, the save. */
+    private fieldInput: HTMLInputElement | null = null;
+    private hintInput: HTMLInputElement | null = null;
+    private problemLine: HTMLElement | null = null;
+    private clozeSave: ClozeSaveHandler | null = null;
+    /** The card numbers when the editor opened, to name the ones a save leaves without a mask. */
+    private openedNumbers: number[] = [];
     private deleteButton: HTMLButtonElement | null = null;
     private chips: HTMLElement | null = null;
     private count: HTMLElement | null = null;
@@ -105,9 +119,38 @@ export class OcclusionEditorModal extends Modal {
         this.options = options;
     }
 
+    /**
+     * The editor on an image cloze block: each mask has a card field and a hint instead of an answer. `textCards` is how
+     * many cards the text clozes beside the block make, so a new mask gets a number they do not use.
+     */
+    static forCloze(
+        app: App,
+        sourcePath: string,
+        block: ImageClozeBlock,
+        textCards: number,
+        onSave: ClozeSaveHandler,
+        options: OcclusionEditorOptions = {},
+    ): OcclusionEditorModal {
+        const modal = new OcclusionEditorModal(
+            app,
+            sourcePath,
+            toOcclusionView(block),
+            () => false,
+            options,
+        );
+        modal.model = OcclusionEditorModel.fromCloze(block, textCards);
+        modal.clozeSave = onSave;
+        modal.openedNumbers = modal.model.cardNumbers();
+        return modal;
+    }
+
+    private get cloze(): boolean {
+        return this.model.kind === "cloze";
+    }
+
     onOpen(): void {
         this.modalEl.addClass("fs-studio", "fs-occ-editor-modal");
-        this.setTitle(t("OCCLUSION_EDITOR_TITLE"));
+        this.setTitle(t(this.cloze ? "IMAGE_CLOZE_EDITOR_TITLE" : "OCCLUSION_EDITOR_TITLE"));
         const { contentEl } = this;
         contentEl.empty();
         const root = contentEl.createDiv({ cls: "fs-occ-editor" });
@@ -234,19 +277,10 @@ export class OcclusionEditorModal extends Modal {
     }
 
     private buildFields(root: HTMLElement): void {
+        if (this.cloze) this.problemLine = root.createDiv({ cls: "fs-occ-missing fs-occ-problem" });
         const fields = root.createDiv({ cls: "fs-occ-fields" });
-
-        const labelField = fields.createEl("label", { cls: "fs-occ-field" });
-        labelField.createSpan({ cls: "fs-occ-field-label", text: t("OCCLUSION_LABEL_FIELD") });
-        this.labelInput = labelField.createEl("input", {
-            cls: "fs-occ-input",
-            attr: { type: "text", placeholder: t("OCCLUSION_LABEL_PLACEHOLDER") },
-        });
-        this.labelInput.addEventListener("input", () => {
-            this.model.setLabel(this.labelInput?.value ?? "");
-            this.renderMasks();
-            this.renderChips();
-        });
+        if (this.cloze) this.buildClozeFields(fields);
+        else this.buildAnswerField(fields);
 
         const questionField = fields.createEl("label", { cls: "fs-occ-field" });
         questionField.createSpan({
@@ -261,6 +295,48 @@ export class OcclusionEditorModal extends Modal {
         question.addEventListener("input", () => (this.model.question = question.value));
 
         this.chips = root.createDiv({ cls: "fs-occ-chips" });
+    }
+
+    /** Cloze cards: the card field (locked during review, where the cards are in the queue) and the hint. */
+    private buildClozeFields(fields: HTMLElement): void {
+        const fieldLabel = fields.createEl("label", { cls: "fs-occ-field" });
+        fieldLabel.createSpan({ cls: "fs-occ-field-label", text: t("IMAGE_CLOZE_CARD_FIELD") });
+        this.fieldInput = fieldLabel.createEl("input", {
+            cls: "fs-occ-input",
+            attr: { type: "text", placeholder: t("IMAGE_CLOZE_CARD_PLACEHOLDER") },
+        });
+        this.fieldInput.addEventListener("input", () => {
+            this.model.setField(this.fieldInput?.value ?? "");
+            this.renderMasks();
+            this.renderChips();
+            this.renderProblems();
+        });
+
+        const hintLabel = fields.createEl("label", { cls: "fs-occ-field" });
+        hintLabel.createSpan({ cls: "fs-occ-field-label", text: t("IMAGE_CLOZE_HINT_FIELD") });
+        this.hintInput = hintLabel.createEl("input", {
+            cls: "fs-occ-input",
+            attr: { type: "text", placeholder: t("IMAGE_CLOZE_HINT_PLACEHOLDER") },
+        });
+        this.hintInput.addEventListener("input", () => {
+            this.model.setHint(this.hintInput?.value ?? "");
+            this.renderChips();
+        });
+    }
+
+    /** Answers: the selected mask's answer. */
+    private buildAnswerField(fields: HTMLElement): void {
+        const labelField = fields.createEl("label", { cls: "fs-occ-field" });
+        labelField.createSpan({ cls: "fs-occ-field-label", text: t("OCCLUSION_LABEL_FIELD") });
+        this.labelInput = labelField.createEl("input", {
+            cls: "fs-occ-input",
+            attr: { type: "text", placeholder: t("OCCLUSION_LABEL_PLACEHOLDER") },
+        });
+        this.labelInput.addEventListener("input", () => {
+            this.model.setLabel(this.labelInput?.value ?? "");
+            this.renderMasks();
+            this.renderChips();
+        });
     }
 
     private buildFooter(root: HTMLElement, canSave: boolean): void {
@@ -297,9 +373,36 @@ export class OcclusionEditorModal extends Modal {
             this.labelInput.disabled = selected === undefined;
             this.labelInput.value = selected?.label ?? "";
         }
+        if (this.fieldInput !== null) {
+            this.fieldInput.disabled = selected === undefined || this.options.lockMasks === true;
+            this.fieldInput.value = selected?.fieldText ?? "";
+        }
+        if (this.hintInput !== null) {
+            this.hintInput.disabled = selected === undefined;
+            this.hintInput.value = selected?.hint ?? "";
+        }
         if (this.deleteButton !== null) this.deleteButton.disabled = selected === undefined;
-        this.count?.setText(t("OCCLUSION_MASK_COUNT", { n: this.model.masks.length }));
+        const cards = this.cloze ? this.model.cardNumbers().length : this.model.masks.length;
+        this.count?.setText(t("OCCLUSION_MASK_COUNT", { n: cards }));
         this.renderChips();
+        this.renderProblems();
+    }
+
+    /** Cloze cards: what is wrong (card fields that cannot be read, nothing asked) and the numbers a save leaves. */
+    private renderProblems(): void {
+        if (this.problemLine === null) return;
+        const lines: string[] = [];
+        const problems = this.model.fieldProblems();
+        if (problems.length > 0)
+            lines.push(
+                t("IMAGE_CLOZE_FIELD_PROBLEMS", { masks: problems.map((i) => i + 1).join(", ") }),
+            );
+        if (this.model.nothingAsked()) lines.push(t("IMAGE_CLOZE_NOTHING_ASKED"));
+        const unused = this.model.unusedNumbers(this.openedNumbers);
+        if (unused.length > 0)
+            lines.push(t("IMAGE_CLOZE_UNUSED_NUMBERS", { numbers: unused.join(", ") }));
+        this.problemLine.setText(lines.join(" "));
+        this.problemLine.toggleClass("is-empty", lines.length === 0);
     }
 
     private placeMask(el: HTMLElement, rect: Rect): void {
@@ -321,7 +424,10 @@ export class OcclusionEditorModal extends Modal {
             el.toggleClass("is-ellipse", mask.shape === "ellipse");
             el.toggleClass("is-selected", selected);
             this.placeMask(el, mask);
-            el.createSpan({ cls: "fs-occ-emask-num", text: String(index + 1) });
+            el.createSpan({
+                cls: "fs-occ-emask-num",
+                text: this.cloze ? mask.fieldText || "?" : String(index + 1),
+            });
             if (selected) {
                 for (const handle of HANDLES) el.createDiv({ cls: `fs-occ-handle is-${handle}` });
             }
@@ -336,10 +442,12 @@ export class OcclusionEditorModal extends Modal {
             const chip = chips.createEl("button", { cls: "fs-occ-chip", attr: { type: "button" } });
             chip.toggleClass("is-selected", index === this.model.selected);
             chip.createSpan({ cls: "fs-occ-chip-num", text: String(index + 1) });
-            chip.createSpan({
-                cls: "fs-occ-chip-text",
-                text: plainLabel(mask.label) || t("OCCLUSION_NO_LABEL"),
-            });
+            const text = this.cloze
+                ? [mask.fieldText ?? "", plainLabel(mask.hint ?? "")]
+                      .filter((part) => part)
+                      .join(" · ")
+                : plainLabel(mask.label);
+            chip.createSpan({ cls: "fs-occ-chip-text", text: text || t("OCCLUSION_NO_LABEL") });
             chip.addEventListener("click", () => {
                 this.model.select(index);
                 this.refresh();
@@ -461,7 +569,7 @@ export class OcclusionEditorModal extends Modal {
             this.model.addMask(drag.rect);
             this.refresh();
             // On a phone the keyboard would cover the picture
-            if (pointerType !== "touch") this.labelInput?.focus();
+            if (pointerType !== "touch") (this.hintInput ?? this.labelInput)?.focus();
         }
     }
 
@@ -478,12 +586,25 @@ export class OcclusionEditorModal extends Modal {
             new Notice(t("OCCLUSION_NEEDS_MASK"));
             return;
         }
+        // Nothing half-written: a card field that cannot be read, or a block alone that asks nothing, is not saved
+        if (this.cloze && this.model.fieldProblems().length > 0) {
+            new Notice(t("IMAGE_CLOZE_FIX_FIELDS"));
+            return;
+        }
+        if (this.cloze && this.model.nothingAsked()) {
+            new Notice(t("IMAGE_CLOZE_NOTHING_ASKED"));
+            return;
+        }
 
         // The editor stays open until the block is saved, so a refused save does not lose what was drawn
         this.saving = true;
         if (this.saveButton !== null) this.saveButton.disabled = true;
         try {
-            if ((await this.onSave(this.model.result())) !== false) this.close();
+            const saved =
+                this.clozeSave !== null
+                    ? await this.clozeSave({ block: this.model.clozeResult() })
+                    : await this.onSave(this.model.result());
+            if (saved !== false) this.close();
         } catch (error) {
             console.error("Image occlusion: could not save", error);
             new Notice(t("OCCLUSION_SAVE_FAILED"));
