@@ -4867,28 +4867,54 @@ body.fs-reduced-bottom-fade-mask {
   pointer-events: auto;
   cursor: pointer;
 }
-.fs-occ.is-cloze .fs-occ-tag.is-expanded {
-  overflow: visible;
-  z-index: 2;
-}
-.fs-occ.is-cloze .fs-occ-tag.is-expanded .fs-occ-tag-text {
-  flex: none;
-  width: max-content;
-  max-width: 70cqw;
-  max-height: none;
-  padding: 0.35em 0.7em;
-  border-radius: 8px;
-  color: var(--fs-on-accent);
-  background-color: var(--fs-accent);
-  box-shadow: var(--fs-shadow);
-}
 .fs-occ.is-cloze .fs-occ-tag-text {
   flex: initial;
   max-width: 100%;
-  max-height: 100%;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fs-occ-hint-bubble {
+  position: absolute;
+  z-index: 3;
+  left: var(--fs-occ-left, 0);
+  top: calc(var(--fs-occ-top) + 10px);
+  width: max-content;
+  max-width: min(80%, 320px);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  max-height: var(--fs-occ-room, none);
+  overflow-y: auto;
+  text-align: left;
+  color: var(--fs-text);
+  background-color: var(--fs-surface);
+  box-shadow:
+    var(--fs-shadow),
+    0 0 0 1px var(--fs-border);
+  pointer-events: auto;
+}
+.fs-occ-hint-bubble.is-above {
+  top: auto;
+  bottom: calc(var(--fs-occ-bottom) + 10px);
+}
+.fs-occ-hint-bubble:before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: var(--fs-occ-arrow, 50%);
+  width: 12px;
+  height: 12px;
+  background-color: var(--fs-surface);
+  box-shadow: -1px -1px 0 var(--fs-border);
+  transform: translate(-50%) rotate(45deg);
+}
+.fs-occ-hint-bubble.is-above:before {
+  top: auto;
+  bottom: -6px;
+  box-shadow: 1px 1px 0 var(--fs-border);
 }
 .fs-occ-problem.is-empty {
   display: none;

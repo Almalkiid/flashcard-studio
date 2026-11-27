@@ -209,7 +209,7 @@ describe("image cloze", function () {
         expect(picture.tags).toEqual(["first"]);
     });
 
-    it("a long hint on a small mask stays inside the mask and wraps", async function () {
+    it("a long hint on a small mask is cut with an ellipsis, and a tap shows it whole in a bubble", async function () {
         const hint = "a long hint that goes on ".repeat(8).trim();
         await useNote(
             [TAG, "", block(`mask: 1 | ra rect 0.4000 0.4000 0.0800 0.0800 | ${hint}`), ""].join(
@@ -234,33 +234,36 @@ describe("image cloze", function () {
                     tag.top >= mask.top - 1 &&
                     tag.right <= mask.right + 1 &&
                     tag.bottom <= mask.bottom + 1,
-                wraps: getComputedStyle(span).whiteSpace === "normal",
+                cut: getComputedStyle(span).textOverflow === "ellipsis",
                 title,
             };
         });
         expect(fit).not.toBeNull();
         expect(fit?.inside).toBe(true);
-        expect(fit?.wraps).toBe(true);
+        expect(fit?.cut).toBe(true);
         expect(fit?.title).toBe(hint);
         await screenshot("long-hint");
 
-        // A tap shows the whole hint over the picture, and the card stays on its front
+        // A tap opens a bubble with the whole hint, inside the picture, and the card stays on its front
         await browser.$(".fs-view .fs-card-container .fs-occ-tag").click();
-        const expanded = await browser.execute(() => {
-            const tag = document.querySelector(".fs-view .fs-card-container .fs-occ-tag");
-            const mask = document.querySelector(".fs-view .fs-card-container .fs-mask.is-active");
-            const text = tag?.querySelector(".fs-occ-tag-text")?.getBoundingClientRect();
-            const span = tag?.querySelector(".fs-occ-tag-text");
-            const background =
-                span === null || span === undefined ? "" : getComputedStyle(span).backgroundColor;
+        const bubble = await browser.execute(() => {
+            const card = ".fs-view .fs-card-container";
+            const el = document.querySelector<HTMLElement>(`${card} .fs-occ-hint-bubble`);
+            const stage = document.querySelector(`${card} .fs-occ-stage`)?.getBoundingClientRect();
+            if (el === null || stage === undefined) return null;
+            const box = el.getBoundingClientRect();
             return {
-                expanded: tag?.classList.contains("is-expanded") ?? false,
-                wider: (text?.width ?? 0) > (mask?.getBoundingClientRect().width ?? 0),
-                // The words have a solid background of their own, so they read over the picture
-                solid: /^rgb\(/.test(background),
+                text: el.textContent ?? "",
+                inside:
+                    box.left >= stage.left - 1 &&
+                    box.right <= stage.right + 1 &&
+                    box.top >= stage.top - 1 &&
+                    box.bottom <= stage.bottom + 1,
+                // A solid background of its own, so it reads over the picture
+                solid: /^rgb\(/.test(getComputedStyle(el).backgroundColor),
             };
         });
-        expect(expanded).toEqual({ expanded: true, wider: true, solid: true });
+        expect(bubble).toEqual({ text: hint, inside: true, solid: true });
         expect(
             await browser.$(".fs-view .fs-card-container .fs-show-answer-button").isDisplayed(),
         ).toBe(true);

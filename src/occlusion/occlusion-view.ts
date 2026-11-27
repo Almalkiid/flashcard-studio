@@ -182,6 +182,45 @@ function scrollCardToMask(el: HTMLElement, scroller: HTMLElement, stage: HTMLEle
         (maskBox.left + maskBox.right) / 2 - stageBox.left - scroller.clientWidth / 2;
 }
 
+/**
+ * A bubble with a mask's whole hint, under the mask (above it when the mask is low on the picture), its arrow pointing
+ * at the mask, kept inside the picture. Normal-size text on the page's own surface, so the picture stays readable.
+ */
+function showHintBubble(
+    stage: HTMLElement,
+    mask: OcclusionBlock["masks"][number],
+    index: number,
+): void {
+    const bubble = stage.createDiv({ cls: "fs-occ-hint-bubble", text: plainLabel(mask.label) });
+    bubble.setAttribute("role", "tooltip");
+    bubble.setAttribute("data-mask", String(index));
+    // On the side of the mask with more room, and no taller than that room (a longer hint scrolls in the bubble), so
+    // the picture's frame never cuts it off. Before the picture is laid out, a mask low on it has its bubble above
+    const height = stage.clientHeight;
+    const gap = 16;
+    const below = height * (1 - mask.y - mask.h) - gap;
+    const above = height * mask.y - gap;
+    const onTop = height > 0 ? above > below : mask.y + mask.h > 0.6;
+    bubble.toggleClass("is-above", onTop);
+    bubble.setCssProps({
+        "--fs-occ-top": percent(mask.y + mask.h),
+        "--fs-occ-bottom": percent(1 - mask.y),
+        ...(height > 0 ? { "--fs-occ-room": `${Math.max(48, onTop ? above : below)}px` } : {}),
+    });
+    // Centred on the mask, but never past the picture's edges; the arrow stays on the mask
+    const width = stage.clientWidth;
+    const centre = (mask.x + mask.w / 2) * width;
+    const left = Math.max(
+        4,
+        Math.min(centre - bubble.offsetWidth / 2, width - bubble.offsetWidth - 4),
+    );
+    bubble.setCssProps({ "--fs-occ-left": `${left}px`, "--fs-occ-arrow": `${centre - left}px` });
+    bubble.addEventListener("click", (event) => {
+        event.stopPropagation();
+        bubble.remove();
+    });
+}
+
 /** How an image cloze card differs from an image occlusion card when it is drawn. Left out: as image occlusion. */
 export interface OcclusionRenderOptions {
     /** The text on each mask, by mask index ("" for none), in place of "?" and the labels. */
@@ -329,10 +368,14 @@ export function renderOcclusion(
         // A hint is clipped to its mask: the whole of it is in the tooltip
         if (options.cloze === true) {
             tag.setAttribute("title", mask.label);
-            // A tap shows the whole hint (a phone has no tooltip), and is not a tap on the card: it does not turn it
+            // A tap shows the whole hint in a bubble at its mask (a phone has no tooltip). It is not a tap on the card:
+            // it does not turn it. One bubble at a time; a second tap on the same mask closes it
             tag.addEventListener("click", (event) => {
                 event.stopPropagation();
-                tag.toggleClass("is-expanded", !tag.hasClass("is-expanded"));
+                const open = stage.querySelector(".fs-occ-hint-bubble");
+                const same = open?.getAttribute("data-mask") === String(index);
+                open?.remove();
+                if (!same) showHintBubble(stage, mask, index);
             });
         }
         tag.setCssProps({

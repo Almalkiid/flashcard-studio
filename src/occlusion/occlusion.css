@@ -688,40 +688,66 @@
     }
 }
 
-/* An image cloze card: a hint is written inside its mask, wrapped and cut to the mask; the whole hint is its tooltip */
+/* An image cloze card: a hint is written inside its mask on one line, cut with "…" when it is longer; a tap opens it */
 .fs-occ.is-cloze .fs-occ-tag {
     overflow: hidden;
-    /* A hint is tapped to show all of it */
     pointer-events: auto;
     cursor: pointer;
-}
-
-/* A tapped hint: all of it, over the picture, as wide as it needs up to most of the picture */
-.fs-occ.is-cloze .fs-occ-tag.is-expanded {
-    overflow: visible;
-    z-index: 2;
-}
-
-.fs-occ.is-cloze .fs-occ-tag.is-expanded .fs-occ-tag-text {
-    flex: none;
-    width: max-content;
-    max-width: 70cqw;
-    max-height: none;
-    /* Its own background: past the mask, nothing is under the words */
-    padding: 0.35em 0.7em;
-    border-radius: 8px;
-    color: var(--fs-on-accent);
-    background-color: var(--fs-accent);
-    box-shadow: var(--fs-shadow);
 }
 
 .fs-occ.is-cloze .fs-occ-tag-text {
     flex: initial;
     max-width: 100%;
-    max-height: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* The whole hint, in a bubble at its mask: normal text on the page's surface, an arrow pointing at the mask */
+.fs-occ-hint-bubble {
+    position: absolute;
+    z-index: 3;
+    left: var(--fs-occ-left, 0);
+    top: calc(var(--fs-occ-top) + 10px);
+    width: max-content;
+    max-width: min(80%, 320px);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    max-height: var(--fs-occ-room, none);
+    overflow-y: auto;
+    text-align: left;
+    color: var(--fs-text);
+    background-color: var(--fs-surface);
+    box-shadow:
+        var(--fs-shadow),
+        0 0 0 1px var(--fs-border);
+    pointer-events: auto;
+}
+
+.fs-occ-hint-bubble.is-above {
+    top: auto;
+    bottom: calc(var(--fs-occ-bottom) + 10px);
+}
+
+.fs-occ-hint-bubble::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: var(--fs-occ-arrow, 50%);
+    width: 12px;
+    height: 12px;
+    background-color: var(--fs-surface);
+    box-shadow: -1px -1px 0 var(--fs-border);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.fs-occ-hint-bubble.is-above::before {
+    top: auto;
+    bottom: -6px;
+    box-shadow: 1px 1px 0 var(--fs-border);
 }
 
 /* The editor's line of what is wrong with a cloze block: only there when something is */

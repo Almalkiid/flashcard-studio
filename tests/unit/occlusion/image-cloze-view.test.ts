@@ -206,19 +206,32 @@ describe("drawing into the page", () => {
         expect(el.querySelectorAll(".fs-mask.is-revealed")).toHaveLength(2);
     });
 
-    test("a tap on a hint shows all of it, and does not turn the card; a second tap shrinks it again", () => {
+    test("a tap on a hint opens a bubble with all of it at its mask, and does not turn the card; a second tap closes it", () => {
         const host = document.body.createDiv();
         let turned = 0;
         host.addEventListener("click", () => turned++);
         const el = host.createDiv();
         renderImageClozeCard(el, appWith(true), "note.md", spec(1, "front"));
-        const tag = el.querySelector<HTMLElement>(".fs-occ-tag");
-        if (tag === null) throw new Error("no hint tag");
-        tag.click();
-        expect(tag.classList.contains("is-expanded")).toBe(true);
+        const tags = el.querySelectorAll<HTMLElement>(".fs-occ-tag");
+        tags[0].click();
+        const bubble = el.querySelector(".fs-occ-hint-bubble");
+        expect(bubble?.textContent).toBe("chamber");
+        expect(bubble?.getAttribute("role")).toBe("tooltip");
         expect(turned).toBe(0);
-        tag.click();
-        expect(tag.classList.contains("is-expanded")).toBe(false);
+        // Another mask's hint: one bubble at a time
+        tags[1].click();
+        expect(el.querySelectorAll(".fs-occ-hint-bubble")).toHaveLength(1);
+        expect(el.querySelector(".fs-occ-hint-bubble")?.textContent).toBe("valve");
+        tags[1].click();
+        expect(el.querySelector(".fs-occ-hint-bubble")).toBeNull();
+    });
+
+    test("a mask low on the picture has its bubble above it", () => {
+        const block = read("image: x.png\nmask: 1 | a rect .1 .8 .1 .1 | low");
+        const el = document.body.createDiv();
+        renderImageClozeCard(el, appWith(true), "note.md", spec(1, "front", block));
+        el.querySelector<HTMLElement>(".fs-occ-tag")?.click();
+        expect(el.querySelector(".fs-occ-hint-bubble")?.classList.contains("is-above")).toBe(true);
     });
 
     test("an image that is not in the vault, on a card and in the note", () => {
