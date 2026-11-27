@@ -8,6 +8,7 @@ import {
     LineSpan,
     lineStarts,
     replaceCard,
+    replaceCardKeepingLineEnds,
 } from "src/data/data-structures/card/note-region";
 import { TopicPath, TopicPathList, TopicPathWithWs } from "src/data/decks/topic-path";
 import { CARD_METADATA_CALLOUT, SCHEDULE_COMMENT_PREFIX } from "src/data/formats";
@@ -356,7 +357,9 @@ export class Question {
             );
             return null;
         }
-        const newText = replaceCard(noteText, region, replacement);
+        // The note keeps the line breaks (two spaces at a line's end) of the lines that did not change; the question's
+        // own text stays trimmed, as it is read
+        const newText = replaceCardKeepingLineEnds(noteText, region, replacement);
         return {
             noteText: newText,
             replacement,
@@ -419,7 +422,7 @@ export class Question {
         return this.note.file.edit((noteText) => {
             this.learnOffsets(noteText);
             const region = findCard(noteText, original, this.span());
-            return region === null ? null : replaceCard(noteText, region, text);
+            return region === null ? null : replaceCardKeepingLineEnds(noteText, region, text);
         });
     }
 

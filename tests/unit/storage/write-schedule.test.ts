@@ -70,6 +70,12 @@ const CHANGED: Record<string, Pick<Row, "output" | "reparse">> = {
             { type: 0, cards: [none] },
         ],
     },
+    // Two spaces at the end of a line are a Markdown line break: the lines of the card keep them (the golden run trimmed
+    // them, and 26 of 1,637 real public notes lost line breaks on their first review). Read again, the card is the same
+    "w-trailing-ws-line": {
+        output: "#flashcards\nQ  \n?\nA   \n<!--SR:!2026-10-20,12,260,id=012345-->\n\nx::y",
+        reparse: rows.find((row) => row.id === "w-trailing-ws-line")?.reparse ?? [],
+    },
     // fix 5: the line endings of the note stay as they are
     "w-crlf": {
         output: "#flashcards\r\nQ::A\r\n<!--SR:!2026-10-20,12,260,id=012345-->\r\nR::S\r\n",

@@ -227,6 +227,37 @@ export function findCard(text: string, card: string, readAt: LineSpan | null): R
 }
 
 /** The note text with the run of lines replaced by `replacement` (LF line endings), keeping the note's line endings. */
+/**
+ * Replaces a card's run as {@link replaceCard} does, but each line written back keeps the white space it had at its end
+ * in the note when it is otherwise the same: two spaces at the end of a line are a Markdown line break, and a card's own
+ * text has them trimmed (as it was read). Every write of a card's text goes through here.
+ */
+export function replaceCardKeepingLineEnds(
+    text: string,
+    region: Region,
+    replacement: string,
+): string {
+    const run = text.slice(region.start, region.end).replace(/\r\n?/g, "\n");
+    // White space after the card on its last line (the run's padding) is read as that line's own
+    const onLastLine = region.post !== "" && !region.post.includes("\n");
+    const card = run.slice(region.pre.length, run.length - region.post.length);
+    const lines = (onLastLine ? card + region.post : card).split("\n");
+    let lastKept = false;
+    const kept = replacement
+        .split("\n")
+        .map((line, at) => {
+            const was = lines[at];
+            const same = was !== undefined && was !== line && was.trimEnd() === line;
+            if (same && at === lines.length - 1) lastKept = true;
+            return same ? was : line;
+        })
+        .join("\n");
+    // That line came back as it was, so it has its white space again (a line break there); when it changed (a schedule
+    // comment rewritten), the white space stays after the replacement, as it always did
+    const post = onLastLine && lastKept ? "" : region.post;
+    return replaceCard(text, { ...region, post }, kept);
+}
+
 export function replaceCard(text: string, region: Region, replacement: string): string {
     const inserted =
         region.ending === "\n" ? replacement : replacement.replace(/\n/g, region.ending);
