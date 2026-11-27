@@ -1,5 +1,10 @@
 import { IClozeFormatter } from "clozecraft";
 
+import {
+    expandImageCloze,
+    hasImageClozeBlock,
+    withFencesKept,
+} from "src/cards/image-cloze-question";
 import { CardType } from "src/data/data-structures/card/question";
 import { splitCalloutCard } from "src/data/data-structures/card/questions/callout-card";
 import { StudioSettings } from "src/data/settings-model";
@@ -9,6 +14,9 @@ import { occlusionCardMarkdown } from "src/occlusion/occlusion-view";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/text";
 
 export class CardFrontBack {
+    /** For a card of an image cloze question: its card number, which its schedule is bound to. */
+    cardNumber?: number;
+
     constructor(
         public front: string,
         public back: string,
@@ -80,8 +88,22 @@ class ImageOcclusion implements IQuestionTypeHandler {
     }
 }
 
+/** A block of masks asked like clozes, with no text clozes beside it: its cards are the block's card numbers. */
+class ImageCloze implements IQuestionTypeHandler {
+    expand(text: string, settings: StudioSettings): CardFrontBack[] {
+        return expandImageCloze(text, settings);
+    }
+}
+
 class Cloze implements IQuestionTypeHandler {
     expand(text: string, settings: StudioSettings): CardFrontBack[] {
+        // Text clozes and an image cloze block share card numbers; a block that makes no cards is kept out of the
+        // text clozes' way
+        if (hasImageClozeBlock(text)) return expandImageCloze(text, settings);
+        return withFencesKept(text, (swapped) => this.expandText(swapped, settings));
+    }
+
+    private expandText(text: string, settings: StudioSettings): CardFrontBack[] {
         const withInputs = settings.convertClozePatternsToInputs || settings.typeAnswers;
         const style: IClozeFormatter = withInputs
             ? new QuestionTypeClozeInputFormatter()
@@ -145,6 +167,7 @@ export class QuestionTypeFactory {
             [CardType.Cloze]: () => new Cloze(),
             [CardType.Callout]: () => new Callout(),
             [CardType.ImageOcclusion]: () => new ImageOcclusion(),
+            [CardType.ImageCloze]: () => new ImageCloze(),
         };
         return handlers[type]();
     }

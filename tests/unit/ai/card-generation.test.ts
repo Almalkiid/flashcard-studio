@@ -444,6 +444,12 @@ describe("editing choice options as text", () => {
 // The real parser and expansion decide whether a card can be written: a card is only written if its text reads back as
 // exactly the card that was meant.
 describe("writeProblem", () => {
+    test("a generated cloze holding an image cloze block is not written", () => {
+        const front =
+            "The {{board}} approves it\n```image-cloze\nimage: x.png\nmask: 1 | a rect 0 0 .1 .1 |\n```";
+        expect(writeProblem({ kind: "cloze", front, back: "" }, DEFAULT_SETTINGS)).not.toBeNull();
+    });
+
     const s = DEFAULT_SETTINGS;
     const basic = (front: string, back: string) => ({ kind: "basic" as const, front, back });
 

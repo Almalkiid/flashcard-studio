@@ -1,6 +1,6 @@
 import { CardFrontBackUtil } from "src/cards/expand";
 import { parse, parserOptionsFromSettings } from "src/cards/parse";
-import { CardType } from "src/data/data-structures/card/question";
+import { CardType, isClozeKind } from "src/data/data-structures/card/question";
 import { CARD_METADATA_CALLOUT } from "src/data/formats";
 import { StudioSettings } from "src/data/settings-model";
 import { findLineIndexOfSearchStringIgnoringWs } from "src/utils/text";
@@ -108,7 +108,8 @@ function withScheduleComment(
         settings.cardCommentOnSameLine &&
         !text.endsWith("```") &&
         !isCallout &&
-        type !== CardType.ImageOcclusion
+        type !== CardType.ImageOcclusion &&
+        type !== CardType.ImageCloze
     ) {
         lines[last] += ` ${comment}`;
     } else {
@@ -131,7 +132,7 @@ export function readsBackAsOneQuestion(
 ): boolean {
     // With card regions on, a multi-line card or a cloze is only found inside a region
     const start = settings.multilineCardStartMarker;
-    const inRegion = start !== "" && (isMultiLine(type) || type === CardType.Cloze);
+    const inRegion = start !== "" && (isMultiLine(type) || isClozeKind(type));
     // The comment has a schedule for each card of the question. With atomic clozes the parser counts them: a paragraph
     // stays one question when its comment has more than the clozes of its last line
     const cardCount = CardFrontBackUtil.expand(type, text, settings).length || 1;

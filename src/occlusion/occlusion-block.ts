@@ -50,12 +50,17 @@ const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));
 const round4 = (n: number): number => Math.round(n * 10000) / 10000;
 const oneLine = (text: string): string => text.replaceAll(/\s*\r?\n\s*/g, " ").trim();
 
-/** One mask line, or null when it is not one, has a number that is not finite, or would show nothing. */
-function parseMask(value: string): OcclusionMask | null {
-    const match = MASK_LINE.exec(value.trim());
-    if (match === null) return null;
+/** A mask's place on the image: its shape and its box, as fractions of the image. */
+export type MaskGeometry = Pick<OcclusionMask, "shape" | "x" | "y" | "w" | "h">;
 
-    const [x, y, w, h] = [match[3], match[4], match[5], match[6]].map(Number);
+const GEOMETRY = new RegExp(
+    String.raw`^(rect|ellipse)\s+(${NUMBER})\s+(${NUMBER})\s+(${NUMBER})\s+(${NUMBER})$`,
+    "i",
+);
+
+/** The box from its four numbers as written, or null when one is not finite or the box would show nothing. */
+function fitGeometry(shape: string, numbers: string[]): MaskGeometry | null {
+    const [x, y, w, h] = numbers.map(Number);
     if (![x, y, w, h].every(Number.isFinite)) return null;
 
     const left = round4(clamp01(x));
@@ -64,15 +69,24 @@ function parseMask(value: string): OcclusionMask | null {
     const height = round4(Math.min(h, 1 - top));
     if (width <= 0 || height <= 0) return null;
 
-    return {
-        id: match[1],
-        shape: match[2].toLowerCase() as MaskShape,
-        x: left,
-        y: top,
-        w: width,
-        h: height,
-        label: match[7].trim(),
-    };
+    return { shape: shape.toLowerCase() as MaskShape, x: left, y: top, w: width, h: height };
+}
+
+/** `rect|ellipse x y w h`, read the way a mask line's geometry is read. Null when it is not one. */
+export function parseMaskGeometry(value: string): MaskGeometry | null {
+    const match = GEOMETRY.exec(value.trim());
+    return match === null ? null : fitGeometry(match[1], match.slice(2, 6));
+}
+
+/** One mask line, or null when it is not one, has a number that is not finite, or would show nothing. */
+function parseMask(value: string): OcclusionMask | null {
+    const match = MASK_LINE.exec(value.trim());
+    if (match === null) return null;
+
+    const geometry = fitGeometry(match[2], [match[3], match[4], match[5], match[6]]);
+    if (geometry === null) return null;
+
+    return { id: match[1], ...geometry, label: match[7].trim() };
 }
 
 /** Parses the text between the fences. Null when there is no image or no valid mask. */

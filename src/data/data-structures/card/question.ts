@@ -27,6 +27,18 @@ export enum CardType {
     Callout,
     // An image with masks on it, in a fenced `image-occlusion` block: one card per mask
     ImageOcclusion,
+    // An `image-cloze` block with no text clozes beside it: one card per card number its masks ask on
+    ImageCloze,
+}
+
+/** A cloze question: text clozes, or an image cloze block alone. Never multiple choice, no typed answer of its own. */
+export function isClozeKind(type: CardType): boolean {
+    return type === CardType.Cloze || type === CardType.ImageCloze;
+}
+
+/** A question whose back is the whole card, so the study screen shows only the back: clozes and image cards. */
+export function showsBackOnly(type: CardType): boolean {
+    return isClozeKind(type) || type === CardType.ImageOcclusion;
 }
 
 const BLOCK_ID_AT_END = / (\^[A-Za-z0-9-]+)$/;
@@ -217,6 +229,7 @@ export class Question {
         if (this.questionText.endsWithCodeBlock()) sameLine = false;
         if (this.isCalloutCard) sameLine = false;
         if (this.parsedQuestionInfo?.cardType === CardType.ImageOcclusion) sameLine = false;
+        if (this.parsedQuestionInfo?.cardType === CardType.ImageCloze) sameLine = false;
         return commentInCallout || sameLine ? " " : "\n";
     }
 

@@ -75,6 +75,11 @@ describe("collectExamCards", () => {
         expect(cards.find((card) => card.id === "s1")?.suspended).toBe(true);
     });
 
+    test("an image cloze card is a cloze too: the exam leaves it out", () => {
+        const cards = collectExamCards(treeOf([makeCard({ id: "i1", type: CardType.ImageCloze })]));
+        expect(cards[0].isCloze).toBe(true);
+    });
+
     test("a card in two decks comes once for each, under one id", () => {
         const cards = collectExamCards(
             treeOf([makeCard({ id: "t1", decks: ["CIA/Part1", "Trivia"] })]),

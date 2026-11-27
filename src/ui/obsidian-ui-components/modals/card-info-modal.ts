@@ -5,6 +5,7 @@ import { Card } from "src/data/data-structures/card/flashcard";
 import { ReviewLogEntry } from "src/data/review-log/review-log-entry";
 import { IBaseLocale } from "src/lang/en-strings";
 import { t } from "src/lang/translate";
+import { imageClozeCardText } from "src/occlusion/image-cloze-view";
 import { occlusionCardText } from "src/occlusion/occlusion-view";
 import { retrievability } from "src/stats/cards";
 import { StatsCard } from "src/stats/types";
@@ -47,6 +48,23 @@ const FRONT_PREVIEW_LENGTH = 140;
 /**
  * Everything known about one card: where it stands now, and every time it was answered.
  */
+/**
+ * A card's front as the one line card info shows. The card text is markdown; a preview reads better without its
+ * emphasis marks, and is cut. An image occlusion card's text is a block of data: it is shown as its question and the
+ * label of its mask. An image cloze card is shown as its text and its hints, in full: a hint cut short is no hint.
+ */
+export function cardInfoFrontText(front: string): string {
+    const cloze = imageClozeCardText(front);
+    if (cloze !== null) return cloze;
+    const text =
+        occlusionCardText(front) ??
+        front
+            .replace(/(\*\*|__|==|~~|`)/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+    return text.length > FRONT_PREVIEW_LENGTH ? text.slice(0, FRONT_PREVIEW_LENGTH) + "…" : text;
+}
+
 export class CardInfoModal extends Modal {
     private readonly plugin: FlashcardStudioPlugin;
     private readonly card: Card;
@@ -91,17 +109,8 @@ export class CardInfoModal extends Modal {
     }
 
     private renderFront(): void {
-        // The card text is markdown; a preview reads better without its emphasis marks. An image occlusion card's
-        // text is a block of data: it is shown as its question and the label of its mask
-        const text =
-            occlusionCardText(this.card.front) ??
-            this.card.front
-                .replace(/(\*\*|__|==|~~|`)/g, "")
-                .replace(/\s+/g, " ")
-                .trim();
-        if (text === "") return;
-        const preview =
-            text.length > FRONT_PREVIEW_LENGTH ? text.slice(0, FRONT_PREVIEW_LENGTH) + "…" : text;
+        const preview = cardInfoFrontText(this.card.front);
+        if (preview === "") return;
         this.contentEl.createDiv({ cls: "fs-card-info-front fs-card", text: preview });
     }
 

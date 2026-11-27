@@ -6,6 +6,7 @@ import { parse, parserOptionsFromSettings } from "src/cards/parse";
 import { CardType } from "src/data/data-structures/card/question";
 import type { StudioSettings } from "src/data/settings-model";
 import { t } from "src/lang/translate";
+import { scanImageClozeFences } from "src/occlusion/image-cloze-block";
 
 /*
  * The parts of "Generate cards with AI" that are plain text handling: the prompt, reading the model's reply, and
@@ -365,7 +366,9 @@ function readsBackAsCard(card: GeneratedCard, text: string, settings: StudioSett
     const multiline = text.includes("\n");
 
     if (card.kind === "cloze") {
-        if (cardType !== CardType.Cloze) return false;
+        // A generated card never holds an image cloze block: its masks would be read as part of the cloze
+        if (cardType !== CardType.Cloze || scanImageClozeFences(text.split("\n")).length > 0)
+            return false;
         const answers = Array.from(front.matchAll(CLOZE_MARKERS)).filter(
             (match) => match[1] !== "",
         );

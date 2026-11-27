@@ -11,8 +11,33 @@ import {
     TFile,
 } from "obsidian";
 
+import {
+    imageClozeNoteProblem,
+    readImageClozeQuestion,
+    resolveImageClozeContext,
+} from "src/cards/image-cloze-question";
 import { Question } from "src/data/data-structures/card/question";
+import { StudioSettings } from "src/data/settings-model";
 import { t } from "src/lang/translate";
+import { createClozeNote } from "src/math/math-cloze";
+import {
+    formatImageClozeBlock,
+    IMAGE_CLOZE_LANG,
+    ImageClozeBlock,
+    parseImageClozeBlock,
+    scanImageClozeFences,
+} from "src/occlusion/image-cloze-block";
+import {
+    imageClozeInsertion,
+    locateImageClozeBlock,
+    replaceImageClozeBlock,
+} from "src/occlusion/image-cloze-edit";
+import {
+    IMAGE_CLOZE_CARD_LANG,
+    parseImageClozeCardSpec,
+    renderImageClozeCard,
+    renderImageClozeNote,
+} from "src/occlusion/image-cloze-view";
 import { ImageSuggestModal, isImageFile, vaultImages } from "src/occlusion/image-suggest-modal";
 import {
     OCCLUSION_LANG,
@@ -89,10 +114,57 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
         });
     });
 
+    // An image cloze card in the study screen: `fs-image-cloze-card`, which the card's front and back hold
+    plugin.registerMarkdownCodeBlockProcessor(IMAGE_CLOZE_CARD_LANG, (source, el, ctx) => {
+        const spec = parseImageClozeCardSpec(source);
+        if (spec === null) {
+            el.addClass("fs-studio", "fs-occ");
+            el.createDiv({ cls: "fs-occ-missing", text: t("IMAGE_CLOZE_INVALID_CARD") });
+            return;
+        }
+        renderImageClozeCard(el, plugin.app, ctx.sourcePath, spec, ownerOf(el, ctx));
+    });
+
+    // An image cloze block in a note: the picture with each mask's card field and hint on it
+    plugin.registerMarkdownCodeBlockProcessor(IMAGE_CLOZE_LANG, (source, el, ctx) => {
+        const settings = plugin.dataManager.data.settings;
+        const section = ctx.getSectionInfo(el);
+        const problem =
+            section === null
+                ? null
+                : imageClozeNoteProblem(section.text, section.lineStart, settings);
+        const stage = renderImageClozeNote(
+            el,
+            plugin.app,
+            ctx.sourcePath,
+            source,
+            ownerOf(el, ctx),
+            problem === null ? undefined : t(problem),
+        );
+        const read = parseImageClozeBlock(source);
+        if (stage === null || read.ok === false) return;
+
+        const edit = stage.createEl("button", {
+            cls: "fs-occ-edit",
+            attr: { type: "button", "aria-label": t("OCCLUSION_EDIT") },
+        });
+        setIcon(edit, "pencil");
+        edit.addEventListener("click", (event) => {
+            event.stopPropagation();
+            editImageClozeBlock(plugin, read.block, el, ctx);
+        });
+    });
+
     plugin.addCommand({
         id: "fs-add-image-occlusion",
         name: t("OCCLUSION_ADD_COMMAND"),
         editorCallback: (editor, view) => addImageOcclusion(plugin, editor, view),
+    });
+    // A command of its own, so that Add image occlusion stays exactly what it was
+    plugin.addCommand({
+        id: "fs-add-image-cloze",
+        name: t("IMAGE_CLOZE_ADD_COMMAND"),
+        editorCallback: (editor, view) => addImageCloze(plugin, editor, view),
     });
     plugin.registerEvent(
         plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
@@ -103,6 +175,12 @@ export function registerOcclusion(plugin: FlashcardStudioPlugin): void {
                     .setTitle(t("OCCLUSION_ADD_COMMAND"))
                     .setIcon("image-plus")
                     .onClick(() => addImageOcclusion(plugin, editor, view)),
+            );
+            menu.addItem((item) =>
+                item
+                    .setTitle(t("IMAGE_CLOZE_ADD_COMMAND"))
+                    .setIcon("image-plus")
+                    .onClick(() => addImageCloze(plugin, editor, view)),
             );
         }),
     );
@@ -165,6 +243,105 @@ function editBlock(
 }
 
 /**
+ * Opens the editor on an image cloze block of a note; saving rewrites only that block's lines. Its schedule comment is
+ * not touched: its segments carry card numbers, so they stay with their cards whatever the masks do.
+ */
+function editImageClozeBlock(
+    plugin: FlashcardStudioPlugin,
+    block: ImageClozeBlock,
+    el: HTMLElement,
+    ctx: MarkdownPostProcessorContext,
+): void {
+    const app = plugin.app;
+    const section = ctx.getSectionInfo(el);
+    if (section === null) {
+        new Notice(t("OCCLUSION_BLOCK_NOT_FOUND"));
+        return;
+    }
+    // The text clozes beside the block share its card numbers: a new mask gets one they do not use
+    const context = resolveImageClozeContext(
+        section.text,
+        section.lineStart,
+        plugin.dataManager.data.settings,
+    );
+    const textCards =
+        context?.kind === "question" && context.read?.ok === true
+            ? context.read.question.textCards
+            : 0;
+
+    OcclusionEditorModal.forCloze(
+        app,
+        ctx.sourcePath,
+        block,
+        textCards,
+        async ({ block: edited }) => {
+            const file = app.vault.getFileByPath(ctx.sourcePath);
+            if (file === null) {
+                new Notice(t("OCCLUSION_BLOCK_NOT_FOUND"));
+                return false;
+            }
+            const outcome: { refused: "not-found" | "ambiguous" | null } = { refused: null };
+            await app.vault.process(file, (text) => {
+                // The note may have changed since the block was drawn: only the block that was opened is rewritten
+                const line = locateImageClozeBlock(text, section.lineStart, block);
+                if (typeof line !== "number") {
+                    outcome.refused = line;
+                    return text;
+                }
+                return replaceImageClozeBlock(text, line, edited);
+            });
+            if (outcome.refused === null) return true;
+            new Notice(
+                t(
+                    outcome.refused === "ambiguous"
+                        ? "OCCLUSION_BLOCK_AMBIGUOUS"
+                        : "OCCLUSION_BLOCK_NOT_FOUND",
+                ),
+            );
+            return false;
+        },
+    ).open();
+}
+
+/**
+ * The "Edit card" of the study screen, for an image cloze question (a block alone, or text clozes with a block): the
+ * editor on the block inside the question. The text around it is kept as it is. The masks and their card fields are
+ * locked: the question's cards are in the queue, and their numbers cannot change during a session. Resolves with the
+ * new text of the question; rejects when the editor is closed without saving.
+ */
+export function editImageClozeQuestion(
+    app: App,
+    question: Question,
+    settings: StudioSettings,
+): Promise<string> {
+    const text = question.questionText.actualQuestion;
+    const read = readImageClozeQuestion(text, settings);
+    const span = scanImageClozeFences(text.split("\n")).find((one) => one.leftEdge);
+
+    return new Promise<string>((resolve, reject) => {
+        if (read === null || read.ok === false || span === undefined) {
+            reject(new Error("The card's block cannot be read"));
+            return;
+        }
+        let saved: string | null = null;
+        OcclusionEditorModal.forCloze(
+            app,
+            question.note.filePath,
+            read.question.block,
+            read.question.textCards,
+            ({ block }) => {
+                saved = replaceImageClozeBlock(text, span.open, block);
+            },
+            {
+                lockMasks: true,
+                onClosed: () =>
+                    saved === null ? reject(new Error(t("NO_INPUT"))) : resolve(saved),
+            },
+        ).open();
+    });
+}
+
+/**
  * The "Edit card" of the study screen, for an occlusion card: the occlusion editor on the card's block. It resolves
  * with the new text of the question, which the review session writes to the note and puts on the cards. The masks
  * are locked, because the cards of the block are in the queue and their number and order cannot change during a
@@ -220,6 +397,40 @@ function insertBlock(editor: Editor, block: OcclusionBlock): void {
     else editor.replaceRange("\n\n" + text, { line, ch: current.length });
 }
 
+/** How many cards the text clozes of the cursor's paragraph make: a new block there shares their numbers. */
+function textCardsAtCursor(editor: Editor, settings: StudioSettings): number {
+    const lines = editor.getValue().split("\n");
+    let first = editor.getCursor().line;
+    let last = first;
+    const blank = (at: number) => (lines[at] ?? "").trim() === "";
+    if (blank(first)) return 0;
+    while (first > 0 && !blank(first - 1)) first--;
+    while (last + 1 < lines.length && !blank(last + 1)) last++;
+    const paragraph = lines.slice(first, last + 1).join("\n");
+    const made = createClozeNote(paragraph, settings.clozePatterns, settings.latexClozes === true, {
+        asking: () => "",
+        showingAnswer: () => "",
+        hiding: () => "",
+    });
+    return made.note?.numCards ?? 0;
+}
+
+/** Puts a new image cloze block into the note: under the cursor's cloze paragraph, or on lines of its own. */
+function insertImageClozeBlock(
+    editor: Editor,
+    block: ImageClozeBlock,
+    settings: StudioSettings,
+): void {
+    const fenced = "```" + IMAGE_CLOZE_LANG + "\n" + formatImageClozeBlock(block) + "\n```";
+    if (editor.somethingSelected()) {
+        editor.replaceSelection(fenced + "\n");
+        return;
+    }
+    const lines = editor.getValue().split("\n");
+    const { line, text } = imageClozeInsertion(lines, editor.getCursor().line, fenced, settings);
+    editor.replaceRange(text, { line, ch: lines[line].length });
+}
+
 /** The command: choose an image (or use the one the cursor is on), draw the masks, insert the block. */
 function addImageOcclusion(
     plugin: FlashcardStudioPlugin,
@@ -239,7 +450,17 @@ function addImageOcclusion(
             ({ block }) => insertBlock(editor, block),
         ).open();
     };
+    chooseImage(plugin, editor, sourcePath, edit);
+}
 
+/** The image of a new block: the one the cursor is on, or one picked from the vault. */
+function chooseImage(
+    plugin: FlashcardStudioPlugin,
+    editor: Editor,
+    sourcePath: string,
+    edit: (file: TFile) => void,
+): void {
+    const app = plugin.app;
     const embedded = imageOnCursorLine(editor, plugin, sourcePath);
     if (embedded !== null) {
         edit(embedded);
@@ -248,4 +469,27 @@ function addImageOcclusion(
     } else {
         new ImageSuggestModal(app, edit).open();
     }
+}
+
+/** The command for cloze cards: choose an image, draw masks with card numbers and hints, insert an image cloze block. */
+function addImageCloze(
+    plugin: FlashcardStudioPlugin,
+    editor: Editor,
+    view: MarkdownView | MarkdownFileInfo,
+): void {
+    const app = plugin.app;
+    const sourcePath = view.file?.path ?? "";
+    const settings = plugin.dataManager.data.settings;
+
+    const edit = (file: TFile) => {
+        const image = app.fileManager.generateMarkdownLink(file, sourcePath).replace(/^!/, "");
+        OcclusionEditorModal.forCloze(
+            app,
+            sourcePath,
+            { image, mode: "hide-all", question: "", masks: [] },
+            textCardsAtCursor(editor, settings),
+            ({ block }) => insertImageClozeBlock(editor, block, settings),
+        ).open();
+    };
+    chooseImage(plugin, editor, sourcePath, edit);
 }

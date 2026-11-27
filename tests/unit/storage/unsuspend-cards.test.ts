@@ -16,7 +16,7 @@ describe("unsuspendCards", () => {
             "#syntax\n\n+++\nQ1\n?\nA1\n<!--SR:!2000-01-01,1,250,id=aaaaaa,susp-->\n\nmore text\n<!--SR:!2026-12-01,3,250,id=bbbbbb,susp-->\n+++\n";
         const { vault, note } = await load(input, settings);
 
-        const result = await unsuspendCards([note.questionList[0].cards[0]]);
+        const result = await unsuspendCards([note.questionList[0].cards[0]], settings);
 
         expect(result).toEqual({ done: 1, failed: 0 });
         expect(vault.texts.get("N.md")).toBe(
@@ -32,7 +32,7 @@ describe("unsuspendCards", () => {
         const { vault, note } = await load(input, settings);
         const edits = jest.spyOn(note.questionList[0].note.file, "edit");
 
-        const result = await unsuspendCards(note.questionList[0].cards);
+        const result = await unsuspendCards(note.questionList[0].cards, settings);
 
         expect(result).toEqual({ done: 2, failed: 0 });
         expect(edits).toHaveBeenCalledTimes(1);
@@ -59,10 +59,10 @@ describe("unsuspendCards", () => {
         );
         const error = jest.spyOn(console, "error").mockImplementation(() => undefined);
 
-        const result = await unsuspendCards([
-            first.note.questionList[0].cards[0],
-            second.note.questionList[0].cards[0],
-        ]);
+        const result = await unsuspendCards(
+            [first.note.questionList[0].cards[0], second.note.questionList[0].cards[0]],
+            settings,
+        );
 
         expect(result).toEqual({ done: 1, failed: 1 });
         expect(first.vault.texts.get("A.md")).toContain(",susp");

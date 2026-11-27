@@ -1,4 +1,5 @@
 import { CardFrontBackUtil } from "src/cards/expand";
+import { hasImageClozeBlock } from "src/cards/image-cloze-question";
 import { Card } from "src/data/data-structures/card/flashcard";
 import { CardType, Question } from "src/data/data-structures/card/question";
 import { Deck } from "src/data/decks/deck";
@@ -130,6 +131,14 @@ export async function collectExportNotes(root: Deck, settings: StudioSettings): 
             const text = question.questionText.actualQuestion;
             // One question is one note, except an occlusion block, which is one note for each mask
             const sides: { kind: ExportKind; front: string; back: string }[] = [];
+            // An image cloze has no Anki form yet, and the picture without its masks would give the answers away
+            if (
+                type === CardType.ImageCloze ||
+                (type === CardType.Cloze && hasImageClozeBlock(text))
+            ) {
+                collected.skipped++;
+                continue;
+            }
             if (type === CardType.Cloze) {
                 const converted = convertClozesToAnki(text, settings.clozePatterns);
                 if (converted === null) {
